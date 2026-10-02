@@ -11,6 +11,7 @@ import (
 
 func FuzzFormatPolicies(f *testing.F) {
 	rt := testRuntime(f)
+	d := loadJoy(f)
 	f.Add(`permit(principal,action,resource);`, uint8(80), int8(2))
 	f.Add("// comment\n@id(\"é\") permit(principal==?principal,action,resource);", uint8(20), int8(0))
 	f.Add(`permit(principal,action,resource)when{context.x like "*"};`, uint8(0), int8(-2))
@@ -32,9 +33,32 @@ func FuzzFormatPolicies(f *testing.F) {
 			}
 			return
 		}
+		// Re-formatting proves the output re-parses and is a fixed point.
 		again, err := rt.FormatPolicies(ctx, out, opts...)
 		if err != nil || again != out {
 			t.Fatalf("not idempotent: first %q, second %q, %v", out, again, err)
+		}
+		// Formatting is semantics-preserving: the fixed request must decide
+		// identically against the original and the formatted source.
+		authorize := func(source string) (cedar.Response, error) {
+			a, err := rt.NewAuthorizer(ctx, cedar.Config{Policies: cedar.PoliciesFromCedar(source), Entities: d.entities, Limits: fuzzLimits})
+			if err != nil {
+				checkNoFault(t, err)
+				return cedar.Response{Decision: cedar.Deny}, err
+			}
+			resp, err := a.Authorize(ctx, joyRequest())
+			a.Close()
+			checkNoFault(t, err)
+			if err != nil && resp.Decision != cedar.Deny {
+				t.Fatalf("error %v came with %v", err, resp.Decision)
+			}
+			return resp, err
+		}
+		before, beforeErr := authorize(text)
+		after, afterErr := authorize(out)
+		if (beforeErr == nil) != (afterErr == nil) || before.Decision != after.Decision {
+			t.Fatalf("formatting changed authorization: %v/%v became %v/%v",
+				before.Decision, beforeErr, after.Decision, afterErr)
 		}
 	})
 }

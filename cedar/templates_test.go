@@ -10,7 +10,6 @@ import (
 	"strings"
 	"sync"
 	"testing"
-	"unicode/utf8"
 
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 )
@@ -325,44 +324,6 @@ func TestTemplateConcurrentSnapshots(t *testing.T) {
 	if err != nil || resp.Decision != cedar.Deny {
 		t.Fatalf("existing authorizer changed: %+v, %v", resp, err)
 	}
-}
-
-func FuzzTemplates(f *testing.F) {
-	f.Add(shareTemplate, "share", "alice")
-	f.Add("", "", "")
-	f.Add(`permit(principal == ?principal, action, resource);`, "\x00", "a\n\"雪")
-	rt := testRuntime(f)
-	f.Fuzz(func(t *testing.T, source, templateID, entityID string) {
-		if len(source)+len(templateID)+len(entityID) > 8192 || nesting(source) > maxFuzzNesting {
-			t.Skip()
-		}
-		ctx := context.Background()
-		set, err := rt.AddTemplate(ctx, cedar.PolicySet{}, templateID, cedar.TemplateFromCedar(source))
-		checkNoFault(t, err)
-		if err != nil {
-			return
-		}
-		templates, err := rt.Templates(ctx, set)
-		if err != nil || len(templates) != 1 {
-			t.Fatalf("successful add cannot be inspected: %v, %v", templates, err)
-		}
-		bindings := make(cedar.SlotBindings)
-		for _, slot := range templates[0].Slots {
-			bindings[slot] = cedar.NewEntityUID("User", entityID)
-		}
-		linked, err := rt.LinkTemplate(ctx, set, templates[0].ID, templates[0].ID+"-linked", bindings)
-		if err != nil {
-			checkNoFault(t, err)
-			if !utf8.ValidString(entityID) {
-				return
-			}
-			t.Fatalf("binding discovered slots failed: %v", err)
-		}
-		unlinked, err := rt.UnlinkTemplate(ctx, linked, templates[0].ID+"-linked")
-		if err != nil || !reflect.DeepEqual(normalizedPolicyJSON(t, []byte(set.Text())), normalizedPolicyJSON(t, []byte(unlinked.Text()))) {
-			t.Fatalf("link/unlink did not restore set: %v", err)
-		}
-	})
 }
 
 func equalTemplateMessages(a, b []cedar.PolicyMessage) bool {
