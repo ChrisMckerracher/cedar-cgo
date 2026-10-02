@@ -1,0 +1,140 @@
+diff -ruN a/Cargo.toml b/Cargo.toml
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -137,12 +137,18 @@
+ version = "1.52"
+ features = [
+     "io-util",
+-    "process",
+     "sync",
+     "time",
+     "rt",
+ ]
+ 
++# NOTICE: cedar-go-wasm modified this manifest on 2026-10-01. tokio's
++# `process` feature does not build for wasm targets, so it applies only to
++# other targets.
++[target.'cfg(not(target_family = "wasm"))'.dependencies.tokio]
++version = "1.52"
++features = ["process"]
++
+ [dev-dependencies.cool_asserts]
+ version = "2.0"
+ 
+diff -ruN a/src/lib.rs b/src/lib.rs
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -14,6 +14,10 @@
+  * limitations under the License.
+  */
+ 
++// NOTICE: cedar-go-wasm modified this file on 2026-10-01. It removes
++// `LocalSolver` and the solver pool from wasm targets, because tokio's
++// `process` feature does not build there. No other code changed.
++
+ #![warn(missing_docs)]
+ #![doc = include_str!("../README.md")]
+ 
+@@ -41,6 +45,7 @@
+ pub use symcc::factory as term_factory;
+ pub use symcc::op;
+ pub use symcc::solver;
++#[cfg(not(target_family = "wasm"))]
+ pub use symcc::solver_pool;
+ pub use symcc::term;
+ pub use symcc::term_type;
+diff -ruN a/src/symcc/solver.rs b/src/symcc/solver.rs
+--- a/src/symcc/solver.rs
++++ b/src/symcc/solver.rs
+@@ -14,6 +14,10 @@
+  * limitations under the License.
+  */
+ 
++// NOTICE: cedar-go-wasm modified this file on 2026-10-01. It removes
++// `LocalSolver` and the solver pool from wasm targets, because tokio's
++// `process` feature does not build there. No other code changed.
++
+ //! A simple interface to an SMT solver.
+ //!
+ //! Callers communicate with the solver by issuing commands with s-expressions
+@@ -33,11 +37,16 @@
+ 
+ use super::smtlib_script::SmtLibScript;
+ use miette::Diagnostic;
++#[cfg(not(target_family = "wasm"))]
+ use std::ffi::OsStr;
+ use std::future::Future;
++#[cfg(not(target_family = "wasm"))]
+ use std::process::Stdio;
+ use thiserror::Error;
+-use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader, BufWriter};
++use tokio::io::AsyncWriteExt;
++#[cfg(not(target_family = "wasm"))]
++use tokio::io::{AsyncBufReadExt, BufReader, BufWriter};
++#[cfg(not(target_family = "wasm"))]
+ use tokio::process::{Child, ChildStderr, ChildStdin, ChildStdout, Command};
+ 
+ /// Satisfiability decision from the SMT solver.
+@@ -184,6 +193,7 @@
+ /// // Spawns a custom solver process
+ /// let solver = LocalSolver::from_command(Command::new("z3").args(["rlimit", "1000"])).unwrap();
+ /// ```
++#[cfg(not(target_family = "wasm"))]
+ #[derive(Debug)]
+ pub struct LocalSolver {
+     /// The spawned solver process.
+@@ -197,6 +207,7 @@
+     solver_stderr: BufReader<ChildStderr>,
+ }
+ 
++#[cfg(not(target_family = "wasm"))]
+ impl LocalSolver {
+     /// Creates a new [`LocalSolver`] from a custom [`Command`].
+     ///
+@@ -240,6 +251,7 @@
+     }
+ }
+ 
++#[cfg(not(target_family = "wasm"))]
+ impl Solver for LocalSolver {
+     fn smtlib_input(&mut self) -> &mut (dyn tokio::io::AsyncWrite + Unpin + Send) {
+         &mut self.solver_stdin
+@@ -303,6 +315,7 @@
+     }
+ }
+ 
++#[cfg(not(target_family = "wasm"))]
+ impl LocalSolver {
+     async fn check_child_process_status(&mut self) -> Result<()> {
+         if let Some(status) = self.child.try_wait()? {
+@@ -388,7 +401,7 @@
+     }
+ }
+ 
+-#[cfg(test)]
++#[cfg(all(test, not(target_family = "wasm")))]
+ mod test {
+     use cool_asserts::assert_matches;
+ 
+diff -ruN a/src/symcc.rs b/src/symcc.rs
+--- a/src/symcc.rs
++++ b/src/symcc.rs
+@@ -14,6 +14,10 @@
+  * limitations under the License.
+  */
+ 
++// NOTICE: cedar-go-wasm modified this file on 2026-10-01. It removes
++// `LocalSolver` and the solver pool from wasm targets, because tokio's
++// `process` feature does not build there. No other code changed.
++
+ //! This module is as straightforward a translation as possible of
+ //! <https://github.com/cedar-policy/cedar-spec/blob/main/cedar-lean/Cedar/SymCC.lean>.
+ 
+@@ -37,6 +41,7 @@
+ mod result;
+ mod smtlib_script;
+ pub mod solver;
++#[cfg(not(target_family = "wasm"))]
+ pub mod solver_pool;
+ mod symbolizer;
+ mod tags;

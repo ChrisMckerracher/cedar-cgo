@@ -1,0 +1,20 @@
+[package]
+name = "cgw-analysis"
+description = "Cedar change analysis (SymCC) for the cedar-go-wasm Go host"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+cedar-policy.workspace = true
+cedar-policy-core.workspace = true
+cedar-policy-symcc.workspace = true
+cgw-abi.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true

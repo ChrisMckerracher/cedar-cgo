@@ -1,0 +1,17 @@
+[package]
+name = "cgw-authorizer"
+description = "Cedar authorization and strict validation for the cedar-go-wasm Go host"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+cedar-policy.workspace = true
+cgw-abi.workspace = true
+serde.workspace = true
+serde_json.workspace = true

@@ -1,0 +1,35 @@
+[workspace]
+resolver = "3"
+members = ["crates/abi", "crates/authorizer", "crates/analysis", "crates/native-bench"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "Apache-2.0"
+repository = "https://github.com/ChrisMckerracher/cedar-go-wasm"
+publish = false
+
+[workspace.dependencies]
+# One release of this repository tracks one Cedar release. Bump these together.
+cedar-policy = { version = "=4.13.0", default-features = false, features = ["ipaddr", "decimal", "datetime"] }
+cedar-policy-core = { version = "=4.13.0", default-features = false }
+cedar-policy-symcc = { version = "=0.7.0" }
+miette = "7.6"
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["raw_value"] }
+tokio = { version = "1", default-features = false, features = ["rt"] }
+cgw-abi = { path = "crates/abi" }
+
+[patch.crates-io]
+# cedar-policy-symcc 0.7.0 with LocalSolver gated off wasm targets.
+# See rust/patches/cedar-policy-symcc-0.7.0-wasm.patch and scripts/vendor-symcc.sh.
+cedar-policy-symcc = { path = "vendor/cedar-policy-symcc-0.7.0" }
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = "symbols"
+debug = false
+incremental = false
