@@ -679,5 +679,132 @@
         }
       ]
     }
+  },
+  {
+    "name": "raw_policy_ids_undecided",
+    "result": {
+      "decision": "undecided",
+      "reasons": [],
+      "residuals": [
+        {
+          "policy_id": "error\"\n\\\u0000",
+          "effect": "permit",
+          "state": "error",
+          "cedar": "permit(principal, action, resource) when { error() };"
+        },
+        {
+          "policy_id": "forbid\"\n\\\u0000",
+          "effect": "forbid",
+          "state": "residual",
+          "cedar": "forbid(principal, action, resource) when { !context.mfa };"
+        },
+        {
+          "policy_id": "permit\"\n\\\u0000",
+          "effect": "permit",
+          "state": "true",
+          "cedar": "permit(principal, action, resource) when { true };"
+        }
+      ],
+      "completions": [
+        {
+          "decision": "allow",
+          "reasons": [
+            "permit\"\n\\\u0000"
+          ],
+          "error_policies": [
+            "error\"\n\\\u0000"
+          ]
+        },
+        {
+          "decision": "deny",
+          "reasons": [
+            "forbid\"\n\\\u0000"
+          ],
+          "error_policies": [
+            "error\"\n\\\u0000"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "raw_policy_ids_allow",
+    "result": {
+      "decision": "allow",
+      "reasons": [
+        "permit\"\n\\\u0000"
+      ],
+      "residuals": [
+        {
+          "policy_id": "error\"\n\\\u0000",
+          "effect": "permit",
+          "state": "error",
+          "cedar": "permit(principal, action, resource) when { error() };"
+        },
+        {
+          "policy_id": "forbid\"\n\\\u0000",
+          "effect": "forbid",
+          "state": "false",
+          "cedar": "forbid(principal, action, resource) when { false };"
+        },
+        {
+          "policy_id": "permit\"\n\\\u0000",
+          "effect": "permit",
+          "state": "true",
+          "cedar": "permit(principal, action, resource) when { true };"
+        }
+      ],
+      "completions": [
+        {
+          "decision": "allow",
+          "reasons": [
+            "permit\"\n\\\u0000"
+          ],
+          "error_policies": [
+            "error\"\n\\\u0000"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "raw_policy_ids_deny",
+    "result": {
+      "decision": "deny",
+      "reasons": [
+        "forbid\"\n\\\u0000"
+      ],
+      "residuals": [
+        {
+          "policy_id": "error\"\n\\\u0000",
+          "effect": "permit",
+          "state": "error",
+          "cedar": "permit(principal, action, resource) when { error() };"
+        },
+        {
+          "policy_id": "forbid\"\n\\\u0000",
+          "effect": "forbid",
+          "state": "true",
+          "cedar": "forbid(principal, action, resource) when { true };"
+        },
+        {
+          "policy_id": "permit\"\n\\\u0000",
+          "effect": "permit",
+          "state": "true",
+          "cedar": "permit(principal, action, resource) when { true };"
+        }
+      ],
+      "completions": [
+        {
+          "decision": "deny",
+          "reasons": [
+            "forbid\"\n\\\u0000"
+          ],
+          "error_policies": [
+            "error\"\n\\\u0000"
+          ]
+        }
+      ]
+    }
   }
 ]

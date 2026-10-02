@@ -55,7 +55,9 @@ retains its policy ID and effect, has a `ResidualState`, and includes Cedar's
 display text. `Reasons` contains the known determining policy IDs in sorted
 order; it is empty for an undecided response. Evaluation errors are represented
 by `ResidualError` entries; Cedar skips those policies. Parsing, validation,
-and consistency errors are returned as Go errors.
+and consistency errors are returned as Go errors. Residual IDs, reasons, and
+evaluation-error IDs preserve the original policy IDs exactly, including
+control characters; rendered Cedar and diagnostic text may escape them.
 
 Use `PartialResponse.Reauthorize(ctx, concreteRequest)` to supply the remaining
 data. Rust checks the concrete request and entities against the schema and

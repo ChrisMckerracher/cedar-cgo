@@ -187,6 +187,10 @@ Conflicting definitions of the same UID are errors.
 | `Reasons` | Sorted IDs of policies that determined the decision |
 | `Errors` | Evaluation diagnostics, sorted by policy ID |
 
+Policy IDs in reasons and diagnostics preserve the original identity, including
+quotes, newlines, backslashes, and NUL. Diagnostic message text uses Cedar's
+human-readable rendering.
+
 Always handle the returned Go error. On any Go error, the response denies.
 `Response.Errors` is different: Cedar skips policies whose evaluation fails
 and computes a decision from the remaining policies, which can still allow.

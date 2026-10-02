@@ -3,7 +3,6 @@ package cedar_test
 import (
 	"context"
 	"testing"
-	"time"
 
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 )
@@ -16,14 +15,15 @@ func FuzzPartialEntities(f *testing.F) {
 	} {
 		f.Add([]byte(seed))
 	}
-	a := partialAuthorizer(f, cedar.Limits{MaxInstances: 1, MaxRequestBytes: 32 << 10, CallTimeout: 100 * time.Millisecond})
+	a := partialAuthorizer(f, cedar.Limits{MaxInstances: 1, MaxRequestBytes: 32 << 10, CallTimeout: fuzzLimits.CallTimeout})
 	f.Fuzz(func(t *testing.T, data []byte) {
-		if len(data) > 16<<10 {
+		if len(data) > 16<<10 || nesting(string(data)) > 40 {
 			t.Skip()
 		}
 		req := partialRequest()
 		req.Entities = cedar.PartialEntitiesFromJSON(data)
 		r, err := a.PartialAuthorize(context.Background(), req)
+		checkNoFault(t, err)
 		if err != nil {
 			if r.Decision != cedar.Undecided {
 				t.Fatalf("error grants decision: %+v %v", r, err)

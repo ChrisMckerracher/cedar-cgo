@@ -2,7 +2,7 @@
 
 use cedar_policy::{
     Authorizer, Context, Decision, Entities, EntityId, EntityUid, PartialEntities,
-    PartialEntityUid, PartialRequest, PolicySet, Request, Schema,
+    PartialEntityUid, PartialRequest, Policy, PolicyId, PolicySet, Request, Schema,
 };
 use serde_json::{Value, json};
 use std::{error::Error, io::Read};
@@ -24,14 +24,16 @@ fn response_json(response: &cedar_policy::Response) -> Value {
     let mut reasons: Vec<_> = response
         .diagnostics()
         .reason()
-        .map(ToString::to_string)
+        .map(|id| AsRef::<str>::as_ref(id).to_owned())
         .collect();
     reasons.sort();
     let mut errors: Vec<_> = response
         .diagnostics()
         .errors()
         .map(|e| match e {
-            cedar_policy::AuthorizationError::PolicyEvaluationError(e) => e.policy_id().to_string(),
+            cedar_policy::AuthorizationError::PolicyEvaluationError(e) => {
+                AsRef::<str>::as_ref(e.policy_id()).to_owned()
+            }
         })
         .collect();
     errors.sort();
@@ -62,7 +64,16 @@ fn completion(v: &Value, schema: &Schema, loaded: &Entities) -> Result<(Request,
 }
 
 fn case(v: &Value, schema: &Schema) -> Result<Value> {
-    let policies: PolicySet = v["policies"].as_str().ok_or("missing policies")?.parse()?;
+    let named = v["policies_json"]["staticPolicies"].as_object();
+    let policies = if let Some(named) = named {
+        let mut policies = PolicySet::new();
+        for (id, policy) in named {
+            policies.add(Policy::from_json(Some(PolicyId::new(id)), policy.clone())?)?;
+        }
+        policies
+    } else {
+        v["policies"].as_str().ok_or("missing policies")?.parse()?
+    };
     let loaded = Entities::from_json_value(v["loaded"].clone(), Some(schema))?;
     let p = &v["partial"];
     let mut json_entities = v["loaded"].as_array().ok_or("loaded array")?.clone();
@@ -114,7 +125,7 @@ fn case(v: &Value, schema: &Schema) -> Result<Value> {
         .reason()
         .into_iter()
         .flatten()
-        .map(ToString::to_string)
+        .map(|id| AsRef::<str>::as_ref(id).to_owned())
         .collect();
     reasons.sort();
     let mut residuals: Vec<_> = response.policies().map(|policy| {
@@ -123,7 +134,7 @@ fn case(v: &Value, schema: &Schema) -> Result<Value> {
             else if response.false_permits().chain(response.false_forbids()).any(|p| p == id) { "false" }
             else if response.error_permits().chain(response.error_forbids()).any(|p| p == id) { "error" }
             else { "residual" };
-        json!({"policy_id":id.to_string(), "effect":policy.effect().to_string(), "state":state, "cedar":policy.to_string()})
+        json!({"policy_id":AsRef::<str>::as_ref(id).to_owned(), "effect":policy.effect().to_string(), "state":state, "cedar":policy.to_string()})
     }).collect();
     residuals.sort_by(|a, b| a["policy_id"].as_str().cmp(&b["policy_id"].as_str()));
     let mut completions = Vec::new();
@@ -144,9 +155,37 @@ fn case(v: &Value, schema: &Schema) -> Result<Value> {
             Err(_) => json!({"error_stage":"request"}),
         });
     }
-    Ok(
-        json!({"decision":response.decision().map(decision).unwrap_or("undecided"), "reasons":reasons, "residuals":residuals, "completions":completions}),
-    )
+    let output = json!({"decision":response.decision().map(decision).unwrap_or("undecided"), "reasons":reasons, "residuals":residuals, "completions":completions});
+    if let Some(named) = named {
+        // Anchor the oracle to input keys so two escaped Display projections cannot agree unnoticed.
+        let mut expected: Vec<_> = named.keys().map(String::as_str).collect();
+        expected.sort_unstable();
+        let actual: Vec<_> = output["residuals"]
+            .as_array()
+            .ok_or("residuals")?
+            .iter()
+            .map(|p| p["policy_id"].as_str().expect("policy id string"))
+            .collect();
+        assert_eq!(
+            actual, expected,
+            "native residual identities must match input keys"
+        );
+        for response in
+            std::iter::once(&output).chain(output["completions"].as_array().ok_or("completions")?)
+        {
+            for field in ["reasons", "error_policies"] {
+                if let Some(ids) = response[field].as_array() {
+                    for id in ids {
+                        assert!(
+                            named.contains_key(id.as_str().expect("policy id string")),
+                            "native {field} ID {id:?} is not an original input key"
+                        );
+                    }
+                }
+            }
+        }
+    }
+    Ok(output)
 }
 
 fn main() -> Result<()> {

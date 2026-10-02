@@ -56,6 +56,7 @@ func TestPartialNativeFixtures(t *testing.T) {
 		Schema string
 		Cases  []struct {
 			Name, Policies string
+			PoliciesJSON   json.RawMessage `json:"policies_json"`
 			Loaded         json.RawMessage
 			Partial        partialFixtureRequest
 			Completions    []partialFixtureRequest
@@ -82,8 +83,12 @@ func TestPartialNativeFixtures(t *testing.T) {
 			if want.Name != tc.Name {
 				t.Fatal("fixture order mismatch")
 			}
+			policies := cedar.PoliciesFromCedar(tc.Policies)
+			if tc.PoliciesJSON != nil {
+				policies = cedar.PoliciesFromJSON(tc.PoliciesJSON)
+			}
 			a, err := testRuntime(t).NewAuthorizer(ctx, cedar.Config{
-				Schema: &schema, Policies: cedar.PoliciesFromCedar(tc.Policies), Entities: cedar.EntitiesFromJSON(tc.Loaded),
+				Schema: &schema, Policies: policies, Entities: cedar.EntitiesFromJSON(tc.Loaded),
 			})
 			if err != nil {
 				t.Fatal(err)

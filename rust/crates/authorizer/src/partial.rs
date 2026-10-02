@@ -118,7 +118,7 @@ pub(crate) fn summarize(response: &TpeResponse<'_>) -> PartialOutput {
     let mut residuals: Vec<_> = response
         .policies()
         .map(|p| ResidualOutput {
-            policy_id: p.id().to_string(),
+            policy_id: AsRef::<str>::as_ref(p.id()).to_owned(),
             effect: match p.effect() {
                 Effect::Permit => "permit",
                 Effect::Forbid => "forbid",
@@ -140,7 +140,7 @@ pub(crate) fn summarize(response: &TpeResponse<'_>) -> PartialOutput {
         .reason()
         .into_iter()
         .flatten()
-        .map(ToString::to_string)
+        .map(|id| AsRef::<str>::as_ref(id).to_owned())
         .collect();
     reasons.sort_unstable();
     PartialOutput {
@@ -230,7 +230,7 @@ fn reauthorize(bytes: &[u8]) -> Result<AuthorizeOutput, OpError> {
         let mut reasons: Vec<_> = result
             .diagnostics()
             .reason()
-            .map(ToString::to_string)
+            .map(|id| AsRef::<str>::as_ref(id).to_owned())
             .collect();
         reasons.sort_unstable();
         let mut errors: Vec<_> = result
@@ -238,7 +238,7 @@ fn reauthorize(bytes: &[u8]) -> Result<AuthorizeOutput, OpError> {
             .errors()
             .map(|e| match e {
                 cedar_policy::AuthorizationError::PolicyEvaluationError(pe) => PolicyMessage {
-                    policy_id: pe.policy_id().to_string(),
+                    policy_id: AsRef::<str>::as_ref(pe.policy_id()).to_owned(),
                     message: cgw_abi::diagnostics::render(pe.inner()),
                 },
             })
