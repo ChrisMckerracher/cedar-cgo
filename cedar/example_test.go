@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm"
+	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 )
 
 const photoSchema = `

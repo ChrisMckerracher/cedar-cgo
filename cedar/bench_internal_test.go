@@ -13,7 +13,7 @@ import (
 // one loaded instance of the joy authorizer holds.
 func BenchmarkInstanceMemory(b *testing.B) {
 	read := func(name string) string {
-		data, err := os.ReadFile("testdata/joy/" + name)
+		data, err := os.ReadFile("../testdata/joy/" + name)
 		if err != nil {
 			b.Fatal(err)
 		}

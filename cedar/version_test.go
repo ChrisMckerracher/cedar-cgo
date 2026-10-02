@@ -4,11 +4,11 @@ import (
 	"regexp"
 	"testing"
 
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm"
+	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 )
 
 func TestVersionsMatchCargoLock(t *testing.T) {
-	lock := string(readFile(t, "rust/Cargo.lock"))
+	lock := string(readFile(t, "../rust/Cargo.lock"))
 	for crate, want := range map[string]string{
 		"cedar-policy":       cedar.CedarVersion,
 		"cedar-policy-core":  cedar.CedarVersion,

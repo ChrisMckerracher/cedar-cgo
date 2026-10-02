@@ -1,109 +1,147 @@
 # Contributing
 
 Report bugs and propose changes through GitHub issues and pull requests.
-Report vulnerabilities privately, as [SECURITY.md](SECURITY.md) describes.
+Report vulnerabilities privately as described in [SECURITY.md](SECURITY.md).
 
-## Layout
+## Contents
 
-| Path | Contents |
-|---|---|
-| `*.go` | Package `cedar`: the runtime, the authorizer, validation and the Go types |
-| `analysis/` | Package `analysis`: change analysis with SymCC and an external solver |
-| `internal/wasmhost/` | wazero setup: hash check, import allowlist, instances, calls |
-| `internal/modules/` | The embedded modules and their SHA-256 constants, written by `scripts/build-wasm.sh` |
-| `rust/crates/abi/` | Memory exchange shared by both modules |
-| `rust/crates/authorizer/` | The authorization module: load, authorize, validate |
-| `rust/crates/analysis/` | The analysis module: SymCC over host solver calls |
-| `rust/crates/native-bench/` | Native timing baseline; not part of any module |
-| `rust/vendor/`, `rust/patches/` | cedar-policy-symcc 0.7.0 and the patch that makes it build for wasm |
-| `testdata/joy/` | A 45-policy schema and policy set used by tests and benchmarks |
+- [Repository layout](#repository-layout)
+- [Tests](#tests)
+- [Guest changes](#guest-changes)
+- [Documentation changes](#documentation-changes)
+- [Dependencies and releases](#dependencies-and-releases)
+
+## Repository layout
+
+```text
+cedar/                 Public authorization and validation package
+analysis/              Public policy-comparison package and solver adapter
+internal/
+  wasmhost/            Shared module compilation, instances, and faults
+  wire/                Shared JSON source, UID, and error envelopes
+  capbuf/              Bounded diagnostic output
+  modules/             Embedded Wasm artifacts and generated hashes
+  verification/        Source-linked SMT proof of ABI arithmetic
+rust/
+  crates/
+    abi/               Guest memory exchange and source parsing
+    authorizer/        Guest load, authorize, and validate operations
+    analysis/          SymCC guest and solver protocol
+    native-bench/      Native authorization benchmark
+  patches/             Wasm target patch for SymCC
+  vendor/              Pinned SymCC source
+testdata/joy/          Shared policy, schema, and entity fixtures
+docs/                  API, analysis, security, verification, performance, maintenance
+scripts/               Rebuild, vendoring, and license-generation scripts
+.github/               CI, releases, and dependency-update configuration
+```
+
+Tests and benchmarks live beside the package they exercise. The repository
+root contains project metadata; Go users import `/cedar` or `/analysis`.
+
+Within `cedar`, `runtime.go` manages module compilation, `config.go` defines
+authorizer settings, `pool.go` handles instance lifetime, `authorizer.go`
+coordinates calls, `protocol.go` decodes authorization results, and
+`validation.go` runs strict validation. Sources, entities, values, contexts,
+and errors each have a focused file.
+
+Within `analysis`, `analyzer.go` coordinates comparisons, `options.go`
+defines budgets, `host.go` implements the guest's solver imports,
+`solver.go` manages native processes, and `report.go` decodes results.
+The shared `wasmhost` package separates module setup, instance calls, and
+fault reporting.
+
+Keep Cedar decisions inside the Rust engine. Changes to transport,
+pooling, or resource handling belong at the corresponding Go seam.
 
 ## Tests
 
-You need Go 1.26 or later.
+Use Go 1.26 or later. The committed guest modules let Go tests run without
+rebuilding Rust:
 
 ```bash
 go vet ./...
 go test ./...
 ```
 
-The corpus conformance test runs when `CEDAR_CORPUS_DIR` names an extracted
-corpus. Use the commit and checksum that `.github/workflows/ci.yml` pins:
+The conformance test requires `CEDAR_CORPUS_DIR`. The corpus commit and
+checksum must match the pins in both workflows:
 
 ```bash
 commit=1999ea249229e26cabb398a279fea721854a471d
 curl -sSfL -o corpus.tar.gz "https://raw.githubusercontent.com/cedar-policy/cedar-integration-tests/$commit/corpus-tests.tar.gz"
 echo "65476adf952c0574d6bf9b317d67d30c9ac462eb1dbf5e4c7b2a35856baf5205  corpus.tar.gz" | sha256sum --check
-mkdir corpus && tar xzf corpus.tar.gz -C corpus
-CEDAR_CORPUS_DIR="$PWD/corpus" go test -run '^TestCorpus$' -v .
+mkdir -p corpus
+tar xzf corpus.tar.gz -C corpus
+CEDAR_CORPUS_DIR="$PWD/corpus" go test -run '^TestCorpus$' -v ./cedar
 ```
 
-The analysis tests run when `CVC5` names a cvc5 1.3.1 executable, from the
-[cvc5 release](https://github.com/cvc5/cvc5/releases/tag/cvc5-1.3.1):
+Analysis integration tests require a cvc5 1.3.1 executable from the
+[official release](https://github.com/cvc5/cvc5/releases/tag/cvc5-1.3.1):
 
 ```bash
-CVC5=/path/to/cvc5 go test -v ./analysis/
+CVC5=/path/to/cvc5 go test -v ./analysis
 ```
 
-The fuzz targets run their seeds in `go test`. To fuzz one:
+Unset variables cause the corresponding integration tests to skip. Set
+both when running a complete verification pass:
 
 ```bash
-go test -run '^$' -fuzz '^FuzzAuthorize$' -fuzztime 5m .
+CEDAR_CORPUS_DIR="$PWD/corpus" CVC5=/path/to/cvc5 go test -count=1 ./...
 ```
 
-## Changing the Modules
-
-The Go packages embed prebuilt modules, so users need no Rust toolchain.
-After any change under `rust/`, rebuild them and commit the result:
+Fuzz seeds run in ordinary tests. To fuzz a target for longer:
 
 ```bash
-rustup toolchain install       # installs the version in rust-toolchain.toml
-scripts/build-wasm.sh          # rewrites internal/modules/*/*.wasm and sha256.go
-scripts/third-party-licenses.sh  # needs cargo-about 0.9.2 with the cli feature
+go test -run '^$' -fuzz '^FuzzAuthorize$' -fuzztime 5m ./cedar
 ```
 
-CI rebuilds the modules from source and fails if the bytes differ from the
-committed ones. It also runs rustfmt, clippy, `cargo deny`, `cargo audit`
-and `scripts/vendor-symcc.sh`, which checks the vendored SymCC against
-crates.io.
+Repeat with `FuzzPolicies` and `FuzzEntities`. See
+[Verification](docs/verification.md) for coverage and
+[Performance](docs/performance.md#reproduce) for benchmarks.
 
-A Dependabot pull request that changes `rust/Cargo.lock` fails that
-comparison until someone runs the two scripts above on its branch.
+## Guest changes
 
-## Dependencies
+Use the pinned Rust toolchain and Wasm target from `rust-toolchain.toml`.
+After editing guest code or its dependencies:
 
-Each direct dependency, tool, toolchain, binary and GitHub Action must come
-from an established organization or have a solid star count. A personal
-repository with few stars is not acceptable. Transitive dependencies of an
-accepted dependency are acceptable. Download every binary from the
-project's official release and pin its SHA-256. Pin GitHub Actions by commit
-SHA. Record each new direct dependency in the README's supply-chain table.
+```bash
+scripts/build-wasm.sh
+scripts/third-party-licenses.sh
+```
 
-Every crate must pass `cargo deny`, whose license allowlist contains only
-licenses compatible with Apache-2.0. Do not add code under the LGPL or the
-GPL to the modules.
+Include the regenerated modules, hashes, and license notices with the
+source changes. CI compares rebuilt bytes with the committed artifacts.
 
-## Upgrading Cedar
+Run the Rust checks from `rust/`:
 
-Each release embeds exactly one Cedar version. To move to a new one:
+```bash
+cargo fmt --all -- --check
+cargo clippy --locked --release --target wasm32-wasip1 -p cgw-abi -p cgw-authorizer -p cgw-analysis -- -D warnings
+cargo clippy --locked --release -p cgw-native-bench -- -D warnings
+cargo deny --all-features check
+cargo audit --deny warnings
+```
 
-1. Set the new `cedar-policy`, `cedar-policy-core` and `cedar-policy-symcc`
-   pins in `rust/Cargo.toml`. Use the SymCC version that the Cedar release
-   pairs with.
-2. In `scripts/vendor-symcc.sh`, set the new SymCC version and the checksum
-   from the crates.io index. Update the patch in `rust/patches` so that it
-   applies, then run `scripts/vendor-symcc.sh --write`.
-3. Run `cargo update --manifest-path rust/Cargo.toml -p cedar-policy`, then
-   `scripts/build-wasm.sh` and `scripts/third-party-licenses.sh`.
-4. Set `CedarVersion` and `SymCCVersion` in `version.go`.
-5. Set the corpus commit and checksum in both workflows and in this file, to
-   the corpus that Cedar generated for the new version.
-6. Run the corpus and analysis tests. Every mismatch blocks the upgrade.
-7. Update the version table in the README.
+Run `scripts/vendor-symcc.sh` from the repository root to verify the
+vendored source. The [maintenance guide](docs/maintenance.md) describes
+tool versions, rebuilds, and Cedar upgrades.
 
-## Releases
+## Documentation changes
 
-A maintainer tags a commit on `main` whose CI passed, such as `v0.1.0`. The
-release workflow rebuilds the modules, checks them against the committed
-ones, runs the tests with the corpus, attests build provenance, and
-publishes the release.
+Keep the README focused on the purpose, example, measured tradeoffs, and
+links to the guides. Put detailed contracts in [API](docs/api.md), execution
+assumptions in [Security](docs/security.md), and development procedures in
+this file or [Maintenance](docs/maintenance.md).
+
+Keep examples aligned with the executable Go examples. Identify the
+workload, versions, and environment for benchmark claims, and state the
+scope of verification evidence. Update links and commands when moving files.
+
+## Dependencies and releases
+
+See [dependency review](docs/maintenance.md#dependency-review),
+[Cedar upgrades](docs/maintenance.md#upgrading-cedar), and
+[releases](docs/maintenance.md#releases). Dependency changes require
+maintainer review and must satisfy the repository's license and provenance
+policies.

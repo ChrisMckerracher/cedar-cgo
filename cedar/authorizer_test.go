@@ -8,7 +8,7 @@ import (
 	"sync"
 	"testing"
 
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm"
+	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 	"github.com/tetratelabs/wazero"
 )
 
@@ -56,11 +56,11 @@ type joyData struct {
 
 func loadJoy(t testing.TB) joyData {
 	return joyData{
-		schema:   cedar.SchemaFromCedar(string(readFile(t, "testdata/joy/joy.cedarschema"))),
-		old:      cedar.PoliciesFromCedar(string(readFile(t, "testdata/joy/old.cedar"))),
-		new:      cedar.PoliciesFromCedar(string(readFile(t, "testdata/joy/new.cedar"))),
-		tight:    cedar.PoliciesFromCedar(string(readFile(t, "testdata/joy/tight.cedar"))),
-		entities: cedar.EntitiesFromJSON(readFile(t, "testdata/joy/entities.json")),
+		schema:   cedar.SchemaFromCedar(string(readFile(t, "../testdata/joy/joy.cedarschema"))),
+		old:      cedar.PoliciesFromCedar(string(readFile(t, "../testdata/joy/old.cedar"))),
+		new:      cedar.PoliciesFromCedar(string(readFile(t, "../testdata/joy/new.cedar"))),
+		tight:    cedar.PoliciesFromCedar(string(readFile(t, "../testdata/joy/tight.cedar"))),
+		entities: cedar.EntitiesFromJSON(readFile(t, "../testdata/joy/entities.json")),
 	}
 }
 

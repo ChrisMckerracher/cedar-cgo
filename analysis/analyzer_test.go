@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm"
 	"github.com/ChrisMckerracher/cedar-go-wasm/analysis"
+	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 )
 
 func readFile(t *testing.T, name string) string {

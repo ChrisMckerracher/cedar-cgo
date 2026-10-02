@@ -71,7 +71,7 @@ jobs:
           echo "$CORPUS_SHA256  corpus.tar.gz" | sha256sum --check
           mkdir corpus && tar xzf corpus.tar.gz -C corpus
       - name: Run the corpus through the Go API
-        run: CEDAR_CORPUS_DIR="$PWD/corpus" go test -count=1 -run '^TestCorpus$' -v .
+        run: CEDAR_CORPUS_DIR="$PWD/corpus" go test -count=1 -run '^TestCorpus$' -v ./cedar
 
   analysis:
     name: Change analysis with cvc5
@@ -89,6 +89,8 @@ jobs:
           echo "$CVC5_SHA256  cvc5.zip" | sha256sum --check
           unzip -q cvc5.zip
       - run: CVC5="$PWD/cvc5-Linux-x86_64-static/bin/cvc5" go test -count=1 -v ./analysis/
+      - name: Prove the ABI arithmetic
+        run: CVC5="$PWD/cvc5-Linux-x86_64-static/bin/cvc5" go test -count=1 -v ./internal/verification
 
   fuzz:
     name: Fuzz the boundary
@@ -103,7 +105,7 @@ jobs:
       - name: Fuzz each target for 60 seconds
         run: |
           for target in FuzzAuthorize FuzzPolicies FuzzEntities; do
-            go test -run '^$' -fuzz "^$target\$" -fuzztime 60s .
+            go test -run '^$' -fuzz "^$target\$" -fuzztime 60s ./cedar
           done
 
   govulncheck:

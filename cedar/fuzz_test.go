@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm"
+	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 )
 
 // The fuzz targets check the boundary between Go and the module. For any
@@ -118,7 +118,7 @@ func FuzzPolicies(f *testing.F) {
 func FuzzEntities(f *testing.F) {
 	d := loadJoy(f)
 	rt := testRuntime(f)
-	f.Add(string(readFile(f, "testdata/joy/entities.json")))
+	f.Add(string(readFile(f, "../testdata/joy/entities.json")))
 	f.Add(`[{"uid":{"__entity":{"type":"Joy::Device","id":"d"}},"attrs":{},"parents":[{"type":"Joy::Account","id":"a"}],"tags":{}}]`)
 	f.Add(`[{"uid":{"type":"Joy::Action","id":"session.read"},"attrs":{},"parents":[]}]`)
 	f.Fuzz(func(t *testing.T, text string) {

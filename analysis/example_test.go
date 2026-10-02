@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm"
 	"github.com/ChrisMckerracher/cedar-go-wasm/analysis"
+	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 )
 
 // This example needs a cvc5 executable, so it has no Output comment and

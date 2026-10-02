@@ -1,9 +1,6 @@
 package cedar
 
 import (
-	"bytes"
-	"encoding/json"
-
 	"github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
 )
 
@@ -77,58 +74,4 @@ func optionalSchema(s *Schema) *wire.Source {
 	}
 	w := s.wire()
 	return &w
-}
-
-// Entities holds Cedar entities, either as Go values or as Cedar's entity
-// JSON. The zero value holds no entities.
-type Entities struct {
-	list   []Entity
-	raw    []byte
-	isJSON bool
-}
-
-// NewEntities returns entities built from Go values.
-func NewEntities(entities ...Entity) Entities { return Entities{list: entities} }
-
-// EntitiesFromJSON returns entities in Cedar's entity JSON format: an array
-// of objects with "uid", "attrs", "parents" and optional "tags".
-func EntitiesFromJSON(data []byte) Entities {
-	return Entities{raw: bytes.Clone(data), isJSON: true}
-}
-
-// IsZero reports whether e is the zero value.
-func (e Entities) IsZero() bool { return !e.isJSON && e.list == nil }
-
-// MarshalJSON implements [json.Marshaler] with Cedar's entity JSON format.
-func (e Entities) MarshalJSON() ([]byte, error) {
-	if e.isJSON {
-		return e.raw, nil
-	}
-	if e.list == nil {
-		return []byte("[]"), nil
-	}
-	return json.Marshal(e.list)
-}
-
-// Context holds the context record of a request, either as a Go [Record] or
-// as Cedar JSON. The zero value is the empty record.
-type Context struct {
-	record Record
-	raw    []byte
-	isJSON bool
-}
-
-// NewContext returns a context built from a record.
-func NewContext(r Record) Context { return Context{record: r} }
-
-// ContextFromJSON returns a context in Cedar's JSON value format. It must be
-// a JSON object.
-func ContextFromJSON(data []byte) Context { return Context{raw: bytes.Clone(data), isJSON: true} }
-
-// MarshalJSON implements [json.Marshaler] with Cedar's JSON value format.
-func (c Context) MarshalJSON() ([]byte, error) {
-	if c.isJSON {
-		return c.raw, nil
-	}
-	return c.record.MarshalJSON()
 }

@@ -13,7 +13,7 @@ import (
 	"sync"
 	"testing"
 
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm"
+	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 )
 
 // corpusTest is one test in Cedar's integration-test corpus. The format is

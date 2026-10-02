@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm"
+	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 	"github.com/tetratelabs/wazero"
 )
 

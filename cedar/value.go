@@ -3,26 +3,7 @@ package cedar
 import (
 	"encoding/json"
 	"fmt"
-	"strconv"
-
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
 )
-
-// EntityUID identifies an entity by its type and ID, such as
-// Type "Photos::User" and ID "alice".
-type EntityUID struct {
-	Type string
-	ID   string
-}
-
-// NewEntityUID returns the UID of the entity with type typ and ID id.
-func NewEntityUID(typ, id string) EntityUID { return EntityUID{Type: typ, ID: id} }
-
-// String returns the UID for logs, such as Photos::User::"alice". It quotes
-// the ID with Go's rules, which differ from Cedar's for some characters.
-func (u EntityUID) String() string { return u.Type + "::" + strconv.Quote(u.ID) }
-
-func (u EntityUID) wire() wire.UID { return wire.UID{Type: u.Type, ID: u.ID} }
 
 // Value is a Cedar value: [Bool], [Long], [String], [Set], [Record],
 // [EntityUID], [Decimal], [IPAddr], [Datetime] or [Duration].
@@ -110,14 +91,6 @@ func (v Record) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]Value(v))
 }
 
-// MarshalJSON implements [json.Marshaler]. It writes the explicit
-// {"__entity": {"type": ..., "id": ...}} form.
-func (u EntityUID) MarshalJSON() ([]byte, error) {
-	return json.Marshal(struct {
-		Entity wire.UID `json:"__entity"`
-	}{u.wire()})
-}
-
 type extnJSON struct {
 	Extn struct {
 		Fn  string `json:"fn"`
@@ -150,30 +123,4 @@ func checkValues(vs []Value) error {
 		}
 	}
 	return nil
-}
-
-// Entity is a Cedar entity: a UID, attributes, ancestors and tags.
-type Entity struct {
-	UID EntityUID
-	// Parents lists the direct parents. Cedar computes the transitive
-	// closure.
-	Parents []EntityUID
-	Attrs   Record
-	Tags    Record
-}
-
-type entityJSON struct {
-	UID     wire.UID   `json:"uid"`
-	Attrs   Record     `json:"attrs"`
-	Parents []wire.UID `json:"parents"`
-	Tags    Record     `json:"tags,omitempty"`
-}
-
-// MarshalJSON implements [json.Marshaler] with Cedar's entity JSON format.
-func (e Entity) MarshalJSON() ([]byte, error) {
-	parents := make([]wire.UID, len(e.Parents))
-	for i, p := range e.Parents {
-		parents[i] = p.wire()
-	}
-	return json.Marshal(entityJSON{UID: e.UID.wire(), Attrs: e.Attrs, Parents: parents, Tags: e.Tags})
 }

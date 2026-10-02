@@ -13,8 +13,8 @@ expect. We confirm receipt within 5 working days.
 
 In scope:
 
-- The Go packages, including the fail-closed handling, the limits and the
-  WASI capability set that the README describes.
+- The Go packages, including fail-closed handling, resource limits, and the
+  WASI capabilities described in the [security model](docs/security.md).
 - The Rust glue in `rust/crates`, and the patch to cedar-policy-symcc in
   `rust/patches`.
 - The build, release and provenance workflows.
