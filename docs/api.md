@@ -7,6 +7,7 @@
 - [Packages and imports](#packages-and-imports)
 - [Runtime lifecycle](#runtime-lifecycle)
 - [Schemas and policies](#schemas-and-policies)
+- [Templates (experimental)](#templates-experimental)
 - [Entities and values](#entities-and-values)
 - [Authorization](#authorization)
 - [Entity slicing](#entity-slicing)
@@ -84,6 +85,62 @@ check the policies themselves.
 
 In Cedar text, policies receive IDs `policy0`, `policy1`, and so on in source
 order. An `@id` annotation is metadata; it does not assign the policy ID.
+
+## Templates (experimental)
+
+Template management is an experimental Go API and may change in a minor release.
+Its Cedar semantics come from the pinned Rust `PolicySet` operations.
+
+| Operation | Result |
+|---|---|
+| `TemplateFromCedar(text)`, `TemplateFromJSON(data)` | Immutable template source; parsed on add |
+| `rt.AddTemplate(ctx, set, templateID, template)` | New set containing a template with an explicit ID |
+| `rt.Templates(ctx, set)` | Templates sorted by ID, with Cedar/JSON, annotations, and sorted slot names |
+| `rt.LinkTemplate(ctx, set, templateID, policyID, bindings)` | New set containing the named template-linked policy |
+| `rt.TemplateLinks(ctx, set)` | Links sorted by policy ID, with template IDs and slot bindings |
+| `rt.UnlinkTemplate(ctx, set, policyID)` | New set without the linked policy; template retained |
+| `rt.RemoveTemplate(ctx, set, templateID)` | New set without the template; fails if links remain |
+
+`SlotBindings` maps `PrincipalSlot` (`?principal`) and `ResourceSlot`
+(`?resource`) to `EntityUID` values. Bindings must exactly match the slots
+in the template. Rust rejects missing/extra bindings, invalid UIDs, duplicate
+IDs across templates and policies, and attempts to unlink static policies.
+Upstream diagnostics are returned as `*cedar.Error` with `KindPolicies`.
+An empty `PolicySet{}` starts a new set. A slot-free policy is not a template.
+
+Each successful edit returns an immutable JSON-backed `PolicySet`, preserving
+static policies, template IDs, linked-policy IDs, annotations, and bindings.
+It can be passed directly to `NewAuthorizer` and `Validate`, or persisted
+using `Text()` and restored with `PoliciesFromJSON`. Failed operations return
+an error and a zero result. Always check the error before replacing your set.
+Invalid UTF-8 is rejected before JSON encoding so IDs cannot be silently
+changed by replacement characters. Input values and previously created
+authorizers do not change. Original source
+formatting is not retained by the JSON conversion.
+
+Linking does not validate schema types: a syntactically valid binding can
+produce a policy that fails strict validation. Call `Runtime.Validate` on the
+result before creating a new authorizer when schema correctness is required.
+Unlinked templates do not participate in authorization; linked policy IDs
+appear in decision reasons. Returned ID fields retain the raw ID, including
+quotes, backslashes, and control characters; diagnostic messages use Rust
+formatting.
+
+Every call uses a fresh guest instance and releases it on success, failure,
+or cancellation. The caller's context bounds execution; `WithMaxSourceBytes`
+bounds the whole encoded input (including source, IDs, and bindings), and the
+existing memory and response limits apply. These calls are safe to invoke
+concurrently but are not governed by an authorizer's `MaxInstances` pool;
+callers should bound their own concurrency. Do not mutate bindings during a
+call. Returned inspection maps/slices are owned by the caller and do not
+alter policy snapshots.
+
+The [runnable template example](../cedar/templates_example_test.go) adds a
+template, links it, validates and authorizes it, then unlinks and removes it:
+
+```bash
+go test -run '^ExampleRuntime_LinkTemplate$' -v ./cedar
+```
 
 ## Entities and values
 
@@ -223,7 +280,7 @@ check `cedar.ErrFault`, `context.DeadlineExceeded`, or `context.Canceled`.
 
 | Error kind | Meaning |
 |---|---|
-| `KindSchema`, `KindPolicies` | Source parsing failed |
+| `KindSchema`, `KindPolicies` | Source parsing or policy/template operation failed |
 | `KindEntities`, `KindContext`, `KindRequest` | Data parsing or schema checks failed |
 | `KindPrincipal`, `KindAction`, `KindResource` | A UID failed to parse |
 | `KindInput` | Request envelope or Go value encoding failed |
@@ -263,12 +320,12 @@ implementation. See [versioning](maintenance.md#versioning).
 ## Supported operations
 
 The Go interface exposes authorization, strict validation, parsed policy
-inspection and static policy edits, experimental on-demand entity loading and
+inspection and static policy edits, template management, experimental on-demand entity loading and
 request-specific entity slicing, and the policy comparisons in `analysis`. These
 execute Cedar's Rust implementation, including its core and extension value types.
 
 Conformance results establish agreement for the tested operations. The Rust
-library also exposes APIs for template linking, partial evaluation, deprecated
+library also exposes APIs for partial evaluation, deprecated
 entity manifests, and formatting; those APIs are outside this Go interface. See
 [verification scope](verification.md) for the evidence behind compatibility
 claims.

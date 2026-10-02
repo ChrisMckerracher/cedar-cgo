@@ -13,6 +13,7 @@ use std::cell::RefCell;
 mod batched;
 mod policies;
 mod slicing;
+mod templates;
 
 cgw_abi::export_memory_functions!();
 
