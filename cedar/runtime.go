@@ -51,7 +51,7 @@ func WithCompilationCache(cache wazero.CompilationCache) RuntimeOption {
 	return func(c *runtimeConfig) { c.cache = cache }
 }
 
-// WithMaxSourceBytes bounds each encoded load or validation input, including its envelope.
+// WithMaxSourceBytes bounds each encoded load, validation or slicing input, including its envelope.
 // The default is [DefaultMaxSourceBytes].
 func WithMaxSourceBytes(n int) RuntimeOption {
 	return func(c *runtimeConfig) { c.maxSourceBytes = n }
@@ -74,7 +74,7 @@ func NewRuntime(ctx context.Context, opts ...RuntimeOption) (*Runtime, error) {
 		Cache:            cfg.cache,
 		AllowedImports:   authorizerImports,
 		HostModules:      defineEntityLoaderModule,
-		Exports:          []string{"cgw_load", "cgw_authorize", "cgw_validate", "cgw_authorize_batched"},
+		Exports:          []string{"cgw_load", "cgw_authorize", "cgw_validate", "cgw_authorize_batched", "cgw_slice_entities"},
 	})
 	if err != nil {
 		return nil, fmt.Errorf("cedar: %w", err)

@@ -1,5 +1,6 @@
 [package]
 name = "cgw-native-bench"
+default-run = "cgw-native-bench"
 description = "Native cedar-policy timing, as a baseline for the wazero benchmarks"
 version.workspace = true
 edition.workspace = true
@@ -8,5 +9,5 @@ repository.workspace = true
 publish.workspace = true
 
 [dependencies]
-cedar-policy.workspace = true
+cedar-policy = { workspace = true, features = ["tpe"] }
 serde_json.workspace = true

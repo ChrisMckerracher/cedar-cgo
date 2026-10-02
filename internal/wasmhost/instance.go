@@ -55,9 +55,13 @@ func (m *Module) Instantiate(ctx context.Context) (*Instance, error) {
 		inst.ops[name] = mod.ExportedFunction(name)
 	}
 	version, err := mod.ExportedFunction("cgw_abi_version").Call(ctx)
-	if err != nil || len(version) != 1 || version[0] != ABIVersion {
-		_ = mod.Close(ctx)
-		return nil, &Fault{Module: m.name, Op: "cgw_abi_version", Err: fmt.Errorf("ABI version %v, want %d (%v)", version, ABIVersion, err)}
+	if err != nil {
+		_ = mod.Close(context.WithoutCancel(ctx))
+		return nil, &Fault{Module: m.name, Op: "cgw_abi_version", Err: err}
+	}
+	if len(version) != 1 || version[0] != ABIVersion {
+		_ = mod.Close(context.WithoutCancel(ctx))
+		return nil, &Fault{Module: m.name, Op: "cgw_abi_version", Err: fmt.Errorf("ABI version %v, want %d", version, ABIVersion)}
 	}
 	return inst, nil
 }

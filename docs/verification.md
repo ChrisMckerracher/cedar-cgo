@@ -33,21 +33,35 @@ or expose every API in the Rust library. See
 
 For reproduction, use the corpus setup in [Contributing](../CONTRIBUTING.md#tests).
 
+Experimental slicing has a separate [native differential suite](../testdata/parity/slicing/README.md).
+`scripts/slicing-fixtures.sh --check` compares regenerated direct native Cedar
+results with committed fixtures. `TestSliceEntitiesNativeParity` checks Wasm
+decisions, selected entity data, and load rounds against that oracle, then
+compares ordinary authorization using full and reduced stores. This covers the
+listed fixtures, not general minimality or equivalence for arbitrary requests.
+
 ## Fuzzing
 
-[`cedar/fuzz_test.go`](../cedar/fuzz_test.go) contains three Go fuzz targets:
+The authorization and slicing packages contain these Go fuzz targets:
 
 | Target | Exercises |
 |---|---|
 | `FuzzAuthorize` | UIDs, contexts, per-request entities, and response handling |
 | `FuzzPolicies` | Policy parsing, strict validation, loading, and authorization |
 | `FuzzEntities` | Entity parsing and authorization, with and without a schema |
+| `FuzzSliceEntities` | Source entity parsing, fail-closed slicing, and full/reduced authorization agreement |
 
-Each target rejects unexpected module faults and checks that authorization
+The three authorization targets reject unexpected module faults and check that authorization
 errors return `Deny`. Fuzz inputs deeper than 200 nested brackets are
 skipped to focus on logic failures; stack exhaustion has a separate fault
 test. When a corpus directory is supplied, up to 200 corpus policies seed
 `FuzzPolicies`.
+
+The slicing target bounds its input to 64 KiB and four loading rounds. On a
+successful slice it checks full and reduced authorization decisions; on any
+error it requires an empty denying result. Explicit slicing resource tests
+cover input-size boundaries, response limits, memory faults, iteration
+exhaustion, cancellation, and subsequent recovery.
 
 Ordinary `go test` runs the seeds. CI fuzzes each target for 60 seconds.
 For a longer local run:
