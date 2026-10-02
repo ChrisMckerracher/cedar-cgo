@@ -1,6 +1,8 @@
 //! Authorization and strict validation delegate to `cedar-policy` so the Go
 //! boundary shares the reference implementation's semantics.
 
+mod partial;
+
 use cedar_policy::{
     Authorizer, Context, Decision, Entities, EntityUid, PolicySet, Request, Schema, ValidationMode,
     Validator,

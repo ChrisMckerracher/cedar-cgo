@@ -1,0 +1,3068 @@
+{
+  "schema": "entity Group; entity User in [Group] tags String; entity Photo { owner: User, private: Bool }; action view appliesTo { principal: User, resource: Photo, context: { mfa: Bool } };",
+  "cases": [
+    {
+      "name": "concrete_allow",
+      "policies": "permit(principal, action, resource) when { resource.owner == principal };",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": {
+          "mfa": true
+        },
+        "entities": [
+          {
+            "uid": {
+              "type": "User",
+              "id": "alice"
+            },
+            "attrs": {},
+            "parents": [],
+            "tags": {}
+          },
+          {
+            "uid": {
+              "type": "Photo",
+              "id": "beach"
+            },
+            "attrs": {
+              "owner": {
+                "__entity": {
+                  "type": "User",
+                  "id": "alice"
+                }
+              },
+              "private": true
+            },
+            "parents": [],
+            "tags": {}
+          }
+        ]
+      },
+      "completions": [
+        {
+          "principal": {
+            "type": "User",
+            "id": "alice"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": true
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        }
+      ],
+      "loaded": []
+    },
+    {
+      "name": "concrete_deny",
+      "policies": "permit(principal, action, resource) when { resource.owner == principal };",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "bob"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": {
+          "mfa": true
+        },
+        "entities": [
+          {
+            "uid": {
+              "type": "User",
+              "id": "alice"
+            },
+            "attrs": {},
+            "parents": [],
+            "tags": {}
+          },
+          {
+            "uid": {
+              "type": "Photo",
+              "id": "beach"
+            },
+            "attrs": {
+              "owner": {
+                "__entity": {
+                  "type": "User",
+                  "id": "alice"
+                }
+              },
+              "private": true
+            },
+            "parents": [],
+            "tags": {}
+          }
+        ]
+      },
+      "completions": [
+        {
+          "principal": {
+            "type": "User",
+            "id": "bob"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": true
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        }
+      ],
+      "loaded": []
+    },
+    {
+      "name": "unknown_entities",
+      "policies": "permit(principal, action, resource) when { resource.owner == principal };",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": {
+          "mfa": true
+        },
+        "entities": []
+      },
+      "completions": [
+        {
+          "principal": {
+            "type": "User",
+            "id": "alice"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": true
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        }
+      ],
+      "loaded": []
+    },
+    {
+      "name": "unknown_principal",
+      "policies": "permit(principal, action, resource) when { resource.owner == principal };",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": null
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": {
+          "mfa": true
+        },
+        "entities": []
+      },
+      "completions": [
+        {
+          "principal": {
+            "type": "User",
+            "id": "alice"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": true
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        },
+        {
+          "principal": {
+            "type": "User",
+            "id": "bob"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": true
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        }
+      ],
+      "loaded": []
+    },
+    {
+      "name": "unknown_resource",
+      "policies": "permit(principal, action, resource) when { resource.owner == principal };",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": null
+        },
+        "context": {
+          "mfa": true
+        },
+        "entities": []
+      },
+      "completions": [
+        {
+          "principal": {
+            "type": "User",
+            "id": "alice"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": true
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        }
+      ],
+      "loaded": []
+    },
+    {
+      "name": "unknown_context",
+      "policies": "permit(principal, action, resource) when { context.mfa };",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": null,
+        "entities": []
+      },
+      "completions": [
+        {
+          "principal": {
+            "type": "User",
+            "id": "alice"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": true
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        },
+        {
+          "principal": {
+            "type": "User",
+            "id": "alice"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": false
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        }
+      ],
+      "loaded": []
+    },
+    {
+      "name": "unknown_attributes",
+      "policies": "permit(principal, action, resource) when { resource.owner == principal };",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": {
+          "mfa": true
+        },
+        "entities": [
+          {
+            "uid": {
+              "type": "Photo",
+              "id": "beach"
+            },
+            "attrs": null,
+            "parents": [],
+            "tags": {}
+          }
+        ]
+      },
+      "completions": [
+        {
+          "principal": {
+            "type": "User",
+            "id": "alice"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": true
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        }
+      ],
+      "loaded": []
+    },
+    {
+      "name": "known_attributes_unknown_parents",
+      "policies": "permit(principal, action, resource) when { resource.owner == principal };",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": {
+          "mfa": true
+        },
+        "entities": [
+          {
+            "uid": {
+              "type": "Photo",
+              "id": "beach"
+            },
+            "attrs": {
+              "owner": {
+                "__entity": {
+                  "type": "User",
+                  "id": "alice"
+                }
+              },
+              "private": true
+            },
+            "parents": null,
+            "tags": {}
+          }
+        ]
+      },
+      "completions": [
+        {
+          "principal": {
+            "type": "User",
+            "id": "alice"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": true
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        }
+      ],
+      "loaded": []
+    },
+    {
+      "name": "conflicting_permit_forbid",
+      "policies": "permit(principal, action, resource); forbid(principal, action, resource) unless { context.mfa };",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": null,
+        "entities": []
+      },
+      "completions": [
+        {
+          "principal": {
+            "type": "User",
+            "id": "alice"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": true
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        },
+        {
+          "principal": {
+            "type": "User",
+            "id": "alice"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": false
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        }
+      ],
+      "loaded": []
+    },
+    {
+      "name": "known_forbid",
+      "policies": "permit(principal, action, resource) when { resource.private }; forbid(principal, action, resource);",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": {
+          "mfa": true
+        },
+        "entities": []
+      },
+      "completions": [
+        {
+          "principal": {
+            "type": "User",
+            "id": "alice"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": true
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        }
+      ],
+      "loaded": []
+    },
+    {
+      "name": "overflow",
+      "policies": "permit(principal, action, resource) when { 9223372036854775807 + 1 > 0 };",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": {
+          "mfa": true
+        },
+        "entities": []
+      },
+      "completions": [
+        {
+          "principal": {
+            "type": "User",
+            "id": "alice"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": true
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        }
+      ],
+      "loaded": []
+    },
+    {
+      "name": "overflow_and_permit",
+      "policies": "permit(principal, action, resource); forbid(principal, action, resource) when { 9223372036854775807 + 1 > 0 };",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": {
+          "mfa": true
+        },
+        "entities": []
+      },
+      "completions": [
+        {
+          "principal": {
+            "type": "User",
+            "id": "alice"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": true
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        }
+      ],
+      "loaded": []
+    },
+    {
+      "name": "residual_error_short_circuit",
+      "policies": "permit(principal, action, resource) when { context.mfa || 9223372036854775807 + 1 > 0 };",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": null,
+        "entities": []
+      },
+      "completions": [
+        {
+          "principal": {
+            "type": "User",
+            "id": "alice"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": true
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        },
+        {
+          "principal": {
+            "type": "User",
+            "id": "alice"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": false
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        }
+      ],
+      "loaded": []
+    },
+    {
+      "name": "inconsistent_id",
+      "policies": "permit(principal, action, resource) when { resource.owner == principal };",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": {
+          "mfa": true
+        },
+        "entities": [
+          {
+            "uid": {
+              "type": "Photo",
+              "id": "beach"
+            },
+            "attrs": {
+              "owner": {
+                "__entity": {
+                  "type": "User",
+                  "id": "alice"
+                }
+              },
+              "private": true
+            },
+            "parents": [],
+            "tags": {}
+          }
+        ]
+      },
+      "completions": [
+        {
+          "principal": {
+            "type": "User",
+            "id": "alice"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "other"
+          },
+          "context": {
+            "mfa": true
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        }
+      ],
+      "loaded": []
+    },
+    {
+      "name": "inconsistent_context",
+      "policies": "permit(principal, action, resource) when { resource.owner == principal };",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": {
+          "mfa": true
+        },
+        "entities": [
+          {
+            "uid": {
+              "type": "User",
+              "id": "alice"
+            },
+            "attrs": {},
+            "parents": [],
+            "tags": {}
+          },
+          {
+            "uid": {
+              "type": "Photo",
+              "id": "beach"
+            },
+            "attrs": {
+              "owner": {
+                "__entity": {
+                  "type": "User",
+                  "id": "alice"
+                }
+              },
+              "private": true
+            },
+            "parents": [],
+            "tags": {}
+          }
+        ]
+      },
+      "completions": [
+        {
+          "principal": {
+            "type": "User",
+            "id": "alice"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": false
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        }
+      ],
+      "loaded": []
+    },
+    {
+      "name": "inconsistent_attributes",
+      "policies": "permit(principal, action, resource) when { resource.owner == principal };",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": {
+          "mfa": true
+        },
+        "entities": [
+          {
+            "uid": {
+              "type": "User",
+              "id": "alice"
+            },
+            "attrs": {},
+            "parents": [],
+            "tags": {}
+          },
+          {
+            "uid": {
+              "type": "Photo",
+              "id": "beach"
+            },
+            "attrs": {
+              "owner": {
+                "__entity": {
+                  "type": "User",
+                  "id": "alice"
+                }
+              },
+              "private": true
+            },
+            "parents": [],
+            "tags": {}
+          }
+        ]
+      },
+      "completions": [
+        {
+          "principal": {
+            "type": "User",
+            "id": "alice"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": true
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": false
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        }
+      ],
+      "loaded": []
+    },
+    {
+      "name": "missing_previous_entity",
+      "policies": "permit(principal, action, resource) when { resource.owner == principal };",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": {
+          "mfa": true
+        },
+        "entities": [
+          {
+            "uid": {
+              "type": "User",
+              "id": "alice"
+            },
+            "attrs": {},
+            "parents": [],
+            "tags": {}
+          },
+          {
+            "uid": {
+              "type": "Photo",
+              "id": "beach"
+            },
+            "attrs": {
+              "owner": {
+                "__entity": {
+                  "type": "User",
+                  "id": "alice"
+                }
+              },
+              "private": true
+            },
+            "parents": [],
+            "tags": {}
+          }
+        ]
+      },
+      "completions": [
+        {
+          "principal": {
+            "type": "User",
+            "id": "alice"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": true
+          },
+          "entities": []
+        }
+      ],
+      "loaded": []
+    },
+    {
+      "name": "invalid_policy",
+      "policies": "permit(principal, action, resource) when { principal.missing };",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": {
+          "mfa": true
+        },
+        "entities": []
+      },
+      "completions": [],
+      "loaded": []
+    },
+    {
+      "name": "invalid_principal_type",
+      "policies": "permit(principal, action, resource) when { resource.owner == principal };",
+      "partial": {
+        "principal": {
+          "type": "Missing",
+          "id": null
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": {
+          "mfa": true
+        },
+        "entities": []
+      },
+      "completions": [],
+      "loaded": []
+    },
+    {
+      "name": "invalid_action",
+      "policies": "permit(principal, action, resource) when { resource.owner == principal };",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "missing"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": {
+          "mfa": true
+        },
+        "entities": []
+      },
+      "completions": [],
+      "loaded": []
+    },
+    {
+      "name": "invalid_context",
+      "policies": "permit(principal, action, resource) when { resource.owner == principal };",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": {
+          "mfa": "yes"
+        },
+        "entities": []
+      },
+      "completions": [],
+      "loaded": []
+    },
+    {
+      "name": "invalid_partial_entities",
+      "policies": "permit(principal, action, resource) when { resource.owner == principal };",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": {
+          "mfa": true
+        },
+        "entities": [
+          {
+            "uid": {
+              "type": "Photo",
+              "id": "beach"
+            },
+            "attrs": {},
+            "parents": [],
+            "tags": {}
+          }
+        ]
+      },
+      "completions": [],
+      "loaded": []
+    },
+    {
+      "name": "duplicate_entities",
+      "policies": "permit(principal, action, resource) when { resource.owner == principal };",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": {
+          "mfa": true
+        },
+        "entities": [
+          {
+            "uid": {
+              "type": "Photo",
+              "id": "beach"
+            },
+            "attrs": {
+              "owner": {
+                "__entity": {
+                  "type": "User",
+                  "id": "alice"
+                }
+              },
+              "private": true
+            },
+            "parents": [],
+            "tags": {}
+          },
+          {
+            "uid": {
+              "type": "Photo",
+              "id": "beach"
+            },
+            "attrs": {
+              "owner": {
+                "__entity": {
+                  "type": "User",
+                  "id": "alice"
+                }
+              },
+              "private": true
+            },
+            "parents": [],
+            "tags": {}
+          }
+        ]
+      },
+      "completions": [],
+      "loaded": []
+    },
+    {
+      "name": "loaded_concrete_entities",
+      "policies": "permit(principal, action, resource) when { resource.owner == principal };",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": {
+          "mfa": true
+        },
+        "entities": []
+      },
+      "completions": [
+        {
+          "principal": {
+            "type": "User",
+            "id": "alice"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": true
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        }
+      ],
+      "loaded": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "alice"
+          },
+          "attrs": {},
+          "parents": [],
+          "tags": {}
+        },
+        {
+          "uid": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "attrs": {
+            "owner": {
+              "__entity": {
+                "type": "User",
+                "id": "alice"
+              }
+            },
+            "private": true
+          },
+          "parents": [],
+          "tags": {}
+        }
+      ]
+    },
+    {
+      "name": "loaded_uid_conflict",
+      "policies": "permit(principal, action, resource) when { resource.owner == principal };",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": {
+          "mfa": true
+        },
+        "entities": [
+          {
+            "uid": {
+              "type": "Photo",
+              "id": "beach"
+            },
+            "attrs": {
+              "owner": {
+                "__entity": {
+                  "type": "User",
+                  "id": "alice"
+                }
+              },
+              "private": true
+            },
+            "parents": [],
+            "tags": {}
+          }
+        ]
+      },
+      "completions": [],
+      "loaded": [
+        {
+          "uid": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "attrs": {
+            "owner": {
+              "__entity": {
+                "type": "User",
+                "id": "alice"
+              }
+            },
+            "private": true
+          },
+          "parents": [],
+          "tags": {}
+        }
+      ]
+    },
+    {
+      "name": "known_empty_id",
+      "policies": "permit(principal == User::\"\", action, resource);",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": ""
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": {
+          "mfa": true
+        },
+        "entities": []
+      },
+      "completions": [
+        {
+          "principal": {
+            "type": "User",
+            "id": ""
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": true
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        }
+      ],
+      "loaded": []
+    },
+    {
+      "name": "empty_policy_set",
+      "policies": "",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": null
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": null
+        },
+        "context": null,
+        "entities": []
+      },
+      "completions": [
+        {
+          "principal": {
+            "type": "User",
+            "id": "alice"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": true
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        }
+      ],
+      "loaded": []
+    },
+    {
+      "name": "unknown_tags",
+      "policies": "permit(principal, action, resource) when { principal.hasTag(\"tier\") && principal.getTag(\"tier\") == \"gold\" };",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": {
+          "mfa": true
+        },
+        "entities": [
+          {
+            "uid": {
+              "type": "User",
+              "id": "alice"
+            },
+            "attrs": {},
+            "parents": []
+          }
+        ]
+      },
+      "completions": [
+        {
+          "principal": {
+            "type": "User",
+            "id": "alice"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": true
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {
+                "tier": "gold"
+              }
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        },
+        {
+          "principal": {
+            "type": "User",
+            "id": "alice"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": true
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        }
+      ],
+      "loaded": []
+    },
+    {
+      "name": "unknown_parents",
+      "policies": "permit(principal in Group::\"staff\", action, resource);",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": {
+          "mfa": true
+        },
+        "entities": [
+          {
+            "uid": {
+              "type": "User",
+              "id": "alice"
+            },
+            "attrs": {},
+            "parents": null,
+            "tags": {}
+          }
+        ]
+      },
+      "completions": [
+        {
+          "principal": {
+            "type": "User",
+            "id": "alice"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": true
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [
+                {
+                  "type": "Group",
+                  "id": "staff"
+                }
+              ],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Group",
+                "id": "staff"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        },
+        {
+          "principal": {
+            "type": "User",
+            "id": "alice"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": true
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        }
+      ],
+      "loaded": []
+    },
+    {
+      "name": "parent_with_unknown_parents",
+      "policies": "permit(principal, action, resource) when { resource.owner == principal };",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": {
+          "mfa": true
+        },
+        "entities": [
+          {
+            "uid": {
+              "type": "User",
+              "id": "alice"
+            },
+            "attrs": {},
+            "parents": [
+              {
+                "type": "Group",
+                "id": "staff"
+              }
+            ],
+            "tags": {}
+          },
+          {
+            "uid": {
+              "type": "Group",
+              "id": "staff"
+            }
+          }
+        ]
+      },
+      "completions": [],
+      "loaded": []
+    },
+    {
+      "name": "escaped_unicode_id",
+      "policies": "permit(principal, action, resource) when { resource.owner == principal };",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "quoted\"\n🔥"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": {
+          "mfa": true
+        },
+        "entities": [
+          {
+            "uid": {
+              "type": "User",
+              "id": "quoted\"\n🔥"
+            },
+            "attrs": {},
+            "parents": [],
+            "tags": {}
+          },
+          {
+            "uid": {
+              "type": "Photo",
+              "id": "beach"
+            },
+            "attrs": {
+              "owner": {
+                "__entity": {
+                  "type": "User",
+                  "id": "quoted\"\n🔥"
+                }
+              },
+              "private": true
+            },
+            "parents": [],
+            "tags": {}
+          }
+        ]
+      },
+      "completions": [
+        {
+          "principal": {
+            "type": "User",
+            "id": "quoted\"\n🔥"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": true
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "quoted\"\n🔥"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "quoted\"\n🔥"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        }
+      ],
+      "loaded": []
+    },
+    {
+      "name": "unsupported_unknown_context_field",
+      "policies": "permit(principal, action, resource) when { resource.owner == principal };",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": {
+          "mfa": {
+            "__expr": "unknown(\"mfa\")"
+          }
+        },
+        "entities": [
+          {
+            "uid": {
+              "type": "User",
+              "id": "alice"
+            },
+            "attrs": {},
+            "parents": [],
+            "tags": {}
+          },
+          {
+            "uid": {
+              "type": "Photo",
+              "id": "beach"
+            },
+            "attrs": {
+              "owner": {
+                "__entity": {
+                  "type": "User",
+                  "id": "alice"
+                }
+              },
+              "private": true
+            },
+            "parents": [],
+            "tags": {}
+          }
+        ]
+      },
+      "completions": [],
+      "loaded": []
+    },
+    {
+      "name": "loaded_omitted_tags_are_known_empty",
+      "policies": "permit(principal, action, resource) unless { principal.hasTag(\"blocked\") };",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": {
+          "mfa": true
+        },
+        "entities": []
+      },
+      "completions": [
+        {
+          "principal": {
+            "type": "User",
+            "id": "alice"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": true
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        }
+      ],
+      "loaded": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "alice"
+          },
+          "attrs": {},
+          "parents": []
+        },
+        {
+          "uid": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "attrs": {
+            "owner": {
+              "__entity": {
+                "type": "User",
+                "id": "alice"
+              }
+            },
+            "private": true
+          },
+          "parents": [],
+          "tags": {}
+        }
+      ]
+    },
+    {
+      "name": "raw_policy_ids_undecided",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": null,
+        "entities": []
+      },
+      "completions": [
+        {
+          "principal": {
+            "type": "User",
+            "id": "alice"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": true
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        },
+        {
+          "principal": {
+            "type": "User",
+            "id": "alice"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": false
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        }
+      ],
+      "loaded": [],
+      "policies_json": {
+        "templates": {},
+        "templateLinks": [],
+        "staticPolicies": {
+          "permit\"\n\\\u0000": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "Value": true
+                }
+              }
+            ]
+          },
+          "forbid\"\n\\\u0000": {
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "unless",
+                "body": {
+                  ".": {
+                    "left": {
+                      "Var": "context"
+                    },
+                    "attr": "mfa"
+                  }
+                }
+              }
+            ]
+          },
+          "error\"\n\\\u0000": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "==": {
+                    "left": {
+                      "+": {
+                        "left": {
+                          "Value": 9223372036854775807
+                        },
+                        "right": {
+                          "Value": 1
+                        }
+                      }
+                    },
+                    "right": {
+                      "Value": 0
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "raw_policy_ids_allow",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": {
+          "mfa": true
+        },
+        "entities": []
+      },
+      "completions": [
+        {
+          "principal": {
+            "type": "User",
+            "id": "alice"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": true
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        }
+      ],
+      "loaded": [],
+      "policies_json": {
+        "templates": {},
+        "templateLinks": [],
+        "staticPolicies": {
+          "permit\"\n\\\u0000": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "Value": true
+                }
+              }
+            ]
+          },
+          "forbid\"\n\\\u0000": {
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "unless",
+                "body": {
+                  ".": {
+                    "left": {
+                      "Var": "context"
+                    },
+                    "attr": "mfa"
+                  }
+                }
+              }
+            ]
+          },
+          "error\"\n\\\u0000": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "==": {
+                    "left": {
+                      "+": {
+                        "left": {
+                          "Value": 9223372036854775807
+                        },
+                        "right": {
+                          "Value": 1
+                        }
+                      }
+                    },
+                    "right": {
+                      "Value": 0
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "raw_policy_ids_deny",
+      "partial": {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "beach"
+        },
+        "context": {
+          "mfa": false
+        },
+        "entities": []
+      },
+      "completions": [
+        {
+          "principal": {
+            "type": "User",
+            "id": "alice"
+          },
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource": {
+            "type": "Photo",
+            "id": "beach"
+          },
+          "context": {
+            "mfa": false
+          },
+          "entities": [
+            {
+              "uid": {
+                "type": "User",
+                "id": "alice"
+              },
+              "attrs": {},
+              "parents": [],
+              "tags": {}
+            },
+            {
+              "uid": {
+                "type": "Photo",
+                "id": "beach"
+              },
+              "attrs": {
+                "owner": {
+                  "__entity": {
+                    "type": "User",
+                    "id": "alice"
+                  }
+                },
+                "private": true
+              },
+              "parents": [],
+              "tags": {}
+            }
+          ]
+        }
+      ],
+      "loaded": [],
+      "policies_json": {
+        "templates": {},
+        "templateLinks": [],
+        "staticPolicies": {
+          "permit\"\n\\\u0000": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "Value": true
+                }
+              }
+            ]
+          },
+          "forbid\"\n\\\u0000": {
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "unless",
+                "body": {
+                  ".": {
+                    "left": {
+                      "Var": "context"
+                    },
+                    "attr": "mfa"
+                  }
+                }
+              }
+            ]
+          },
+          "error\"\n\\\u0000": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "==": {
+                    "left": {
+                      "+": {
+                        "left": {
+                          "Value": 9223372036854775807
+                        },
+                        "right": {
+                          "Value": 1
+                        }
+                      }
+                    },
+                    "right": {
+                      "Value": 0
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

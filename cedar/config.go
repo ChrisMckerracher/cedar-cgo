@@ -48,7 +48,7 @@ func (l Limits) withDefaults() Limits {
 
 type Config struct {
 	// Schema checks entities, contexts and requests, and supplies action entities.
-	// Policy validation requires [Runtime.Validate].
+	// Use [Runtime.Validate] to check policies before ordinary authorization.
 	Schema   *Schema
 	Policies PolicySet
 	// Entities are available to every request.
