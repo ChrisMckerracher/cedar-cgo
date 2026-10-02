@@ -37,12 +37,8 @@ func FuzzBatchedEntities(f *testing.F) {
 	})
 }
 
-// fuzzBatchedStore merges the fixture's entity batches with well-formed extra
-// entities. Extras are kept only when their UIDs are unique and their parents
-// stay inside the merged store: Rust's EntityLoader requires complete ancestry
-// while an ordinary entity store does not, so unclosed extras would compare
-// unequal semantics rather than the loading mechanism.
-func fuzzBatchedStore(t *testing.T, fixture batchFixture, extraJSON string) (json.RawMessage, map[cedar.EntityUID]bool) {
+// Keep unique entities with complete ancestry so both evaluation paths use the same data.
+func fuzzBatchedStore(t *testing.T, fixture batchFixture, extraJSON string) (json.RawMessage, map[cedar.EntityUID]json.RawMessage) {
 	t.Helper()
 	type entity struct {
 		raw     json.RawMessage
@@ -87,9 +83,9 @@ func fuzzBatchedStore(t *testing.T, fixture batchFixture, extraJSON string) (jso
 			}
 		}
 	}
-	reachable := map[cedar.EntityUID]bool{}
+	reachable := map[cedar.EntityUID]json.RawMessage{}
 	for _, e := range pool {
-		reachable[e.uid.uid()] = true
+		reachable[e.uid.uid()] = e.raw
 	}
 	combined := make([]json.RawMessage, 0, len(pool)+len(extras))
 	for _, e := range pool {
@@ -98,7 +94,7 @@ func fuzzBatchedStore(t *testing.T, fixture batchFixture, extraJSON string) (jso
 	for _, e := range extras {
 		closed := true
 		for _, p := range e.parents {
-			if !reachable[p.uid()] {
+			if _, ok := reachable[p.uid()]; !ok {
 				closed = false
 				break
 			}
@@ -106,11 +102,10 @@ func fuzzBatchedStore(t *testing.T, fixture batchFixture, extraJSON string) (jso
 		if !closed {
 			continue
 		}
-		reachable[e.uid.uid()] = true
+		reachable[e.uid.uid()] = e.raw
 		combined = append(combined, e.raw)
 	}
-	// The known set covers exactly the returned store, so anything else the
-	// guest requests is reported missing, matching the sequential side.
+	// The index contains exactly the returned store; other requested UIDs are missing.
 	data, err := json.Marshal(combined)
 	if err != nil {
 		t.Fatal(err)
@@ -124,6 +119,7 @@ func FuzzBatchedDifferential(f *testing.F) {
 	f.Add("bob", "doc", `{`, `[{"uid":{"type":"User","id":"carol"},"attrs":{"enabled":false},"parents":[]}]`, uint8(0))
 	f.Add("manager", "doc", ``, `[{"uid":{"type":"User","id":"alice"},"attrs":{},"parents":[]}]`, uint8(0))
 	f.Add("alice", "doc", `{}`, `[`, uint8(1))
+	f.Add("bob", "doc", `{}`, `[{"uid":{"type":"User","id":"bob"},"attrs":{"manager":{"__entity":{"type":"User","id":"missing"}}},"parents":[]}]`, uint8(0))
 	fixture := batchedFixtures(f)[0]
 	a := batchAuthorizer(f, fixture, fuzzLimits)
 	rt := testRuntime(f)
@@ -153,13 +149,19 @@ func FuzzBatchedDifferential(f *testing.F) {
 			case mode&4 != 0:
 				return cedar.EntityLoadResult{Entities: json.RawMessage(`{"not":"an array"}`)}, nil
 			}
-			result := cedar.EntityLoadResult{Entities: store}
+			result := cedar.EntityLoadResult{}
+			entities := make([]json.RawMessage, 0, len(uids))
 			for _, uid := range uids {
-				if !known[uid] {
+				if entity, ok := known[uid]; ok {
+					entities = append(entities, entity)
+				} else {
 					result.Missing = append(result.Missing, uid)
 				}
 			}
-			return result, nil
+			// Cedar keeps prior batches, so return only the requested entities each round.
+			var err error
+			result.Entities, err = json.Marshal(entities)
+			return result, err
 		})
 		decision, err := a.AuthorizeBatched(context.Background(), req, loader, cedar.BatchedOptions{MaxIterations: 4})
 		checkNoFault(t, err)
