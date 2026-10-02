@@ -14,6 +14,7 @@
 - [Build checks](#build-checks)
 - [Batched loading and arithmetic](#batched-loading-parity-and-bounded-arithmetic)
 - [Policy construction and editing](#policy-construction-and-editing)
+- [Property-based testing](#property-based-testing)
 
 ## Conformance
 
@@ -283,3 +284,47 @@ These are differential and resource tests, not a proof of policy semantics. The
 feature introduces no new ABI arithmetic or shared mutable guest state; the
 existing ABI proof remains the applicable bitvector evidence. No new solver
 claim is made for parsing, PST conversion or authorization.
+
+## Property-based testing
+
+`cedar/*_property_test.go` and `analysis/analysis_property_test.go` carry
+property tests built on [`pgregory.net/rapid`](https://pgregory.net/rapid)
+v1.3.0, a test-only Go dependency. Generators in
+[`cedar/property_gen_test.go`](../cedar/property_gen_test.go) compose policies
+from a small grammar of fixture-proven, strictly valid Joy-schema expressions,
+plus contexts, entity stores, requests, values, templates, and malformed JSON.
+Each property asserts only contracts documented here or in the package tests:
+
+| Area | Property |
+|---|---|
+| Formatting | `format` is idempotent, output re-parses, and authorization is unchanged before/after formatting |
+| Templates | linking authorizes identically to textual slot substitution; inspection round-trips IDs/slots/annotations/bindings; unlink removes exactly the link |
+| Policy editing | add/remove sequences track a Go-side ID model; JSON and EST views round-trip; edits never disturb unrelated policies |
+| Partial evaluation | reauthorizing residuals equals direct authorization; fully known inputs decide exactly like full evaluation |
+| Slicing | the sliced decision equals full-store and reduced-store authorization |
+| Batched loading | loader-served, preloaded, and sequential authorization agree |
+| Validation | identical diagnostics across calls; sampled corpus tests that should validate always pass |
+| Values/entities | value and entity JSON reach a fixpoint; malformed entity input fails closed |
+| Authorizer | decisions are deterministic and stateless across reused calls |
+| Analysis | sampled cvc5 counterexamples replay as deny→allow in the concrete authorizer; a set is equivalent to itself |
+
+rapid selects a random seed for each run and prints the seed on failure.
+To reproduce a failure, use
+`go test ./cedar -run TestPropertyFormatIdempotent -rapid.seed=N`
+or `-rapid.failfile`. By default, rapid runs 100 checks per property.
+Use `-rapid.checks` or `RAPID_CHECKS` to change this count for the test process.
+Use `go test -short` to divide the check count by five.
+Each check runs its assertions without a time guard, including during replay
+and shrinking. Generator limits control policy size and entity count.
+
+The analysis property checks every counterexample's reported decisions.
+It replays up to three counterexamples per report through concrete authorization.
+A run with `-rapid.seed=1` checked 100 cases.
+It recorded 858 solver-held environments and replayed 88 counterexamples.
+
+The validation determinism property uncovered real upstream nondeterminism:
+cedar-policy's validator picks its `did you mean` suggestion by hash iteration,
+so identical inputs can render different hint text across calls. The property
+normalizes those `(help: did you mean ...)` substrings before comparing
+diagnostics; Passed, policy IDs, counts, and all remaining message text stay
+exact.

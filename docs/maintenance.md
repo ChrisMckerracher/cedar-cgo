@@ -109,6 +109,7 @@ dependencies remain subject to the automated audits.
 | `miette` | zkat/miette, also used by Cedar; diagnostic rendering |
 | `wazero` | tetratelabs/wazero; Go WebAssembly runtime |
 | `puddle/v2` | jackc/puddle, the pgx connection pool; instance pooling |
+| `pgregory.net/rapid` | Gregory Petrosyan; property-based testing (Go, test-only) |
 | Go and Rust | Official toolchain distributions |
 | cargo-deny, cargo-about | EmbarkStudios; dependency policy and license notices |
 | cargo-audit | RustSec; Rust vulnerability auditing |

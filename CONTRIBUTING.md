@@ -96,6 +96,9 @@ Fuzz seeds run in ordinary tests. To fuzz a target for longer:
 go test -run '^$' -fuzz '^FuzzAuthorize$' -fuzztime 5m ./cedar
 ```
 
+Property tests (`TestProperty*`) run in ordinary tests too; rapid prints the
+seed on failure, so reproduce with `go test ./cedar -run TestPropertyX -rapid.seed=N`.
+
 Repeat for every target listed in the CI workflow and verification guide. See
 [Verification](docs/verification.md) for coverage and
 [Performance](docs/performance.md#reproduce) for benchmarks.
