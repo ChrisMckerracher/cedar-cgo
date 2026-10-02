@@ -85,8 +85,9 @@ scripts/check-template-parity.sh
 Template tests also cover JSON inspection/round trips, escaped IDs, concurrent
 immutable snapshots, malformed envelopes, exact input bounds, response/memory
 limits, cancellation/deadlines, and calls after runtime closure. `FuzzTemplates`
-checks parsing, binding discovered slots, and link/unlink round trips. These
-are differential and boundary tests, not a formal proof of template semantics.
+checks parsing, EST round trips, binding discovered slots, link/unlink state
+transitions with authorization restoration, and non-UTF-8 rejection. These are
+differential and boundary tests, not a formal proof of template semantics.
 The operations reuse the existing ABI arithmetic and fresh-instance lifecycle;
 no new arithmetic or mutable handle state is introduced.
 
@@ -119,14 +120,17 @@ The `cedar` package contains these Go fuzz targets:
 | Target | Exercises |
 |---|---|
 | `FuzzAuthorize` | UIDs, contexts, per-request entities, and response handling |
-| `FuzzPolicies` | Policy parsing, strict validation, loading, and authorization |
+| `FuzzPolicies` | Policy parsing, strict validation, loading, and authorization, seeded with corpus-derived literals |
 | `FuzzEntities` | Entity parsing and authorization, with and without a schema |
 | `FuzzBatchedEntities` | Callback entity JSON, bounded loading, and fail-closed results |
+| `FuzzBatchedDifferential` | Batched loading against single-shot authorization with identical data, plus failing/oversized/malformed loaders |
 | `FuzzSliceEntities` | Source entity parsing, fail-closed slicing, and full/reduced authorization agreement |
 | `FuzzPolicySyntax` | Structured policy construction and malformed syntax envelopes |
-| `FuzzTemplates` | Template parsing and immutable link/unlink round trips |
+| `FuzzPolicyEdits` | Add/remove sequences over parsed sets, membership coherence, and JSON reparse stability |
+| `FuzzTemplates` | Template parsing, EST round trips, binding, link/unlink state transitions, and authorization restoration |
 | `FuzzPartialEntities` | Unknown entity input and undecided results |
-| `FuzzFormatPolicies` | Policy/template text and layout options, malformed UTF-8, errors, and idempotence |
+| `FuzzPartialReauthorize` | Residual reauthorization against direct authorization with concrete values |
+| `FuzzFormatPolicies` | Policy/template text and layout options, malformed UTF-8, errors, idempotence, and decision preservation |
 
 Each target rejects unexpected module faults; authorization errors must return
 `Deny`, partial-evaluation errors return `Undecided`, and formatting errors return
@@ -134,7 +138,27 @@ no text. Batched, slicing, partial, and formatting targets skip inputs deeper
 than 40 nested brackets; other targets use the 200-bracket bound. Dedicated fault
 tests cover stack exhaustion. Formatting also bounds input to 4 KiB and output
 to 1 MiB. When a corpus directory is supplied, up to 200 corpus policies seed
-`FuzzPolicies`.
+`FuzzPolicies`; eight small corpus-derived literals are baked in unconditionally.
+
+Several bodies also check semantic invariants beyond fail-closed behavior:
+
+- `FuzzFormatPolicies` requires successful output to be a formatting fixed
+  point and to leave the decision (and error outcome) of a fixed request
+  unchanged against the original source.
+- `FuzzBatchedDifferential` serves the same closed entity store through the
+  callback and an ordinary authorizer and requires equal decisions and error
+  outcomes; its adversarial legs inject loader errors, oversized batches, and
+  malformed JSON, which must fail closed without faults.
+- `FuzzPolicyEdits` requires each add/remove to either succeed with the
+  inspected membership updated or fail with the set still reparsing to the
+  same JSON and policy list.
+- `FuzzTemplates` requires an accepted template to survive its EST round trip,
+  links to be listed consistently, unlinking to restore both the pre-link
+  policy set and its decision, and non-UTF-8 inputs to be rejected as input
+  errors before the guest runs.
+- `FuzzPartialReauthorize` requires reauthorizing the residual with concrete
+  principal, resource, and context values to match direct authorization with
+  those values, including matching error outcomes.
 
 The slicing target bounds its input to 64 KiB and four loading rounds. On a
 successful slice it checks full and reduced authorization decisions; on any
