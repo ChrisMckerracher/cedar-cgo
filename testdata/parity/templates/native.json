@@ -1,0 +1,2366 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "decision": "allow",
+        "errors": [],
+        "policies": {
+          "staticPolicies": {
+            "policy0": {
+              "action": {
+                "op": "All"
+              },
+              "conditions": [
+                {
+                  "body": {
+                    "Value": false
+                  },
+                  "kind": "when"
+                }
+              ],
+              "effect": "forbid",
+              "principal": {
+                "op": "All"
+              },
+              "resource": {
+                "op": "All"
+              }
+            }
+          },
+          "templateLinks": [
+            {
+              "newId": "alice-access",
+              "templateId": "share",
+              "values": {
+                "?principal": {
+                  "__entity": {
+                    "id": "alice",
+                    "type": "User"
+                  }
+                },
+                "?resource": {
+                  "__entity": {
+                    "id": "beach",
+                    "type": "Photo"
+                  }
+                }
+              }
+            }
+          ],
+          "templates": {
+            "share": {
+              "action": {
+                "entity": {
+                  "id": "view",
+                  "type": "Action"
+                },
+                "op": "=="
+              },
+              "annotations": {
+                "description": "shared access"
+              },
+              "conditions": [],
+              "effect": "permit",
+              "principal": {
+                "op": "==",
+                "slot": "?principal"
+              },
+              "resource": {
+                "op": "==",
+                "slot": "?resource"
+              }
+            }
+          }
+        },
+        "reasons": [
+          "alice-access"
+        ],
+        "valid": true,
+        "warnings": [
+          {
+            "message": "for policy `policy0`, policy is impossible: the policy expression evaluates to false for all valid requests",
+            "policy_id": "policy0"
+          }
+        ]
+      },
+      "name": "valid link",
+      "operation": {
+        "bindings": {
+          "?principal": {
+            "id": "alice",
+            "type": "User"
+          },
+          "?resource": {
+            "id": "beach",
+            "type": "Photo"
+          }
+        },
+        "op": "link",
+        "policy_id": "alice-access",
+        "template_id": "share"
+      },
+      "policies": {
+        "staticPolicies": {
+          "policy0": {
+            "action": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "body": {
+                  "Value": false
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            }
+          }
+        },
+        "templateLinks": [],
+        "templates": {
+          "share": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "description": "shared access"
+            },
+            "conditions": [],
+            "effect": "permit",
+            "principal": {
+              "op": "==",
+              "slot": "?principal"
+            },
+            "resource": {
+              "op": "==",
+              "slot": "?resource"
+            }
+          }
+        }
+      }
+    },
+    {
+      "expected": {
+        "error": "unable to link template; the following slots were not provided as arguments: ?resource"
+      },
+      "name": "missing one binding",
+      "operation": {
+        "bindings": {
+          "?principal": {
+            "id": "alice",
+            "type": "User"
+          }
+        },
+        "op": "link",
+        "policy_id": "new",
+        "template_id": "share"
+      },
+      "policies": {
+        "staticPolicies": {
+          "policy0": {
+            "action": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "body": {
+                  "Value": false
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            }
+          }
+        },
+        "templateLinks": [],
+        "templates": {
+          "share": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "description": "shared access"
+            },
+            "conditions": [],
+            "effect": "permit",
+            "principal": {
+              "op": "==",
+              "slot": "?principal"
+            },
+            "resource": {
+              "op": "==",
+              "slot": "?resource"
+            }
+          }
+        }
+      }
+    },
+    {
+      "expected": {
+        "error": "unable to link template; the following slots were not provided as arguments: ?resource,?principal"
+      },
+      "name": "missing all bindings",
+      "operation": {
+        "bindings": {},
+        "op": "link",
+        "policy_id": "new",
+        "template_id": "share"
+      },
+      "policies": {
+        "staticPolicies": {
+          "policy0": {
+            "action": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "body": {
+                  "Value": false
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            }
+          }
+        },
+        "templateLinks": [],
+        "templates": {
+          "share": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "description": "shared access"
+            },
+            "conditions": [],
+            "effect": "permit",
+            "principal": {
+              "op": "==",
+              "slot": "?principal"
+            },
+            "resource": {
+              "op": "==",
+              "slot": "?resource"
+            }
+          }
+        }
+      }
+    },
+    {
+      "expected": {
+        "error": "unable to link template; template-linked policy id `share` conflicts with an existing policy id"
+      },
+      "name": "duplicate template id",
+      "operation": {
+        "bindings": {
+          "?principal": {
+            "id": "alice",
+            "type": "User"
+          },
+          "?resource": {
+            "id": "beach",
+            "type": "Photo"
+          }
+        },
+        "op": "link",
+        "policy_id": "share",
+        "template_id": "share"
+      },
+      "policies": {
+        "staticPolicies": {
+          "policy0": {
+            "action": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "body": {
+                  "Value": false
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            }
+          }
+        },
+        "templateLinks": [],
+        "templates": {
+          "share": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "description": "shared access"
+            },
+            "conditions": [],
+            "effect": "permit",
+            "principal": {
+              "op": "==",
+              "slot": "?principal"
+            },
+            "resource": {
+              "op": "==",
+              "slot": "?resource"
+            }
+          }
+        }
+      }
+    },
+    {
+      "expected": {
+        "error": "unable to link template; template-linked policy id `policy0` conflicts with an existing policy id"
+      },
+      "name": "duplicate static id",
+      "operation": {
+        "bindings": {
+          "?principal": {
+            "id": "alice",
+            "type": "User"
+          },
+          "?resource": {
+            "id": "beach",
+            "type": "Photo"
+          }
+        },
+        "op": "link",
+        "policy_id": "policy0",
+        "template_id": "share"
+      },
+      "policies": {
+        "staticPolicies": {
+          "policy0": {
+            "action": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "body": {
+                  "Value": false
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            }
+          }
+        },
+        "templateLinks": [],
+        "templates": {
+          "share": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "description": "shared access"
+            },
+            "conditions": [],
+            "effect": "permit",
+            "principal": {
+              "op": "==",
+              "slot": "?principal"
+            },
+            "resource": {
+              "op": "==",
+              "slot": "?resource"
+            }
+          }
+        }
+      }
+    },
+    {
+      "expected": {
+        "error": "unable to link template; failed to find a template with id `absent`"
+      },
+      "name": "missing template",
+      "operation": {
+        "bindings": {
+          "?principal": {
+            "id": "alice",
+            "type": "User"
+          },
+          "?resource": {
+            "id": "beach",
+            "type": "Photo"
+          }
+        },
+        "op": "link",
+        "policy_id": "new",
+        "template_id": "absent"
+      },
+      "policies": {
+        "staticPolicies": {
+          "policy0": {
+            "action": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "body": {
+                  "Value": false
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            }
+          }
+        },
+        "templateLinks": [],
+        "templates": {
+          "share": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "description": "shared access"
+            },
+            "conditions": [],
+            "effect": "permit",
+            "principal": {
+              "op": "==",
+              "slot": "?principal"
+            },
+            "resource": {
+              "op": "==",
+              "slot": "?resource"
+            }
+          }
+        }
+      }
+    },
+    {
+      "expected": {
+        "error": "expected a template, but a static policy was provided"
+      },
+      "name": "link static policy",
+      "operation": {
+        "bindings": {
+          "?principal": {
+            "id": "alice",
+            "type": "User"
+          },
+          "?resource": {
+            "id": "beach",
+            "type": "Photo"
+          }
+        },
+        "op": "link",
+        "policy_id": "new",
+        "template_id": "policy0"
+      },
+      "policies": {
+        "staticPolicies": {
+          "policy0": {
+            "action": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "body": {
+                  "Value": false
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            }
+          }
+        },
+        "templateLinks": [],
+        "templates": {
+          "share": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "description": "shared access"
+            },
+            "conditions": [],
+            "effect": "permit",
+            "principal": {
+              "op": "==",
+              "slot": "?principal"
+            },
+            "resource": {
+              "op": "==",
+              "slot": "?resource"
+            }
+          }
+        }
+      }
+    },
+    {
+      "expected": {
+        "error": "unable to link template; template-linked policy id `alice-access` conflicts with an existing policy id"
+      },
+      "name": "duplicate linked id",
+      "operation": {
+        "bindings": {
+          "?principal": {
+            "id": "alice",
+            "type": "User"
+          },
+          "?resource": {
+            "id": "beach",
+            "type": "Photo"
+          }
+        },
+        "op": "link",
+        "policy_id": "alice-access",
+        "template_id": "share"
+      },
+      "policies": {
+        "staticPolicies": {
+          "policy0": {
+            "action": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "body": {
+                  "Value": false
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            }
+          }
+        },
+        "templateLinks": [
+          {
+            "newId": "alice-access",
+            "templateId": "share",
+            "values": {
+              "?principal": {
+                "__entity": {
+                  "id": "alice",
+                  "type": "User"
+                }
+              },
+              "?resource": {
+                "__entity": {
+                  "id": "beach",
+                  "type": "Photo"
+                }
+              }
+            }
+          }
+        ],
+        "templates": {
+          "share": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "description": "shared access"
+            },
+            "conditions": [],
+            "effect": "permit",
+            "principal": {
+              "op": "==",
+              "slot": "?principal"
+            },
+            "resource": {
+              "op": "==",
+              "slot": "?resource"
+            }
+          }
+        }
+      }
+    },
+    {
+      "expected": {
+        "error": "unable to link template; the following slots were provided as arguments, but did not exist in the template: ?resource"
+      },
+      "name": "extra resource binding",
+      "operation": {
+        "bindings": {
+          "?principal": {
+            "id": "alice",
+            "type": "User"
+          },
+          "?resource": {
+            "id": "beach",
+            "type": "Photo"
+          }
+        },
+        "op": "link",
+        "policy_id": "new",
+        "template_id": "share"
+      },
+      "policies": {
+        "staticPolicies": {},
+        "templateLinks": [],
+        "templates": {
+          "share": {
+            "action": {
+              "op": "All"
+            },
+            "conditions": [],
+            "effect": "permit",
+            "principal": {
+              "op": "==",
+              "slot": "?principal"
+            },
+            "resource": {
+              "op": "All"
+            }
+          }
+        }
+      }
+    },
+    {
+      "expected": {
+        "decision": "deny",
+        "errors": [],
+        "policies": {
+          "staticPolicies": {
+            "policy0": {
+              "action": {
+                "op": "All"
+              },
+              "conditions": [
+                {
+                  "body": {
+                    "Value": false
+                  },
+                  "kind": "when"
+                }
+              ],
+              "effect": "forbid",
+              "principal": {
+                "op": "All"
+              },
+              "resource": {
+                "op": "All"
+              }
+            }
+          },
+          "templateLinks": [
+            {
+              "newId": "new",
+              "templateId": "share",
+              "values": {
+                "?principal": {
+                  "__entity": {
+                    "id": "alice",
+                    "type": "Photo"
+                  }
+                },
+                "?resource": {
+                  "__entity": {
+                    "id": "beach",
+                    "type": "Photo"
+                  }
+                }
+              }
+            }
+          ],
+          "templates": {
+            "share": {
+              "action": {
+                "entity": {
+                  "id": "view",
+                  "type": "Action"
+                },
+                "op": "=="
+              },
+              "annotations": {
+                "description": "shared access"
+              },
+              "conditions": [],
+              "effect": "permit",
+              "principal": {
+                "op": "==",
+                "slot": "?principal"
+              },
+              "resource": {
+                "op": "==",
+                "slot": "?resource"
+              }
+            }
+          }
+        },
+        "reasons": [],
+        "valid": true,
+        "warnings": [
+          {
+            "message": "for policy `new`, unable to find an applicable action given the policy scope constraints",
+            "policy_id": "new"
+          },
+          {
+            "message": "for policy `policy0`, policy is impossible: the policy expression evaluates to false for all valid requests",
+            "policy_id": "policy0"
+          }
+        ]
+      },
+      "name": "inapplicable link warns but passes validation",
+      "operation": {
+        "bindings": {
+          "?principal": {
+            "id": "alice",
+            "type": "Photo"
+          },
+          "?resource": {
+            "id": "beach",
+            "type": "Photo"
+          }
+        },
+        "op": "link",
+        "policy_id": "new",
+        "template_id": "share"
+      },
+      "policies": {
+        "staticPolicies": {
+          "policy0": {
+            "action": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "body": {
+                  "Value": false
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            }
+          }
+        },
+        "templateLinks": [],
+        "templates": {
+          "share": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "description": "shared access"
+            },
+            "conditions": [],
+            "effect": "permit",
+            "principal": {
+              "op": "==",
+              "slot": "?principal"
+            },
+            "resource": {
+              "op": "==",
+              "slot": "?resource"
+            }
+          }
+        }
+      }
+    },
+    {
+      "expected": {
+        "decision": "deny",
+        "errors": [
+          {
+            "message": "for policy `new`, unrecognized entity type `Uzer` (help: did you mean `User`?)",
+            "policy_id": "new"
+          }
+        ],
+        "policies": {
+          "staticPolicies": {
+            "policy0": {
+              "action": {
+                "op": "All"
+              },
+              "conditions": [
+                {
+                  "body": {
+                    "Value": false
+                  },
+                  "kind": "when"
+                }
+              ],
+              "effect": "forbid",
+              "principal": {
+                "op": "All"
+              },
+              "resource": {
+                "op": "All"
+              }
+            }
+          },
+          "templateLinks": [
+            {
+              "newId": "new",
+              "templateId": "share",
+              "values": {
+                "?principal": {
+                  "__entity": {
+                    "id": "alice",
+                    "type": "Uzer"
+                  }
+                },
+                "?resource": {
+                  "__entity": {
+                    "id": "beach",
+                    "type": "Photo"
+                  }
+                }
+              }
+            }
+          ],
+          "templates": {
+            "share": {
+              "action": {
+                "entity": {
+                  "id": "view",
+                  "type": "Action"
+                },
+                "op": "=="
+              },
+              "annotations": {
+                "description": "shared access"
+              },
+              "conditions": [],
+              "effect": "permit",
+              "principal": {
+                "op": "==",
+                "slot": "?principal"
+              },
+              "resource": {
+                "op": "==",
+                "slot": "?resource"
+              }
+            }
+          }
+        },
+        "reasons": [],
+        "valid": false,
+        "warnings": [
+          {
+            "message": "for policy `new`, unable to find an applicable action given the policy scope constraints",
+            "policy_id": "new"
+          },
+          {
+            "message": "for policy `policy0`, policy is impossible: the policy expression evaluates to false for all valid requests",
+            "policy_id": "policy0"
+          }
+        ]
+      },
+      "name": "link succeeds but strict validation fails",
+      "operation": {
+        "bindings": {
+          "?principal": {
+            "id": "alice",
+            "type": "Uzer"
+          },
+          "?resource": {
+            "id": "beach",
+            "type": "Photo"
+          }
+        },
+        "op": "link",
+        "policy_id": "new",
+        "template_id": "share"
+      },
+      "policies": {
+        "staticPolicies": {
+          "policy0": {
+            "action": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "body": {
+                  "Value": false
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            }
+          }
+        },
+        "templateLinks": [],
+        "templates": {
+          "share": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "description": "shared access"
+            },
+            "conditions": [],
+            "effect": "permit",
+            "principal": {
+              "op": "==",
+              "slot": "?principal"
+            },
+            "resource": {
+              "op": "==",
+              "slot": "?resource"
+            }
+          }
+        }
+      }
+    },
+    {
+      "expected": {
+        "decision": "deny",
+        "errors": [],
+        "policies": {
+          "staticPolicies": {
+            "policy0": {
+              "action": {
+                "op": "All"
+              },
+              "conditions": [
+                {
+                  "body": {
+                    "Value": false
+                  },
+                  "kind": "when"
+                }
+              ],
+              "effect": "forbid",
+              "principal": {
+                "op": "All"
+              },
+              "resource": {
+                "op": "All"
+              }
+            }
+          },
+          "templateLinks": [],
+          "templates": {
+            "share": {
+              "action": {
+                "entity": {
+                  "id": "view",
+                  "type": "Action"
+                },
+                "op": "=="
+              },
+              "annotations": {
+                "description": "shared access"
+              },
+              "conditions": [],
+              "effect": "permit",
+              "principal": {
+                "op": "==",
+                "slot": "?principal"
+              },
+              "resource": {
+                "op": "==",
+                "slot": "?resource"
+              }
+            }
+          }
+        },
+        "reasons": [],
+        "valid": true,
+        "warnings": [
+          {
+            "message": "for policy `policy0`, policy is impossible: the policy expression evaluates to false for all valid requests",
+            "policy_id": "policy0"
+          }
+        ]
+      },
+      "name": "unlink",
+      "operation": {
+        "op": "unlink",
+        "policy_id": "alice-access"
+      },
+      "policies": {
+        "staticPolicies": {
+          "policy0": {
+            "action": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "body": {
+                  "Value": false
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            }
+          }
+        },
+        "templateLinks": [
+          {
+            "newId": "alice-access",
+            "templateId": "share",
+            "values": {
+              "?principal": {
+                "__entity": {
+                  "id": "alice",
+                  "type": "User"
+                }
+              },
+              "?resource": {
+                "__entity": {
+                  "id": "beach",
+                  "type": "Photo"
+                }
+              }
+            }
+          }
+        ],
+        "templates": {
+          "share": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "description": "shared access"
+            },
+            "conditions": [],
+            "effect": "permit",
+            "principal": {
+              "op": "==",
+              "slot": "?principal"
+            },
+            "resource": {
+              "op": "==",
+              "slot": "?resource"
+            }
+          }
+        }
+      }
+    },
+    {
+      "expected": {
+        "error": "unable to unlink policy `absent` because it does not exist"
+      },
+      "name": "unlink missing",
+      "operation": {
+        "op": "unlink",
+        "policy_id": "absent"
+      },
+      "policies": {
+        "staticPolicies": {
+          "policy0": {
+            "action": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "body": {
+                  "Value": false
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            }
+          }
+        },
+        "templateLinks": [
+          {
+            "newId": "alice-access",
+            "templateId": "share",
+            "values": {
+              "?principal": {
+                "__entity": {
+                  "id": "alice",
+                  "type": "User"
+                }
+              },
+              "?resource": {
+                "__entity": {
+                  "id": "beach",
+                  "type": "Photo"
+                }
+              }
+            }
+          }
+        ],
+        "templates": {
+          "share": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "description": "shared access"
+            },
+            "conditions": [],
+            "effect": "permit",
+            "principal": {
+              "op": "==",
+              "slot": "?principal"
+            },
+            "resource": {
+              "op": "==",
+              "slot": "?resource"
+            }
+          }
+        }
+      }
+    },
+    {
+      "expected": {
+        "error": "unable to unlink `policy0` because it is not a link"
+      },
+      "name": "unlink static",
+      "operation": {
+        "op": "unlink",
+        "policy_id": "policy0"
+      },
+      "policies": {
+        "staticPolicies": {
+          "policy0": {
+            "action": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "body": {
+                  "Value": false
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            }
+          }
+        },
+        "templateLinks": [
+          {
+            "newId": "alice-access",
+            "templateId": "share",
+            "values": {
+              "?principal": {
+                "__entity": {
+                  "id": "alice",
+                  "type": "User"
+                }
+              },
+              "?resource": {
+                "__entity": {
+                  "id": "beach",
+                  "type": "Photo"
+                }
+              }
+            }
+          }
+        ],
+        "templates": {
+          "share": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "description": "shared access"
+            },
+            "conditions": [],
+            "effect": "permit",
+            "principal": {
+              "op": "==",
+              "slot": "?principal"
+            },
+            "resource": {
+              "op": "==",
+              "slot": "?resource"
+            }
+          }
+        }
+      }
+    },
+    {
+      "expected": {
+        "error": "unable to unlink policy `share` because it does not exist"
+      },
+      "name": "unlink template",
+      "operation": {
+        "op": "unlink",
+        "policy_id": "share"
+      },
+      "policies": {
+        "staticPolicies": {
+          "policy0": {
+            "action": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "body": {
+                  "Value": false
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            }
+          }
+        },
+        "templateLinks": [
+          {
+            "newId": "alice-access",
+            "templateId": "share",
+            "values": {
+              "?principal": {
+                "__entity": {
+                  "id": "alice",
+                  "type": "User"
+                }
+              },
+              "?resource": {
+                "__entity": {
+                  "id": "beach",
+                  "type": "Photo"
+                }
+              }
+            }
+          }
+        ],
+        "templates": {
+          "share": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "description": "shared access"
+            },
+            "conditions": [],
+            "effect": "permit",
+            "principal": {
+              "op": "==",
+              "slot": "?principal"
+            },
+            "resource": {
+              "op": "==",
+              "slot": "?resource"
+            }
+          }
+        }
+      }
+    },
+    {
+      "expected": {
+        "decision": "deny",
+        "errors": [],
+        "policies": {
+          "staticPolicies": {
+            "policy0": {
+              "action": {
+                "op": "All"
+              },
+              "conditions": [
+                {
+                  "body": {
+                    "Value": false
+                  },
+                  "kind": "when"
+                }
+              ],
+              "effect": "forbid",
+              "principal": {
+                "op": "All"
+              },
+              "resource": {
+                "op": "All"
+              }
+            }
+          },
+          "templateLinks": [],
+          "templates": {}
+        },
+        "reasons": [],
+        "valid": true,
+        "warnings": [
+          {
+            "message": "for policy `policy0`, policy is impossible: the policy expression evaluates to false for all valid requests",
+            "policy_id": "policy0"
+          }
+        ]
+      },
+      "name": "remove",
+      "operation": {
+        "op": "remove",
+        "template_id": "share"
+      },
+      "policies": {
+        "staticPolicies": {
+          "policy0": {
+            "action": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "body": {
+                  "Value": false
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            }
+          }
+        },
+        "templateLinks": [],
+        "templates": {
+          "share": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "description": "shared access"
+            },
+            "conditions": [],
+            "effect": "permit",
+            "principal": {
+              "op": "==",
+              "slot": "?principal"
+            },
+            "resource": {
+              "op": "==",
+              "slot": "?resource"
+            }
+          }
+        }
+      }
+    },
+    {
+      "expected": {
+        "error": "unable to remove policy template `share` because it has active links"
+      },
+      "name": "remove active template",
+      "operation": {
+        "op": "remove",
+        "template_id": "share"
+      },
+      "policies": {
+        "staticPolicies": {
+          "policy0": {
+            "action": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "body": {
+                  "Value": false
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            }
+          }
+        },
+        "templateLinks": [
+          {
+            "newId": "alice-access",
+            "templateId": "share",
+            "values": {
+              "?principal": {
+                "__entity": {
+                  "id": "alice",
+                  "type": "User"
+                }
+              },
+              "?resource": {
+                "__entity": {
+                  "id": "beach",
+                  "type": "Photo"
+                }
+              }
+            }
+          }
+        ],
+        "templates": {
+          "share": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "description": "shared access"
+            },
+            "conditions": [],
+            "effect": "permit",
+            "principal": {
+              "op": "==",
+              "slot": "?principal"
+            },
+            "resource": {
+              "op": "==",
+              "slot": "?resource"
+            }
+          }
+        }
+      }
+    },
+    {
+      "expected": {
+        "error": "unable to remove template `absent` because it does not exist"
+      },
+      "name": "remove missing",
+      "operation": {
+        "op": "remove",
+        "template_id": "absent"
+      },
+      "policies": {
+        "staticPolicies": {
+          "policy0": {
+            "action": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "body": {
+                  "Value": false
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            }
+          }
+        },
+        "templateLinks": [],
+        "templates": {
+          "share": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "description": "shared access"
+            },
+            "conditions": [],
+            "effect": "permit",
+            "principal": {
+              "op": "==",
+              "slot": "?principal"
+            },
+            "resource": {
+              "op": "==",
+              "slot": "?resource"
+            }
+          }
+        }
+      }
+    },
+    {
+      "expected": {
+        "error": "unable to remove template `policy0` because it does not exist"
+      },
+      "name": "remove static",
+      "operation": {
+        "op": "remove",
+        "template_id": "policy0"
+      },
+      "policies": {
+        "staticPolicies": {
+          "policy0": {
+            "action": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "body": {
+                  "Value": false
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            }
+          }
+        },
+        "templateLinks": [],
+        "templates": {
+          "share": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "description": "shared access"
+            },
+            "conditions": [],
+            "effect": "permit",
+            "principal": {
+              "op": "==",
+              "slot": "?principal"
+            },
+            "resource": {
+              "op": "==",
+              "slot": "?resource"
+            }
+          }
+        }
+      }
+    },
+    {
+      "expected": {
+        "error": "unable to remove template `alice-access` because it does not exist"
+      },
+      "name": "remove linked policy",
+      "operation": {
+        "op": "remove",
+        "template_id": "alice-access"
+      },
+      "policies": {
+        "staticPolicies": {
+          "policy0": {
+            "action": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "body": {
+                  "Value": false
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            }
+          }
+        },
+        "templateLinks": [
+          {
+            "newId": "alice-access",
+            "templateId": "share",
+            "values": {
+              "?principal": {
+                "__entity": {
+                  "id": "alice",
+                  "type": "User"
+                }
+              },
+              "?resource": {
+                "__entity": {
+                  "id": "beach",
+                  "type": "Photo"
+                }
+              }
+            }
+          }
+        ],
+        "templates": {
+          "share": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "description": "shared access"
+            },
+            "conditions": [],
+            "effect": "permit",
+            "principal": {
+              "op": "==",
+              "slot": "?principal"
+            },
+            "resource": {
+              "op": "==",
+              "slot": "?resource"
+            }
+          }
+        }
+      }
+    },
+    {
+      "expected": {
+        "decision": "allow",
+        "errors": [],
+        "policies": {
+          "staticPolicies": {
+            "policy0": {
+              "action": {
+                "op": "All"
+              },
+              "conditions": [
+                {
+                  "body": {
+                    "Value": false
+                  },
+                  "kind": "when"
+                }
+              ],
+              "effect": "forbid",
+              "principal": {
+                "op": "All"
+              },
+              "resource": {
+                "op": "All"
+              }
+            }
+          },
+          "templateLinks": [
+            {
+              "newId": "alice-access",
+              "templateId": "share",
+              "values": {
+                "?principal": {
+                  "__entity": {
+                    "id": "alice",
+                    "type": "User"
+                  }
+                },
+                "?resource": {
+                  "__entity": {
+                    "id": "beach",
+                    "type": "Photo"
+                  }
+                }
+              }
+            }
+          ],
+          "templates": {
+            "new": {
+              "action": {
+                "entity": {
+                  "id": "view",
+                  "type": "Action"
+                },
+                "op": "=="
+              },
+              "annotations": {
+                "description": "shared access"
+              },
+              "conditions": [],
+              "effect": "permit",
+              "principal": {
+                "op": "==",
+                "slot": "?principal"
+              },
+              "resource": {
+                "op": "==",
+                "slot": "?resource"
+              }
+            },
+            "share": {
+              "action": {
+                "entity": {
+                  "id": "view",
+                  "type": "Action"
+                },
+                "op": "=="
+              },
+              "annotations": {
+                "description": "shared access"
+              },
+              "conditions": [],
+              "effect": "permit",
+              "principal": {
+                "op": "==",
+                "slot": "?principal"
+              },
+              "resource": {
+                "op": "==",
+                "slot": "?resource"
+              }
+            }
+          }
+        },
+        "reasons": [
+          "alice-access"
+        ],
+        "valid": true,
+        "warnings": [
+          {
+            "message": "for policy `policy0`, policy is impossible: the policy expression evaluates to false for all valid requests",
+            "policy_id": "policy0"
+          }
+        ]
+      },
+      "name": "add template",
+      "operation": {
+        "id": "new",
+        "op": "add",
+        "template": "@description(\"shared access\") permit(principal == ?principal, action == Action::\"view\", resource == ?resource);"
+      },
+      "policies": {
+        "staticPolicies": {
+          "policy0": {
+            "action": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "body": {
+                  "Value": false
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            }
+          }
+        },
+        "templateLinks": [
+          {
+            "newId": "alice-access",
+            "templateId": "share",
+            "values": {
+              "?principal": {
+                "__entity": {
+                  "id": "alice",
+                  "type": "User"
+                }
+              },
+              "?resource": {
+                "__entity": {
+                  "id": "beach",
+                  "type": "Photo"
+                }
+              }
+            }
+          }
+        ],
+        "templates": {
+          "share": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "description": "shared access"
+            },
+            "conditions": [],
+            "effect": "permit",
+            "principal": {
+              "op": "==",
+              "slot": "?principal"
+            },
+            "resource": {
+              "op": "==",
+              "slot": "?resource"
+            }
+          }
+        }
+      }
+    },
+    {
+      "expected": {
+        "error": "duplicate template or policy id `share`"
+      },
+      "name": "add duplicate template",
+      "operation": {
+        "id": "share",
+        "op": "add",
+        "template": "@description(\"shared access\") permit(principal == ?principal, action == Action::\"view\", resource == ?resource);"
+      },
+      "policies": {
+        "staticPolicies": {
+          "policy0": {
+            "action": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "body": {
+                  "Value": false
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            }
+          }
+        },
+        "templateLinks": [
+          {
+            "newId": "alice-access",
+            "templateId": "share",
+            "values": {
+              "?principal": {
+                "__entity": {
+                  "id": "alice",
+                  "type": "User"
+                }
+              },
+              "?resource": {
+                "__entity": {
+                  "id": "beach",
+                  "type": "Photo"
+                }
+              }
+            }
+          }
+        ],
+        "templates": {
+          "share": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "description": "shared access"
+            },
+            "conditions": [],
+            "effect": "permit",
+            "principal": {
+              "op": "==",
+              "slot": "?principal"
+            },
+            "resource": {
+              "op": "==",
+              "slot": "?resource"
+            }
+          }
+        }
+      }
+    },
+    {
+      "expected": {
+        "error": "duplicate template or policy id `policy0`"
+      },
+      "name": "add duplicate static",
+      "operation": {
+        "id": "policy0",
+        "op": "add",
+        "template": "@description(\"shared access\") permit(principal == ?principal, action == Action::\"view\", resource == ?resource);"
+      },
+      "policies": {
+        "staticPolicies": {
+          "policy0": {
+            "action": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "body": {
+                  "Value": false
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            }
+          }
+        },
+        "templateLinks": [
+          {
+            "newId": "alice-access",
+            "templateId": "share",
+            "values": {
+              "?principal": {
+                "__entity": {
+                  "id": "alice",
+                  "type": "User"
+                }
+              },
+              "?resource": {
+                "__entity": {
+                  "id": "beach",
+                  "type": "Photo"
+                }
+              }
+            }
+          }
+        ],
+        "templates": {
+          "share": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "description": "shared access"
+            },
+            "conditions": [],
+            "effect": "permit",
+            "principal": {
+              "op": "==",
+              "slot": "?principal"
+            },
+            "resource": {
+              "op": "==",
+              "slot": "?resource"
+            }
+          }
+        }
+      }
+    },
+    {
+      "expected": {
+        "error": "duplicate template or policy id `alice-access`"
+      },
+      "name": "add duplicate link",
+      "operation": {
+        "id": "alice-access",
+        "op": "add",
+        "template": "@description(\"shared access\") permit(principal == ?principal, action == Action::\"view\", resource == ?resource);"
+      },
+      "policies": {
+        "staticPolicies": {
+          "policy0": {
+            "action": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "body": {
+                  "Value": false
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            }
+          }
+        },
+        "templateLinks": [
+          {
+            "newId": "alice-access",
+            "templateId": "share",
+            "values": {
+              "?principal": {
+                "__entity": {
+                  "id": "alice",
+                  "type": "User"
+                }
+              },
+              "?resource": {
+                "__entity": {
+                  "id": "beach",
+                  "type": "Photo"
+                }
+              }
+            }
+          }
+        ],
+        "templates": {
+          "share": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "description": "shared access"
+            },
+            "conditions": [],
+            "effect": "permit",
+            "principal": {
+              "op": "==",
+              "slot": "?principal"
+            },
+            "resource": {
+              "op": "==",
+              "slot": "?resource"
+            }
+          }
+        }
+      }
+    },
+    {
+      "expected": {
+        "decision": "allow",
+        "errors": [],
+        "policies": {
+          "staticPolicies": {},
+          "templateLinks": [
+            {
+              "newId": "link\\\"\n\u0000雪",
+              "templateId": "share\\\"\n\u0000雪",
+              "values": {
+                "?principal": {
+                  "__entity": {
+                    "id": "alice",
+                    "type": "User"
+                  }
+                },
+                "?resource": {
+                  "__entity": {
+                    "id": "beach",
+                    "type": "Photo"
+                  }
+                }
+              }
+            }
+          ],
+          "templates": {
+            "share\\\"\n\u0000雪": {
+              "action": {
+                "entity": {
+                  "id": "view",
+                  "type": "Action"
+                },
+                "op": "=="
+              },
+              "annotations": {
+                "description": "shared access"
+              },
+              "conditions": [],
+              "effect": "permit",
+              "principal": {
+                "op": "==",
+                "slot": "?principal"
+              },
+              "resource": {
+                "op": "==",
+                "slot": "?resource"
+              }
+            }
+          }
+        },
+        "reasons": [
+          "link\\\"\n\u0000雪"
+        ],
+        "valid": true,
+        "warnings": []
+      },
+      "name": "escaped template and linked IDs",
+      "operation": {
+        "bindings": {
+          "?principal": {
+            "id": "alice",
+            "type": "User"
+          },
+          "?resource": {
+            "id": "beach",
+            "type": "Photo"
+          }
+        },
+        "op": "link",
+        "policy_id": "link\\\"\n\u0000雪",
+        "template_id": "share\\\"\n\u0000雪"
+      },
+      "policies": {
+        "staticPolicies": {},
+        "templateLinks": [],
+        "templates": {
+          "share\\\"\n\u0000雪": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "description": "shared access"
+            },
+            "conditions": [],
+            "effect": "permit",
+            "principal": {
+              "op": "==",
+              "slot": "?principal"
+            },
+            "resource": {
+              "op": "==",
+              "slot": "?resource"
+            }
+          }
+        }
+      }
+    },
+    {
+      "expected": {
+        "decision": "deny",
+        "errors": [
+          {
+            "message": "for policy `link\\\\\\\"\\n\\0雪`, unrecognized entity type `Uzer` (help: did you mean `User`?)",
+            "policy_id": "link\\\"\n\u0000雪"
+          }
+        ],
+        "policies": {
+          "staticPolicies": {},
+          "templateLinks": [
+            {
+              "newId": "link\\\"\n\u0000雪",
+              "templateId": "share\\\"\n\u0000雪",
+              "values": {
+                "?principal": {
+                  "__entity": {
+                    "id": "alice",
+                    "type": "Uzer"
+                  }
+                },
+                "?resource": {
+                  "__entity": {
+                    "id": "beach",
+                    "type": "Photo"
+                  }
+                }
+              }
+            }
+          ],
+          "templates": {
+            "share\\\"\n\u0000雪": {
+              "action": {
+                "entity": {
+                  "id": "view",
+                  "type": "Action"
+                },
+                "op": "=="
+              },
+              "annotations": {
+                "description": "shared access"
+              },
+              "conditions": [],
+              "effect": "permit",
+              "principal": {
+                "op": "==",
+                "slot": "?principal"
+              },
+              "resource": {
+                "op": "==",
+                "slot": "?resource"
+              }
+            }
+          }
+        },
+        "reasons": [],
+        "valid": false,
+        "warnings": [
+          {
+            "message": "for policy `link\\\\\\\"\\n\\0雪`, unable to find an applicable action given the policy scope constraints",
+            "policy_id": "link\\\"\n\u0000雪"
+          }
+        ]
+      },
+      "name": "escaped ID in validation diagnostics",
+      "operation": {
+        "bindings": {
+          "?principal": {
+            "id": "alice",
+            "type": "Uzer"
+          },
+          "?resource": {
+            "id": "beach",
+            "type": "Photo"
+          }
+        },
+        "op": "link",
+        "policy_id": "link\\\"\n\u0000雪",
+        "template_id": "share\\\"\n\u0000雪"
+      },
+      "policies": {
+        "staticPolicies": {},
+        "templateLinks": [],
+        "templates": {
+          "share\\\"\n\u0000雪": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "description": "shared access"
+            },
+            "conditions": [],
+            "effect": "permit",
+            "principal": {
+              "op": "==",
+              "slot": "?principal"
+            },
+            "resource": {
+              "op": "==",
+              "slot": "?resource"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "cedar_version": "4.13.0",
+  "schema": "entity User; entity Photo; action view appliesTo { principal: User, resource: Photo, context: {} };"
+}

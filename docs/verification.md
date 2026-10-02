@@ -5,6 +5,7 @@
 ## Contents
 
 - [Conformance](#conformance)
+- [Native template parity](#native-template-parity)
 - [Fuzzing](#fuzzing)
 - [Fault tests](#fault-tests)
 - [ABI arithmetic proof](#abi-arithmetic-proof)
@@ -40,9 +41,37 @@ decisions, selected entity data, and load rounds against that oracle, then
 compares ordinary authorization using full and reduced stores. This covers the
 listed fixtures, not general minimality or equivalence for arbitrary requests.
 
+
+## Native template parity
+
+[`template_fixtures.rs`](../rust/crates/authorizer/examples/template_fixtures.rs)
+calls pinned native `cedar-policy` 4.13.0 directly, independently of the guest
+operation implementation. It emits committed fixtures for valid links,
+missing/extra bindings, duplicate IDs, unlinking, and removal. Successful
+operations include native authorization decisions/reasons and strict-validation
+outcomes, including a link that succeeds but fails schema validation.
+
+`TestTemplateNativeParity` replays these operations through the exported Go
+API and compares policy-set JSON, upstream error diagnostics, authorization,
+and validation. CI regenerates and compares the native fixtures before running
+the Go comparison. Reproduce with existing Rust and Go tools:
+
+```bash
+scripts/check-template-parity.sh
+```
+
+Template tests also cover JSON inspection/round trips, escaped IDs, concurrent
+immutable snapshots, malformed envelopes, exact input bounds, response/memory
+limits, cancellation/deadlines, and calls after runtime closure. `FuzzTemplates`
+checks parsing, binding discovered slots, and link/unlink round trips. These
+are differential and boundary tests, not a formal proof of template semantics.
+The operations reuse the existing ABI arithmetic and fresh-instance lifecycle;
+no new arithmetic or mutable handle state is introduced.
+
+
 ## Fuzzing
 
-The authorization and slicing packages contain these Go fuzz targets:
+The `cedar` package contains these Go fuzz targets:
 
 | Target | Exercises |
 |---|---|
@@ -50,6 +79,7 @@ The authorization and slicing packages contain these Go fuzz targets:
 | `FuzzPolicies` | Policy parsing, strict validation, loading, and authorization |
 | `FuzzEntities` | Entity parsing and authorization, with and without a schema |
 | `FuzzSliceEntities` | Source entity parsing, fail-closed slicing, and full/reduced authorization agreement |
+| `FuzzTemplates` | Template parsing and immutable link/unlink round trips |
 
 The three authorization targets reject unexpected module faults and check that authorization
 errors return `Deny`. Fuzz inputs deeper than 200 nested brackets are

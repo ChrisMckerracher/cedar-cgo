@@ -102,7 +102,7 @@ jobs:
           go-version: "1.27.x"
       - name: Fuzz each target for 60 seconds
         run: |
-          for target in FuzzAuthorize FuzzPolicies FuzzEntities FuzzBatchedEntities FuzzSliceEntities FuzzPolicySyntax; do
+          for target in FuzzAuthorize FuzzPolicies FuzzEntities FuzzBatchedEntities FuzzSliceEntities FuzzPolicySyntax FuzzTemplates; do
             go test -run '^$' -fuzz "^$target\$" -fuzztime 60s ./cedar
           done
 
@@ -135,6 +135,7 @@ jobs:
         run: |
           cargo clippy --locked --release --target wasm32-wasip1 -p cgw-abi -p cgw-authorizer -p cgw-analysis -- -D warnings
           cargo clippy --locked --release -p cgw-native-bench -- -D warnings
+          cargo clippy --locked --release -p cgw-authorizer --example template_fixtures -- -D warnings
       - name: Verify native slicing fixtures
         run: scripts/slicing-fixtures.sh --check
       - name: Policy construction native parity
@@ -186,3 +187,8 @@ jobs:
       - run: scripts/build-wasm.sh
       - name: The rebuilt modules must equal the committed ones
         run: git diff --exit-code -- internal/modules
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: "1.27.x"
+      - name: Native template parity
+        run: scripts/check-template-parity.sh

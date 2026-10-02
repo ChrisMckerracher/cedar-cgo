@@ -12,7 +12,7 @@ type ErrorKind string
 // KindLimit and KindFault originate in the host; the remaining kinds come from Cedar.
 const (
 	KindSchema    ErrorKind = "schema"    // The schema does not parse.
-	KindPolicies  ErrorKind = "policies"  // The policies do not parse.
+	KindPolicies  ErrorKind = "policies"  // Policy parsing or a template operation failed.
 	KindEntities  ErrorKind = "entities"  // The entities do not parse or do not match the schema.
 	KindContext   ErrorKind = "context"   // The context does not parse or does not match the schema.
 	KindRequest   ErrorKind = "request"   // The request does not match the schema.
