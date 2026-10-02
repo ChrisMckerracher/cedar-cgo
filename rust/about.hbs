@@ -1,0 +1,17 @@
+Third-party licenses
+
+The WebAssembly modules in internal/modules contain the Rust crates below.
+scripts/third-party-licenses.sh generates this file with cargo-about from
+rust/Cargo.lock. Do not edit it by hand.
+{{#each licenses}}
+
+================================================================================
+{{name}} ({{id}})
+
+Used by:
+{{#each used_by}}
+  - {{crate.name}} {{crate.version}}{{#if crate.repository}} ({{crate.repository}}){{/if}}
+{{/each}}
+
+{{text}}
+{{/each}}
