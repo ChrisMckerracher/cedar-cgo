@@ -5,11 +5,11 @@ analysis for Go. The reference implementation runs as embedded WebAssembly
 under [wazero](https://wazero.io/), so authorization ships in a Go binary
 and builds with the Go toolchain alone.
 
-We created this because we wanted current Cedar semantics and tooling in
-Go. As of October 1, 2026, [cedar-go's last merged update was June 1](https://github.com/cedar-policy/cedar-go/commits/main/),
-four months earlier, and its [Rust comparison](https://github.com/cedar-policy/cedar-go#comparison-to-the-rust-implementation)
-still lists feature gaps and experimental validation. This project brings
-Rust's authorizer, strict validator, and SymCC to Go by running them directly.
+We wanted all of Cedar in Go.
+[cedar-go](https://github.com/cedar-policy/cedar-go#comparison-to-the-rust-implementation)
+lacks feature parity with the Rust reference implementation and
+[doesn't appear actively maintained](https://github.com/cedar-policy/cedar-go/commits/main/).
+So we run the Rust implementation directly.
 
 The embedded versions are **cedar-policy 4.13.0** and
 **cedar-policy-symcc 0.7.0**. Authorization and strict validation match the
