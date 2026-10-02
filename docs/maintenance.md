@@ -31,7 +31,7 @@ version, checked by the host at instantiation.
 
 ## Upgrading Cedar
 
-1. Update the exact `cedar-policy`, `cedar-policy-core`, and
+1. Update the exact `cedar-policy`, `cedar-policy-core`, `cedar-policy-formatter`, and
    `cedar-policy-symcc` pins in [`rust/Cargo.toml`](../rust/Cargo.toml).
    Choose the SymCC version paired with that Cedar release. Check its
    minimum supported Rust version and update `rust-toolchain.toml` if
@@ -51,8 +51,8 @@ version, checked by the host at instantiation.
 5. Update the corpus commit and checksum in both workflows and the
    [contributor instructions](../CONTRIBUTING.md#tests). Use the corpus
    generated for the new Cedar version.
-6. Run all Go tests with `CEDAR_CORPUS_DIR` and `CVC5` set, fuzz the three
-   targets, and run the Rust and dependency checks. Every conformance
+6. Run all Go tests with `CEDAR_CORPUS_DIR` and `CVC5` set, fuzz every target
+   listed in CI, and run the Rust and dependency checks. Every conformance
    mismatch blocks the upgrade.
 7. Update this version table, the README's embedded versions, and the
    [verification results](verification.md). Re-measure performance before
@@ -103,7 +103,7 @@ dependencies remain subject to the automated audits.
 
 | Direct choice | Source and role |
 |---|---|
-| `cedar-policy`, `cedar-policy-core`, `cedar-policy-symcc` | Cedar organization; reference engine and symbolic compiler |
+| `cedar-policy`, `cedar-policy-core`, `cedar-policy-formatter`, `cedar-policy-symcc` | Cedar organization; reference engine, formatter, and symbolic compiler |
 | `serde`, `serde_json` | serde-rs; serialization |
 | `tokio` | tokio-rs; SymCC runtime |
 | `miette` | zkat/miette, also used by Cedar; diagnostic rendering |
@@ -134,8 +134,9 @@ application; see [analysis setup](analysis.md#setup).
 | Go tests, vet, and formatting | Validate the public packages on Linux, macOS, and Windows |
 | Pinned upstream corpus | Detect authorization or validation drift |
 | cvc5 analysis tests | Check policy comparisons and counterexamples |
-| cvc5 ABI arithmetic proof | Check response packing, unpacking, and header predicates |
-| Three fuzz targets, 60 s each | Exercise malformed requests, policies, and entities |
+| cvc5 arithmetic proofs | Check response packing, header predicates, and callback budgets/conversions |
+| Native feature fixture regeneration | Detect drift in templates, policies, TPE, loading, slicing, and formatting |
+| All fuzz targets, 60 s each | Exercise authorization and each new policy/entity boundary |
 | rustfmt and clippy | Check the Rust glue |
 | Vendored SymCC comparison | Verify release archive plus local patch |
 | Byte-identical Wasm rebuild | Verify committed artifacts against source |

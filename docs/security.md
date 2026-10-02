@@ -55,7 +55,7 @@ security review.
 | Guest execution deadline | 1 s per `Authorize` call | 60 s per analysis call, including solver time |
 | Instance creation and load deadline | 30 s | Included in the analysis deadline |
 | Encoded request, including context and extra entities | 1 MiB | Included in source input |
-| Encoded source input | 64 MiB per load or validation | 64 MiB per comparison |
+| Encoded source input | 64 MiB per load, validation or format | 64 MiB per comparison |
 | Response size | 16 MiB | 256 MiB |
 | Retained linear memory before recycling | 64 MiB | Instance closed after each call |
 | Instances | Up to `GOMAXPROCS` per authorizer | One per concurrent call |
@@ -64,7 +64,11 @@ security review.
 Runtime options and per-authorizer `Limits` configure the budgets, except
 for the fixed response-size caps. The caller's context bounds waiting for
 an authorization instance and bounds validation, which uses a fresh
-instance. Analysis concurrency is controlled by the application.
+instance. Formatting also uses a fresh instance per call, with the runtime's
+source, response, and memory caps; only the caller's context bounds time.
+`WithFormatMaxOutputBytes` can reduce the raw result limit below the fixed
+16 MiB encoded-response cap. Intermediate allocations remain subject to the
+memory cap. The application controls formatting and analysis concurrency.
 
 The guest's 8 MiB stack sits below its data. Stack overflow traps instead
 of overwriting data. Actual nesting limits depend on the workload and
@@ -93,6 +97,10 @@ state without mutating it.
 Policy evaluation diagnostics in `Response.Errors` follow Cedar semantics:
 Cedar skips those policies and decides using the remaining ones. They are
 distinct from a returned Go error and can accompany an `Allow` decision.
+
+Formatting returns no text on error and always closes its temporary instance.
+Its input and raw output size failures use `KindLimit`; guest faults and an
+oversized encoded response use `KindFault`. Loaded authorizers are unaffected.
 
 ## Solver process
 

@@ -12,9 +12,13 @@
 - [Authorization](#authorization)
 - [Entity slicing](#entity-slicing)
 - [Strict validation](#strict-validation)
+- [Policy formatting](#policy-formatting)
 - [Errors](#errors)
 - [Configuration reference](#configuration-reference)
 - [Supported operations](#supported-operations)
+- [On-demand entity loading](#experimental-on-demand-entity-loading)
+- [Parsed policies and static edits](#parsed-policies-and-static-policy-edits)
+- [Partial evaluation](#partial-evaluation-experimental)
 
 ## Packages and imports
 
@@ -25,8 +29,9 @@ import (
 )
 ```
 
-`cedar` provides authorization and strict validation. `analysis` provides
-policy comparison. Importing only `cedar` embeds only the authorization module.
+`cedar` provides authorization, validation, policy/template operations, formatting,
+partial evaluation, and entity loading/slicing.
+`analysis` provides policy comparison. Importing only `cedar` embeds only the authorization module.
 
 The package reorganization moves the former module-root import to
 `github.com/ChrisMckerracher/cedar-go-wasm/cedar`. Existing callers should
@@ -277,6 +282,66 @@ if !result.Passed {
 validation. Parse errors are returned as Go errors; type errors appear in
 the validation result. The caller's context bounds validation time.
 
+## Policy formatting
+
+`Runtime.FormatPolicies` is experimental and may change before v1. It invokes
+`cedar-policy-formatter` 4.13.0 in a fresh Wasm instance, separately from loaded
+authorizers. It accepts UTF-8 Cedar text, including templates, annotations, and
+comments; it does not convert Cedar to JSON or validate policies against a schema.
+
+```go
+formatted, err := rt.FormatPolicies(ctx,
+    `permit(principal,action,resource)when{context.mfa};`)
+if err != nil {
+    return err
+}
+fmt.Print(formatted)
+```
+
+Before:
+
+```cedar
+permit(principal,action,resource)when{context.mfa};
+```
+
+After:
+
+```cedar
+permit (principal, action, resource)
+when { context.mfa };
+```
+
+The [executable example](../cedar/format_test.go) checks this output.
+Formatting follows the pinned upstream version, including its trailing newline,
+comment placement, and blank lines between policies. An empty source formats to
+one newline. Formatting is idempotent for the tested inputs; native fixtures
+compare full policy/template JSON and authorization results before and after.
+
+| Format option | Default | Contract |
+|---|---|---|
+| `WithFormatLineWidth(uint32)` | 80 | Upstream target width; zero is supported. Long tokens/comments may exceed it. |
+| `WithFormatIndentWidth(int32)` | 2 | Upstream indentation per nesting level, including zero and negative values. |
+| `WithFormatMaxOutputBytes(int)` | 16 MiB | UTF-8 result cap; must be positive and at most `DefaultMaxResponseBytes`. |
+
+The integer types match Wasm's upstream `usize`/`isize` range. Large indentation
+can exhaust the memory budget; line width is a layout preference, not a resource
+limit. `WithMaxSourceBytes` limits the encoded input envelope, and the runtime's
+16 MiB response limit also applies to the JSON-encoded result or diagnostics.
+JSON escaping can reach the envelope cap before the raw output cap.
+
+Supply a context deadline to bound execution; formatting has no separate default
+timeout. The runtime's memory cap applies to all intermediate guest allocations.
+Concurrent formatting calls each use a fresh instance; callers control their
+concurrency. Cancellation, traps, and memory/stack exhaustion return `KindFault`
+and destroy only that call's instance. Context errors remain discoverable with
+`errors.Is`. No partial formatted text is returned on any error.
+
+Invalid UTF-8 is `KindInput`, rejected before JSON could replace bytes. Invalid
+Cedar is `KindPolicies`, with upstream error/help text and source labels rendered
+as zero-based, half-open UTF-8 byte spans. Input/raw-output limit failures return
+`KindLimit`; an oversized encoded response is `KindFault`, matching the shared
+Wasm boundary. A formatter failure on otherwise valid Cedar is also `KindFault`.
+
 ## Errors
 
 Use `errors.As` to inspect `*cedar.Error` and its `Kind`, and `errors.Is` to
@@ -289,7 +354,9 @@ check `cedar.ErrFault`, `context.DeadlineExceeded`, or `context.Canceled`.
 | `KindPrincipal`, `KindAction`, `KindResource` | A UID failed to parse |
 | `KindInput` | Request envelope or Go value encoding failed |
 | `KindSlicing` | TPE validation or entity-loading iteration limit failed |
-| `KindLimit` | Encoded input exceeded its configured size limit |
+| `KindBatched` | Native TPE validation or batched-authorization failure |
+| `KindLoader` | Host entity-loader error or panic |
+| `KindLimit` | Input or formatted output exceeded its configured size limit |
 | `KindFault` | Guest trap, timeout, abort, or broken module protocol |
 
 The [failure behavior table](security.md#failure-behavior) explains when an
@@ -325,13 +392,13 @@ implementation. See [versioning](maintenance.md#versioning).
 
 The Go interface exposes authorization, strict validation, parsed policy
 inspection and static policy edits, template management, experimental partial
-evaluation, on-demand entity loading and
-request-specific entity slicing, and the policy comparisons in `analysis`. These
-execute Cedar's Rust implementation, including its core and extension value types.
+evaluation, on-demand entity loading, request-specific entity slicing, policy
+formatting, and the policy comparisons in `analysis`. These execute Cedar's Rust
+implementation, including its core and extension value types.
 
-Conformance results establish agreement for the tested operations. The Rust
-library also exposes APIs for deprecated entity manifests and formatting;
-those APIs are outside this Go interface. See
+Conformance establishes agreement for the tested cases, not complete public-API
+parity. Deprecated entity manifests remain unsupported; request-specific slicing
+uses TPE. See
 [verification scope](verification.md) for the evidence behind compatibility
 claims.
 

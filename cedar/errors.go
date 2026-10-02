@@ -9,7 +9,7 @@ import (
 
 type ErrorKind string
 
-// KindLimit and KindFault originate in the host; the remaining kinds come from Cedar.
+// Kinds distinguish Cedar input errors from bridge resource and protocol failures.
 const (
 	KindSchema    ErrorKind = "schema"    // The schema does not parse.
 	KindPolicies  ErrorKind = "policies"  // Policy parsing, editing, or TPE validation failed.
@@ -20,7 +20,7 @@ const (
 	KindAction    ErrorKind = "action"    // The action UID does not parse.
 	KindResource  ErrorKind = "resource"  // The resource UID does not parse.
 	KindInput     ErrorKind = "input"     // The module rejected the input envelope.
-	KindLimit     ErrorKind = "limit"     // An input exceeds a configured size limit.
+	KindLimit     ErrorKind = "limit"     // An input or formatted output exceeds a size limit.
 	KindFault     ErrorKind = "fault"     // The module trapped, exited, timed out or broke the ABI.
 )
 

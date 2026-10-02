@@ -1,0 +1,237 @@
+[
+  {
+    "name": "empty",
+    "input": "",
+    "line_width": 80,
+    "indent_width": 2,
+    "contexts": [
+      {}
+    ],
+    "valid": true
+  },
+  {
+    "name": "comments-only",
+    "input": "// leading café\n// trailing",
+    "line_width": 80,
+    "indent_width": 2,
+    "contexts": [
+      {}
+    ],
+    "valid": true
+  },
+  {
+    "name": "simple",
+    "input": "permit(principal,action,resource);",
+    "line_width": 80,
+    "indent_width": 2,
+    "contexts": [
+      {}
+    ],
+    "valid": true
+  },
+  {
+    "name": "crlf",
+    "input": "// hello\r\npermit(principal,action,resource);\r\n// end\r\n",
+    "line_width": 80,
+    "indent_width": 2,
+    "contexts": [
+      {}
+    ],
+    "valid": true
+  },
+  {
+    "name": "annotations-comments",
+    "input": "// permit marker\n@id(\"α\") @description(\"a < b & c > d\")\npermit( principal,action==Action::\"view\",resource) // scope\nwhen{context.enabled// enabled\n&& context.name == \"café ☃\"}; // last\n// eof",
+    "line_width": 40,
+    "indent_width": 4,
+    "contexts": [
+      {
+        "enabled": true,
+        "name": "café ☃"
+      },
+      {
+        "enabled": false,
+        "name": "café ☃"
+      }
+    ],
+    "valid": true
+  },
+  {
+    "name": "precedence",
+    "input": "permit(principal,action,resource)when{context.n + 2 * 3 >= 7 && (context.enabled || !context.enabled)};forbid(principal,action,resource)when{context.block};",
+    "line_width": 38,
+    "indent_width": 3,
+    "contexts": [
+      {
+        "n": 2,
+        "enabled": true,
+        "block": false
+      },
+      {
+        "n": 2,
+        "enabled": true,
+        "block": true
+      },
+      {
+        "n": 0,
+        "enabled": true,
+        "block": false
+      }
+    ],
+    "valid": true
+  },
+  {
+    "name": "template",
+    "input": "@note(\"template\") permit(principal == ?principal,action == Action::\"view\",resource in ?resource)when{context.enabled};",
+    "line_width": 36,
+    "indent_width": 4,
+    "contexts": [
+      {
+        "enabled": true
+      },
+      {
+        "enabled": false
+      }
+    ],
+    "valid": true
+  },
+  {
+    "name": "mixed",
+    "input": "permit(principal,action,resource) when {context.enabled};\n// link me\n@note(\"t\") forbid(principal==?principal,action,resource==?resource) when {context.block};",
+    "line_width": 25,
+    "indent_width": 2,
+    "contexts": [
+      {
+        "enabled": true,
+        "block": false
+      },
+      {
+        "enabled": true,
+        "block": true
+      }
+    ],
+    "valid": true
+  },
+  {
+    "name": "zero-width",
+    "input": "permit(principal,action,resource)when{context.enabled && [1,2,3].contains(context.n)};",
+    "line_width": 0,
+    "indent_width": 0,
+    "contexts": [
+      {
+        "enabled": true,
+        "n": 2
+      },
+      {
+        "enabled": true,
+        "n": 9
+      }
+    ],
+    "valid": true
+  },
+  {
+    "name": "negative-indent",
+    "input": "permit(principal,action,resource)when{if context.enabled then context.n > 1 else context.n < 1};",
+    "line_width": 20,
+    "indent_width": -2,
+    "contexts": [
+      {
+        "enabled": true,
+        "n": 2
+      },
+      {
+        "enabled": false,
+        "n": 2
+      }
+    ],
+    "valid": true
+  },
+  {
+    "name": "wide",
+    "input": "permit(principal,action,resource)when{context.enabled&&context.n>1};",
+    "line_width": 4294967295,
+    "indent_width": 2,
+    "contexts": [
+      {
+        "enabled": true,
+        "n": 2
+      }
+    ],
+    "valid": true
+  },
+  {
+    "name": "extensions",
+    "input": "permit(principal,action,resource)when{ip(\"10.2.3.4\").isInRange(ip(\"10.0.0.0/8\"))&&decimal(\"1.2500\").lessThan(decimal(\"2\"))&&datetime(\"2026-10-01T00:00:00Z\").offset(duration(\"1h\"))>datetime(\"2026-10-01T00:00:00Z\")};",
+    "line_width": 50,
+    "indent_width": 2,
+    "contexts": [
+      {}
+    ],
+    "valid": true
+  },
+  {
+    "name": "escaped",
+    "input": "@note(\"a\\nb\\t\\\"c\") permit(principal,action,resource)when{context.name like \"a\\*b*\" && {\"x y\":true}[\"x y\"]};",
+    "line_width": 30,
+    "indent_width": 2,
+    "contexts": [
+      {
+        "name": "a*bzzz"
+      },
+      {
+        "name": "axbzzz"
+      }
+    ],
+    "valid": true
+  },
+  {
+    "name": "malformed",
+    "input": "permit(principal,action,resource) when { 1 + };",
+    "line_width": 80,
+    "indent_width": 2,
+    "contexts": [],
+    "valid": false
+  },
+  {
+    "name": "duplicate-annotation",
+    "input": "@id(\"x\") @id(\"y\") permit(principal,action,resource);",
+    "line_width": 80,
+    "indent_width": 2,
+    "contexts": [],
+    "valid": false
+  },
+  {
+    "name": "slot-in-condition",
+    "input": "permit(principal,action,resource)when{principal==?principal};",
+    "line_width": 80,
+    "indent_width": 2,
+    "contexts": [],
+    "valid": false
+  },
+  {
+    "name": "minimum-indent",
+    "input": "permit(principal,action,resource)when{context.enabled && (if context.n > 1 then true else false)};",
+    "line_width": 1,
+    "indent_width": -2147483648,
+    "contexts": [
+      {
+        "enabled": true,
+        "n": 2
+      }
+    ],
+    "valid": true
+  },
+  {
+    "name": "evaluation-errors",
+    "input": "permit(principal,action,resource)when{context.missing};forbid(principal,action,resource)when{context.block};",
+    "line_width": 25,
+    "indent_width": 2,
+    "contexts": [
+      {},
+      {
+        "block": true
+      }
+    ],
+    "valid": true
+  }
+]
