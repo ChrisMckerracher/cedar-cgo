@@ -2,6 +2,8 @@ package cedar
 
 import (
 	"bytes"
+
+	"github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
 )
 
 // Context defaults to an empty record.
@@ -18,6 +20,9 @@ func ContextFromJSON(data []byte) Context { return Context{raw: bytes.Clone(data
 
 func (c Context) MarshalJSON() ([]byte, error) {
 	if c.isJSON {
+		if err := wire.CheckUTF8(string(c.raw)); err != nil {
+			return nil, err
+		}
 		return c.raw, nil
 	}
 	return c.record.MarshalJSON()

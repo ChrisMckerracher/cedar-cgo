@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"testing"
 	"time"
+	"unicode/utf8"
 
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 )
@@ -66,6 +67,11 @@ func FuzzAuthorize(f *testing.F) {
 		}
 		resp, err := a.Authorize(context.Background(), req)
 		checkNoFault(t, err)
+		for _, text := range []string{pType, pID, action, rType, rID, ctxJSON, entJSON} {
+			if !utf8.ValidString(text) {
+				requireUTF8InputError(t, err)
+			}
+		}
 		if err != nil && resp.Decision != cedar.Deny {
 			t.Fatalf("error %v came with %v", err, resp.Decision)
 		}

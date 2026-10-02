@@ -37,6 +37,19 @@ type PartialEntityUID struct {
 	ID   *string `json:"id"`
 }
 
+func (u PartialEntityUID) MarshalJSON() ([]byte, error) {
+	if err := wire.CheckUTF8(u.Type); err != nil {
+		return nil, err
+	}
+	if u.ID != nil {
+		if err := wire.CheckUTF8(*u.ID); err != nil {
+			return nil, err
+		}
+	}
+	type uid PartialEntityUID
+	return json.Marshal(uid(u))
+}
+
 func UnknownEntityUID(typ string) PartialEntityUID { return PartialEntityUID{Type: typ} }
 
 func KnownEntityUID(uid EntityUID) PartialEntityUID {
@@ -88,6 +101,9 @@ func PartialEntitiesFromJSON(data []byte) PartialEntities {
 
 func (e PartialEntities) MarshalJSON() ([]byte, error) {
 	if e.isJSON {
+		if err := wire.CheckUTF8(string(e.raw)); err != nil {
+			return nil, err
+		}
 		return e.raw, nil
 	}
 	if e.list == nil {

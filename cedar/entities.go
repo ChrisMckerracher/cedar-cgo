@@ -67,6 +67,9 @@ func (e Entities) IsZero() bool { return !e.isJSON && e.list == nil }
 
 func (e Entities) MarshalJSON() ([]byte, error) {
 	if e.isJSON {
+		if err := wire.CheckUTF8(string(e.raw)); err != nil {
+			return nil, err
+		}
 		return e.raw, nil
 	}
 	if e.list == nil {

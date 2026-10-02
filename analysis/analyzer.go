@@ -101,7 +101,7 @@ func (a *Analyzer) run(ctx context.Context, query string, schema cedar.Schema, p
 		Query:  query,
 	})
 	if err != nil {
-		return Report{}, err
+		return Report{}, &Error{Kind: string(cedar.KindInput), Message: err.Error()}
 	}
 	if len(in) > a.maxSourceBytes {
 		return Report{}, fmt.Errorf("analysis: input is %d bytes, above the limit of %d", len(in), a.maxSourceBytes)

@@ -76,6 +76,17 @@ embedded version; the fault tests exercise deep policy input.
 
 ## Failure behavior
 
+All input strings must contain valid UTF-8. This includes source text, entity
+types and IDs, values, record keys, and raw JSON bytes. The Go boundary checks
+these inputs before JSON encoding can replace malformed bytes with `U+FFFD`.
+Valid Unicode, including `U+FFFD`, retains its identity without normalization.
+
+Malformed UTF-8 returns `KindInput` before instance acquisition in every request
+mode. Ordinary authorization and reauthorization return `Deny`; partial
+authorization returns `Undecided`. Analysis returns an input error before starting
+the solver. Loader results are checked before transfer to the guest; malformed
+UTF-8 returns `KindInput` and discards the interrupted instance.
+
 The table describes ordinary authorization and residual reauthorization.
 Experimental `PartialAuthorize` returns `Undecided` on these failures with the
 same error and instance handling; see [partial evaluation](partial-evaluation.md).

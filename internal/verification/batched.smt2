@@ -1,6 +1,7 @@
 ; Models charge, calls++, int(n), and int32(len(body)) in cedar/batched.go.
 ; Native int may be 32 or 64 bits; sizes are nonnegative and capped by their source guards.
 ; Excludes JSON correctness, guest memory, callbacks, Cedar semantics, and control-flow verification.
+; UTF-8 guards only reject input; accepted lengths and their bounds remain unchanged.
 (set-logic QF_BV)
 (set-option :incremental true)
 
