@@ -12,8 +12,7 @@ import (
 	"time"
 )
 
-// Analyzer runs change analysis. It is safe for concurrent use; each call
-// gets its own module instance and solver session.
+// Analyzer is safe for concurrent use; each call owns its instance and solver session.
 type Analyzer struct {
 	module          *wasmhost.Module
 	solver          Solver
@@ -22,8 +21,7 @@ type Analyzer struct {
 	maxSolverOutput int64
 }
 
-// New verifies the SHA-256 of the embedded analysis module, checks its
-// imports and compiles it.
+// New enforces integrity and capability checks before any guest execution.
 func New(ctx context.Context, solver Solver, opts ...Option) (*Analyzer, error) {
 	if solver == nil {
 		return nil, errors.New("analysis: nil solver")
@@ -59,21 +57,14 @@ func New(ctx context.Context, solver Solver, opts ...Option) (*Analyzer, error) 
 	}, nil
 }
 
-// Close releases the analyzer.
 func (a *Analyzer) Close(ctx context.Context) error { return a.module.Close(ctx) }
 
-// ModuleSHA256 returns the hex SHA-256 of the embedded analysis module.
 func ModuleSHA256() string { return analysismodule.SHA256 }
 
-// NewlyPermitted asks whether after permits any request that before
-// denies. The property holds for an environment when after permits nothing
-// new there. A counterexample is a request that after allows and before
-// denies.
-//
-// Both policy sets must pass strict validation against schema, and must
-// not contain templates.
+// NewlyPermitted holds when after permits nothing new; a counterexample is newly allowed.
+// Both sets must pass strict validation against schema and contain no templates.
 func (a *Analyzer) NewlyPermitted(ctx context.Context, schema cedar.Schema, before, after cedar.PolicySet) (Report, error) {
-	// SymCC's implies(a, b): every request that a allows, b allows.
+	// Reverse implication proves that after is a subset of before.
 	return a.run(ctx, "implies", schema, after, before, true)
 }
 
@@ -90,8 +81,6 @@ type analyzeInput struct {
 	Query  string      `json:"query"`
 }
 
-// Error is an analysis error that the module reports, such as a policy
-// that does not validate.
 type Error struct {
 	Kind    string
 	Message string
@@ -103,8 +92,7 @@ func source(f cedar.Format, text string) wire.Source {
 	return wire.Source{Format: f.String(), Text: text}
 }
 
-// run sends one query. swap is true when the wire order (a, b) is the
-// reverse of the caller's argument order.
+// swap restores the caller's argument order after a reversed implication query.
 func (a *Analyzer) run(ctx context.Context, query string, schema cedar.Schema, pa, pb cedar.PolicySet, swap bool) (Report, error) {
 	in, err := json.Marshal(analyzeInput{
 		Schema: source(schema.Format(), schema.Text()),
@@ -149,8 +137,6 @@ func (a *Analyzer) run(ctx context.Context, query string, schema cedar.Schema, p
 	return decodeReport(w, swap)
 }
 
-// withSolverDetail adds the host-side solver error and the solver's stderr
-// to err.
 func (a *Analyzer) withSolverDetail(err error, state *sessionState, session Session) error {
 	if state.err != nil {
 		err = fmt.Errorf("%w (host: %v)", err, state.err)

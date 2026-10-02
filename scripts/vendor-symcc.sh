@@ -1,17 +1,10 @@
 #!/usr/bin/env bash
-# Rebuilds rust/vendor/cedar-policy-symcc-0.7.0 from the crates.io release
-# and rust/patches/cedar-policy-symcc-0.7.0-wasm.patch, and checks that the
-# committed copy matches.
-#
-# The crate archive must match the checksum that crates.io publishes in its
-# index, which is also the checksum that cargo verifies.
-#
-# Usage: scripts/vendor-symcc.sh          # check the committed copy
-#        scripts/vendor-symcc.sh --write  # replace the committed copy
+# Check vendored SymCC against the upstream archive plus our patch; --write replaces it.
 set -euo pipefail
 
 name=cedar-policy-symcc
 version=0.7.0
+# Pin the crates.io index checksum so the vendor check also verifies archive integrity.
 sha256=c4a1e6ff21119f50f3114451b9d7ac135690fe18759cc37a59d8aa5b1c797c5b
 
 repo=$(cd "$(dirname "$0")/.." && pwd)

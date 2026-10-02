@@ -18,9 +18,7 @@ var (
 	sharedRuntimeErr  error
 )
 
-// testRuntime returns one Runtime for the whole test binary, because
-// compiling the module takes seconds. A file cache shares the compiled
-// code with the worker processes of a fuzz run.
+// Compile once per test binary; the disk cache also spares fuzz workers the startup cost.
 func testRuntime(t testing.TB) *cedar.Runtime {
 	t.Helper()
 	sharedRuntimeOnce.Do(func() {

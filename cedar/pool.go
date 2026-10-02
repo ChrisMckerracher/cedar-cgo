@@ -9,8 +9,7 @@ import (
 	"github.com/jackc/puddle/v2"
 )
 
-// NewAuthorizer parses the configuration in one module instance, and
-// returns an [*Error] if Cedar rejects it.
+// NewAuthorizer loads one instance eagerly so invalid configuration fails before use.
 func (rt *Runtime) NewAuthorizer(ctx context.Context, cfg Config) (*Authorizer, error) {
 	load, err := json.Marshal(loadInput{Schema: optionalSchema(cfg.Schema), Policies: cfg.Policies.wire(), Entities: cfg.Entities})
 	if err != nil {
@@ -38,7 +37,6 @@ func (rt *Runtime) NewAuthorizer(ctx context.Context, cfg Config) (*Authorizer, 
 	return a, nil
 }
 
-// newInstance creates and loads one instance. puddle calls it.
 func (a *Authorizer) newInstance(ctx context.Context) (*wasmhost.Instance, error) {
 	ctx, cancel := context.WithTimeout(ctx, a.limits.LoadTimeout)
 	defer cancel()
@@ -68,8 +66,6 @@ func (a *Authorizer) newInstance(ctx context.Context) (*wasmhost.Instance, error
 	return inst, nil
 }
 
-// finish returns an instance to the pool, or discards it if it faulted or
-// grew past the recycle threshold.
 func (a *Authorizer) finish(res *puddle.Resource[*wasmhost.Instance]) {
 	inst := res.Value()
 	if inst.Faulted() || inst.MemoryBytes() > a.limits.RecycleMemoryBytes {
@@ -80,18 +76,15 @@ func (a *Authorizer) finish(res *puddle.Resource[*wasmhost.Instance]) {
 	res.Release()
 }
 
-// Stats counts module instances.
 type Stats struct {
-	// Created counts instances created and loaded.
+	// Created excludes instances that failed to load.
 	Created uint64
-	// Discarded counts instances discarded after a fault or after their
-	// memory grew past Limits.RecycleMemoryBytes.
+	// Discarded includes faults and instances exceeding Limits.RecycleMemoryBytes.
 	Discarded uint64
 	// Idle is the number of instances ready for a call.
 	Idle int
 }
 
-// Stats returns instance counts.
 func (a *Authorizer) Stats() Stats {
 	return Stats{Created: a.created.Load(), Discarded: a.discarded.Load(), Idle: int(a.pool.Stat().IdleResources())}
 }

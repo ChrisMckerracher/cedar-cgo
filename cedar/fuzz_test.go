@@ -11,13 +11,7 @@ import (
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 )
 
-// The fuzz targets check the boundary between Go and the module. For any
-// input, a call returns either a response or an error, an error always
-// comes with Deny, and the module never faults. A fault would mean that
-// Cedar panicked or ran out of a resource on a small input.
-
-// fuzzLimits gives fuzz inputs room, so that a fault means a crash and not
-// a limit.
+// Generous budgets distinguish small-input crashes from expected resource-limit faults.
 var fuzzLimits = cedar.Limits{MaxInstances: 1, CallTimeout: 10 * time.Second}
 
 func checkNoFault(t *testing.T, err error) {
@@ -27,9 +21,7 @@ func checkNoFault(t *testing.T, err error) {
 	}
 }
 
-// nesting returns the deepest bracket nesting in s. Inputs nested deeper
-// than maxFuzzNesting are skipped: the module traps on about 800 levels, as
-// native Cedar does, and that limit has its own test.
+// Skip deep nesting because stack exhaustion has its own fail-closed test.
 func nesting(s string) int {
 	depth, deepest := 0, 0
 	for _, r := range s {
@@ -87,7 +79,6 @@ func FuzzPolicies(f *testing.F) {
 	f.Add(`permit(principal is Joy::Device in Joy::Account::"a", action, resource) when { context.sourceIp.isInRange(ip("10.0.0.0/8")) && "x" like "*" };`)
 	f.Add(`forbid(principal, action, resource) unless { context.now.toTime() >= duration("23h") || decimal("1.5").lessThan(decimal("2.0")) };`)
 	f.Add(`@id("a") permit(principal == ?principal, action, resource);`)
-	// With CEDAR_CORPUS_DIR set, the upstream corpus policies seed the run.
 	if dir := os.Getenv("CEDAR_CORPUS_DIR"); dir != "" {
 		files, _ := filepath.Glob(filepath.Join(dir, "corpus-tests", "*.cedar"))
 		for _, name := range files[:min(len(files), 200)] {

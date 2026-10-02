@@ -16,8 +16,7 @@ import (
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 )
 
-// corpusTest is one test in Cedar's integration-test corpus. The format is
-// cedar-testing's JsonTest, which the Rust implementation runs in CI.
+// Match cedar-testing's JsonTest so both implementations consume the same corpus.
 type corpusTest struct {
 	Policies       string          `json:"policies"`
 	PolicyFormat   string          `json:"policyFormat"`
@@ -90,10 +89,7 @@ func (c *corpusTally) note(counter *int, format string, args ...any) {
 	}
 }
 
-// TestCorpus runs Cedar's integration-test corpus through the Go API. Set
-// CEDAR_CORPUS_DIR to the directory that holds corpus-tests/. The test
-// requires zero mismatches in decisions, reasons, errors and strict
-// validation.
+// CEDAR_CORPUS_DIR must contain corpus-tests/ from the pinned upstream archive.
 func TestCorpus(t *testing.T) {
 	dir := os.Getenv("CEDAR_CORPUS_DIR")
 	if dir == "" {
@@ -234,7 +230,7 @@ func runCorpusTest(rt *cedar.Runtime, dir, file string, tally *corpusTally) {
 	}
 }
 
-// sameSet compares two lists of policy IDs as sets, as cedar-testing does.
+// Ignore policy-ID order to match cedar-testing's comparison.
 func sameSet(a, b []string) bool {
 	a, b = slices.Clone(a), slices.Clone(b)
 	slices.Sort(a)

@@ -9,8 +9,7 @@ import (
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 )
 
-// This example needs a cvc5 executable, so it has no Output comment and
-// go test only compiles it.
+// Omit Output because running the example requires an external cvc5 executable.
 func ExampleAnalyzer_NewlyPermitted() {
 	ctx := context.Background()
 	a, err := analysis.New(ctx, analysis.CVC5("/usr/local/bin/cvc5"))

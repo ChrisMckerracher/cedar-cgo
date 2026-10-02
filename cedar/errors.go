@@ -7,11 +7,9 @@ import (
 	"github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
 )
 
-// ErrorKind classifies an [Error].
 type ErrorKind string
 
-// Error kinds. Cedar reports the kinds from KindSchema to KindInput; this
-// package reports KindLimit and KindFault.
+// KindLimit and KindFault originate in the host; the remaining kinds come from Cedar.
 const (
 	KindSchema    ErrorKind = "schema"    // The schema does not parse.
 	KindPolicies  ErrorKind = "policies"  // The policies do not parse.
@@ -26,13 +24,11 @@ const (
 	KindFault     ErrorKind = "fault"     // The module trapped, exited, timed out or broke the ABI.
 )
 
-// Error is an error from Cedar or from this package. Every Authorize call
-// that returns an Error returns the Deny decision.
+// Error always accompanies Deny when returned by Authorize.
 type Error struct {
 	Kind    ErrorKind
 	Message string
-	// Err is the cause of a KindFault error. A timeout unwraps to
-	// context.DeadlineExceeded.
+	// Err preserves fault causes, including context.DeadlineExceeded for timeouts.
 	Err error
 }
 
@@ -43,13 +39,11 @@ func (e *Error) Error() string {
 	return fmt.Sprintf("cedar: %s: %s", e.Kind, e.Message)
 }
 
-// Unwrap returns the cause of a KindFault error.
 func (e *Error) Unwrap() error { return e.Err }
 
 // ErrFault matches every KindFault error with [errors.Is].
 var ErrFault = errors.New("cedar: module fault")
 
-// Is reports whether target is [ErrFault] and e is a fault.
 func (e *Error) Is(target error) bool { return target == ErrFault && e.Kind == KindFault }
 
 func faultError(err error) *Error {
@@ -60,8 +54,7 @@ func limitError(what string, n, limit int) *Error {
 	return &Error{Kind: KindLimit, Message: fmt.Sprintf("%s is %d bytes, above the limit of %d", what, n, limit)}
 }
 
-// moduleError converts a module error. A kind that Cedar does not report,
-// such as "internal", becomes a fault.
+// Unknown guest error kinds are faults so the instance cannot return to the pool.
 func moduleError(w *wire.Error) *Error {
 	switch k := ErrorKind(w.Kind); k {
 	case KindSchema, KindPolicies, KindEntities, KindContext, KindRequest,

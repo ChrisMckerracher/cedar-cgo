@@ -1,14 +1,5 @@
-//! Cedar change analysis with SymCC, exported to the Go host.
-//!
-//! Export, besides `cgw_abi_version`, `cgw_alloc` and `cgw_free`:
-//!
-//! - `cgw_analyze`: compares two policy sets under one schema, for each
-//!   request environment that the schema defines.
-//!
-//! SymCC writes SMT-LIB to the solver and reads its replies through two host
-//! imports, `cgw_host.solver_write` and `cgw_host.solver_read`. The host
-//! connects them to an SMT solver process. Every counterexample that the
-//! solver returns is re-checked here with Cedar's concrete authorizer.
+//! SymCC uses a host-owned solver; Cedar's concrete authorizer rechecks every
+//! counterexample before it crosses the Go boundary.
 
 use cedar_policy::{Authorizer, Decision, Entities, EntityUid, PolicySet, Request, Schema};
 use cedar_policy_core::ast::Context as CoreContext;
@@ -23,14 +14,12 @@ cgw_abi::export_memory_functions!();
 
 #[link(wasm_import_module = "cgw_host")]
 unsafe extern "C" {
-    /// Writes `len` bytes to the solver. Returns 0, or a negative value on error.
+    /// Returns 0 on success or a negative value on error.
     fn solver_write(ptr: *const u8, len: u32) -> i32;
-    /// Reads at most `cap` bytes from the solver. Returns the byte count, 0 at
-    /// end of stream, or a negative value on error.
+    /// Returns at most `cap` bytes, 0 at EOF, or a negative value on error.
     fn solver_read(ptr: *mut u8, cap: u32) -> i32;
 }
 
-/// The solver's output stream, read through the host.
 struct HostReader;
 
 impl Read for HostReader {
@@ -42,9 +31,7 @@ impl Read for HostReader {
     }
 }
 
-/// A [`Solver`] that speaks SMT-LIB with a solver process owned by the host.
-///
-/// The reply handling follows `cedar_policy_symcc::solver::LocalSolver`.
+/// Mirrors `LocalSolver`'s reply handling to keep the host transport compatible.
 struct HostSolver {
     pending: Vec<u8>,
     output: BufReader<HostReader>,
@@ -70,7 +57,7 @@ impl HostSolver {
         Ok(())
     }
 
-    /// Reads one line. End of stream is an error: the solver exited.
+    /// EOF means the solver exited before answering, not a completed reply.
     fn read_line(&mut self, buf: &mut String) -> Result<usize, SolverError> {
         let n = self.output.read_line(buf)?;
         if n == 0 {
@@ -217,7 +204,7 @@ fn request_part(uid: Option<&EntityUid>, what: &str) -> Result<Uid, OpError> {
         .ok_or_else(|| OpError::msg("internal", format!("counterexample has no {what}")))
 }
 
-/// Serializes a counterexample, after Cedar's authorizer confirms it.
+/// Reject solver counterexamples that Cedar's concrete authorizer cannot reproduce.
 fn confirm(
     query: Query,
     env: &Env,

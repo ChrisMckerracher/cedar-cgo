@@ -23,28 +23,24 @@ func (r Report) Holds() bool {
 	return true
 }
 
-// Result is the answer for one request environment: one principal type,
-// one action and one resource type from the schema.
+// Result covers one schema-defined combination of principal type, action and resource type.
 type Result struct {
 	PrincipalType string
 	Action        cedar.EntityUID
 	ResourceType  string
-	// Holds is true when the solver proved the property for this
-	// environment.
+	// Holds relies on SymCC's encoding and the solver's unsat answer.
 	Holds bool
 	// Counterexample is set when Holds is false.
 	Counterexample *Counterexample
 }
 
-// Counterexample is a concrete request on which the property fails.
+// Counterexample is rechecked with Cedar's concrete authorizer before being returned.
 type Counterexample struct {
-	// Request carries the context and the entities of the counterexample.
-	// It omits the schema's action entities.
+	// Request includes context and entities, except action entities supplied by the schema.
 	Request cedar.Request
 	// Text describes the request in Cedar syntax.
 	Text string
-	// First and Second are the decisions of the first and the second policy
-	// set argument on Request, from Cedar's authorizer.
+	// First and Second follow the caller's policy-set argument order.
 	First, Second cedar.Decision
 }
 

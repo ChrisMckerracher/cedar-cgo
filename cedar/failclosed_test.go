@@ -12,8 +12,7 @@ import (
 	"github.com/tetratelabs/wazero"
 )
 
-// permitAll allows every request. Under it, a Deny can only come from the
-// fail-closed path.
+// A denial under permitAll can only come from the fail-closed path.
 var permitAll = cedar.PoliciesFromCedar("permit(principal, action, resource);")
 
 func simpleRequest(ctx cedar.Context) cedar.Request {
@@ -25,13 +24,8 @@ func simpleRequest(ctx cedar.Context) cedar.Request {
 	}
 }
 
-// testCache shares compiled code between the runtimes that these tests
-// create.
 var testCache = wazero.NewCompilationCache()
 
-// requireFaultThenRecovery checks that a call returned Deny with a fault,
-// that its instance was discarded, and that the next call gets a fresh
-// instance and is allowed.
 func requireFaultThenRecovery(t *testing.T, a *cedar.Authorizer, resp cedar.Response, err error, wantStderr string) {
 	t.Helper()
 	if resp.Decision != cedar.Deny {
@@ -105,7 +99,6 @@ func TestFailClosedOnTimeout(t *testing.T) {
 	if !errors.Is(err, context.DeadlineExceeded) {
 		t.Fatalf("got error %v, want a deadline", err)
 	}
-	// The second call has no context, so it is fast and allowed.
 	requireFaultThenRecovery(t, a, resp, err, "")
 }
 
@@ -128,10 +121,7 @@ func TestFailClosedOnCallerCancel(t *testing.T) {
 
 func TestFailClosedOnStackOverflow(t *testing.T) {
 	rt := testRuntime(t)
-	// Native cedar-policy 4.13.0 overflows Linux's default 8 MiB
-	// main-thread stack and aborts the process on 575 nested parentheses.
-	// The module's 8 MiB stack holds 750; on 800 it traps, and the host
-	// survives.
+	// 800 nested parentheses exhaust the guest's 8 MiB stack, exercising host survival.
 	deep := "permit(principal, action, resource) when { " + strings.Repeat("(", 800) + "true" + strings.Repeat(")", 800) + " };"
 	_, err := rt.NewAuthorizer(context.Background(), cedar.Config{Policies: cedar.PoliciesFromCedar(deep)})
 	if !errors.Is(err, cedar.ErrFault) {

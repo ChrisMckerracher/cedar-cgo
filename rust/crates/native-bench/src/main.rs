@@ -1,11 +1,5 @@
-//! Native timing of cedar-policy on the joy data set, as a baseline for the
-//! wazero benchmarks in the Go package.
-//!
-//! Usage: cargo run --release -p cgw-native-bench -- ../testdata/joy
-//!
-//! It prints two numbers. "decision" times `Authorizer::is_authorized` on a
-//! prebuilt request. "end-to-end" also parses the request and its context
-//! from JSON, as the authorization module does on every call.
+//! Native baseline for Go benchmarks: "decision" reuses a parsed request;
+//! "end-to-end" includes JSON parsing to match the guest's per-call work.
 
 use cedar_policy::{Authorizer, Context, Entities, EntityUid, PolicySet, Request, Schema};
 use std::hint::black_box;

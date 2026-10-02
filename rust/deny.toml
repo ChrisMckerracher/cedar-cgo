@@ -1,11 +1,7 @@
-# cargo-deny configuration. CI runs `cargo deny --all-features check`.
-# The modules ship inside an Apache-2.0 Go module, so every license must be
-# permissive and compatible with Apache-2.0. Copyleft licenses, weak or
-# strong, are not allowed.
+# Embedded dependencies must have permissive licenses compatible with Apache-2.0.
 
 [graph]
-# The targets that this workspace builds: the modules, and the native
-# benchmark on Linux.
+# Check both shipped guests and the native Linux benchmark.
 targets = ["wasm32-wasip1", "x86_64-unknown-linux-gnu"]
 all-features = true
 

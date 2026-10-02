@@ -1,24 +1,13 @@
 #!/usr/bin/env bash
-# Builds the two guest modules and updates the copies that the Go packages
-# embed, with their SHA-256 constants.
-#
-# The build is reproducible: the same toolchain (rust-toolchain.toml), the
-# same lockfile (--locked) and the same sources give the same bytes. Path
-# remapping removes the checkout, CARGO_HOME and RUSTUP_HOME paths from the
-# output. CI runs this script and fails if the result differs from the
-# committed modules.
-#
-# Usage: scripts/build-wasm.sh
+# CI rebuilds the embedded modules and hashes to verify the committed artifacts.
 set -euo pipefail
 
 repo=$(cd "$(dirname "$0")/.." && pwd)
 cargo_home=$(cd "${CARGO_HOME:-$HOME/.cargo}" && pwd)
 rustup_home=$(cd "${RUSTUP_HOME:-$HOME/.rustup}" && pwd)
 
-# The 8 MiB shadow stack matches the default main-thread stack of native
-# Linux builds. With it the module parses deeper policies than a native
-# build does. The stack sits below the data, so an overflow traps instead
-# of overwriting memory.
+# An 8 MiB stack matches native Linux's default; placing it below data makes overflow trap.
+# Path remapping keeps checkout and toolchain locations out of reproducible artifacts.
 export RUSTFLAGS="-C link-arg=-zstack-size=8388608 --remap-path-prefix=$repo=/cedar-go-wasm --remap-path-prefix=$cargo_home=/cargo --remap-path-prefix=$rustup_home=/rustup"
 export CARGO_INCREMENTAL=0
 unset CARGO_BUILD_RUSTFLAGS CARGO_ENCODED_RUSTFLAGS RUSTC_WRAPPER
@@ -37,7 +26,6 @@ install_module() {
 
 package $name
 
-// SHA256 is the hex SHA-256 of $name.wasm.
 const SHA256 = "$sum"
 EOF
 	echo "$name.wasm $sum $(stat -c %s "$dir/$name.wasm") bytes"

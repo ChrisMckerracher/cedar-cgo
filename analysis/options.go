@@ -5,7 +5,6 @@ import (
 	"time"
 )
 
-// Defaults for [New].
 const (
 	DefaultTimeout          = 60 * time.Second
 	DefaultMemoryLimitBytes = 1 << 30
@@ -22,23 +21,20 @@ type config struct {
 	maxSolverOutput int64
 }
 
-// Option configures [New].
 type Option func(*config)
 
-// WithTimeout bounds each analysis call, solver time included. The default
-// is [DefaultTimeout].
+// WithTimeout includes solver time; the default is [DefaultTimeout].
 func WithTimeout(d time.Duration) Option { return func(c *config) { c.timeout = d } }
 
-// WithMemoryLimit caps the linear memory of each module instance. The
-// default is [DefaultMemoryLimitBytes].
+// WithMemoryLimit caps per-instance linear memory; the default is [DefaultMemoryLimitBytes].
 func WithMemoryLimit(bytes uint64) Option { return func(c *config) { c.memoryLimit = bytes } }
 
-// WithCompilationCache reuses compiled machine code across analyzers.
+// WithCompilationCache avoids recompilation across analyzers.
 func WithCompilationCache(cache wazero.CompilationCache) Option {
 	return func(c *config) { c.cache = cache }
 }
 
-// WithMaxSourceBytes caps the size of the schema and the two policy sets.
+// WithMaxSourceBytes includes both policy sets, the schema and the JSON envelope.
 // The default is [DefaultMaxSourceBytes].
 func WithMaxSourceBytes(n int) Option { return func(c *config) { c.maxSourceBytes = n } }
 

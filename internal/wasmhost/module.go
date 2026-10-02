@@ -9,34 +9,28 @@ import (
 	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
 )
 
-// ABIVersion is the guest ABI version that this host speaks.
 const ABIVersion = 1
 
-// wasmPageSize is the size of one WebAssembly memory page.
 const wasmPageSize = 65536
 
-// Config configures a [Module].
 type Config struct {
 	// Name labels the module in errors.
 	Name string
-	// Wasm is the module binary.
 	Wasm []byte
 	// SHA256 is the expected hex SHA-256 of Wasm.
 	SHA256 string
-	// MemoryLimitBytes caps the linear memory of each instance.
+	// MemoryLimitBytes applies per instance and rounds down to whole Wasm pages.
 	MemoryLimitBytes uint64
 	// Cache, if not nil, stores compiled machine code across runtimes.
 	Cache wazero.CompilationCache
-	// AllowedImports lists every function the module may import, as
-	// "module.name". Compilation fails if the module imports anything else.
+	// AllowedImports rejects unlisted "module.name" imports to bound guest capabilities.
 	AllowedImports []string
 	// HostModules, if not nil, defines host modules before compilation.
 	HostModules func(ctx context.Context, r wazero.Runtime) error
-	// Exports lists the operation exports the module must have.
+	// Exports names required operations in addition to the fixed memory ABI.
 	Exports []string
 }
 
-// Module is a compiled guest module and the runtime that owns it.
 type Module struct {
 	name     string
 	runtime  wazero.Runtime
@@ -44,7 +38,6 @@ type Module struct {
 	exports  []string
 }
 
-// Compile verifies and compiles a guest module.
 func Compile(ctx context.Context, cfg Config) (*Module, error) {
 	sum := sha256.Sum256(cfg.Wasm)
 	if got := hex.EncodeToString(sum[:]); got != cfg.SHA256 {
@@ -107,7 +100,7 @@ func compile(ctx context.Context, r wazero.Runtime, cfg Config) (*Module, error)
 	return &Module{name: cfg.Name, runtime: r, compiled: compiled, exports: cfg.Exports}, nil
 }
 
-// Close releases the runtime and every instance of the module.
+// Close invalidates every instance owned by the module.
 func (m *Module) Close(ctx context.Context) error {
 	return m.runtime.Close(ctx)
 }

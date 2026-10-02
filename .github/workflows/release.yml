@@ -1,11 +1,6 @@
 name: Release
 
-# A tag such as v0.1.0 builds the modules from source, checks that they equal
-# the committed modules, runs the tests, attests build provenance for the
-# modules with Sigstore, and publishes a GitHub release.
-#
-# A manual run (workflow_dispatch) does everything except the release, to
-# verify the workflow.
+# Manual runs verify the release pipeline without publishing a release.
 
 on:
   push:

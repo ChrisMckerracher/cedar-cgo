@@ -20,8 +20,6 @@ func readFile(t *testing.T, name string) string {
 	return string(b)
 }
 
-// newAnalyzer returns an analyzer that runs the cvc5 executable named by
-// the CVC5 environment variable, as cedar-policy-symcc's LocalSolver does.
 func newAnalyzer(t *testing.T) *analysis.Analyzer {
 	t.Helper()
 	path := os.Getenv("CVC5")
@@ -98,8 +96,7 @@ func TestNewlyPermittedJoy(t *testing.T) {
 	}
 }
 
-// checkWithAuthorizer replays a counterexample through the Go authorizer:
-// after must allow it and before must deny it.
+// Replay through Go to verify that counterexample decoding preserves the guest's result.
 func checkWithAuthorizer(t *testing.T, rt *cedar.Runtime, schema cedar.Schema, before, after cedar.PolicySet, c *analysis.Counterexample) {
 	t.Helper()
 	ctx := context.Background()

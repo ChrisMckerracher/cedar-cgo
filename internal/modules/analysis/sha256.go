@@ -2,5 +2,4 @@
 
 package analysis
 
-// SHA256 is the hex SHA-256 of analysis.wasm.
-const SHA256 = "1c2a578d7368ee887af47bdd8e25535fd39f7c18b2c8cd952fe7ec06f66b029d"
+const SHA256 = "a2001269078fce2420b7d8edc3a652df20e8bfd077675dbee02d911cf312c283"

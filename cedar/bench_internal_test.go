@@ -9,8 +9,7 @@ import (
 	"github.com/ChrisMckerracher/cedar-go-wasm/internal/wasmhost"
 )
 
-// BenchmarkInstanceMemory reports the Go heap and the linear memory that
-// one loaded instance of the joy authorizer holds.
+// Report guest linear memory separately because Go heap metrics exclude it.
 func BenchmarkInstanceMemory(b *testing.B) {
 	read := func(name string) string {
 		data, err := os.ReadFile("../testdata/joy/" + name)

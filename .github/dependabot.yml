@@ -1,7 +1,4 @@
-# Dependabot opens pull requests. Nothing merges them automatically: a
-# maintainer reviews each one, and a change to rust/Cargo.lock also needs
-# scripts/build-wasm.sh, because CI compares the rebuilt modules with the
-# committed ones.
+# Rust lockfile updates also require scripts/build-wasm.sh because CI compares artifacts.
 version: 2
 updates:
   - package-ecosystem: gomod
@@ -13,8 +10,7 @@ updates:
     schedule:
       interval: weekly
     ignore:
-      # A Cedar upgrade follows the procedure in CONTRIBUTING.md: it moves
-      # cedar-policy and the vendored cedar-policy-symcc together.
+      # Cedar and vendored SymCC must move together; follow CONTRIBUTING.md.
       - dependency-name: cedar-policy
       - dependency-name: cedar-policy-core
       - dependency-name: cedar-policy-symcc

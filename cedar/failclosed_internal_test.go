@@ -11,9 +11,7 @@ import (
 	"github.com/ChrisMckerracher/cedar-go-wasm/internal/wasmhost"
 )
 
-// TestFailClosedOnCorruptInstance overwrites the whole linear memory of an
-// idle instance. The next call on it must fault, return Deny, and discard
-// the instance, even though the policy allows every request.
+// A permit-all policy makes any denial attributable to corruption handling.
 func TestFailClosedOnCorruptInstance(t *testing.T) {
 	ctx := context.Background()
 	rt, err := NewRuntime(ctx)

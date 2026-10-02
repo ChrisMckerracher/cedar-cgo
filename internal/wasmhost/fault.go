@@ -17,8 +17,7 @@ type Fault struct {
 	Stderr string
 }
 
-// Error returns the first line of the cause, without wazero's stack trace,
-// and the guest's stderr.
+// Error keeps panic diagnostics while omitting wazero's stack trace from routine errors.
 func (f *Fault) Error() string {
 	cause, _, _ := strings.Cut(f.Err.Error(), "\n")
 	msg := fmt.Sprintf("%s module: %s: %s", f.Module, f.Op, cause)
@@ -28,8 +27,7 @@ func (f *Fault) Error() string {
 	return msg
 }
 
-// Unwrap returns the cause. A timeout unwraps to [context.DeadlineExceeded]
-// and a cancellation to [context.Canceled].
+// Unwrap preserves [context.DeadlineExceeded] and [context.Canceled] for errors.Is.
 func (f *Fault) Unwrap() error {
 	var exit *sys.ExitError
 	if errors.As(f.Err, &exit) {

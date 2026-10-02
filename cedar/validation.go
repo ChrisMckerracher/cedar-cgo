@@ -7,7 +7,6 @@ import (
 	"github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
 )
 
-// callOnce runs one operation on a fresh instance and closes it.
 func (rt *Runtime) callOnce(ctx context.Context, op string, input []byte) ([]byte, error) {
 	inst, err := rt.module.Instantiate(ctx)
 	if err != nil {
@@ -21,10 +20,8 @@ func (rt *Runtime) callOnce(ctx context.Context, op string, input []byte) ([]byt
 	return out, nil
 }
 
-// ValidationResult is the outcome of strict validation.
 type ValidationResult struct {
-	// Passed is true when the validator found no errors. Warnings do not
-	// fail validation.
+	// Passed can be true with warnings; only errors fail validation.
 	Passed   bool
 	Errors   []PolicyMessage
 	Warnings []PolicyMessage

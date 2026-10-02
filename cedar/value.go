@@ -5,46 +5,34 @@ import (
 	"fmt"
 )
 
-// Value is a Cedar value: [Bool], [Long], [String], [Set], [Record],
-// [EntityUID], [Decimal], [IPAddr], [Datetime] or [Duration].
-//
-// Each value marshals to Cedar's JSON value format. Cedar parses that JSON,
-// so its rules apply: for example, a [Record] whose only key is "__entity" or
-// "__extn" reads as an entity reference or an extension value.
+// Value uses Cedar's JSON encoding; records with only "__entity" or "__extn"
+// are interpreted as entity references or extension values.
 type Value interface {
 	json.Marshaler
 	cedarValue()
 }
 
-// Bool is a Cedar boolean.
 type Bool bool
 
-// Long is a Cedar 64-bit signed integer.
 type Long int64
 
-// String is a Cedar string.
 type String string
 
-// Set is a Cedar set. Cedar ignores the order and removes duplicates.
+// Set ignores order and duplicates when evaluated by Cedar.
 type Set []Value
 
-// Record is a Cedar record.
 type Record map[string]Value
 
-// Decimal is a Cedar decimal, written as Cedar's decimal() constructor
-// accepts it, such as "12.3456".
+// Decimal accepts Cedar's decimal() syntax, such as "12.3456".
 type Decimal string
 
-// IPAddr is a Cedar IP address or range, written as Cedar's ip()
-// constructor accepts it, such as "10.0.0.0/8".
+// IPAddr accepts Cedar's ip() syntax, such as "10.0.0.0/8".
 type IPAddr string
 
-// Datetime is a Cedar datetime, written as Cedar's datetime() constructor
-// accepts it, such as "2026-10-01T12:00:00Z".
+// Datetime accepts Cedar's datetime() syntax, such as "2026-10-01T12:00:00Z".
 type Datetime string
 
-// Duration is a Cedar duration, written as Cedar's duration() constructor
-// accepts it, such as "1h30m".
+// Duration accepts Cedar's duration() syntax, such as "1h30m".
 type Duration string
 
 func (Bool) cedarValue()      {}
@@ -58,16 +46,12 @@ func (IPAddr) cedarValue()    {}
 func (Datetime) cedarValue()  {}
 func (Duration) cedarValue()  {}
 
-// MarshalJSON implements [json.Marshaler].
 func (v Bool) MarshalJSON() ([]byte, error) { return json.Marshal(bool(v)) }
 
-// MarshalJSON implements [json.Marshaler].
 func (v Long) MarshalJSON() ([]byte, error) { return json.Marshal(int64(v)) }
 
-// MarshalJSON implements [json.Marshaler].
 func (v String) MarshalJSON() ([]byte, error) { return json.Marshal(string(v)) }
 
-// MarshalJSON implements [json.Marshaler].
 func (v Set) MarshalJSON() ([]byte, error) {
 	if v == nil {
 		return []byte("[]"), nil
@@ -78,7 +62,6 @@ func (v Set) MarshalJSON() ([]byte, error) {
 	return json.Marshal([]Value(v))
 }
 
-// MarshalJSON implements [json.Marshaler].
 func (v Record) MarshalJSON() ([]byte, error) {
 	if v == nil {
 		return []byte("{}"), nil
@@ -104,16 +87,12 @@ func marshalExtn(fn, arg string) ([]byte, error) {
 	return json.Marshal(e)
 }
 
-// MarshalJSON implements [json.Marshaler].
 func (v Decimal) MarshalJSON() ([]byte, error) { return marshalExtn("decimal", string(v)) }
 
-// MarshalJSON implements [json.Marshaler].
 func (v IPAddr) MarshalJSON() ([]byte, error) { return marshalExtn("ip", string(v)) }
 
-// MarshalJSON implements [json.Marshaler].
 func (v Datetime) MarshalJSON() ([]byte, error) { return marshalExtn("datetime", string(v)) }
 
-// MarshalJSON implements [json.Marshaler].
 func (v Duration) MarshalJSON() ([]byte, error) { return marshalExtn("duration", string(v)) }
 
 func checkValues(vs []Value) error {

@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
-# Writes THIRD_PARTY_LICENSES.txt: the license of every crate that the
-# WebAssembly modules contain, from rust/Cargo.lock, with cargo-about.
-#
-# Usage: scripts/third-party-licenses.sh
+# Derive shipped license notices from the locked dependency graph.
 set -euo pipefail
 repo=$(cd "$(dirname "$0")/.." && pwd)
 cd "$repo/rust"

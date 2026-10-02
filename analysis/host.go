@@ -16,7 +16,6 @@ const (
 	solverReadChunk     = 1 << 16
 )
 
-// analysisImports lists every function the analysis module may import.
 var analysisImports = []string{
 	hostModuleName + "." + solverWriteFunction,
 	hostModuleName + "." + solverReadFunction,
@@ -31,8 +30,7 @@ var analysisImports = []string{
 
 type sessionKey struct{}
 
-// sessionState is the solver session of one call, which the host functions
-// find through the call's context.
+// Context binds host imports to one call's solver even when analyzers run concurrently.
 type sessionState struct {
 	session Session
 	read    int64
@@ -48,7 +46,6 @@ func defineHostModule(ctx context.Context, r wazero.Runtime) error {
 	return err
 }
 
-// solverWrite copies guest bytes to the solver's input.
 func solverWrite(ctx context.Context, m api.Module, ptr, n uint32) int32 {
 	s, _ := ctx.Value(sessionKey{}).(*sessionState)
 	if s == nil || s.err != nil {
@@ -66,8 +63,7 @@ func solverWrite(ctx context.Context, m api.Module, ptr, n uint32) int32 {
 	return 0
 }
 
-// solverRead copies solver output into guest memory. It returns the byte
-// count, 0 at end of stream, or -1 on error.
+// The guest ABI expects a byte count, 0 at EOF, or -1 on error.
 func solverRead(ctx context.Context, m api.Module, ptr, n uint32) int32 {
 	s, _ := ctx.Value(sessionKey{}).(*sessionState)
 	if s == nil || s.err != nil {

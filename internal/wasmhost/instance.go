@@ -12,12 +12,10 @@ import (
 	"io"
 )
 
-// stderrLimit bounds the guest stderr that an instance keeps. Rust writes a
-// panic message there before it aborts.
+// Retain enough stderr for Rust panic diagnostics without unbounded host allocation.
 const stderrLimit = 4096
 
-// Instance is one instantiation of a [Module]. It is not safe for
-// concurrent use.
+// Instance requires exclusive use; its call stack and guest state are mutable.
 type Instance struct {
 	module *Module
 	mod    api.Module
@@ -26,16 +24,12 @@ type Instance struct {
 	ops    map[string]api.Function
 	stack  []uint64
 	stderr *capbuf.Buffer
-	// faulted is set after any trap, exit or ABI violation. A faulted
-	// instance must be closed.
+	// Faulted state is untrusted, so discard the instance.
 	faulted bool
 }
 
-// Instantiate creates a fresh instance. The instance gets crypto/rand as its
-// random source, which Rust's hash maps use for their seeds. It gets no
-// arguments, no environment variables, no files, no network, no real clock
-// and no stdin. Its stdout is discarded and its stderr is kept, bounded, for
-// fault messages.
+// Instantiate grants randomness for Rust hash seeds and bounded stderr for panic diagnostics.
+// Other WASI capabilities retain wazero's isolated defaults.
 func (m *Module) Instantiate(ctx context.Context) (*Instance, error) {
 	stderr := &capbuf.Buffer{Limit: stderrLimit}
 	cfg := wazero.NewModuleConfig().
@@ -68,25 +62,20 @@ func (m *Module) Instantiate(ctx context.Context) (*Instance, error) {
 	return inst, nil
 }
 
-// Close releases the instance.
 func (i *Instance) Close(ctx context.Context) error {
 	return i.mod.Close(ctx)
 }
 
-// Faulted reports whether a call on this instance faulted.
 func (i *Instance) Faulted() bool { return i.faulted }
 
-// MemoryBytes returns the current size of the instance's linear memory.
 func (i *Instance) MemoryBytes() uint64 {
 	return uint64(i.mod.Memory().Size())
 }
 
-// Module returns the underlying wazero module, for host functions.
 func (i *Instance) Module() api.Module { return i.mod }
 
-// Call runs operation op with input and returns its response. The response
-// is a copy that outlives the instance. Any error from Call is a [*Fault],
-// and it marks the instance as faulted.
+// Call copies responses out of guest memory so they outlive the instance.
+// Every error is a [*Fault] and makes the instance unusable.
 func (i *Instance) Call(ctx context.Context, op string, input []byte, maxResponse uint32) ([]byte, error) {
 	if i.faulted {
 		return nil, i.fault(op, errors.New("instance already faulted"))
@@ -134,8 +123,7 @@ func (i *Instance) Call(ctx context.Context, op string, input []byte, maxRespons
 	return out, nil
 }
 
-// MarkFaulted marks the instance as faulted, for errors that the caller
-// finds in a response, such as invalid JSON.
+// MarkFaulted prevents reuse when a caller detects an invalid response, such as malformed JSON.
 func (i *Instance) MarkFaulted() { i.faulted = true }
 
 func (i *Instance) fault(op string, err error) *Fault {

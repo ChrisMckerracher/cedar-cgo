@@ -1,13 +1,5 @@
-//! Cedar authorization and strict validation, exported to the Go host.
-//!
-//! Exports, besides `cgw_abi_version`, `cgw_alloc` and `cgw_free`:
-//!
-//! - `cgw_load`: parses a schema, a policy set and entities, and keeps them
-//!   in this instance for later `cgw_authorize` calls.
-//! - `cgw_authorize`: evaluates one request against the loaded state.
-//! - `cgw_validate`: validates a policy set against a schema in strict mode.
-//!
-//! All logic is in `cedar-policy`. This crate only moves JSON in and out.
+//! Authorization and strict validation delegate to `cedar-policy` so the Go
+//! boundary shares the reference implementation's semantics.
 
 use cedar_policy::{
     Authorizer, Context, Decision, Entities, EntityUid, PolicySet, Request, Schema, ValidationMode,
@@ -20,7 +12,6 @@ use std::cell::RefCell;
 
 cgw_abi::export_memory_functions!();
 
-/// The state that `cgw_load` installs.
 struct Loaded {
     schema: Option<Schema>,
     policies: PolicySet,
@@ -45,8 +36,7 @@ struct LoadOutput {
     policies: usize,
 }
 
-/// Parses entities in Cedar's entity JSON format. With a schema, Cedar checks
-/// the entities against it and adds the schema's action entities.
+/// A schema also validates entity data and supplies action entities.
 fn parse_entities(json: Option<&RawValue>, schema: Option<&Schema>) -> Result<Entities, OpError> {
     let text = json.map_or("[]", RawValue::get);
     Entities::from_json_str(text, schema).map_err(|e| OpError::new("entities", &e))

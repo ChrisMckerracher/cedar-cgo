@@ -12,12 +12,10 @@ permissions:
   contents: read
 
 env:
-  # cedar-integration-tests commit "updated corpus tests from latest nightly
-  # run of 4.13.0" (2026-09-15). Update it with every Cedar version.
+  # Keep the cedar-integration-tests corpus aligned with Cedar 4.13.0.
   CORPUS_COMMIT: 1999ea249229e26cabb398a279fea721854a471d
   CORPUS_SHA256: 65476adf952c0574d6bf9b317d67d30c9ac462eb1dbf5e4c7b2a35856baf5205
-  # cvc5 1.3.1, the solver version that Cedar tests SymCC with. CI downloads
-  # the official static build; this repository does not ship it.
+  # Match the cvc5 version used by Cedar's SymCC tests.
   CVC5_URL: https://github.com/cvc5/cvc5/releases/download/cvc5-1.3.1/cvc5-Linux-x86_64-static.zip
   CVC5_SHA256: 1a1cda20d2df4938fa4944a69f33ddc9172e319ece0eed0aa09c4d7abede3ed1
   CARGO_DENY_VERSION: 0.20.2

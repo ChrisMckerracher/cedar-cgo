@@ -8,8 +8,6 @@ import (
 	"github.com/tetratelabs/wazero"
 )
 
-// BenchmarkAuthorizeJoy measures one decision over the 45-policy joy set,
-// from the Go request to the Go response.
 func BenchmarkAuthorizeJoy(b *testing.B) {
 	a := newJoyAuthorizer(b, cedar.Limits{MaxInstances: 1})
 	req := joyRequest()
@@ -23,8 +21,6 @@ func BenchmarkAuthorizeJoy(b *testing.B) {
 	}
 }
 
-// BenchmarkValidateJoy measures strict validation of the joy set, which
-// creates and closes one module instance.
 func BenchmarkValidateJoy(b *testing.B) {
 	d := loadJoy(b)
 	rt := testRuntime(b)
@@ -36,8 +32,6 @@ func BenchmarkValidateJoy(b *testing.B) {
 	}
 }
 
-// BenchmarkNewAuthorizerJoy measures creating an authorizer, which creates
-// one instance and parses the schema, the policies and the entities in it.
 func BenchmarkNewAuthorizerJoy(b *testing.B) {
 	d := loadJoy(b)
 	rt := testRuntime(b)
@@ -50,8 +44,6 @@ func BenchmarkNewAuthorizerJoy(b *testing.B) {
 	}
 }
 
-// BenchmarkAuthorizeJoyParallel measures throughput with one instance per
-// CPU.
 func BenchmarkAuthorizeJoyParallel(b *testing.B) {
 	a := newJoyAuthorizer(b, cedar.Limits{})
 	req := joyRequest()
@@ -66,8 +58,6 @@ func BenchmarkAuthorizeJoyParallel(b *testing.B) {
 	})
 }
 
-// BenchmarkNewRuntime measures compiling the authorization module with no
-// cache.
 func BenchmarkNewRuntime(b *testing.B) {
 	for b.Loop() {
 		rt, err := cedar.NewRuntime(context.Background())
@@ -78,8 +68,6 @@ func BenchmarkNewRuntime(b *testing.B) {
 	}
 }
 
-// BenchmarkNewRuntimeCached measures NewRuntime with a warm compilation
-// cache on disk, as on the second start of a process.
 func BenchmarkNewRuntimeCached(b *testing.B) {
 	dir := b.TempDir()
 	cache, err := wazero.NewCompilationCacheWithDir(dir)
@@ -92,8 +80,7 @@ func BenchmarkNewRuntimeCached(b *testing.B) {
 	}
 	_ = rt.Close(context.Background())
 	for b.Loop() {
-		// A new cache object over the same directory reads the code from
-		// disk, as a new process would.
+		// Reopen the disk cache to model a process restart.
 		cache, err := wazero.NewCompilationCacheWithDir(dir)
 		if err != nil {
 			b.Fatal(err)

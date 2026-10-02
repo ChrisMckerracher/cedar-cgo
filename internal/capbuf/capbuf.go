@@ -1,5 +1,4 @@
-// Package capbuf provides a byte buffer that keeps only the start of what
-// is written to it.
+// Package capbuf bounds diagnostic capture so guest output cannot exhaust host memory.
 package capbuf
 
 import (
@@ -7,15 +6,14 @@ import (
 	"sync"
 )
 
-// Buffer keeps the first Limit bytes written to it and drops the rest. It
-// is safe for concurrent use.
+// Buffer keeps the first Limit bytes and is safe for concurrent use.
 type Buffer struct {
 	Limit int
 	mu    sync.Mutex
 	buf   []byte
 }
 
-// Write implements io.Writer. It never fails.
+// Write reports all bytes consumed even when truncating, so producers keep running.
 func (b *Buffer) Write(p []byte) (int, error) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
@@ -25,7 +23,6 @@ func (b *Buffer) Write(p []byte) (int, error) {
 	return len(p), nil
 }
 
-// String returns the kept bytes without surrounding white space.
 func (b *Buffer) String() string {
 	b.mu.Lock()
 	defer b.mu.Unlock()

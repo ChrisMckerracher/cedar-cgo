@@ -10,12 +10,8 @@ import (
 	"sync/atomic"
 )
 
-// Authorizer evaluates requests against one schema, policy set and entity
-// set. It is safe for concurrent use.
-//
-// It keeps a pool of module instances. Each instance holds its own parsed
-// copy of the configuration. A call that faults returns Deny, and its
-// instance is discarded; the pool creates a fresh one when needed.
+// Authorizer is safe for concurrent use; pooled instances each own their parsed state.
+// Faulted instances are discarded and replaced on demand.
 type Authorizer struct {
 	rt        *Runtime
 	load      []byte
@@ -25,8 +21,7 @@ type Authorizer struct {
 	discarded atomic.Uint64
 }
 
-// Authorize evaluates one request. On any error it returns a Response with
-// the Deny decision, and the error.
+// Authorize returns Deny on every error so callers fail closed.
 func (a *Authorizer) Authorize(ctx context.Context, req Request) (Response, error) {
 	in, err := json.Marshal(authorizeInput{
 		Principal: req.Principal.wire(),
@@ -65,8 +60,7 @@ func (a *Authorizer) Authorize(ctx context.Context, req Request) (Response, erro
 	return resp, err
 }
 
-// Close releases the authorizer's instances. It waits for calls in
-// progress to finish.
+// Close waits for calls in progress before releasing their instances.
 func (a *Authorizer) Close() {
 	a.pool.Close()
 }

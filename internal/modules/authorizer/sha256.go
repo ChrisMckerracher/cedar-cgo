@@ -2,5 +2,4 @@
 
 package authorizer
 
-// SHA256 is the hex SHA-256 of authorizer.wasm.
-const SHA256 = "db59bcba4142504279f579e85cee05b8cec419367c1539a233940bc74253b5b9"
+const SHA256 = "528e9496ef2295929ed8044a1bac158101b27277d83defeb4b9bb0c2d2b5f2ff"

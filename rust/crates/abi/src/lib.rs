@@ -1,21 +1,12 @@
-//! Memory exchange between the Go host and the cedar-go-wasm modules.
-//!
-//! The host allocates an input buffer with `cgw_alloc`, writes a JSON request
-//! into it, and passes `(ptr, len)` to an operation export. The operation takes
-//! ownership of the input buffer. It returns its JSON response as one `u64`:
-//! the pointer in the high 32 bits and the length in the low 32 bits. The host
-//! copies the response out and releases it with `cgw_free`.
-//!
-//! Every response is a JSON object. A failed operation returns
-//! `{"error":{"kind":"...","message":"..."}}`.
+//! Operations consume host-allocated JSON input and transfer JSON response ownership
+//! back to the host, which copies the bytes before calling `cgw_free`.
 
 use cedar_policy::{PolicySet, Schema};
 use serde::{Deserialize, Serialize};
 use std::alloc::Layout;
 use std::str::FromStr;
 
-/// The ABI version that `cgw_abi_version` reports. The Go host refuses a
-/// module whose version differs.
+/// The host rejects a version mismatch before exchanging memory.
 pub const ABI_VERSION: u32 = 1;
 
 /// Allocates `len` bytes for the host. Returns 0 if the allocation fails.
@@ -58,7 +49,6 @@ pub struct Input {
 }
 
 impl Input {
-    /// The input bytes.
     pub fn bytes(&self) -> &[u8] {
         if self.len == 0 {
             return &[];
@@ -75,7 +65,7 @@ impl Drop for Input {
     }
 }
 
-/// Hands a response to the host and returns the packed pointer and length.
+/// Transfers ownership to the host: pointer in the high 32 bits, length in the low 32.
 pub fn respond(body: Vec<u8>) -> u64 {
     let len = body.len() as u32;
     let ptr = alloc(len);
@@ -88,8 +78,6 @@ pub fn respond(body: Vec<u8>) -> u64 {
     (u64::from(ptr) << 32) | u64::from(len)
 }
 
-/// Serializes `value` as the response. A serialization failure becomes an
-/// error response.
 pub fn respond_json<T: Serialize>(value: &T) -> u64 {
     match serde_json::to_vec(value) {
         Ok(body) => respond(body),
@@ -97,7 +85,6 @@ pub fn respond_json<T: Serialize>(value: &T) -> u64 {
     }
 }
 
-/// The body of an error response.
 #[derive(Serialize)]
 struct ErrorBody<'a> {
     kind: &'a str,
@@ -109,7 +96,6 @@ struct ErrorResponse<'a> {
     error: ErrorBody<'a>,
 }
 
-/// Returns an error response with a machine-readable `kind`.
 pub fn respond_error(kind: &str, message: String) -> u64 {
     let body = ErrorResponse {
         error: ErrorBody { kind, message },
@@ -118,18 +104,15 @@ pub fn respond_error(kind: &str, message: String) -> u64 {
     respond(serde_json::to_vec(&body).unwrap_or_default())
 }
 
-/// An operation error: a kind for the host and a message for people.
 #[derive(Debug)]
 pub struct OpError {
     /// Machine-readable error kind, such as `schema` or `request`.
     pub kind: &'static str,
-    /// Human-readable error message.
     pub message: String,
 }
 
 impl OpError {
-    /// Builds an error of `kind` from any Cedar error, including its related
-    /// errors and help text.
+    /// Retains related diagnostics and help text that `Display` alone omits.
     pub fn new(kind: &'static str, err: &(dyn diagnostics::Diagnostic + '_)) -> Self {
         Self {
             kind,
@@ -137,7 +120,6 @@ impl OpError {
         }
     }
 
-    /// Builds an error of `kind` from a plain message.
     pub fn msg(kind: &'static str, message: impl Into<String>) -> Self {
         Self {
             kind,
@@ -146,7 +128,6 @@ impl OpError {
     }
 }
 
-/// Runs an operation and turns its result into a response.
 pub fn run<T: Serialize>(input: Input, op: impl FnOnce(&[u8]) -> Result<T, OpError>) -> u64 {
     let result = op(input.bytes());
     drop(input);
@@ -156,32 +137,25 @@ pub fn run<T: Serialize>(input: Input, op: impl FnOnce(&[u8]) -> Result<T, OpErr
     }
 }
 
-/// Parses a JSON operation input, rejecting unknown fields.
 pub fn parse_input<'a, T: Deserialize<'a>>(bytes: &'a [u8]) -> Result<T, OpError> {
     serde_json::from_slice(bytes).map_err(|e| OpError::msg("input", e.to_string()))
 }
 
-/// The format of a schema or policy source.
 #[derive(Deserialize, Clone, Copy)]
 #[serde(rename_all = "lowercase")]
 pub enum Format {
     /// Cedar's human-readable syntax.
     Cedar,
-    /// Cedar's JSON syntax.
     Json,
 }
 
-/// A schema or a policy set, as source text.
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Source {
-    /// The format of `text`.
     pub format: Format,
-    /// The source text.
     pub text: String,
 }
 
-/// Parses a schema in either Cedar format.
 pub fn parse_schema(src: &Source) -> Result<Schema, OpError> {
     match src.format {
         Format::Cedar => Schema::from_cedarschema_str(&src.text)
@@ -191,7 +165,6 @@ pub fn parse_schema(src: &Source) -> Result<Schema, OpError> {
     }
 }
 
-/// Parses a policy set in either Cedar format.
 pub fn parse_policies(src: &Source) -> Result<PolicySet, OpError> {
     match src.format {
         Format::Cedar => PolicySet::from_str(&src.text).map_err(|e| OpError::new("policies", &e)),
@@ -201,11 +174,9 @@ pub fn parse_policies(src: &Source) -> Result<PolicySet, OpError> {
     }
 }
 
-/// Renders Cedar's diagnostics as one line of text.
 pub mod diagnostics {
     pub use miette::Diagnostic;
 
-    /// Joins the message, the related messages and the help text.
     pub fn render(err: &(dyn Diagnostic + '_)) -> String {
         let mut out = err.to_string();
         if let Some(related) = err.related() {
@@ -226,17 +197,14 @@ pub mod diagnostics {
     }
 }
 
-/// Exports `cgw_abi_version`, `cgw_alloc` and `cgw_free` from a cdylib.
 #[macro_export]
 macro_rules! export_memory_functions {
     () => {
-        /// Returns the ABI version of this module.
         #[unsafe(no_mangle)]
         pub extern "C" fn cgw_abi_version() -> u32 {
             $crate::ABI_VERSION
         }
 
-        /// Allocates an input buffer for the host.
         #[unsafe(no_mangle)]
         pub extern "C" fn cgw_alloc(len: u32) -> u32 {
             $crate::alloc(len)
