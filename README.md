@@ -11,8 +11,8 @@ lacks feature parity with the Rust reference implementation and
 [doesn't appear actively maintained](https://github.com/cedar-policy/cedar-go/commits/main/).
 So we run the Rust implementation directly.
 
-The embedded versions are **cedar-policy 4.13.0** and
-**cedar-policy-symcc 0.7.0**. Authorization and strict validation match the
+The embedded versions are **cedar-policy 4.13.0**,
+**cedar-policy-formatter 4.13.0**, and **cedar-policy-symcc 0.7.0**. Authorization and strict validation match the
 pinned upstream corpus: **7,523 tests, 60,184 requests, zero mismatches**.
 See [verification](docs/verification.md) for the checks and their scope.
 
@@ -31,6 +31,9 @@ import "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 ```
 
 The project is pre-v1; the Go API may evolve before a stable release.
+The [API guide](docs/api.md) covers parsed policy edits, template management,
+on-demand entity loading, request-specific slicing, and policy formatting through
+the pinned Rust implementation. Experimental APIs are marked individually.
 
 ## Example
 
@@ -109,7 +112,7 @@ cvc5 and returns concrete counterexamples for changed decisions.
 
 Read the [security model](docs/security.md) and
 [verification guide](docs/verification.md) for details, including a scoped
-SMT proof of the ABI's response-word arithmetic.
+SMT proofs of response-word and callback-budget arithmetic.
 
 ## Performance
 
@@ -142,7 +145,7 @@ review, versioning, and release steps.
 
 | Guide | Contents |
 |---|---|
-| [API](docs/api.md) | Runtime, authorizers, types, validation, and errors |
+| [API](docs/api.md) | Runtime, policies, templates, entity loading/slicing, formatting, and errors |
 | [Partial evaluation](docs/partial-evaluation.md) | Experimental TPE, unknown inputs, and residual reauthorization |
 | [Change analysis](docs/analysis.md) | Setup, policy comparisons, and counterexamples |
 | [Security](docs/security.md) | Sandbox, limits, and failure behavior |

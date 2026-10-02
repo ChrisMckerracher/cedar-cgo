@@ -1,0 +1,260 @@
+[
+  {
+    "name": "empty",
+    "formatted": "\n",
+    "outcomes": [
+      {
+        "decision": "deny",
+        "reasons": [],
+        "error_ids": []
+      }
+    ]
+  },
+  {
+    "name": "comments-only",
+    "formatted": "\n// leading café\n// trailing\n",
+    "outcomes": [
+      {
+        "decision": "deny",
+        "reasons": [],
+        "error_ids": []
+      }
+    ]
+  },
+  {
+    "name": "simple",
+    "formatted": "permit (principal, action, resource);\n",
+    "outcomes": [
+      {
+        "decision": "allow",
+        "reasons": [
+          "policy0"
+        ],
+        "error_ids": []
+      }
+    ]
+  },
+  {
+    "name": "crlf",
+    "formatted": "// hello\npermit (principal, action, resource);\n// end\n",
+    "outcomes": [
+      {
+        "decision": "allow",
+        "reasons": [
+          "policy0"
+        ],
+        "error_ids": []
+      }
+    ]
+  },
+  {
+    "name": "annotations-comments",
+    "formatted": "// permit marker\n@id(\"α\")\n@description(\"a < b & c > d\")\npermit (\n    principal,\n    action == Action::\"view\",\n    resource\n) // scope\nwhen\n{\n    context.enabled // enabled\n     &&\n    context.name == \"café ☃\"\n}; // last\n// eof\n",
+    "outcomes": [
+      {
+        "decision": "allow",
+        "reasons": [
+          "policy0"
+        ],
+        "error_ids": []
+      },
+      {
+        "decision": "deny",
+        "reasons": [],
+        "error_ids": []
+      }
+    ]
+  },
+  {
+    "name": "precedence",
+    "formatted": "permit (principal, action, resource)\nwhen\n{\n   context.n + 2 * 3 >= 7 &&\n   (context.enabled ||\n    !context.enabled)\n};\n\nforbid (principal, action, resource)\nwhen { context.block };\n",
+    "outcomes": [
+      {
+        "decision": "allow",
+        "reasons": [
+          "policy0"
+        ],
+        "error_ids": []
+      },
+      {
+        "decision": "deny",
+        "reasons": [
+          "policy1"
+        ],
+        "error_ids": []
+      },
+      {
+        "decision": "deny",
+        "reasons": [],
+        "error_ids": []
+      }
+    ]
+  },
+  {
+    "name": "template",
+    "formatted": "@note(\"template\")\npermit (\n    principal == ?principal,\n    action == Action::\"view\",\n    resource in ?resource\n)\nwhen { context.enabled };\n",
+    "outcomes": [
+      {
+        "decision": "deny",
+        "reasons": [],
+        "error_ids": []
+      },
+      {
+        "decision": "deny",
+        "reasons": [],
+        "error_ids": []
+      }
+    ]
+  },
+  {
+    "name": "mixed",
+    "formatted": "permit\n(principal, action, resource)\nwhen { context.enabled };\n\n// link me\n@note(\"t\")\nforbid (\n  principal ==\n    ?principal,\n  action,\n  resource == ?resource\n)\nwhen { context.block };\n",
+    "outcomes": [
+      {
+        "decision": "allow",
+        "reasons": [
+          "policy0"
+        ],
+        "error_ids": []
+      },
+      {
+        "decision": "allow",
+        "reasons": [
+          "policy0"
+        ],
+        "error_ids": []
+      }
+    ]
+  },
+  {
+    "name": "zero-width",
+    "formatted": "permit\n(principal, action, resource)\nwhen\n{\ncontext.enabled &&\n[1,\n 2,\n 3].contains\n(\ncontext.n\n)\n};\n",
+    "outcomes": [
+      {
+        "decision": "allow",
+        "reasons": [
+          "policy0"
+        ],
+        "error_ids": []
+      },
+      {
+        "decision": "deny",
+        "reasons": [],
+        "error_ids": []
+      }
+    ]
+  },
+  {
+    "name": "negative-indent",
+    "formatted": "permit\n(principal, action, resource)\nwhen\n{\nif\ncontext.enabled\nthen\ncontext.n > 1\nelse\ncontext.n < 1\n};\n",
+    "outcomes": [
+      {
+        "decision": "allow",
+        "reasons": [
+          "policy0"
+        ],
+        "error_ids": []
+      },
+      {
+        "decision": "deny",
+        "reasons": [],
+        "error_ids": []
+      }
+    ]
+  },
+  {
+    "name": "wide",
+    "formatted": "permit (principal, action, resource)\nwhen { context.enabled && context.n > 1 };\n",
+    "outcomes": [
+      {
+        "decision": "allow",
+        "reasons": [
+          "policy0"
+        ],
+        "error_ids": []
+      }
+    ]
+  },
+  {
+    "name": "extensions",
+    "formatted": "permit (principal, action, resource)\nwhen\n{\n  ip(\"10.2.3.4\").isInRange(ip(\"10.0.0.0/8\")) &&\n  decimal(\"1.2500\").lessThan(decimal(\"2\")) &&\n  datetime(\n      \"2026-10-01T00:00:00Z\"\n    )\n    .offset\n    (\n      duration(\"1h\")\n    ) > datetime(\"2026-10-01T00:00:00Z\")\n};\n",
+    "outcomes": [
+      {
+        "decision": "deny",
+        "reasons": [],
+        "error_ids": [
+          "policy0"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "escaped",
+    "formatted": "@note(\"a\\nb\\t\\\"c\")\npermit\n(principal, action, resource)\nwhen\n{\n  context.name like \"a\\*b*\" &&\n  { \"x y\": true }[\"x y\"]\n};\n",
+    "outcomes": [
+      {
+        "decision": "allow",
+        "reasons": [
+          "policy0"
+        ],
+        "error_ids": []
+      },
+      {
+        "decision": "deny",
+        "reasons": [],
+        "error_ids": []
+      }
+    ]
+  },
+  {
+    "name": "malformed",
+    "formatted": null,
+    "outcomes": []
+  },
+  {
+    "name": "duplicate-annotation",
+    "formatted": null,
+    "outcomes": []
+  },
+  {
+    "name": "slot-in-condition",
+    "formatted": null,
+    "outcomes": []
+  },
+  {
+    "name": "minimum-indent",
+    "formatted": "permit\n(principal, action, resource)\nwhen\n{\ncontext.enabled &&\n(if\ncontext.n > 1\n then\ntrue\n else\nfalse)\n};\n",
+    "outcomes": [
+      {
+        "decision": "allow",
+        "reasons": [
+          "policy0"
+        ],
+        "error_ids": []
+      }
+    ]
+  },
+  {
+    "name": "evaluation-errors",
+    "formatted": "permit\n(principal, action, resource)\nwhen { context.missing };\n\nforbid\n(principal, action, resource)\nwhen { context.block };\n",
+    "outcomes": [
+      {
+        "decision": "deny",
+        "reasons": [],
+        "error_ids": [
+          "policy0",
+          "policy1"
+        ]
+      },
+      {
+        "decision": "deny",
+        "reasons": [
+          "policy1"
+        ],
+        "error_ids": [
+          "policy0"
+        ]
+      }
+    ]
+  }
+]

@@ -96,9 +96,21 @@ Fuzz seeds run in ordinary tests. To fuzz a target for longer:
 go test -run '^$' -fuzz '^FuzzAuthorize$' -fuzztime 5m ./cedar
 ```
 
-Repeat with `FuzzPolicies` and `FuzzEntities`. See
+Repeat for every target listed in the CI workflow and verification guide. See
 [Verification](docs/verification.md) for coverage and
 [Performance](docs/performance.md#reproduce) for benchmarks.
+
+Formatting has a direct native upstream oracle, independent of the guest wrapper:
+
+```bash
+scripts/format-parity.sh --check
+cargo clippy --manifest-path rust/Cargo.toml --locked --release -p cgw-authorizer --example format_parity -- -D warnings
+```
+
+After changing the formatter pin or fixture inputs, run
+`scripts/format-parity.sh --write`, review `testdata/parity/format/expected.json`,
+and run `go test -run 'TestFormat|ExampleRuntime_FormatPolicies' ./cedar`.
+CI checks regenerated fixtures against the committed results.
 
 ## Guest changes
 

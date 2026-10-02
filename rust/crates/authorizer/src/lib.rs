@@ -13,6 +13,7 @@ use serde_json::value::RawValue;
 use std::cell::RefCell;
 
 mod batched;
+mod format;
 mod policies;
 mod slicing;
 mod templates;

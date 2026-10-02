@@ -6,11 +6,14 @@
 
 - [Conformance](#conformance)
 - [Native template parity](#native-template-parity)
+- [Formatting parity](#formatting-parity)
 - [Fuzzing](#fuzzing)
 - [Fault tests](#fault-tests)
 - [ABI arithmetic proof](#abi-arithmetic-proof)
 - [Upstream assurance](#upstream-assurance)
 - [Build checks](#build-checks)
+- [Batched loading and arithmetic](#batched-loading-parity-and-bounded-arithmetic)
+- [Policy construction and editing](#policy-construction-and-editing)
 
 ## Conformance
 
@@ -34,12 +37,31 @@ or expose every API in the Rust library. See
 
 For reproduction, use the corpus setup in [Contributing](../CONTRIBUTING.md#tests).
 
+CI regenerates each feature's fixtures through the pinned native Rust APIs.
+Ordinary Go tests compare the embedded guest with those fixtures:
+
+| Feature | Native regeneration check | Go/Wasm comparison |
+|---|---|---|
+| Templates | `scripts/check-template-parity.sh` | `TestTemplateNativeParity` |
+| Partial evaluation | `scripts/partial-fixtures.sh --check` | `TestPartialNativeFixtures` |
+| Batched loading | `scripts/check-batched-parity.sh` | `TestBatchedNativeParity` |
+| Slicing | `scripts/slicing-fixtures.sh --check` | `TestSliceEntitiesNativeParity` |
+| Policy construction | `scripts/policies-parity.sh --check` | `TestPoliciesNativeParity` |
+| Formatting | `scripts/format-parity.sh --check` | `TestFormatNativeParity` |
+
 Experimental slicing has a separate [native differential suite](../testdata/parity/slicing/README.md).
 `scripts/slicing-fixtures.sh --check` compares regenerated direct native Cedar
 results with committed fixtures. `TestSliceEntitiesNativeParity` checks Wasm
 decisions, selected entity data, and load rounds against that oracle, then
 compares ordinary authorization using full and reduced stores. This covers the
 listed fixtures, not general minimality or equivalence for arbitrary requests.
+
+[`TestCombinedPolicyEvaluationPaths`](../cedar/combined_parity_test.go) carries one
+policy set through formatting, PST construction, static edits, template linking,
+JSON snapshots, ordinary authorization, partial evaluation/reauthorization,
+batched loading, and slicing. It checks exact raw IDs and explicit allow/deny
+outcomes. The loader must supply missing data, and a fresh authorizer evaluates
+the reduced store, so earlier request data cannot hide missing slice entities.
 
 
 ## Native template parity
@@ -68,6 +90,27 @@ are differential and boundary tests, not a formal proof of template semantics.
 The operations reuse the existing ABI arithmetic and fresh-instance lifecycle;
 no new arithmetic or mutable handle state is introduced.
 
+## Formatting parity
+
+[`testdata/parity/format`](../testdata/parity/format) contains representative
+policies, templates, annotations, comments, Unicode, extensions, layout options,
+and invalid sources. `scripts/format-parity.sh --check` calls the pinned native
+`cedar-policy-formatter` API directly and checks the committed output. CI runs
+this regeneration check and lints the native example.
+
+The native oracle checks formatting idempotence, complete Cedar JSON equality
+(including templates and annotations), and concrete authorization results both
+before and after formatting and template linking. `TestFormatNativeParity`
+compares the exported Go API's Wasm output byte-for-byte with that native output,
+then checks authorization against the native decisions and reasons. These are
+finite differential tests, not a proof of semantic preservation for all inputs.
+
+The formatting boundary tests cover source/output limits including JSON
+expansion and exact boundaries, parser diagnostics, invalid UTF-8, malformed
+envelopes/responses, cancellation during guest execution, memory and stack
+exhaustion, concurrent calls, recovery, and isolation from loaded authorizers.
+The existing ABI arithmetic proof applies unchanged; formatting introduces no
+new memory-packing or state-transition arithmetic.
 
 ## Fuzzing
 
@@ -78,13 +121,19 @@ The `cedar` package contains these Go fuzz targets:
 | `FuzzAuthorize` | UIDs, contexts, per-request entities, and response handling |
 | `FuzzPolicies` | Policy parsing, strict validation, loading, and authorization |
 | `FuzzEntities` | Entity parsing and authorization, with and without a schema |
+| `FuzzBatchedEntities` | Callback entity JSON, bounded loading, and fail-closed results |
 | `FuzzSliceEntities` | Source entity parsing, fail-closed slicing, and full/reduced authorization agreement |
+| `FuzzPolicySyntax` | Structured policy construction and malformed syntax envelopes |
 | `FuzzTemplates` | Template parsing and immutable link/unlink round trips |
+| `FuzzPartialEntities` | Unknown entity input and undecided results |
+| `FuzzFormatPolicies` | Policy/template text and layout options, malformed UTF-8, errors, and idempotence |
 
-The three authorization targets reject unexpected module faults and check that authorization
-errors return `Deny`. Fuzz inputs deeper than 200 nested brackets are
-skipped to focus on logic failures; stack exhaustion has a separate fault
-test. When a corpus directory is supplied, up to 200 corpus policies seed
+Each target rejects unexpected module faults; authorization errors must return
+`Deny`, partial-evaluation errors return `Undecided`, and formatting errors return
+no text. Batched, slicing, partial, and formatting targets skip inputs deeper
+than 40 nested brackets; other targets use the 200-bracket bound. Dedicated fault
+tests cover stack exhaustion. Formatting also bounds input to 4 KiB and output
+to 1 MiB. When a corpus directory is supplied, up to 200 corpus policies seed
 `FuzzPolicies`.
 
 The slicing target bounds its input to 64 KiB and four loading rounds. On a

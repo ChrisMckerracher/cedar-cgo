@@ -12,6 +12,7 @@ publish = false
 [workspace.dependencies]
 # One release of this repository tracks one Cedar release. Bump these together.
 cedar-policy = { version = "=4.13.0", default-features = false, features = ["ipaddr", "decimal", "datetime"] }
+cedar-policy-formatter = { version = "=4.13.0", default-features = false }
 cedar-policy-core = { version = "=4.13.0", default-features = false }
 cedar-policy-symcc = { version = "=0.7.0" }
 miette = "7.6"

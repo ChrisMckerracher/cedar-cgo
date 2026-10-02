@@ -4,7 +4,8 @@
 
 | Guide | Use it to |
 |---|---|
-| [API](api.md) | Configure the runtime, authorize requests, validate policies, and handle errors |
+| [API](api.md) | Authorize requests, edit policies/templates, load/slice entities, validate, and format |
+| [Partial evaluation](partial-evaluation.md) | Use unknown inputs and reauthorize residual policies |
 | [Change analysis](analysis.md) | Compare policy sets with SymCC and cvc5 |
 | [Security model](security.md) | Understand sandbox capabilities, resource limits, and failure behavior |
 | [Verification](verification.md) | Review conformance, fuzzing, fault tests, and proof scope |

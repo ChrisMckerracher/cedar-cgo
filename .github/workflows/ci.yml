@@ -102,7 +102,7 @@ jobs:
           go-version: "1.27.x"
       - name: Fuzz each target for 60 seconds
         run: |
-          for target in FuzzAuthorize FuzzPolicies FuzzEntities FuzzBatchedEntities FuzzSliceEntities FuzzPolicySyntax FuzzTemplates FuzzPartialEntities; do
+          for target in FuzzAuthorize FuzzPolicies FuzzEntities FuzzBatchedEntities FuzzSliceEntities FuzzPolicySyntax FuzzTemplates FuzzPartialEntities FuzzFormatPolicies; do
             go test -run '^$' -fuzz "^$target\$" -fuzztime 60s ./cedar
           done
 
@@ -146,6 +146,10 @@ jobs:
         run: |
           cargo clippy --locked --release --manifest-path rust/Cargo.toml -p cgw-native-bench --example partial_fixture -- -D warnings
           scripts/partial-fixtures.sh --check
+      - name: Native formatting parity and lint
+        run: |
+          cargo clippy --manifest-path rust/Cargo.toml --locked --release -p cgw-authorizer --example format_parity -- -D warnings
+          scripts/format-parity.sh --check
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cargo/bin/cargo-deny
