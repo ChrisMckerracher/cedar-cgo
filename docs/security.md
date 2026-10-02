@@ -118,3 +118,22 @@ environment.
 Release builds attest module provenance and publish checksums. See
 [Maintenance](maintenance.md#reproducible-builds) for reproduction and
 verification commands, and [SECURITY.md](../SECURITY.md) for private reporting.
+
+### Experimental entity-loader callbacks
+
+Batched authorization adds exactly two allowlisted imports,
+`cgw_entity_loader.load` and `cgw_entity_loader.read`. Their state belongs to one
+call context, with serial load/read ownership and no global callback registry.
+The host checks guest memory bounds and byte/call budgets before deserializing
+UIDs or invoking the application loader. The result is sized before a guest
+allocation, then copied once into the exact destination. A failed host callback
+closes and discards that instance; returned errors cannot become an allow or a
+known-missing entity. Guest-side entity parsing errors are latched across the
+remaining bounded upstream iterations and returned as errors.
+
+Application loaders are trusted host code: they can allocate memory or block
+outside Wasm's limits and must honor the supplied context. The bridge uses no
+background callback goroutines. Complete ancestor data and consistency across
+rounds remain the loader's responsibility, matching upstream's experimental
+contract. This API does not imply a proof of convergence or correctness for
+malicious/inconsistent entity stores.

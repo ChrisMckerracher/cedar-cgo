@@ -16,6 +16,8 @@ const (
 
 // Reject unlisted imports so guest upgrades cannot silently gain host capabilities.
 var authorizerImports = []string{
+	"cgw_entity_loader.load",
+	"cgw_entity_loader.read",
 	"wasi_snapshot_preview1.random_get",
 	"wasi_snapshot_preview1.environ_get",
 	"wasi_snapshot_preview1.environ_sizes_get",
@@ -71,7 +73,8 @@ func NewRuntime(ctx context.Context, opts ...RuntimeOption) (*Runtime, error) {
 		MemoryLimitBytes: cfg.memoryLimit,
 		Cache:            cfg.cache,
 		AllowedImports:   authorizerImports,
-		Exports:          []string{"cgw_load", "cgw_authorize", "cgw_validate"},
+		HostModules:      defineEntityLoaderModule,
+		Exports:          []string{"cgw_load", "cgw_authorize", "cgw_validate", "cgw_authorize_batched"},
 	})
 	if err != nil {
 		return nil, fmt.Errorf("cedar: %w", err)

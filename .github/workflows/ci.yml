@@ -102,7 +102,7 @@ jobs:
           go-version: "1.27.x"
       - name: Fuzz each target for 60 seconds
         run: |
-          for target in FuzzAuthorize FuzzPolicies FuzzEntities; do
+          for target in FuzzAuthorize FuzzPolicies FuzzEntities FuzzBatchedEntities; do
             go test -run '^$' -fuzz "^$target\$" -fuzztime 60s ./cedar
           done
 
@@ -152,6 +152,13 @@ jobs:
           command -v cargo-deny || cargo install --locked "cargo-deny@$CARGO_DENY_VERSION"
           command -v cargo-audit || cargo install --locked "cargo-audit@$CARGO_AUDIT_VERSION"
           command -v cargo-about || cargo install --locked --features cli "cargo-about@$CARGO_ABOUT_VERSION"
+      - working-directory: rust
+        run: cargo clippy --offline --locked --release -p cgw-authorizer --example batched-oracle -- -D warnings
+      - name: Check native batched fixtures
+        run: |
+          set -euo pipefail
+          cargo run --offline --locked --release --manifest-path rust/Cargo.toml -p cgw-authorizer --example batched-oracle < testdata/parity/batched/input.json > /tmp/batched-expected.json
+          diff -u testdata/parity/batched/expected.json /tmp/batched-expected.json
       - working-directory: rust
         run: cargo deny --all-features check
       - working-directory: rust

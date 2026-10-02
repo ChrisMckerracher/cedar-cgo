@@ -1,0 +1,158 @@
+[
+  {
+    "name": "incremental_allow",
+    "decision": "allow",
+    "error": null,
+    "calls": [
+      [
+        {
+          "type": "User",
+          "id": "alice"
+        }
+      ],
+      [
+        {
+          "type": "User",
+          "id": "manager"
+        }
+      ]
+    ]
+  },
+  {
+    "name": "incremental_deny",
+    "decision": "deny",
+    "error": null,
+    "calls": [
+      [
+        {
+          "type": "User",
+          "id": "alice"
+        }
+      ],
+      [
+        {
+          "type": "User",
+          "id": "manager"
+        }
+      ]
+    ]
+  },
+  {
+    "name": "insufficient_one_round",
+    "decision": "deny",
+    "error": "Batched evaluation failed: insufficient iteration limit.",
+    "calls": [
+      [
+        {
+          "type": "User",
+          "id": "alice"
+        }
+      ]
+    ]
+  },
+  {
+    "name": "zero_unresolved",
+    "decision": "deny",
+    "error": "Batched evaluation failed: insufficient iteration limit.",
+    "calls": []
+  },
+  {
+    "name": "zero_decided",
+    "decision": "allow",
+    "error": null,
+    "calls": []
+  },
+  {
+    "name": "missing_principal",
+    "decision": "deny",
+    "error": null,
+    "calls": [
+      [
+        {
+          "type": "User",
+          "id": "alice"
+        }
+      ]
+    ]
+  },
+  {
+    "name": "missing_referenced_entity",
+    "decision": "deny",
+    "error": null,
+    "calls": [
+      [
+        {
+          "type": "User",
+          "id": "alice"
+        }
+      ],
+      [
+        {
+          "type": "User",
+          "id": "manager"
+        }
+      ]
+    ]
+  },
+  {
+    "name": "omitted_remains_unknown",
+    "decision": "deny",
+    "error": "Batched evaluation failed: insufficient iteration limit.",
+    "calls": [
+      [
+        {
+          "type": "User",
+          "id": "alice"
+        }
+      ],
+      [
+        {
+          "type": "User",
+          "id": "alice"
+        }
+      ]
+    ]
+  },
+  {
+    "name": "extra_entities",
+    "decision": "allow",
+    "error": null,
+    "calls": [
+      [
+        {
+          "type": "User",
+          "id": "alice"
+        }
+      ]
+    ]
+  },
+  {
+    "name": "forbid_no_load",
+    "decision": "deny",
+    "error": null,
+    "calls": []
+  },
+  {
+    "name": "invalid_policy",
+    "decision": "deny",
+    "error": "policy failed to validate against the schema",
+    "calls": []
+  },
+  {
+    "name": "ancestry",
+    "decision": "allow",
+    "error": null,
+    "calls": [
+      [
+        {
+          "type": "Group",
+          "id": "all"
+        },
+        {
+          "type": "User",
+          "id": "alice"
+        }
+      ]
+    ]
+  }
+]
