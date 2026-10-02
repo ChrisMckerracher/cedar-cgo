@@ -1,0 +1,463 @@
+[
+  {
+    "name": "incremental_allow",
+    "schema": "entity Group; entity User in [Group] { manager?: User, enabled?: Bool }; entity Resource; action \"view\" appliesTo {principal: User, resource: Resource, context: {}};",
+    "policies": "permit(principal, action, resource) when { principal has manager && principal.manager has enabled && principal.manager.enabled };",
+    "max_iterations": 2,
+    "request": {
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Resource",
+        "id": "doc"
+      },
+      "context": {}
+    },
+    "batches": [
+      {
+        "entities": [
+          {
+            "uid": {
+              "type": "User",
+              "id": "alice"
+            },
+            "attrs": {
+              "manager": {
+                "__entity": {
+                  "type": "User",
+                  "id": "manager"
+                }
+              }
+            },
+            "parents": []
+          }
+        ],
+        "missing": []
+      },
+      {
+        "entities": [
+          {
+            "uid": {
+              "type": "User",
+              "id": "manager"
+            },
+            "attrs": {
+              "enabled": true
+            },
+            "parents": []
+          }
+        ],
+        "missing": []
+      }
+    ]
+  },
+  {
+    "name": "incremental_deny",
+    "schema": "entity Group; entity User in [Group] { manager?: User, enabled?: Bool }; entity Resource; action \"view\" appliesTo {principal: User, resource: Resource, context: {}};",
+    "policies": "permit(principal, action, resource) when { principal has manager && principal.manager has enabled && principal.manager.enabled };",
+    "max_iterations": 2,
+    "request": {
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Resource",
+        "id": "doc"
+      },
+      "context": {}
+    },
+    "batches": [
+      {
+        "entities": [
+          {
+            "uid": {
+              "type": "User",
+              "id": "alice"
+            },
+            "attrs": {
+              "manager": {
+                "__entity": {
+                  "type": "User",
+                  "id": "manager"
+                }
+              }
+            },
+            "parents": []
+          }
+        ],
+        "missing": []
+      },
+      {
+        "entities": [
+          {
+            "uid": {
+              "type": "User",
+              "id": "manager"
+            },
+            "attrs": {
+              "enabled": false
+            },
+            "parents": []
+          }
+        ],
+        "missing": []
+      }
+    ]
+  },
+  {
+    "name": "insufficient_one_round",
+    "schema": "entity Group; entity User in [Group] { manager?: User, enabled?: Bool }; entity Resource; action \"view\" appliesTo {principal: User, resource: Resource, context: {}};",
+    "policies": "permit(principal, action, resource) when { principal has manager && principal.manager has enabled && principal.manager.enabled };",
+    "max_iterations": 1,
+    "request": {
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Resource",
+        "id": "doc"
+      },
+      "context": {}
+    },
+    "batches": [
+      {
+        "entities": [
+          {
+            "uid": {
+              "type": "User",
+              "id": "alice"
+            },
+            "attrs": {
+              "manager": {
+                "__entity": {
+                  "type": "User",
+                  "id": "manager"
+                }
+              }
+            },
+            "parents": []
+          }
+        ],
+        "missing": []
+      }
+    ]
+  },
+  {
+    "name": "zero_unresolved",
+    "schema": "entity Group; entity User in [Group] { manager?: User, enabled?: Bool }; entity Resource; action \"view\" appliesTo {principal: User, resource: Resource, context: {}};",
+    "policies": "permit(principal, action, resource) when { principal has manager && principal.manager has enabled && principal.manager.enabled };",
+    "max_iterations": 0,
+    "request": {
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Resource",
+        "id": "doc"
+      },
+      "context": {}
+    },
+    "batches": []
+  },
+  {
+    "name": "zero_decided",
+    "schema": "entity Group; entity User in [Group] { manager?: User, enabled?: Bool }; entity Resource; action \"view\" appliesTo {principal: User, resource: Resource, context: {}};",
+    "policies": "permit(principal, action, resource);",
+    "max_iterations": 0,
+    "request": {
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Resource",
+        "id": "doc"
+      },
+      "context": {}
+    },
+    "batches": []
+  },
+  {
+    "name": "missing_principal",
+    "schema": "entity Group; entity User in [Group] { manager?: User, enabled?: Bool }; entity Resource; action \"view\" appliesTo {principal: User, resource: Resource, context: {}};",
+    "policies": "permit(principal, action, resource) when { principal has manager && principal.manager has enabled && principal.manager.enabled };",
+    "max_iterations": 2,
+    "request": {
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Resource",
+        "id": "doc"
+      },
+      "context": {}
+    },
+    "batches": [
+      {
+        "entities": [],
+        "missing": [
+          {
+            "type": "User",
+            "id": "alice"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "missing_referenced_entity",
+    "schema": "entity Group; entity User in [Group] { manager?: User, enabled?: Bool }; entity Resource; action \"view\" appliesTo {principal: User, resource: Resource, context: {}};",
+    "policies": "permit(principal, action, resource) when { principal has manager && principal.manager has enabled && principal.manager.enabled };",
+    "max_iterations": 2,
+    "request": {
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Resource",
+        "id": "doc"
+      },
+      "context": {}
+    },
+    "batches": [
+      {
+        "entities": [
+          {
+            "uid": {
+              "type": "User",
+              "id": "alice"
+            },
+            "attrs": {
+              "manager": {
+                "__entity": {
+                  "type": "User",
+                  "id": "manager"
+                }
+              }
+            },
+            "parents": []
+          }
+        ],
+        "missing": []
+      },
+      {
+        "entities": [],
+        "missing": [
+          {
+            "type": "User",
+            "id": "manager"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "omitted_remains_unknown",
+    "schema": "entity Group; entity User in [Group] { manager?: User, enabled?: Bool }; entity Resource; action \"view\" appliesTo {principal: User, resource: Resource, context: {}};",
+    "policies": "permit(principal, action, resource) when { principal has manager && principal.manager has enabled && principal.manager.enabled };",
+    "max_iterations": 2,
+    "request": {
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Resource",
+        "id": "doc"
+      },
+      "context": {}
+    },
+    "batches": [
+      {
+        "entities": [],
+        "missing": []
+      },
+      {
+        "entities": [],
+        "missing": []
+      }
+    ]
+  },
+  {
+    "name": "extra_entities",
+    "schema": "entity Group; entity User in [Group] { manager?: User, enabled?: Bool }; entity Resource; action \"view\" appliesTo {principal: User, resource: Resource, context: {}};",
+    "policies": "permit(principal, action, resource) when { principal has manager && principal.manager has enabled && principal.manager.enabled };",
+    "max_iterations": 1,
+    "request": {
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Resource",
+        "id": "doc"
+      },
+      "context": {}
+    },
+    "batches": [
+      {
+        "entities": [
+          {
+            "uid": {
+              "type": "User",
+              "id": "alice"
+            },
+            "attrs": {
+              "manager": {
+                "__entity": {
+                  "type": "User",
+                  "id": "manager"
+                }
+              }
+            },
+            "parents": []
+          },
+          {
+            "uid": {
+              "type": "User",
+              "id": "manager"
+            },
+            "attrs": {
+              "enabled": true
+            },
+            "parents": []
+          }
+        ],
+        "missing": []
+      }
+    ]
+  },
+  {
+    "name": "forbid_no_load",
+    "schema": "entity Group; entity User in [Group] { manager?: User, enabled?: Bool }; entity Resource; action \"view\" appliesTo {principal: User, resource: Resource, context: {}};",
+    "policies": "permit(principal, action, resource) when { principal has manager && principal.manager has enabled && principal.manager.enabled };forbid(principal, action, resource);",
+    "max_iterations": 0,
+    "request": {
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Resource",
+        "id": "doc"
+      },
+      "context": {}
+    },
+    "batches": []
+  },
+  {
+    "name": "invalid_policy",
+    "schema": "entity Group; entity User in [Group] { manager?: User, enabled?: Bool }; entity Resource; action \"view\" appliesTo {principal: User, resource: Resource, context: {}};",
+    "policies": "permit(principal, action, resource) when { principal.noSuchAttribute };",
+    "max_iterations": 2,
+    "request": {
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Resource",
+        "id": "doc"
+      },
+      "context": {}
+    },
+    "batches": []
+  },
+  {
+    "name": "ancestry",
+    "schema": "entity Group; entity User in [Group] { manager?: User, enabled?: Bool }; entity Resource; action \"view\" appliesTo {principal: User, resource: Resource, context: {}};",
+    "policies": "permit(principal in Group::\"all\", action, resource);",
+    "max_iterations": 2,
+    "request": {
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Resource",
+        "id": "doc"
+      },
+      "context": {}
+    },
+    "batches": [
+      {
+        "entities": [
+          {
+            "uid": {
+              "type": "User",
+              "id": "alice"
+            },
+            "attrs": {},
+            "parents": [
+              {
+                "type": "Group",
+                "id": "all"
+              }
+            ]
+          }
+        ],
+        "missing": [
+          {
+            "type": "Group",
+            "id": "all"
+          }
+        ]
+      }
+    ]
+  }
+]

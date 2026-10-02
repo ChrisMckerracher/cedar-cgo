@@ -125,3 +125,24 @@ successful universal analysis results depend on the solver's `unsat` answer.
   and regenerates third-party license notices from the lockfile.
 
 See [Maintenance](maintenance.md) for the upgrade and release checks.
+
+### Batched loading parity and bounded arithmetic
+
+`scripts/check-batched-parity.sh` regenerates `testdata/parity/batched/expected.json`
+with a native program that calls pinned `cedar_policy::PolicySet::is_authorized_batched`
+and implements its own `EntityLoader`, independently of the guest bridge. It
+compares the regenerated fixture and runs `TestBatchedNativeParity` through the
+exported Go API and embedded Wasm, comparing decisions, upstream error text, and
+sorted callback UID traces. Fixtures cover incremental loading, nonexistent and
+omitted data, extra entities, ancestry, invalid policies, early decisions, and
+iteration boundaries. The Rust CI job regenerates and compares the fixture.
+`FuzzBatchedEntities` exercises the callback JSON boundary; other batched tests
+cover callback failures, ownership, concurrency, cancellation, pool waits, and
+resource bounds.
+
+`internal/verification/batched.smt2` models bounded nonnegative byte-budget
+subtraction, the guarded uint32 callback-counter increment, and positive int32
+result lengths below the 64 MiB cap. Source fingerprints require review when the
+modeled Go functions or limits change. These are arithmetic proofs only: they do
+not prove JSON parsing, memory ownership, callback termination, Rust evaluation,
+Cedar semantics, or batched convergence.

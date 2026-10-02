@@ -2,4 +2,4 @@
 
 package analysis
 
-const SHA256 = "a2001269078fce2420b7d8edc3a652df20e8bfd077675dbee02d911cf312c283"
+const SHA256 = "b222d16d660c0e41c3b824848fd511ccd975df49c5b689c897e8a66af2fba123"

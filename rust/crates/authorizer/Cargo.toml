@@ -11,7 +11,7 @@ publish.workspace = true
 crate-type = ["cdylib"]
 
 [dependencies]
-cedar-policy.workspace = true
+cedar-policy = { workspace = true, features = ["tpe"] }
 cgw-abi.workspace = true
 serde.workspace = true
 serde_json.workspace = true

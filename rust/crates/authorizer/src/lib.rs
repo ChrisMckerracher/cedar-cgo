@@ -10,6 +10,8 @@ use serde::{Deserialize, Serialize};
 use serde_json::value::RawValue;
 use std::cell::RefCell;
 
+mod batched;
+
 cgw_abi::export_memory_functions!();
 
 struct Loaded {

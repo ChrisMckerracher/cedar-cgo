@@ -206,3 +206,72 @@ library also exposes APIs for template linking, partial evaluation, entity
 slicing, and formatting; those APIs are outside this Go interface. See
 [verification scope](verification.md) for the evidence behind compatibility
 claims.
+
+## Experimental on-demand entity loading
+
+`Authorizer.AuthorizeBatched(ctx, request, loader, options)` calls Cedar 4.13.0's
+experimental `PolicySet::is_authorized_batched`. This authorizes **one request**
+using Rust type-aware partial evaluation to discover entity UIDs as needed. It
+returns `(Decision, error)`, with `Deny` on every error. Rust returns no policy
+reasons or residual result from this operation. A schema and policies that pass
+upstream strict validation are required. Experimental APIs may change with the
+pinned Cedar version.
+
+```go
+loader := cedar.EntityLoaderFunc(func(ctx context.Context, uids []cedar.EntityUID) (cedar.EntityLoadResult, error) {
+    // Query your store using ctx. Each returned entity includes all ancestor UIDs.
+    entities, missing, err := store.Load(ctx, uids)
+    return cedar.EntityLoadResult{Entities: entities, Missing: missing}, err
+})
+decision, err := authorizer.AuthorizeBatched(ctx, request, loader,
+    cedar.BatchedOptions{MaxIterations: 8})
+```
+
+`EntityLoadResult.Entities` is a Cedar JSON entity array (`json.RawMessage`). Use
+`json.Marshal(cedar.NewEntities(...))` for typed data. Raw JSON lets the bridge
+reject oversized results before parsing or copying them. `Missing` explicitly
+marks nonexistent UIDs, matching Rust's `None`. Omitting a UID from both fields
+leaves it unknown: Rust can request it again and eventually report insufficient
+iterations. Callback errors are never converted into missing entities. Extra
+entities are allowed; duplicate or conflicting entries are errors. Callback data
+must not repeat any configured/request entity UID, even with identical data, or
+mark such a UID missing. Unlike the
+ordinary `Entity.Parents` contract, callback entity parents must contain the
+**complete transitive ancestor set**, as upstream's loader assumes ancestry is
+already computed. The bridge parses callback entities individually and does not
+infer ancestry across callback rounds.
+
+`MaxIterations` is explicit and capped at 1024. Zero allows only the initial Rust
+evaluation; a request already determined can succeed without loading. Each Rust
+loader round counts, including rounds served entirely from configured or
+request-specific entities. Rust checks for a decision after the last round;
+unresolved results return `KindBatched` with upstream's insufficient-iterations
+error. Loaded/request entities are a per-call cache. Callback results never
+change the authorizer or subsequent requests.
+
+Callbacks run synchronously and serially within a call. A shared loader may be
+called concurrently by separate authorizations and must synchronize its own
+state. Each callback receives a Go-owned UID slice that it may retain. Returned
+JSON and missing UID slices must remain immutable until `AuthorizeBatched`
+returns. The bridge copies encoded results into guest-owned memory. A loader
+must not recursively call or close the same authorizer: the call holds a pooled
+instance, and waiting on that pool can deadlock.
+
+The request envelope uses `Limits.MaxRequestBytes`. `MaxBatchBytes` defaults to
+1 MiB and caps each encoded UID request and result, with a 64 MiB maximum.
+`MaxLoaderBytes` defaults to 16 MiB and caps their cumulative bytes across the
+call. Raw callback JSON must also fit the remaining budgets before encoding;
+JSON envelope and escaping bytes count. Existing guest memory, response,
+recycling, and load limits remain in force. `Limits.CallTimeout` includes guest
+execution and callbacks; the caller context also bounds waiting for an instance.
+Callbacks must honor their context. Go cannot interrupt a callback that blocks
+or bound allocations made by application callback code, so loaders remain trusted
+host code. No detached callback goroutines are created.
+
+Callback errors use `KindLoader`, preserve their cause for `errors.Is`, and discard
+the guest. Callback panics become `KindLoader` without exposing the panic value.
+Host byte limits use `KindLimit`; context cancellation/timeouts use `KindFault`
+with the context cause. Invalid entity data uses `KindEntities`. Rust TPE and
+iteration failures use `KindBatched`. See the executable
+`ExampleAuthorizer_AuthorizeBatched` and the native parity fixtures in
+`testdata/parity/batched`.
