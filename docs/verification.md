@@ -317,3 +317,10 @@ solver-gated analysis property) and skips its remaining checks. On the pinned
 workstation the 18 Cedar properties add about 66 s and the analysis property
 about 21 s (≈100 checks, 800+ solver-held environments, 90+ counterexample
 replays), within the same `go test ./...` run as the rest of the suite.
+
+The validation determinism property uncovered real upstream nondeterminism:
+cedar-policy's validator picks its `did you mean` suggestion by hash iteration,
+so identical inputs can render different hint text across calls. The property
+normalizes those `(help: did you mean ...)` substrings before comparing
+diagnostics; Passed, policy IDs, counts, and all remaining message text stay
+exact.

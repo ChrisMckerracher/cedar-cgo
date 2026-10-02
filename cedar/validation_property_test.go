@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"regexp"
 	"slices"
 	"strings"
 	"testing"
@@ -14,6 +15,18 @@ import (
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 	"pgregory.net/rapid"
 )
+
+// Upstream chooses the "did you mean" hint by hash iteration, so the suggested
+// type varies between identical runs; it is excluded from the determinism claim.
+var propHelpHint = regexp.MustCompile("(help: did you mean `[^`]*`\\?)")
+
+func propStripHints(messages []cedar.PolicyMessage) []cedar.PolicyMessage {
+	out := slices.Clone(messages)
+	for i := range out {
+		out[i].Message = propHelpHint.ReplaceAllString(out[i].Message, "")
+	}
+	return out
+}
 
 // The API does not document diagnostic order, so compare as sorted multisets.
 func propSortedMessages(messages []cedar.PolicyMessage) []cedar.PolicyMessage {
@@ -30,8 +43,8 @@ func propSortedMessages(messages []cedar.PolicyMessage) []cedar.PolicyMessage {
 func propSameValidation(t *rapid.T, a, b cedar.ValidationResult) {
 	t.Helper()
 	if a.Passed != b.Passed ||
-		!slices.Equal(propSortedMessages(a.Errors), propSortedMessages(b.Errors)) ||
-		!slices.Equal(propSortedMessages(a.Warnings), propSortedMessages(b.Warnings)) {
+		!slices.Equal(propSortedMessages(propStripHints(a.Errors)), propSortedMessages(propStripHints(b.Errors))) ||
+		!slices.Equal(propSortedMessages(propStripHints(a.Warnings)), propSortedMessages(propStripHints(b.Warnings))) {
 		t.Fatalf("validation is not deterministic: %+v vs %+v", a, b)
 	}
 }
