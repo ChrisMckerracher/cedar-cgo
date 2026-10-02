@@ -86,6 +86,10 @@ Set `mfa` to false and the result is `deny [policy1]`. The
 [runnable example](cedar/example_test.go) exercises both outcomes and strict
 validation. The [API guide](docs/api.md) covers values, lifecycle, and errors.
 
+Experimental [partial evaluation](docs/partial-evaluation.md) accepts unknown
+request and entity data, returns inspectable residual policies, and resumes
+authorization when the missing data is available.
+
 Package [`analysis`](docs/analysis.md) also answers whether a change permits
 anything new, or whether two policy sets are equivalent. It uses SymCC with
 cvc5 and returns concrete counterexamples for changed decisions.
@@ -98,7 +102,8 @@ cvc5 and returns concrete counterexamples for changed decisions.
   across the Go/Wasm interface; CI runs each target for 60 seconds.
 - **Fault handling:** tests exercise timeouts, cancellation, memory
   exhaustion, stack overflow, and corrupted instances.
-  Authorization errors return `Deny`; faulted instances are discarded.
+  Concrete authorization errors return `Deny`; partial evaluation errors return
+  `Undecided`. Faulted instances are discarded.
 - **Sandbox and build checks:** import allowlists, memory and time limits,
   module hashes, and byte-for-byte rebuild checks are part of the design.
 
@@ -138,6 +143,7 @@ review, versioning, and release steps.
 | Guide | Contents |
 |---|---|
 | [API](docs/api.md) | Runtime, authorizers, types, validation, and errors |
+| [Partial evaluation](docs/partial-evaluation.md) | Experimental TPE, unknown inputs, and residual reauthorization |
 | [Change analysis](docs/analysis.md) | Setup, policy comparisons, and counterexamples |
 | [Security](docs/security.md) | Sandbox, limits, and failure behavior |
 | [Verification](docs/verification.md) | Conformance, fuzzing, and assurance scope |

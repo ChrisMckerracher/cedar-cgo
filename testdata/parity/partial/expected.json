@@ -1,0 +1,683 @@
+[
+  {
+    "name": "concrete_allow",
+    "result": {
+      "decision": "allow",
+      "reasons": [
+        "policy0"
+      ],
+      "residuals": [
+        {
+          "policy_id": "policy0",
+          "effect": "permit",
+          "state": "true",
+          "cedar": "permit(principal, action, resource) when { true };"
+        }
+      ],
+      "completions": [
+        {
+          "decision": "allow",
+          "reasons": [
+            "policy0"
+          ],
+          "error_policies": []
+        }
+      ]
+    }
+  },
+  {
+    "name": "concrete_deny",
+    "result": {
+      "decision": "deny",
+      "reasons": [],
+      "residuals": [
+        {
+          "policy_id": "policy0",
+          "effect": "permit",
+          "state": "false",
+          "cedar": "permit(principal, action, resource) when { false };"
+        }
+      ],
+      "completions": [
+        {
+          "decision": "deny",
+          "reasons": [],
+          "error_policies": []
+        }
+      ]
+    }
+  },
+  {
+    "name": "unknown_entities",
+    "result": {
+      "decision": "undecided",
+      "reasons": [],
+      "residuals": [
+        {
+          "policy_id": "policy0",
+          "effect": "permit",
+          "state": "residual",
+          "cedar": "permit(principal, action, resource) when { Photo::\"beach\".owner == User::\"alice\" };"
+        }
+      ],
+      "completions": [
+        {
+          "decision": "allow",
+          "reasons": [
+            "policy0"
+          ],
+          "error_policies": []
+        }
+      ]
+    }
+  },
+  {
+    "name": "unknown_principal",
+    "result": {
+      "decision": "undecided",
+      "reasons": [],
+      "residuals": [
+        {
+          "policy_id": "policy0",
+          "effect": "permit",
+          "state": "residual",
+          "cedar": "permit(principal, action, resource) when { Photo::\"beach\".owner == principal };"
+        }
+      ],
+      "completions": [
+        {
+          "decision": "allow",
+          "reasons": [
+            "policy0"
+          ],
+          "error_policies": []
+        },
+        {
+          "decision": "deny",
+          "reasons": [],
+          "error_policies": []
+        }
+      ]
+    }
+  },
+  {
+    "name": "unknown_resource",
+    "result": {
+      "decision": "undecided",
+      "reasons": [],
+      "residuals": [
+        {
+          "policy_id": "policy0",
+          "effect": "permit",
+          "state": "residual",
+          "cedar": "permit(principal, action, resource) when { resource.owner == User::\"alice\" };"
+        }
+      ],
+      "completions": [
+        {
+          "decision": "allow",
+          "reasons": [
+            "policy0"
+          ],
+          "error_policies": []
+        }
+      ]
+    }
+  },
+  {
+    "name": "unknown_context",
+    "result": {
+      "decision": "undecided",
+      "reasons": [],
+      "residuals": [
+        {
+          "policy_id": "policy0",
+          "effect": "permit",
+          "state": "residual",
+          "cedar": "permit(principal, action, resource) when { context.mfa };"
+        }
+      ],
+      "completions": [
+        {
+          "decision": "allow",
+          "reasons": [
+            "policy0"
+          ],
+          "error_policies": []
+        },
+        {
+          "decision": "deny",
+          "reasons": [],
+          "error_policies": []
+        }
+      ]
+    }
+  },
+  {
+    "name": "unknown_attributes",
+    "result": {
+      "decision": "undecided",
+      "reasons": [],
+      "residuals": [
+        {
+          "policy_id": "policy0",
+          "effect": "permit",
+          "state": "residual",
+          "cedar": "permit(principal, action, resource) when { Photo::\"beach\".owner == User::\"alice\" };"
+        }
+      ],
+      "completions": [
+        {
+          "decision": "allow",
+          "reasons": [
+            "policy0"
+          ],
+          "error_policies": []
+        }
+      ]
+    }
+  },
+  {
+    "name": "known_attributes_unknown_parents",
+    "result": {
+      "decision": "allow",
+      "reasons": [
+        "policy0"
+      ],
+      "residuals": [
+        {
+          "policy_id": "policy0",
+          "effect": "permit",
+          "state": "true",
+          "cedar": "permit(principal, action, resource) when { true };"
+        }
+      ],
+      "completions": [
+        {
+          "decision": "allow",
+          "reasons": [
+            "policy0"
+          ],
+          "error_policies": []
+        }
+      ]
+    }
+  },
+  {
+    "name": "conflicting_permit_forbid",
+    "result": {
+      "decision": "undecided",
+      "reasons": [],
+      "residuals": [
+        {
+          "policy_id": "policy0",
+          "effect": "permit",
+          "state": "true",
+          "cedar": "permit(principal, action, resource) when { true };"
+        },
+        {
+          "policy_id": "policy1",
+          "effect": "forbid",
+          "state": "residual",
+          "cedar": "forbid(principal, action, resource) when { !context.mfa };"
+        }
+      ],
+      "completions": [
+        {
+          "decision": "allow",
+          "reasons": [
+            "policy0"
+          ],
+          "error_policies": []
+        },
+        {
+          "decision": "deny",
+          "reasons": [
+            "policy1"
+          ],
+          "error_policies": []
+        }
+      ]
+    }
+  },
+  {
+    "name": "known_forbid",
+    "result": {
+      "decision": "deny",
+      "reasons": [
+        "policy1"
+      ],
+      "residuals": [
+        {
+          "policy_id": "policy0",
+          "effect": "permit",
+          "state": "residual",
+          "cedar": "permit(principal, action, resource) when { Photo::\"beach\".private };"
+        },
+        {
+          "policy_id": "policy1",
+          "effect": "forbid",
+          "state": "true",
+          "cedar": "forbid(principal, action, resource) when { true };"
+        }
+      ],
+      "completions": [
+        {
+          "decision": "deny",
+          "reasons": [
+            "policy1"
+          ],
+          "error_policies": []
+        }
+      ]
+    }
+  },
+  {
+    "name": "overflow",
+    "result": {
+      "decision": "deny",
+      "reasons": [],
+      "residuals": [
+        {
+          "policy_id": "policy0",
+          "effect": "permit",
+          "state": "error",
+          "cedar": "permit(principal, action, resource) when { error() };"
+        }
+      ],
+      "completions": [
+        {
+          "decision": "deny",
+          "reasons": [],
+          "error_policies": [
+            "policy0"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "overflow_and_permit",
+    "result": {
+      "decision": "allow",
+      "reasons": [
+        "policy0"
+      ],
+      "residuals": [
+        {
+          "policy_id": "policy0",
+          "effect": "permit",
+          "state": "true",
+          "cedar": "permit(principal, action, resource) when { true };"
+        },
+        {
+          "policy_id": "policy1",
+          "effect": "forbid",
+          "state": "error",
+          "cedar": "forbid(principal, action, resource) when { error() };"
+        }
+      ],
+      "completions": [
+        {
+          "decision": "allow",
+          "reasons": [
+            "policy0"
+          ],
+          "error_policies": [
+            "policy1"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "residual_error_short_circuit",
+    "result": {
+      "decision": "undecided",
+      "reasons": [],
+      "residuals": [
+        {
+          "policy_id": "policy0",
+          "effect": "permit",
+          "state": "residual",
+          "cedar": "permit(principal, action, resource) when { context.mfa || error() };"
+        }
+      ],
+      "completions": [
+        {
+          "decision": "allow",
+          "reasons": [
+            "policy0"
+          ],
+          "error_policies": []
+        },
+        {
+          "decision": "deny",
+          "reasons": [],
+          "error_policies": [
+            "policy0"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "inconsistent_id",
+    "result": {
+      "decision": "allow",
+      "reasons": [
+        "policy0"
+      ],
+      "residuals": [
+        {
+          "policy_id": "policy0",
+          "effect": "permit",
+          "state": "true",
+          "cedar": "permit(principal, action, resource) when { true };"
+        }
+      ],
+      "completions": [
+        {
+          "error_stage": "request"
+        }
+      ]
+    }
+  },
+  {
+    "name": "inconsistent_context",
+    "result": {
+      "decision": "allow",
+      "reasons": [
+        "policy0"
+      ],
+      "residuals": [
+        {
+          "policy_id": "policy0",
+          "effect": "permit",
+          "state": "true",
+          "cedar": "permit(principal, action, resource) when { true };"
+        }
+      ],
+      "completions": [
+        {
+          "error_stage": "request"
+        }
+      ]
+    }
+  },
+  {
+    "name": "inconsistent_attributes",
+    "result": {
+      "decision": "allow",
+      "reasons": [
+        "policy0"
+      ],
+      "residuals": [
+        {
+          "policy_id": "policy0",
+          "effect": "permit",
+          "state": "true",
+          "cedar": "permit(principal, action, resource) when { true };"
+        }
+      ],
+      "completions": [
+        {
+          "error_stage": "request"
+        }
+      ]
+    }
+  },
+  {
+    "name": "missing_previous_entity",
+    "result": {
+      "decision": "allow",
+      "reasons": [
+        "policy0"
+      ],
+      "residuals": [
+        {
+          "policy_id": "policy0",
+          "effect": "permit",
+          "state": "true",
+          "cedar": "permit(principal, action, resource) when { true };"
+        }
+      ],
+      "completions": [
+        {
+          "error_stage": "request"
+        }
+      ]
+    }
+  },
+  {
+    "name": "invalid_policy",
+    "result": {
+      "error_stage": "policies"
+    }
+  },
+  {
+    "name": "invalid_principal_type",
+    "result": {
+      "error_stage": "request"
+    }
+  },
+  {
+    "name": "invalid_action",
+    "result": {
+      "error_stage": "context"
+    }
+  },
+  {
+    "name": "invalid_context",
+    "result": {
+      "error_stage": "request"
+    }
+  },
+  {
+    "name": "invalid_partial_entities",
+    "result": {
+      "error_stage": "entities"
+    }
+  },
+  {
+    "name": "duplicate_entities",
+    "result": {
+      "error_stage": "entities"
+    }
+  },
+  {
+    "name": "loaded_concrete_entities",
+    "result": {
+      "decision": "allow",
+      "reasons": [
+        "policy0"
+      ],
+      "residuals": [
+        {
+          "policy_id": "policy0",
+          "effect": "permit",
+          "state": "true",
+          "cedar": "permit(principal, action, resource) when { true };"
+        }
+      ],
+      "completions": [
+        {
+          "decision": "allow",
+          "reasons": [
+            "policy0"
+          ],
+          "error_policies": []
+        }
+      ]
+    }
+  },
+  {
+    "name": "loaded_uid_conflict",
+    "result": {
+      "error_stage": "entities"
+    }
+  },
+  {
+    "name": "known_empty_id",
+    "result": {
+      "decision": "allow",
+      "reasons": [
+        "policy0"
+      ],
+      "residuals": [
+        {
+          "policy_id": "policy0",
+          "effect": "permit",
+          "state": "true",
+          "cedar": "permit(principal, action, resource) when { true };"
+        }
+      ],
+      "completions": [
+        {
+          "decision": "allow",
+          "reasons": [
+            "policy0"
+          ],
+          "error_policies": []
+        }
+      ]
+    }
+  },
+  {
+    "name": "empty_policy_set",
+    "result": {
+      "decision": "deny",
+      "reasons": [],
+      "residuals": [],
+      "completions": [
+        {
+          "decision": "deny",
+          "reasons": [],
+          "error_policies": []
+        }
+      ]
+    }
+  },
+  {
+    "name": "unknown_tags",
+    "result": {
+      "decision": "undecided",
+      "reasons": [],
+      "residuals": [
+        {
+          "policy_id": "policy0",
+          "effect": "permit",
+          "state": "residual",
+          "cedar": "permit(principal, action, resource) when { User::\"alice\".hasTag(\"tier\") && (User::\"alice\".getTag(\"tier\") == \"gold\") };"
+        }
+      ],
+      "completions": [
+        {
+          "decision": "allow",
+          "reasons": [
+            "policy0"
+          ],
+          "error_policies": []
+        },
+        {
+          "decision": "deny",
+          "reasons": [],
+          "error_policies": []
+        }
+      ]
+    }
+  },
+  {
+    "name": "unknown_parents",
+    "result": {
+      "decision": "undecided",
+      "reasons": [],
+      "residuals": [
+        {
+          "policy_id": "policy0",
+          "effect": "permit",
+          "state": "residual",
+          "cedar": "permit(principal, action, resource) when { User::\"alice\" in Group::\"staff\" };"
+        }
+      ],
+      "completions": [
+        {
+          "decision": "allow",
+          "reasons": [
+            "policy0"
+          ],
+          "error_policies": []
+        },
+        {
+          "decision": "deny",
+          "reasons": [],
+          "error_policies": []
+        }
+      ]
+    }
+  },
+  {
+    "name": "parent_with_unknown_parents",
+    "result": {
+      "error_stage": "entities"
+    }
+  },
+  {
+    "name": "escaped_unicode_id",
+    "result": {
+      "decision": "allow",
+      "reasons": [
+        "policy0"
+      ],
+      "residuals": [
+        {
+          "policy_id": "policy0",
+          "effect": "permit",
+          "state": "true",
+          "cedar": "permit(principal, action, resource) when { true };"
+        }
+      ],
+      "completions": [
+        {
+          "decision": "allow",
+          "reasons": [
+            "policy0"
+          ],
+          "error_policies": []
+        }
+      ]
+    }
+  },
+  {
+    "name": "unsupported_unknown_context_field",
+    "result": {
+      "error_stage": "context"
+    }
+  },
+  {
+    "name": "loaded_omitted_tags_are_known_empty",
+    "result": {
+      "decision": "allow",
+      "reasons": [
+        "policy0"
+      ],
+      "residuals": [
+        {
+          "policy_id": "policy0",
+          "effect": "permit",
+          "state": "true",
+          "cedar": "permit(principal, action, resource) when { true };"
+        }
+      ],
+      "completions": [
+        {
+          "decision": "allow",
+          "reasons": [
+            "policy0"
+          ],
+          "error_policies": []
+        }
+      ]
+    }
+  }
+]

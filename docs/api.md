@@ -320,13 +320,14 @@ implementation. See [versioning](maintenance.md#versioning).
 ## Supported operations
 
 The Go interface exposes authorization, strict validation, parsed policy
-inspection and static policy edits, template management, experimental on-demand entity loading and
+inspection and static policy edits, template management, experimental partial
+evaluation, on-demand entity loading and
 request-specific entity slicing, and the policy comparisons in `analysis`. These
 execute Cedar's Rust implementation, including its core and extension value types.
 
 Conformance results establish agreement for the tested operations. The Rust
-library also exposes APIs for partial evaluation, deprecated
-entity manifests, and formatting; those APIs are outside this Go interface. See
+library also exposes APIs for deprecated entity manifests and formatting;
+those APIs are outside this Go interface. See
 [verification scope](verification.md) for the evidence behind compatibility
 claims.
 
@@ -479,3 +480,12 @@ do not invalidate other snapshots or the runtime.
 
 See the executable `ExampleRuntime_ParsePolicy` and
 `ExampleRuntime_PolicyFromSyntax` examples in `cedar/policies_example_test.go`.
+
+## Partial evaluation (experimental)
+
+`Authorizer.PartialAuthorize` uses Cedar 4.13.0 TPE with explicit unknown inputs
+and a separate `PartialDecision` (`Undecided`, `PartialDeny`, `PartialAllow`).
+Inspect `PartialResponse.Residuals`, then supply consistent concrete data with
+`PartialResponse.Reauthorize`. A schema is required. See
+[partial evaluation](partial-evaluation.md) for supported unknowns, limits,
+upstream experimental status, and the executable example.

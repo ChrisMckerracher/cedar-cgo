@@ -72,6 +72,10 @@ embedded version; the fault tests exercise deep policy input.
 
 ## Failure behavior
 
+The table describes ordinary authorization and residual reauthorization.
+Experimental `PartialAuthorize` returns `Undecided` on these failures with the
+same error and instance handling; see [partial evaluation](partial-evaluation.md).
+
 | Condition | Decision | Go error | Instance |
 |---|---|---|---|
 | Cedar rejects the request, entities, context, or a UID | Deny | `*cedar.Error` with the matching kind | Reused |
