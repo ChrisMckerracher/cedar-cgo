@@ -1,0 +1,1782 @@
+[
+  {
+    "name": "nested_attributes",
+    "schema": "entity Group in [Group] { enabled: Bool };\nentity User in [Group] { profile: { active: Bool, label: String }, manager?: User };\nentity Doc { owner: User, public: Bool, metadata: { visible: Bool, note: String } };\naction all;\naction view in [all] appliesTo { principal: User, resource: Doc, context: { bypass: Bool } };",
+    "policies": "permit(principal, action, resource) when { principal.profile.active && resource.metadata.visible };",
+    "entities": [
+      {
+        "uid": {
+          "type": "User",
+          "id": "alice"
+        },
+        "attrs": {
+          "profile": {
+            "active": true,
+            "label": "keep entire record"
+          },
+          "manager": {
+            "__entity": {
+              "type": "User",
+              "id": "boss"
+            }
+          }
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "child"
+          }
+        ]
+      },
+      {
+        "uid": {
+          "type": "User",
+          "id": "boss"
+        },
+        "attrs": {
+          "profile": {
+            "active": true,
+            "label": "boss"
+          }
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "child"
+        },
+        "attrs": {
+          "enabled": true
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "root"
+          }
+        ]
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "root"
+        },
+        "attrs": {
+          "enabled": true
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Doc",
+          "id": "report"
+        },
+        "attrs": {
+          "owner": {
+            "__entity": {
+              "type": "User",
+              "id": "boss"
+            }
+          },
+          "public": false,
+          "metadata": {
+            "visible": true,
+            "note": "retain unused nested field"
+          }
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Doc",
+          "id": "unused"
+        },
+        "attrs": {
+          "owner": {
+            "__entity": {
+              "type": "User",
+              "id": "alice"
+            }
+          },
+          "public": true,
+          "metadata": {
+            "visible": true,
+            "note": "unused entity"
+          }
+        },
+        "parents": []
+      }
+    ],
+    "request": {
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Doc",
+        "id": "report"
+      },
+      "context": {
+        "bypass": false
+      }
+    }
+  },
+  {
+    "name": "relationship_chain",
+    "schema": "entity Group in [Group] { enabled: Bool };\nentity User in [Group] { profile: { active: Bool, label: String }, manager?: User };\nentity Doc { owner: User, public: Bool, metadata: { visible: Bool, note: String } };\naction all;\naction view in [all] appliesTo { principal: User, resource: Doc, context: { bypass: Bool } };",
+    "policies": "permit(principal, action, resource) when { principal has manager && principal.manager.profile.active && resource.owner == principal.manager };",
+    "entities": [
+      {
+        "uid": {
+          "type": "User",
+          "id": "alice"
+        },
+        "attrs": {
+          "profile": {
+            "active": true,
+            "label": "keep entire record"
+          },
+          "manager": {
+            "__entity": {
+              "type": "User",
+              "id": "boss"
+            }
+          }
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "child"
+          }
+        ]
+      },
+      {
+        "uid": {
+          "type": "User",
+          "id": "boss"
+        },
+        "attrs": {
+          "profile": {
+            "active": true,
+            "label": "boss"
+          }
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "child"
+        },
+        "attrs": {
+          "enabled": true
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "root"
+          }
+        ]
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "root"
+        },
+        "attrs": {
+          "enabled": true
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Doc",
+          "id": "report"
+        },
+        "attrs": {
+          "owner": {
+            "__entity": {
+              "type": "User",
+              "id": "boss"
+            }
+          },
+          "public": false,
+          "metadata": {
+            "visible": true,
+            "note": "retain unused nested field"
+          }
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Doc",
+          "id": "unused"
+        },
+        "attrs": {
+          "owner": {
+            "__entity": {
+              "type": "User",
+              "id": "alice"
+            }
+          },
+          "public": true,
+          "metadata": {
+            "visible": true,
+            "note": "unused entity"
+          }
+        },
+        "parents": []
+      }
+    ],
+    "request": {
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Doc",
+        "id": "report"
+      },
+      "context": {
+        "bypass": false
+      }
+    }
+  },
+  {
+    "name": "transitive_ancestors",
+    "schema": "entity Group in [Group] { enabled: Bool };\nentity User in [Group] { profile: { active: Bool, label: String }, manager?: User };\nentity Doc { owner: User, public: Bool, metadata: { visible: Bool, note: String } };\naction all;\naction view in [all] appliesTo { principal: User, resource: Doc, context: { bypass: Bool } };",
+    "policies": "permit(principal, action, resource) when { principal in Group::\"root\" };",
+    "entities": [
+      {
+        "uid": {
+          "type": "User",
+          "id": "alice"
+        },
+        "attrs": {
+          "profile": {
+            "active": true,
+            "label": "keep entire record"
+          },
+          "manager": {
+            "__entity": {
+              "type": "User",
+              "id": "boss"
+            }
+          }
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "child"
+          }
+        ]
+      },
+      {
+        "uid": {
+          "type": "User",
+          "id": "boss"
+        },
+        "attrs": {
+          "profile": {
+            "active": true,
+            "label": "boss"
+          }
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "child"
+        },
+        "attrs": {
+          "enabled": true
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "root"
+          }
+        ]
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "root"
+        },
+        "attrs": {
+          "enabled": true
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Doc",
+          "id": "report"
+        },
+        "attrs": {
+          "owner": {
+            "__entity": {
+              "type": "User",
+              "id": "boss"
+            }
+          },
+          "public": false,
+          "metadata": {
+            "visible": true,
+            "note": "retain unused nested field"
+          }
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Doc",
+          "id": "unused"
+        },
+        "attrs": {
+          "owner": {
+            "__entity": {
+              "type": "User",
+              "id": "alice"
+            }
+          },
+          "public": true,
+          "metadata": {
+            "visible": true,
+            "note": "unused entity"
+          }
+        },
+        "parents": []
+      }
+    ],
+    "request": {
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Doc",
+        "id": "report"
+      },
+      "context": {
+        "bypass": false
+      }
+    }
+  },
+  {
+    "name": "ancestor_attributes",
+    "schema": "entity Group in [Group] { enabled: Bool };\nentity User in [Group] { profile: { active: Bool, label: String }, manager?: User };\nentity Doc { owner: User, public: Bool, metadata: { visible: Bool, note: String } };\naction all;\naction view in [all] appliesTo { principal: User, resource: Doc, context: { bypass: Bool } };",
+    "policies": "permit(principal, action, resource) when { principal in Group::\"root\" && Group::\"root\".enabled };",
+    "entities": [
+      {
+        "uid": {
+          "type": "User",
+          "id": "alice"
+        },
+        "attrs": {
+          "profile": {
+            "active": true,
+            "label": "keep entire record"
+          },
+          "manager": {
+            "__entity": {
+              "type": "User",
+              "id": "boss"
+            }
+          }
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "child"
+          }
+        ]
+      },
+      {
+        "uid": {
+          "type": "User",
+          "id": "boss"
+        },
+        "attrs": {
+          "profile": {
+            "active": true,
+            "label": "boss"
+          }
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "child"
+        },
+        "attrs": {
+          "enabled": true
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "root"
+          }
+        ]
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "root"
+        },
+        "attrs": {
+          "enabled": true
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Doc",
+          "id": "report"
+        },
+        "attrs": {
+          "owner": {
+            "__entity": {
+              "type": "User",
+              "id": "boss"
+            }
+          },
+          "public": false,
+          "metadata": {
+            "visible": true,
+            "note": "retain unused nested field"
+          }
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Doc",
+          "id": "unused"
+        },
+        "attrs": {
+          "owner": {
+            "__entity": {
+              "type": "User",
+              "id": "alice"
+            }
+          },
+          "public": true,
+          "metadata": {
+            "visible": true,
+            "note": "unused entity"
+          }
+        },
+        "parents": []
+      }
+    ],
+    "request": {
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Doc",
+        "id": "report"
+      },
+      "context": {
+        "bypass": false
+      }
+    }
+  },
+  {
+    "name": "action_hierarchy",
+    "schema": "entity Group in [Group] { enabled: Bool };\nentity User in [Group] { profile: { active: Bool, label: String }, manager?: User };\nentity Doc { owner: User, public: Bool, metadata: { visible: Bool, note: String } };\naction all;\naction view in [all] appliesTo { principal: User, resource: Doc, context: { bypass: Bool } };",
+    "policies": "permit(principal, action in Action::\"all\", resource);",
+    "entities": [
+      {
+        "uid": {
+          "type": "User",
+          "id": "alice"
+        },
+        "attrs": {
+          "profile": {
+            "active": true,
+            "label": "keep entire record"
+          },
+          "manager": {
+            "__entity": {
+              "type": "User",
+              "id": "boss"
+            }
+          }
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "child"
+          }
+        ]
+      },
+      {
+        "uid": {
+          "type": "User",
+          "id": "boss"
+        },
+        "attrs": {
+          "profile": {
+            "active": true,
+            "label": "boss"
+          }
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "child"
+        },
+        "attrs": {
+          "enabled": true
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "root"
+          }
+        ]
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "root"
+        },
+        "attrs": {
+          "enabled": true
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Doc",
+          "id": "report"
+        },
+        "attrs": {
+          "owner": {
+            "__entity": {
+              "type": "User",
+              "id": "boss"
+            }
+          },
+          "public": false,
+          "metadata": {
+            "visible": true,
+            "note": "retain unused nested field"
+          }
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Doc",
+          "id": "unused"
+        },
+        "attrs": {
+          "owner": {
+            "__entity": {
+              "type": "User",
+              "id": "alice"
+            }
+          },
+          "public": true,
+          "metadata": {
+            "visible": true,
+            "note": "unused entity"
+          }
+        },
+        "parents": []
+      }
+    ],
+    "request": {
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Doc",
+        "id": "report"
+      },
+      "context": {
+        "bypass": false
+      }
+    }
+  },
+  {
+    "name": "conditional_true",
+    "schema": "entity Group in [Group] { enabled: Bool };\nentity User in [Group] { profile: { active: Bool, label: String }, manager?: User };\nentity Doc { owner: User, public: Bool, metadata: { visible: Bool, note: String } };\naction all;\naction view in [all] appliesTo { principal: User, resource: Doc, context: { bypass: Bool } };",
+    "policies": "permit(principal, action, resource) when { if context.bypass then true else resource.owner.profile.active };",
+    "entities": [
+      {
+        "uid": {
+          "type": "User",
+          "id": "alice"
+        },
+        "attrs": {
+          "profile": {
+            "active": true,
+            "label": "keep entire record"
+          },
+          "manager": {
+            "__entity": {
+              "type": "User",
+              "id": "boss"
+            }
+          }
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "child"
+          }
+        ]
+      },
+      {
+        "uid": {
+          "type": "User",
+          "id": "boss"
+        },
+        "attrs": {
+          "profile": {
+            "active": true,
+            "label": "boss"
+          }
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "child"
+        },
+        "attrs": {
+          "enabled": true
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "root"
+          }
+        ]
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "root"
+        },
+        "attrs": {
+          "enabled": true
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Doc",
+          "id": "report"
+        },
+        "attrs": {
+          "owner": {
+            "__entity": {
+              "type": "User",
+              "id": "boss"
+            }
+          },
+          "public": false,
+          "metadata": {
+            "visible": true,
+            "note": "retain unused nested field"
+          }
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Doc",
+          "id": "unused"
+        },
+        "attrs": {
+          "owner": {
+            "__entity": {
+              "type": "User",
+              "id": "alice"
+            }
+          },
+          "public": true,
+          "metadata": {
+            "visible": true,
+            "note": "unused entity"
+          }
+        },
+        "parents": []
+      }
+    ],
+    "request": {
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Doc",
+        "id": "report"
+      },
+      "context": {
+        "bypass": true
+      }
+    }
+  },
+  {
+    "name": "conditional_false",
+    "schema": "entity Group in [Group] { enabled: Bool };\nentity User in [Group] { profile: { active: Bool, label: String }, manager?: User };\nentity Doc { owner: User, public: Bool, metadata: { visible: Bool, note: String } };\naction all;\naction view in [all] appliesTo { principal: User, resource: Doc, context: { bypass: Bool } };",
+    "policies": "permit(principal, action, resource) when { if context.bypass then true else resource.owner.profile.active };",
+    "entities": [
+      {
+        "uid": {
+          "type": "User",
+          "id": "alice"
+        },
+        "attrs": {
+          "profile": {
+            "active": true,
+            "label": "keep entire record"
+          },
+          "manager": {
+            "__entity": {
+              "type": "User",
+              "id": "boss"
+            }
+          }
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "child"
+          }
+        ]
+      },
+      {
+        "uid": {
+          "type": "User",
+          "id": "boss"
+        },
+        "attrs": {
+          "profile": {
+            "active": true,
+            "label": "boss"
+          }
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "child"
+        },
+        "attrs": {
+          "enabled": true
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "root"
+          }
+        ]
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "root"
+        },
+        "attrs": {
+          "enabled": true
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Doc",
+          "id": "report"
+        },
+        "attrs": {
+          "owner": {
+            "__entity": {
+              "type": "User",
+              "id": "boss"
+            }
+          },
+          "public": false,
+          "metadata": {
+            "visible": true,
+            "note": "retain unused nested field"
+          }
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Doc",
+          "id": "unused"
+        },
+        "attrs": {
+          "owner": {
+            "__entity": {
+              "type": "User",
+              "id": "alice"
+            }
+          },
+          "public": true,
+          "metadata": {
+            "visible": true,
+            "note": "unused entity"
+          }
+        },
+        "parents": []
+      }
+    ],
+    "request": {
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Doc",
+        "id": "report"
+      },
+      "context": {
+        "bypass": false
+      }
+    }
+  },
+  {
+    "name": "optional_absent",
+    "schema": "entity Group in [Group] { enabled: Bool };\nentity User in [Group] { profile: { active: Bool, label: String }, manager?: User };\nentity Doc { owner: User, public: Bool, metadata: { visible: Bool, note: String } };\naction all;\naction view in [all] appliesTo { principal: User, resource: Doc, context: { bypass: Bool } };",
+    "policies": "permit(principal, action, resource) when { principal has manager && principal.manager.profile.active };",
+    "entities": [
+      {
+        "uid": {
+          "type": "User",
+          "id": "alice"
+        },
+        "attrs": {
+          "profile": {
+            "active": true,
+            "label": "keep entire record"
+          },
+          "manager": {
+            "__entity": {
+              "type": "User",
+              "id": "boss"
+            }
+          }
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "child"
+          }
+        ]
+      },
+      {
+        "uid": {
+          "type": "User",
+          "id": "boss"
+        },
+        "attrs": {
+          "profile": {
+            "active": true,
+            "label": "boss"
+          }
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "child"
+        },
+        "attrs": {
+          "enabled": true
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "root"
+          }
+        ]
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "root"
+        },
+        "attrs": {
+          "enabled": true
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Doc",
+          "id": "report"
+        },
+        "attrs": {
+          "owner": {
+            "__entity": {
+              "type": "User",
+              "id": "boss"
+            }
+          },
+          "public": false,
+          "metadata": {
+            "visible": true,
+            "note": "retain unused nested field"
+          }
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Doc",
+          "id": "unused"
+        },
+        "attrs": {
+          "owner": {
+            "__entity": {
+              "type": "User",
+              "id": "alice"
+            }
+          },
+          "public": true,
+          "metadata": {
+            "visible": true,
+            "note": "unused entity"
+          }
+        },
+        "parents": []
+      }
+    ],
+    "request": {
+      "principal": {
+        "type": "User",
+        "id": "boss"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Doc",
+        "id": "report"
+      },
+      "context": {
+        "bypass": false
+      }
+    }
+  },
+  {
+    "name": "missing_entity",
+    "schema": "entity Group in [Group] { enabled: Bool };\nentity User in [Group] { profile: { active: Bool, label: String }, manager?: User };\nentity Doc { owner: User, public: Bool, metadata: { visible: Bool, note: String } };\naction all;\naction view in [all] appliesTo { principal: User, resource: Doc, context: { bypass: Bool } };",
+    "policies": "permit(principal, action, resource) when { principal.profile.active };",
+    "entities": [
+      {
+        "uid": {
+          "type": "User",
+          "id": "alice"
+        },
+        "attrs": {
+          "profile": {
+            "active": true,
+            "label": "keep entire record"
+          },
+          "manager": {
+            "__entity": {
+              "type": "User",
+              "id": "boss"
+            }
+          }
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "child"
+          }
+        ]
+      },
+      {
+        "uid": {
+          "type": "User",
+          "id": "boss"
+        },
+        "attrs": {
+          "profile": {
+            "active": true,
+            "label": "boss"
+          }
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "child"
+        },
+        "attrs": {
+          "enabled": true
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "root"
+          }
+        ]
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "root"
+        },
+        "attrs": {
+          "enabled": true
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Doc",
+          "id": "report"
+        },
+        "attrs": {
+          "owner": {
+            "__entity": {
+              "type": "User",
+              "id": "boss"
+            }
+          },
+          "public": false,
+          "metadata": {
+            "visible": true,
+            "note": "retain unused nested field"
+          }
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Doc",
+          "id": "unused"
+        },
+        "attrs": {
+          "owner": {
+            "__entity": {
+              "type": "User",
+              "id": "alice"
+            }
+          },
+          "public": true,
+          "metadata": {
+            "visible": true,
+            "note": "unused entity"
+          }
+        },
+        "parents": []
+      }
+    ],
+    "request": {
+      "principal": {
+        "type": "User",
+        "id": "missing"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Doc",
+        "id": "report"
+      },
+      "context": {
+        "bypass": false
+      }
+    }
+  },
+  {
+    "name": "explicit_forbid",
+    "schema": "entity Group in [Group] { enabled: Bool };\nentity User in [Group] { profile: { active: Bool, label: String }, manager?: User };\nentity Doc { owner: User, public: Bool, metadata: { visible: Bool, note: String } };\naction all;\naction view in [all] appliesTo { principal: User, resource: Doc, context: { bypass: Bool } };",
+    "policies": "permit(principal, action, resource); forbid(principal, action, resource) when { resource.metadata.visible };",
+    "entities": [
+      {
+        "uid": {
+          "type": "User",
+          "id": "alice"
+        },
+        "attrs": {
+          "profile": {
+            "active": true,
+            "label": "keep entire record"
+          },
+          "manager": {
+            "__entity": {
+              "type": "User",
+              "id": "boss"
+            }
+          }
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "child"
+          }
+        ]
+      },
+      {
+        "uid": {
+          "type": "User",
+          "id": "boss"
+        },
+        "attrs": {
+          "profile": {
+            "active": true,
+            "label": "boss"
+          }
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "child"
+        },
+        "attrs": {
+          "enabled": true
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "root"
+          }
+        ]
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "root"
+        },
+        "attrs": {
+          "enabled": true
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Doc",
+          "id": "report"
+        },
+        "attrs": {
+          "owner": {
+            "__entity": {
+              "type": "User",
+              "id": "boss"
+            }
+          },
+          "public": false,
+          "metadata": {
+            "visible": true,
+            "note": "retain unused nested field"
+          }
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Doc",
+          "id": "unused"
+        },
+        "attrs": {
+          "owner": {
+            "__entity": {
+              "type": "User",
+              "id": "alice"
+            }
+          },
+          "public": true,
+          "metadata": {
+            "visible": true,
+            "note": "unused entity"
+          }
+        },
+        "parents": []
+      }
+    ],
+    "request": {
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Doc",
+        "id": "report"
+      },
+      "context": {
+        "bypass": false
+      }
+    }
+  },
+  {
+    "name": "no_policies",
+    "schema": "entity Group in [Group] { enabled: Bool };\nentity User in [Group] { profile: { active: Bool, label: String }, manager?: User };\nentity Doc { owner: User, public: Bool, metadata: { visible: Bool, note: String } };\naction all;\naction view in [all] appliesTo { principal: User, resource: Doc, context: { bypass: Bool } };",
+    "policies": " ",
+    "entities": [
+      {
+        "uid": {
+          "type": "User",
+          "id": "alice"
+        },
+        "attrs": {
+          "profile": {
+            "active": true,
+            "label": "keep entire record"
+          },
+          "manager": {
+            "__entity": {
+              "type": "User",
+              "id": "boss"
+            }
+          }
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "child"
+          }
+        ]
+      },
+      {
+        "uid": {
+          "type": "User",
+          "id": "boss"
+        },
+        "attrs": {
+          "profile": {
+            "active": true,
+            "label": "boss"
+          }
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "child"
+        },
+        "attrs": {
+          "enabled": true
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "root"
+          }
+        ]
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "root"
+        },
+        "attrs": {
+          "enabled": true
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Doc",
+          "id": "report"
+        },
+        "attrs": {
+          "owner": {
+            "__entity": {
+              "type": "User",
+              "id": "boss"
+            }
+          },
+          "public": false,
+          "metadata": {
+            "visible": true,
+            "note": "retain unused nested field"
+          }
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Doc",
+          "id": "unused"
+        },
+        "attrs": {
+          "owner": {
+            "__entity": {
+              "type": "User",
+              "id": "alice"
+            }
+          },
+          "public": true,
+          "metadata": {
+            "visible": true,
+            "note": "unused entity"
+          }
+        },
+        "parents": []
+      }
+    ],
+    "request": {
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Doc",
+        "id": "report"
+      },
+      "context": {
+        "bypass": false
+      }
+    }
+  },
+  {
+    "name": "extension_value",
+    "schema": "entity Group in [Group] { enabled: Bool };\nentity User in [Group] { profile: { active: Bool, label: String }, manager?: User };\nentity Doc { network: ipaddr, owner: User, public: Bool, metadata: { visible: Bool, note: String } };\naction all;\naction view in [all] appliesTo { principal: User, resource: Doc, context: { bypass: Bool } };",
+    "policies": "permit(principal, action, resource) when { resource.network.isInRange(ip(\"10.0.0.0/8\")) && resource.metadata.visible };",
+    "entities": [
+      {
+        "uid": {
+          "type": "User",
+          "id": "alice"
+        },
+        "attrs": {
+          "profile": {
+            "active": true,
+            "label": "keep entire record"
+          },
+          "manager": {
+            "__entity": {
+              "type": "User",
+              "id": "boss"
+            }
+          }
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "child"
+          }
+        ]
+      },
+      {
+        "uid": {
+          "type": "User",
+          "id": "boss"
+        },
+        "attrs": {
+          "profile": {
+            "active": true,
+            "label": "boss"
+          }
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "child"
+        },
+        "attrs": {
+          "enabled": true
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "root"
+          }
+        ]
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "root"
+        },
+        "attrs": {
+          "enabled": true
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Doc",
+          "id": "report"
+        },
+        "attrs": {
+          "owner": {
+            "__entity": {
+              "type": "User",
+              "id": "boss"
+            }
+          },
+          "public": false,
+          "metadata": {
+            "visible": true,
+            "note": "retain unused nested field"
+          },
+          "network": {
+            "__extn": {
+              "fn": "ip",
+              "arg": "10.0.0.1"
+            }
+          }
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Doc",
+          "id": "unused"
+        },
+        "attrs": {
+          "owner": {
+            "__entity": {
+              "type": "User",
+              "id": "alice"
+            }
+          },
+          "public": true,
+          "metadata": {
+            "visible": true,
+            "note": "unused entity"
+          },
+          "network": {
+            "__extn": {
+              "fn": "ip",
+              "arg": "10.0.0.1"
+            }
+          }
+        },
+        "parents": []
+      }
+    ],
+    "request": {
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Doc",
+        "id": "report"
+      },
+      "context": {
+        "bypass": false
+      }
+    }
+  },
+  {
+    "name": "entity_tags",
+    "schema": "entity Group in [Group] { enabled: Bool };\nentity User in [Group] { profile: { active: Bool, label: String }, manager?: User } tags String;\nentity Doc { owner: User, public: Bool, metadata: { visible: Bool, note: String } };\naction all;\naction view in [all] appliesTo { principal: User, resource: Doc, context: { bypass: Bool } };",
+    "policies": "permit(principal, action, resource) when { principal.hasTag(\"role\") && principal.getTag(\"role\") == \"admin\" };",
+    "entities": [
+      {
+        "uid": {
+          "type": "User",
+          "id": "alice"
+        },
+        "attrs": {
+          "profile": {
+            "active": true,
+            "label": "keep entire record"
+          },
+          "manager": {
+            "__entity": {
+              "type": "User",
+              "id": "boss"
+            }
+          }
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "child"
+          }
+        ],
+        "tags": {
+          "role": "admin",
+          "unused": "retained"
+        }
+      },
+      {
+        "uid": {
+          "type": "User",
+          "id": "boss"
+        },
+        "attrs": {
+          "profile": {
+            "active": true,
+            "label": "boss"
+          }
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "child"
+        },
+        "attrs": {
+          "enabled": true
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "root"
+          }
+        ]
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "root"
+        },
+        "attrs": {
+          "enabled": true
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Doc",
+          "id": "report"
+        },
+        "attrs": {
+          "owner": {
+            "__entity": {
+              "type": "User",
+              "id": "boss"
+            }
+          },
+          "public": false,
+          "metadata": {
+            "visible": true,
+            "note": "retain unused nested field"
+          }
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Doc",
+          "id": "unused"
+        },
+        "attrs": {
+          "owner": {
+            "__entity": {
+              "type": "User",
+              "id": "alice"
+            }
+          },
+          "public": true,
+          "metadata": {
+            "visible": true,
+            "note": "unused entity"
+          }
+        },
+        "parents": []
+      }
+    ],
+    "request": {
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Doc",
+        "id": "report"
+      },
+      "context": {
+        "bypass": false
+      }
+    }
+  },
+  {
+    "name": "unusual_entity_ids",
+    "schema": "entity Group in [Group] { enabled: Bool };\nentity User in [Group] { profile: { active: Bool, label: String }, manager?: User };\nentity Doc { owner: User, public: Bool, metadata: { visible: Bool, note: String } };\naction all;\naction view in [all] appliesTo { principal: User, resource: Doc, context: { bypass: Bool } };",
+    "policies": "permit(principal, action, resource) when { principal.profile.active && resource.metadata.visible };",
+    "entities": [
+      {
+        "uid": {
+          "type": "User",
+          "id": "alice\"\\\n\u2603"
+        },
+        "attrs": {
+          "profile": {
+            "active": true,
+            "label": "keep entire record"
+          },
+          "manager": {
+            "__entity": {
+              "type": "User",
+              "id": "boss"
+            }
+          }
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "child"
+          }
+        ]
+      },
+      {
+        "uid": {
+          "type": "User",
+          "id": "boss"
+        },
+        "attrs": {
+          "profile": {
+            "active": true,
+            "label": "boss"
+          }
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "child"
+        },
+        "attrs": {
+          "enabled": true
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "root"
+          }
+        ]
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "root"
+        },
+        "attrs": {
+          "enabled": true
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Doc",
+          "id": "report\"\\\n\u96ea"
+        },
+        "attrs": {
+          "owner": {
+            "__entity": {
+              "type": "User",
+              "id": "boss"
+            }
+          },
+          "public": false,
+          "metadata": {
+            "visible": true,
+            "note": "retain unused nested field"
+          }
+        },
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Doc",
+          "id": "unused"
+        },
+        "attrs": {
+          "owner": {
+            "__entity": {
+              "type": "User",
+              "id": "alice"
+            }
+          },
+          "public": true,
+          "metadata": {
+            "visible": true,
+            "note": "unused entity"
+          }
+        },
+        "parents": []
+      }
+    ],
+    "request": {
+      "principal": {
+        "type": "User",
+        "id": "alice\"\\\n\u2603"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Doc",
+        "id": "report\"\\\n\u96ea"
+      },
+      "context": {
+        "bypass": false
+      }
+    }
+  }
+]

@@ -17,14 +17,15 @@ func FuzzBatchedEntities(f *testing.F) {
 		f.Add([]byte(seed))
 	}
 	fixture := batchedFixtures(f)[0]
-	a := batchAuthorizer(f, fixture, cedar.Limits{MaxInstances: 1})
+	a := batchAuthorizer(f, fixture, fuzzLimits)
 	f.Fuzz(func(t *testing.T, data []byte) {
-		if len(data) > 4096 {
+		if len(data) > 4096 || nesting(string(data)) > 40 {
 			t.Skip()
 		}
 		decision, err := a.AuthorizeBatched(context.Background(), batchRequest(fixture), cedar.EntityLoaderFunc(func(context.Context, []cedar.EntityUID) (cedar.EntityLoadResult, error) {
 			return cedar.EntityLoadResult{Entities: json.RawMessage(data)}, nil
 		}), cedar.BatchedOptions{MaxIterations: 2, MaxBatchBytes: 8192})
+		checkNoFault(t, err)
 		if err != nil && decision != cedar.Deny {
 			t.Fatalf("error allowed: %s %v", decision, err)
 		}

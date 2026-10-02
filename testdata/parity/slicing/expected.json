@@ -1,0 +1,598 @@
+[
+  {
+    "name": "nested_attributes",
+    "decision": "allow",
+    "entities": [
+      {
+        "attrs": {
+          "manager": {
+            "__entity": {
+              "id": "boss",
+              "type": "User"
+            }
+          },
+          "profile": {
+            "active": true,
+            "label": "keep entire record"
+          }
+        },
+        "parents": [
+          {
+            "id": "child",
+            "type": "Group"
+          },
+          {
+            "id": "root",
+            "type": "Group"
+          }
+        ],
+        "uid": {
+          "id": "alice",
+          "type": "User"
+        }
+      },
+      {
+        "attrs": {
+          "metadata": {
+            "note": "retain unused nested field",
+            "visible": true
+          },
+          "owner": {
+            "__entity": {
+              "id": "boss",
+              "type": "User"
+            }
+          },
+          "public": false
+        },
+        "parents": [],
+        "uid": {
+          "id": "report",
+          "type": "Doc"
+        }
+      }
+    ],
+    "batches": [
+      [
+        {
+          "__entity": {
+            "type": "Doc",
+            "id": "report"
+          }
+        },
+        {
+          "__entity": {
+            "type": "User",
+            "id": "alice"
+          }
+        }
+      ]
+    ]
+  },
+  {
+    "name": "relationship_chain",
+    "decision": "allow",
+    "entities": [
+      {
+        "attrs": {
+          "manager": {
+            "__entity": {
+              "id": "boss",
+              "type": "User"
+            }
+          },
+          "profile": {
+            "active": true,
+            "label": "keep entire record"
+          }
+        },
+        "parents": [
+          {
+            "id": "child",
+            "type": "Group"
+          },
+          {
+            "id": "root",
+            "type": "Group"
+          }
+        ],
+        "uid": {
+          "id": "alice",
+          "type": "User"
+        }
+      },
+      {
+        "attrs": {
+          "metadata": {
+            "note": "retain unused nested field",
+            "visible": true
+          },
+          "owner": {
+            "__entity": {
+              "id": "boss",
+              "type": "User"
+            }
+          },
+          "public": false
+        },
+        "parents": [],
+        "uid": {
+          "id": "report",
+          "type": "Doc"
+        }
+      },
+      {
+        "attrs": {
+          "profile": {
+            "active": true,
+            "label": "boss"
+          }
+        },
+        "parents": [],
+        "uid": {
+          "id": "boss",
+          "type": "User"
+        }
+      }
+    ],
+    "batches": [
+      [
+        {
+          "__entity": {
+            "type": "Doc",
+            "id": "report"
+          }
+        },
+        {
+          "__entity": {
+            "type": "User",
+            "id": "alice"
+          }
+        }
+      ],
+      [
+        {
+          "__entity": {
+            "type": "User",
+            "id": "boss"
+          }
+        }
+      ]
+    ]
+  },
+  {
+    "name": "transitive_ancestors",
+    "decision": "allow",
+    "entities": [
+      {
+        "attrs": {
+          "enabled": true
+        },
+        "parents": [],
+        "uid": {
+          "id": "root",
+          "type": "Group"
+        }
+      },
+      {
+        "attrs": {
+          "manager": {
+            "__entity": {
+              "id": "boss",
+              "type": "User"
+            }
+          },
+          "profile": {
+            "active": true,
+            "label": "keep entire record"
+          }
+        },
+        "parents": [
+          {
+            "id": "child",
+            "type": "Group"
+          },
+          {
+            "id": "root",
+            "type": "Group"
+          }
+        ],
+        "uid": {
+          "id": "alice",
+          "type": "User"
+        }
+      }
+    ],
+    "batches": [
+      [
+        {
+          "__entity": {
+            "type": "Group",
+            "id": "root"
+          }
+        },
+        {
+          "__entity": {
+            "type": "User",
+            "id": "alice"
+          }
+        }
+      ]
+    ]
+  },
+  {
+    "name": "ancestor_attributes",
+    "decision": "allow",
+    "entities": [
+      {
+        "attrs": {
+          "enabled": true
+        },
+        "parents": [],
+        "uid": {
+          "id": "root",
+          "type": "Group"
+        }
+      },
+      {
+        "attrs": {
+          "manager": {
+            "__entity": {
+              "id": "boss",
+              "type": "User"
+            }
+          },
+          "profile": {
+            "active": true,
+            "label": "keep entire record"
+          }
+        },
+        "parents": [
+          {
+            "id": "child",
+            "type": "Group"
+          },
+          {
+            "id": "root",
+            "type": "Group"
+          }
+        ],
+        "uid": {
+          "id": "alice",
+          "type": "User"
+        }
+      }
+    ],
+    "batches": [
+      [
+        {
+          "__entity": {
+            "type": "Group",
+            "id": "root"
+          }
+        },
+        {
+          "__entity": {
+            "type": "User",
+            "id": "alice"
+          }
+        }
+      ]
+    ]
+  },
+  {
+    "name": "action_hierarchy",
+    "decision": "allow",
+    "entities": [],
+    "batches": []
+  },
+  {
+    "name": "conditional_true",
+    "decision": "allow",
+    "entities": [],
+    "batches": []
+  },
+  {
+    "name": "conditional_false",
+    "decision": "allow",
+    "entities": [
+      {
+        "attrs": {
+          "metadata": {
+            "note": "retain unused nested field",
+            "visible": true
+          },
+          "owner": {
+            "__entity": {
+              "id": "boss",
+              "type": "User"
+            }
+          },
+          "public": false
+        },
+        "parents": [],
+        "uid": {
+          "id": "report",
+          "type": "Doc"
+        }
+      },
+      {
+        "attrs": {
+          "profile": {
+            "active": true,
+            "label": "boss"
+          }
+        },
+        "parents": [],
+        "uid": {
+          "id": "boss",
+          "type": "User"
+        }
+      }
+    ],
+    "batches": [
+      [
+        {
+          "__entity": {
+            "type": "Doc",
+            "id": "report"
+          }
+        }
+      ],
+      [
+        {
+          "__entity": {
+            "type": "User",
+            "id": "boss"
+          }
+        }
+      ]
+    ]
+  },
+  {
+    "name": "optional_absent",
+    "decision": "deny",
+    "entities": [
+      {
+        "attrs": {
+          "profile": {
+            "active": true,
+            "label": "boss"
+          }
+        },
+        "parents": [],
+        "uid": {
+          "id": "boss",
+          "type": "User"
+        }
+      }
+    ],
+    "batches": [
+      [
+        {
+          "__entity": {
+            "type": "User",
+            "id": "boss"
+          }
+        }
+      ]
+    ]
+  },
+  {
+    "name": "missing_entity",
+    "decision": "deny",
+    "entities": [],
+    "batches": [
+      [
+        {
+          "__entity": {
+            "type": "User",
+            "id": "missing"
+          }
+        }
+      ]
+    ]
+  },
+  {
+    "name": "explicit_forbid",
+    "decision": "deny",
+    "entities": [
+      {
+        "attrs": {
+          "metadata": {
+            "note": "retain unused nested field",
+            "visible": true
+          },
+          "owner": {
+            "__entity": {
+              "id": "boss",
+              "type": "User"
+            }
+          },
+          "public": false
+        },
+        "parents": [],
+        "uid": {
+          "id": "report",
+          "type": "Doc"
+        }
+      }
+    ],
+    "batches": [
+      [
+        {
+          "__entity": {
+            "type": "Doc",
+            "id": "report"
+          }
+        }
+      ]
+    ]
+  },
+  {
+    "name": "no_policies",
+    "decision": "deny",
+    "entities": [],
+    "batches": []
+  },
+  {
+    "name": "extension_value",
+    "decision": "allow",
+    "entities": [
+      {
+        "attrs": {
+          "metadata": {
+            "note": "retain unused nested field",
+            "visible": true
+          },
+          "network": {
+            "__extn": {
+              "arg": "10.0.0.1",
+              "fn": "ip"
+            }
+          },
+          "owner": {
+            "__entity": {
+              "id": "boss",
+              "type": "User"
+            }
+          },
+          "public": false
+        },
+        "parents": [],
+        "uid": {
+          "id": "report",
+          "type": "Doc"
+        }
+      }
+    ],
+    "batches": [
+      [
+        {
+          "__entity": {
+            "type": "Doc",
+            "id": "report"
+          }
+        }
+      ]
+    ]
+  },
+  {
+    "name": "entity_tags",
+    "decision": "allow",
+    "entities": [
+      {
+        "attrs": {
+          "manager": {
+            "__entity": {
+              "id": "boss",
+              "type": "User"
+            }
+          },
+          "profile": {
+            "active": true,
+            "label": "keep entire record"
+          }
+        },
+        "parents": [
+          {
+            "id": "child",
+            "type": "Group"
+          },
+          {
+            "id": "root",
+            "type": "Group"
+          }
+        ],
+        "tags": {
+          "role": "admin",
+          "unused": "retained"
+        },
+        "uid": {
+          "id": "alice",
+          "type": "User"
+        }
+      }
+    ],
+    "batches": [
+      [
+        {
+          "__entity": {
+            "type": "User",
+            "id": "alice"
+          }
+        }
+      ]
+    ]
+  },
+  {
+    "name": "unusual_entity_ids",
+    "decision": "allow",
+    "entities": [
+      {
+        "attrs": {
+          "manager": {
+            "__entity": {
+              "id": "boss",
+              "type": "User"
+            }
+          },
+          "profile": {
+            "active": true,
+            "label": "keep entire record"
+          }
+        },
+        "parents": [
+          {
+            "id": "child",
+            "type": "Group"
+          },
+          {
+            "id": "root",
+            "type": "Group"
+          }
+        ],
+        "uid": {
+          "id": "alice\"\\\n☃",
+          "type": "User"
+        }
+      },
+      {
+        "attrs": {
+          "metadata": {
+            "note": "retain unused nested field",
+            "visible": true
+          },
+          "owner": {
+            "__entity": {
+              "id": "boss",
+              "type": "User"
+            }
+          },
+          "public": false
+        },
+        "parents": [],
+        "uid": {
+          "id": "report\"\\\n雪",
+          "type": "Doc"
+        }
+      }
+    ],
+    "batches": [
+      [
+        {
+          "__entity": {
+            "type": "Doc",
+            "id": "report\"\\\n雪"
+          }
+        },
+        {
+          "__entity": {
+            "type": "User",
+            "id": "alice\"\\\n☃"
+          }
+        }
+      ]
+    ]
+  }
+]

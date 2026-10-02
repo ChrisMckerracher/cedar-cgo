@@ -11,6 +11,7 @@ use serde_json::value::RawValue;
 use std::cell::RefCell;
 
 mod batched;
+mod slicing;
 
 cgw_abi::export_memory_functions!();
 

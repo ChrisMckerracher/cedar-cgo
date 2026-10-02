@@ -58,7 +58,7 @@ func limitError(what string, n, limit int) *Error {
 func moduleError(w *wire.Error) *Error {
 	switch k := ErrorKind(w.Kind); k {
 	case KindSchema, KindPolicies, KindEntities, KindContext, KindRequest,
-		KindPrincipal, KindAction, KindResource, KindInput:
+		KindPrincipal, KindAction, KindResource, KindInput, KindSlicing:
 		return &Error{Kind: k, Message: w.Message}
 	}
 	return faultError(fmt.Errorf("module error %q: %s", w.Kind, w.Message))

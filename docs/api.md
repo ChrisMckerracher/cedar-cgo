@@ -9,6 +9,7 @@
 - [Schemas and policies](#schemas-and-policies)
 - [Entities and values](#entities-and-values)
 - [Authorization](#authorization)
+- [Entity slicing](#entity-slicing)
 - [Strict validation](#strict-validation)
 - [Errors](#errors)
 - [Configuration reference](#configuration-reference)
@@ -135,6 +136,69 @@ and computes a decision from the remaining policies, which can still allow.
 
 `Authorizer.Stats()` reports `Created`, `Discarded`, and `Idle` instance counts.
 
+## Entity slicing
+
+`Runtime.SliceEntities(ctx, SliceConfig, Request)` computes a whole-entity slice
+for one concrete request from a complete entity snapshot. This is useful when
+preparing smaller authorization inputs for storage or transport. It parses the
+complete source, so it does not reduce the cost of fetching that source initially.
+`Request.Entities` augments `SliceConfig.Entities`, with the same conflict checks
+as ordinary authorization.
+
+The implementation uses Cedar 4.13.0's experimental
+[`PolicySet::is_authorized_batched`](https://docs.rs/cedar-policy/4.13.0/cedar_policy/struct.PolicySet.html#method.is_authorized_batched)
+and [`EntityLoader`](https://docs.rs/cedar-policy/4.13.0/cedar_policy/trait.EntityLoader.html).
+Rust chooses which UIDs to load; Go does not analyze policy dependencies.
+The `tpe` feature replaces the deprecated `entity-manifest` path. No legacy
+manifest compatibility is provided because there is no existing Go manifest
+contract to preserve. This API is experimental and tied to the pinned Cedar
+version; its signature and behavior may change with upstream TPE.
+
+| Result field | Meaning |
+|---|---|
+| `Decision` | Concrete allow or deny; any Go error returns an empty denying result |
+| `Entities` | Requested existing entities, retaining all attributes, tags, and transitive ancestor UIDs |
+| `Batches` | Sorted UID requests per loader round, including nonexistent entities |
+
+Keep the same schema when reusing the slice: schema action entities are supplied
+by Cedar and may require no loader call. Ancestor UIDs are retained even when
+their own attributes were never requested. Missing entities remain absent.
+Conditional branches can avoid loads; the result is neither a minimal entity
+set nor a statement that every returned entity or attribute was necessary.
+
+The supported loader requests whole entities. It does **not** provide a static
+manifest covering all requests, nested attribute projections, or a list of
+attributes to fetch. The slice is valid only for the same policies, schema,
+principal, action, resource, context, and entity snapshot. Invalidate it when
+any of those change. The guarantee concerns the authorization decision, not
+identical evaluation diagnostics or determining-policy lists after early TPE
+decisions. For applications that need to fetch data on demand, use the batched
+authorization loader path instead of first building a complete source snapshot.
+
+```go
+slice, err := rt.SliceEntities(ctx, cedar.SliceConfig{
+    Schema: schema, Policies: policies, Entities: source,
+}, request)
+if err != nil {
+    return err
+}
+authorizer, err := rt.NewAuthorizer(ctx, cedar.Config{
+    Schema: &schema, Policies: policies, Entities: slice.Entities,
+})
+```
+
+See the [executable example](../cedar/slicing_test.go). Source data, request, and
+context are validated against the required schema; TPE typechecks policies for
+the request's types. `MaxIterations` bounds loading rounds (zero selects 32).
+Exhaustion or TPE validation failure returns `KindSlicing`, never a partial slice.
+The caller's context bounds the entire operation; there is no implicit timeout.
+`WithMaxSourceBytes` caps the encoded combined input (64 MiB by default),
+`WithMemoryLimit` caps each guest (256 MiB), and responses are capped at 16 MiB.
+Exceeding guest memory or response limits returns `KindFault`. Each operation
+uses a fresh instance and closes it on success, cancellation, or error.
+Limit concurrent slicing calls in the application; these runtime calls have no
+instance pool or aggregate memory cap.
+
 ## Strict validation
 
 ```go
@@ -163,6 +227,7 @@ check `cedar.ErrFault`, `context.DeadlineExceeded`, or `context.Canceled`.
 | `KindEntities`, `KindContext`, `KindRequest` | Data parsing or schema checks failed |
 | `KindPrincipal`, `KindAction`, `KindResource` | A UID failed to parse |
 | `KindInput` | Request envelope or Go value encoding failed |
+| `KindSlicing` | TPE validation or entity-loading iteration limit failed |
 | `KindLimit` | Encoded input exceeded its configured size limit |
 | `KindFault` | Guest trap, timeout, abort, or broken module protocol |
 
@@ -177,7 +242,7 @@ that are not `*cedar.Error`.
 |---|---|
 | `WithMemoryLimit(bytes)` | Maximum linear memory per instance |
 | `WithCompilationCache(cache)` | Reuse compiled machine code |
-| `WithMaxSourceBytes(bytes)` | Maximum encoded load or validation input |
+| `WithMaxSourceBytes(bytes)` | Maximum encoded load, validation, or slicing input |
 
 | `Config.Limits` field | Purpose |
 |---|---|
@@ -198,12 +263,12 @@ implementation. See [versioning](maintenance.md#versioning).
 ## Supported operations
 
 The Go interface exposes static-policy authorization, strict validation,
-and the policy comparisons in `analysis`. These execute Cedar's Rust
+experimental request-specific entity slicing, and the policy comparisons in `analysis`. These execute Cedar's Rust
 implementation, including its core and extension value types.
 
 Conformance results establish agreement for the tested operations. The Rust
-library also exposes APIs for template linking, partial evaluation, entity
-slicing, and formatting; those APIs are outside this Go interface. See
+library also exposes APIs for template linking, partial evaluation, deprecated
+entity manifests, and formatting; those APIs are outside this Go interface. See
 [verification scope](verification.md) for the evidence behind compatibility
 claims.
 
