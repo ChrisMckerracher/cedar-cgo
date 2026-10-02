@@ -1,0 +1,7 @@
+[
+ {"uid":{"type":"Joy::Account","id":"acct1"},"attrs":{},"parents":[]},
+ {"uid":{"type":"Joy::Device","id":"phone1"},"attrs":{},"parents":[{"type":"Joy::Account","id":"acct1"}]},
+ {"uid":{"type":"Joy::Machine","id":"m1"},"attrs":{},"parents":[]},
+ {"uid":{"type":"Joy::Project","id":"proj1"},"attrs":{},"parents":[{"type":"Joy::Machine","id":"m1"}]},
+ {"uid":{"type":"Joy::Session","id":"s1"},"attrs":{},"parents":[{"type":"Joy::Project","id":"proj1"}]}
+]

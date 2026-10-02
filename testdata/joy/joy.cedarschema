@@ -1,0 +1,18 @@
+namespace Joy {
+  type Platform = { os: String, model: String, securityLevel: Long };
+  type Ctx = {
+    deviceLevel: Long,
+    platform: Platform,
+    sessionId: String,
+    now: datetime,
+    machineAttested: Bool,
+    sourceIp: ipaddr,
+  };
+  entity Account;
+  entity Device in [Account];
+  entity Machine;
+  entity Project in [Machine];
+  entity Session in [Project];
+  action "session.read", "session.write", "terminal.open", "file.read", "file.write"
+    appliesTo { principal: [Device], resource: [Session, Project], context: Ctx };
+}
