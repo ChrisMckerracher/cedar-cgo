@@ -3,7 +3,6 @@ package cedar_test
 import (
 	"context"
 	"testing"
-	"time"
 
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 	"pgregory.net/rapid"
@@ -17,11 +16,7 @@ func TestPropertySliceDecisionPreserved(t *testing.T) {
 	rt := testRuntime(t)
 	joyJSON := readFile(t, "../testdata/joy/entities.json")
 	ctx := context.Background()
-	start := time.Now()
 	rapid.Check(t, func(pt *rapid.T) {
-		if !propWithinBudget(start, 5*time.Second) {
-			return
-		}
 		text := propGenPolicySet(2).Draw(pt, "policies")
 		propAssertStrictlyValid(pt, rt, d.schema, text)
 		entities := propGenEntityStore(joyJSON).Draw(pt, "entities").entities
@@ -31,18 +26,21 @@ func TestPropertySliceDecisionPreserved(t *testing.T) {
 		if err != nil {
 			pt.Fatalf("slice: %v\n%s", err, text)
 		}
-		for name, store := range map[string]cedar.Entities{"full": entities, "slice": slice.Entities} {
-			a, err := rt.NewAuthorizer(ctx, cedar.Config{Schema: &d.schema, Policies: policies, Entities: store})
+		for _, store := range []struct {
+			name     string
+			entities cedar.Entities
+		}{{"full", entities}, {"slice", slice.Entities}} {
+			a, err := rt.NewAuthorizer(ctx, cedar.Config{Schema: &d.schema, Policies: policies, Entities: store.entities})
 			if err != nil {
-				pt.Fatalf("%s store: load: %v", name, err)
+				pt.Fatalf("%s store: load: %v", store.name, err)
 			}
 			resp, err := a.Authorize(ctx, req)
 			a.Close()
 			if err != nil {
-				pt.Fatalf("%s store: authorize: %v", name, err)
+				pt.Fatalf("%s store: authorize: %v", store.name, err)
 			}
 			if resp.Decision != slice.Decision {
-				pt.Fatalf("%s store decided %v, slice decided %v\n%s", name, resp.Decision, slice.Decision, text)
+				pt.Fatalf("%s store decided %v, slice decided %v\n%s", store.name, resp.Decision, slice.Decision, text)
 			}
 		}
 	})

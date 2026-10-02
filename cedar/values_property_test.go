@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"testing"
-	"time"
 
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 	"pgregory.net/rapid"
@@ -68,11 +67,7 @@ func TestPropertyMalformedEntitiesFailClosed(t *testing.T) {
 	rt := testRuntime(t)
 	joyJSON := readFile(t, "../testdata/joy/entities.json")
 	ctx := context.Background()
-	start := time.Now()
 	rapid.Check(t, func(pt *rapid.T) {
-		if !propWithinBudget(start, 5*time.Second) {
-			return
-		}
 		var raw []byte
 		switch rapid.IntRange(0, 2).Draw(pt, "kind") {
 		case 0:
@@ -95,7 +90,7 @@ func TestPropertyMalformedEntitiesFailClosed(t *testing.T) {
 			raw = valid
 		}
 		if nesting(string(raw)) > maxFuzzNesting {
-			return
+			pt.Skip("entity input exceeds the nesting limit")
 		}
 		for _, schema := range []*cedar.Schema{&d.schema, nil} {
 			a, err := rt.NewAuthorizer(ctx, cedar.Config{

@@ -3,7 +3,6 @@ package cedar_test
 import (
 	"context"
 	"testing"
-	"time"
 
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 	"pgregory.net/rapid"
@@ -16,11 +15,7 @@ func TestPropertyBatchedMatchesSequential(t *testing.T) {
 	rt := testRuntime(t)
 	joyJSON := readFile(t, "../testdata/joy/entities.json")
 	ctx := context.Background()
-	start := time.Now()
 	rapid.Check(t, func(pt *rapid.T) {
-		if !propWithinBudget(start, 5*time.Second) {
-			return
-		}
 		text := propGenPolicySet(2).Draw(pt, "policies")
 		propAssertStrictlyValid(pt, rt, d.schema, text)
 		store := propGenEntityStore(joyJSON).Draw(pt, "entities")

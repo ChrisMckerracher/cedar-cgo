@@ -7,7 +7,6 @@ import (
 	"maps"
 	"slices"
 	"testing"
-	"time"
 
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 	"pgregory.net/rapid"
@@ -22,11 +21,7 @@ type propEditOp struct {
 func TestPropertyPolicyEditSequences(t *testing.T) {
 	rt := testRuntime(t)
 	ctx := context.Background()
-	start := time.Now()
 	rapid.Check(t, func(pt *rapid.T) {
-		if !propWithinBudget(start, 5*time.Second) {
-			return
-		}
 		ops := rapid.SliceOfN(rapid.Custom(func(t *rapid.T) propEditOp {
 			return propEditOp{add: rapid.Bool().Draw(t, "add"), stem: propGenPolicyID().Draw(t, "stem")}
 		}), 2, 8).Draw(pt, "ops")
@@ -48,7 +43,7 @@ func TestPropertyPolicyEditSequences(t *testing.T) {
 				set = next.Source()
 			} else {
 				id := propGenPolicyID().Draw(pt, "id")
-				if keys := slices.Collect(maps.Keys(model)); len(keys) > 0 && rapid.Bool().Draw(pt, "hit") {
+				if keys := slices.Sorted(maps.Keys(model)); len(keys) > 0 && rapid.Bool().Draw(pt, "hit") {
 					id = rapid.SampledFrom(keys).Draw(pt, "present")
 				}
 				next, err := rt.RemovePolicy(ctx, set, id)
@@ -82,11 +77,7 @@ func TestPropertyPolicyEditSequences(t *testing.T) {
 func TestPropertyPolicyViewsRoundtrip(t *testing.T) {
 	rt := testRuntime(t)
 	ctx := context.Background()
-	start := time.Now()
 	rapid.Check(t, func(pt *rapid.T) {
-		if !propWithinBudget(start, 5*time.Second) {
-			return
-		}
 		id := propGenPolicyID().Draw(pt, "id")
 		p, err := rt.ParsePolicy(ctx, id, propGenPolicy(id).Draw(pt, "policy"))
 		if err != nil {
@@ -129,11 +120,7 @@ func TestPropertyPolicyViewsRoundtrip(t *testing.T) {
 func TestPropertyEditsIsolateUnrelatedPolicies(t *testing.T) {
 	rt := testRuntime(t)
 	ctx := context.Background()
-	start := time.Now()
 	rapid.Check(t, func(pt *rapid.T) {
-		if !propWithinBudget(start, 5*time.Second) {
-			return
-		}
 		first, err := rt.ParsePolicy(ctx, "first", propGenPolicy("first").Draw(pt, "first"))
 		if err != nil {
 			pt.Fatalf("parse first: %v", err)

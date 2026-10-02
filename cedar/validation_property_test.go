@@ -10,7 +10,6 @@ import (
 	"slices"
 	"strings"
 	"testing"
-	"time"
 
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 	"pgregory.net/rapid"
@@ -54,11 +53,7 @@ func TestPropertyValidationDeterministic(t *testing.T) {
 	d := loadJoy(t)
 	rt := testRuntime(t)
 	ctx := context.Background()
-	start := time.Now()
 	rapid.Check(t, func(pt *rapid.T) {
-		if !propWithinBudget(start, 5*time.Second) {
-			return
-		}
 		policies := cedar.PoliciesFromCedar(propGenPolicySet(3).Draw(pt, "policies"))
 		first, err := rt.Validate(ctx, d.schema, policies)
 		if err != nil {
@@ -84,18 +79,14 @@ func TestPropertyCorpusValidationStable(t *testing.T) {
 		t.Fatalf("no corpus tests in %s: %v", dir, err)
 	}
 	files = slices.DeleteFunc(files, func(f string) bool { return strings.HasSuffix(f, ".entities.json") })
-	// Large tests dominate the time budget; sample the rest.
+	// Large fixtures have high validation costs; sample the remaining fixtures.
 	files = slices.DeleteFunc(files, func(f string) bool {
 		info, err := os.Stat(f)
 		return err != nil || info.Size() > 128<<10
 	})
 	rt := testRuntime(t)
 	ctx := context.Background()
-	start := time.Now()
 	rapid.Check(t, func(pt *rapid.T) {
-		if !propWithinBudget(start, 5*time.Second) {
-			return
-		}
 		file := rapid.SampledFrom(files).Draw(pt, "file")
 		raw, err := os.ReadFile(file)
 		if err != nil {

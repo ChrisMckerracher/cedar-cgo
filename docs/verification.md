@@ -306,17 +306,21 @@ Each property asserts only contracts documented here or in the package tests:
 | Validation | identical diagnostics across calls; sampled corpus tests that should validate always pass |
 | Values/entities | value and entity JSON reach a fixpoint; malformed entity input fails closed |
 | Authorizer | decisions are deterministic and stateless across reused calls |
-| Analysis | every cvc5 counterexample replays as deny→allow in the concrete authorizer; a set is equivalent to itself |
+| Analysis | sampled cvc5 counterexamples replay as deny→allow in the concrete authorizer; a set is equivalent to itself |
 
-rapid draws a fresh random seed per run and prints it on failure; reproduce
-with `go test ./cedar -run TestPropertyFormatIdempotent -rapid.seed=N`
-(or `-rapid.failfile`). `-rapid.checks`/`RAPID_CHECKS` scale iterations
-globally. rapid v1.3 has no per-test iteration setting, so each expensive
-property instead caps its own wall-clock budget (~5 s each, 25 s for the
-solver-gated analysis property) and skips its remaining checks. On the pinned
-workstation the 18 Cedar properties add about 66 s and the analysis property
-about 21 s (≈100 checks, 800+ solver-held environments, 90+ counterexample
-replays), within the same `go test ./...` run as the rest of the suite.
+rapid selects a random seed for each run and prints the seed on failure.
+To reproduce a failure, use
+`go test ./cedar -run TestPropertyFormatIdempotent -rapid.seed=N`
+or `-rapid.failfile`. By default, rapid runs 100 checks per property.
+Use `-rapid.checks` or `RAPID_CHECKS` to change this count for the test process.
+Use `go test -short` to divide the check count by five.
+Each check runs its assertions without a time guard, including during replay
+and shrinking. Generator limits control policy size and entity count.
+
+The analysis property checks every counterexample's reported decisions.
+It replays up to three counterexamples per report through concrete authorization.
+A run with `-rapid.seed=1` checked 100 cases.
+It recorded 858 solver-held environments and replayed 88 counterexamples.
 
 The validation determinism property uncovered real upstream nondeterminism:
 cedar-policy's validator picks its `did you mean` suggestion by hash iteration,

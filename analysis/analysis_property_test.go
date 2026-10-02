@@ -5,17 +5,10 @@ import (
 	"fmt"
 	"strings"
 	"testing"
-	"time"
 
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 	"pgregory.net/rapid"
 )
-
-// rapid v1.3 has only global iteration flags; solver calls cost ~100ms each,
-// so this property bounds its own wall-clock budget.
-func propAnalysisWithinBudget(start time.Time, budget time.Duration) bool {
-	return time.Since(start) < budget
-}
 
 // Simple Joy-valid atoms keep SymCC encoding and solving fast.
 func propAnalysisCondition(t *rapid.T) string {
@@ -60,9 +53,8 @@ func propAnalysisPolicy(t *rapid.T, id string) string {
 	return fmt.Sprintf(`@id(%q) %s(%s, %s, %s)%s;`, id, effect, principal, action, resource, conditions)
 }
 
-// Every counterexample the analyzer reports must be a real, newly permitted
-// request according to concrete Cedar authorization, and a policy set is
-// always equivalent to itself.
+// Sampled counterexamples must replay as deny→allow under concrete authorization.
+// A policy set is equivalent to itself.
 func TestPropertyAnalysisMatchesGroundTruth(t *testing.T) {
 	a := newAnalyzer(t)
 	schema := cedar.SchemaFromCedar(readFile(t, "../testdata/joy/joy.cedarschema"))
@@ -84,12 +76,8 @@ func TestPropertyAnalysisMatchesGroundTruth(t *testing.T) {
 		}
 		return resp.Decision
 	}
-	start := time.Now()
 	held, replayedTotal := 0, 0
 	rapid.Check(t, func(pt *rapid.T) {
-		if !propAnalysisWithinBudget(start, 25*time.Second) {
-			return
-		}
 		replayed := 0
 		count := rapid.IntRange(1, 2).Draw(pt, "count")
 		parts := make([]string, 0, count+1)

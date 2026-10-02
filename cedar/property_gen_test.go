@@ -7,17 +7,10 @@ import (
 	"reflect"
 	"slices"
 	"strings"
-	"time"
 
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 	"pgregory.net/rapid"
 )
-
-// rapid v1.3 only offers global iteration flags, so expensive properties cap
-// their own wall-clock budget and no-op the remaining checks.
-func propWithinBudget(start time.Time, budget time.Duration) bool {
-	return time.Since(start) < budget
-}
 
 // IDs come from an escape-free alphabet so generated Cedar text needs no quoting care.
 // The x-prefix namespace cannot collide with Joy fixture IDs like phone1 or s1.

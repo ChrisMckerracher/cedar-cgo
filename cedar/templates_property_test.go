@@ -4,7 +4,6 @@ import (
 	"context"
 	"reflect"
 	"testing"
-	"time"
 
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 	"pgregory.net/rapid"
@@ -16,11 +15,7 @@ func TestPropertyTemplateLinkMatchesSubstitution(t *testing.T) {
 	d := loadJoy(t)
 	rt := testRuntime(t)
 	ctx := context.Background()
-	start := time.Now()
 	rapid.Check(t, func(pt *rapid.T) {
-		if !propWithinBudget(start, 5*time.Second) {
-			return
-		}
 		c := propGenTemplate().Draw(pt, "template")
 		set, err := rt.AddTemplate(ctx, cedar.PolicySet{}, "tmpl0", cedar.TemplateFromCedar(c.Template))
 		if err != nil {
@@ -30,23 +25,46 @@ func TestPropertyTemplateLinkMatchesSubstitution(t *testing.T) {
 		if err != nil {
 			pt.Fatalf("link rejected: %v", err)
 		}
-		concrete := cedar.PoliciesFromCedar(c.Concrete)
+		policy, err := rt.ParsePolicy(ctx, c.PolicyID, c.Concrete)
+		if err != nil {
+			pt.Fatalf("concrete policy rejected: %v", err)
+		}
+		concrete, err := rt.AddPolicy(ctx, cedar.PolicySet{}, policy)
+		if err != nil {
+			pt.Fatalf("concrete policy set rejected: %v", err)
+		}
 		req := propGenRequest().Draw(pt, "request")
-		authorize := func(policies cedar.PolicySet) cedar.Response {
+		load := func(policies cedar.PolicySet) *cedar.Authorizer {
 			a, err := rt.NewAuthorizer(ctx, cedar.Config{Schema: &d.schema, Policies: policies, Entities: d.entities})
 			if err != nil {
 				pt.Fatalf("load: %v", err)
 			}
-			defer a.Close()
-			resp, err := a.Authorize(ctx, req)
+			return a
+		}
+		fromLink := load(linked)
+		defer fromLink.Close()
+		fromConcrete := load(concrete.Source())
+		defer fromConcrete.Close()
+		authorize := func(a *cedar.Authorizer, request cedar.Request) cedar.Response {
+			resp, err := a.Authorize(ctx, request)
 			if err != nil {
 				pt.Fatalf("authorize: %v", err)
 			}
 			return resp
 		}
-		if fromLink, fromConcrete := authorize(linked), authorize(concrete); !propResponseEqual(fromLink, fromConcrete) {
-			pt.Fatalf("linked template differs from substituted policy: %+v vs %+v\ntemplate: %s\nbindings: %v",
-				fromLink, fromConcrete, c.Template, c.Bindings)
+		requests := []cedar.Request{req}
+		req.Principal = c.Bindings[cedar.PrincipalSlot]
+		req.Resource = c.Bindings[cedar.ResourceSlot]
+		// Matching bindings and each valid action exercise applicable template scopes.
+		for _, action := range propJoyActions {
+			req.Action = cedar.NewEntityUID("Joy::Action", action)
+			requests = append(requests, req)
+		}
+		for _, request := range requests {
+			if linkedResponse, concreteResponse := authorize(fromLink, request), authorize(fromConcrete, request); !propResponseEqual(linkedResponse, concreteResponse) {
+				pt.Fatalf("linked template differs from substituted policy: %+v vs %+v\ntemplate: %s\nbindings: %v\nrequest: %+v",
+					linkedResponse, concreteResponse, c.Template, c.Bindings, request)
+			}
 		}
 	})
 }
@@ -56,11 +74,7 @@ func TestPropertyTemplateLinkMatchesSubstitution(t *testing.T) {
 func TestPropertyTemplateInspectionRoundtrip(t *testing.T) {
 	rt := testRuntime(t)
 	ctx := context.Background()
-	start := time.Now()
 	rapid.Check(t, func(pt *rapid.T) {
-		if !propWithinBudget(start, 5*time.Second) {
-			return
-		}
 		c := propGenTemplate().Draw(pt, "template")
 		base, err := rt.AddTemplate(ctx, cedar.PolicySet{}, "tmpl0", cedar.TemplateFromCedar(c.Template))
 		if err != nil {

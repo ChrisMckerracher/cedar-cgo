@@ -3,7 +3,6 @@ package cedar_test
 import (
 	"context"
 	"testing"
-	"time"
 
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 	"pgregory.net/rapid"
@@ -14,11 +13,7 @@ import (
 func TestPropertyFormatIdempotent(t *testing.T) {
 	rt := testRuntime(t)
 	ctx := context.Background()
-	start := time.Now()
 	rapid.Check(t, func(pt *rapid.T) {
-		if !propWithinBudget(start, 5*time.Second) {
-			return
-		}
 		text := propGenPolicySet(3).Draw(pt, "policies")
 		opts := []cedar.FormatOption{
 			cedar.WithFormatLineWidth(rapid.Uint32Range(0, 120).Draw(pt, "width")),
@@ -44,11 +39,7 @@ func TestPropertyFormatPreservesAuthorization(t *testing.T) {
 	d := loadJoy(t)
 	rt := testRuntime(t)
 	ctx := context.Background()
-	start := time.Now()
 	rapid.Check(t, func(pt *rapid.T) {
-		if !propWithinBudget(start, 5*time.Second) {
-			return
-		}
 		text := propGenPolicySet(2).Draw(pt, "policies")
 		formatted, err := rt.FormatPolicies(ctx, text)
 		if err != nil {
