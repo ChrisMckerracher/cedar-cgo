@@ -139,13 +139,18 @@ func FuzzBatchedDifferential(f *testing.F) {
 		if json.Valid([]byte(ctxJSON)) {
 			req.Context = cedar.ContextFromJSON([]byte(ctxJSON))
 		}
+		// Only bits 0-2 select a loader behavior; higher bits leave the loader
+		// benign, and an adversarial mode only proves anything if Rust called in.
+		mode := flags & 7
+		called := false
 		loader := cedar.EntityLoaderFunc(func(_ context.Context, uids []cedar.EntityUID) (cedar.EntityLoadResult, error) {
+			called = true
 			switch {
-			case flags&1 != 0:
+			case mode&1 != 0:
 				return cedar.EntityLoadResult{}, errors.New("adversarial loader failure")
-			case flags&2 != 0:
+			case mode&2 != 0:
 				return cedar.EntityLoadResult{Entities: json.RawMessage(strings.Repeat("A", 2<<20))}, nil
-			case flags&4 != 0:
+			case mode&4 != 0:
 				return cedar.EntityLoadResult{Entities: json.RawMessage(`{"not":"an array"}`)}, nil
 			}
 			result := cedar.EntityLoadResult{Entities: store}
@@ -161,7 +166,7 @@ func FuzzBatchedDifferential(f *testing.F) {
 		if err != nil && decision != cedar.Deny {
 			t.Fatalf("error allowed: %s %v", decision, err)
 		}
-		if flags != 0 {
+		if mode != 0 && called {
 			if err == nil {
 				t.Fatalf("adversarial loader leg unexpectedly succeeded: %v", decision)
 			}
