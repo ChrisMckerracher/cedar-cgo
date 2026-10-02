@@ -35,7 +35,8 @@ func (s Schema) Format() Format { return s.format }
 
 func (s Schema) Text() string { return s.text }
 
-// PolicySet assigns Cedar-syntax policies IDs "policy0", "policy1", and so on, in order.
+// PolicySet defers parsing. Cedar-syntax policies receive IDs "policy0", "policy1",
+// and so on; JSON preserves explicit IDs. Use [Runtime.ParsePolicySet] for inspection.
 type PolicySet struct {
 	format Format
 	text   string

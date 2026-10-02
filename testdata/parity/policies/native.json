@@ -1,0 +1,2975 @@
+{
+  "constructed": {
+    "json": {
+      "action": {
+        "op": "All"
+      },
+      "annotations": {
+        "origin": "pst"
+      },
+      "conditions": [
+        {
+          "body": {
+            "Value": true
+          },
+          "kind": "when"
+        },
+        {
+          "body": {
+            "Value": false
+          },
+          "kind": "unless"
+        }
+      ],
+      "effect": "permit",
+      "principal": {
+        "entity_type": "User",
+        "op": "is"
+      },
+      "resource": {
+        "op": "All"
+      }
+    },
+    "result": {
+      "errors": [],
+      "json": {
+        "staticPolicies": {
+          "constructed": {
+            "action": {
+              "op": "All"
+            },
+            "annotations": {
+              "origin": "pst"
+            },
+            "conditions": [
+              {
+                "body": {
+                  "Value": true
+                },
+                "kind": "when"
+              },
+              {
+                "body": {
+                  "Value": false
+                },
+                "kind": "unless"
+              }
+            ],
+            "effect": "permit",
+            "principal": {
+              "entity_type": "User",
+              "op": "is"
+            },
+            "resource": {
+              "op": "All"
+            }
+          }
+        },
+        "templateLinks": [],
+        "templates": {}
+      },
+      "outcomes": [
+        {
+          "decision": "allow",
+          "errors": [],
+          "mfa": true,
+          "reasons": [
+            "constructed"
+          ]
+        },
+        {
+          "decision": "allow",
+          "errors": [],
+          "mfa": false,
+          "reasons": [
+            "constructed"
+          ]
+        }
+      ],
+      "passed": true,
+      "warnings": []
+    },
+    "syntax": {
+      "action": {
+        "kind": "any"
+      },
+      "annotations": {
+        "origin": "pst"
+      },
+      "conditions": [
+        {
+          "body": {
+            "Value": true
+          },
+          "kind": "when"
+        },
+        {
+          "body": {
+            "Value": false
+          },
+          "kind": "unless"
+        }
+      ],
+      "effect": "permit",
+      "id": "constructed",
+      "principal": {
+        "entity_type": "User",
+        "kind": "is"
+      },
+      "resource": {
+        "kind": "any"
+      }
+    }
+  },
+  "edits": [
+    {
+      "add": {
+        "id": "require-mfa",
+        "json": {
+          "action": {
+            "op": "All"
+          },
+          "conditions": [
+            {
+              "body": {
+                ".": {
+                  "attr": "mfa",
+                  "left": {
+                    "Var": "context"
+                  }
+                }
+              },
+              "kind": "unless"
+            }
+          ],
+          "effect": "forbid",
+          "principal": {
+            "op": "All"
+          },
+          "resource": {
+            "op": "All"
+          }
+        }
+      },
+      "base": {
+        "staticPolicies": {
+          "allow-view": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "owner": "security"
+            },
+            "conditions": [
+              {
+                "body": {
+                  ".": {
+                    "attr": "public",
+                    "left": {
+                      "Var": "resource"
+                    }
+                  }
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "permit",
+            "principal": {
+              "entity_type": "User",
+              "op": "is"
+            },
+            "resource": {
+              "entity_type": "Photo",
+              "op": "is"
+            }
+          }
+        },
+        "templateLinks": [],
+        "templates": {}
+      },
+      "error": null,
+      "name": "add",
+      "other": null,
+      "remove": null,
+      "rename": false,
+      "renames": {},
+      "result": {
+        "errors": [],
+        "json": {
+          "staticPolicies": {
+            "allow-view": {
+              "action": {
+                "entity": {
+                  "id": "view",
+                  "type": "Action"
+                },
+                "op": "=="
+              },
+              "annotations": {
+                "owner": "security"
+              },
+              "conditions": [
+                {
+                  "body": {
+                    ".": {
+                      "attr": "public",
+                      "left": {
+                        "Var": "resource"
+                      }
+                    }
+                  },
+                  "kind": "when"
+                }
+              ],
+              "effect": "permit",
+              "principal": {
+                "entity_type": "User",
+                "op": "is"
+              },
+              "resource": {
+                "entity_type": "Photo",
+                "op": "is"
+              }
+            },
+            "require-mfa": {
+              "action": {
+                "op": "All"
+              },
+              "conditions": [
+                {
+                  "body": {
+                    ".": {
+                      "attr": "mfa",
+                      "left": {
+                        "Var": "context"
+                      }
+                    }
+                  },
+                  "kind": "unless"
+                }
+              ],
+              "effect": "forbid",
+              "principal": {
+                "op": "All"
+              },
+              "resource": {
+                "op": "All"
+              }
+            }
+          },
+          "templateLinks": [],
+          "templates": {}
+        },
+        "outcomes": [
+          {
+            "decision": "allow",
+            "errors": [],
+            "mfa": true,
+            "reasons": [
+              "allow-view"
+            ]
+          },
+          {
+            "decision": "deny",
+            "errors": [],
+            "mfa": false,
+            "reasons": [
+              "require-mfa"
+            ]
+          }
+        ],
+        "passed": true,
+        "warnings": []
+      }
+    },
+    {
+      "add": {
+        "id": "quote\"\nslash\\雪",
+        "json": {
+          "action": {
+            "op": "All"
+          },
+          "conditions": [
+            {
+              "body": {
+                ".": {
+                  "attr": "mfa",
+                  "left": {
+                    "Var": "context"
+                  }
+                }
+              },
+              "kind": "unless"
+            }
+          ],
+          "effect": "forbid",
+          "principal": {
+            "op": "All"
+          },
+          "resource": {
+            "op": "All"
+          }
+        }
+      },
+      "base": {
+        "staticPolicies": {
+          "allow-view": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "owner": "security"
+            },
+            "conditions": [
+              {
+                "body": {
+                  ".": {
+                    "attr": "public",
+                    "left": {
+                      "Var": "resource"
+                    }
+                  }
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "permit",
+            "principal": {
+              "entity_type": "User",
+              "op": "is"
+            },
+            "resource": {
+              "entity_type": "Photo",
+              "op": "is"
+            }
+          }
+        },
+        "templateLinks": [],
+        "templates": {}
+      },
+      "error": null,
+      "name": "unusual-id",
+      "other": null,
+      "remove": null,
+      "rename": false,
+      "renames": {},
+      "result": {
+        "errors": [],
+        "json": {
+          "staticPolicies": {
+            "allow-view": {
+              "action": {
+                "entity": {
+                  "id": "view",
+                  "type": "Action"
+                },
+                "op": "=="
+              },
+              "annotations": {
+                "owner": "security"
+              },
+              "conditions": [
+                {
+                  "body": {
+                    ".": {
+                      "attr": "public",
+                      "left": {
+                        "Var": "resource"
+                      }
+                    }
+                  },
+                  "kind": "when"
+                }
+              ],
+              "effect": "permit",
+              "principal": {
+                "entity_type": "User",
+                "op": "is"
+              },
+              "resource": {
+                "entity_type": "Photo",
+                "op": "is"
+              }
+            },
+            "quote\"\nslash\\雪": {
+              "action": {
+                "op": "All"
+              },
+              "conditions": [
+                {
+                  "body": {
+                    ".": {
+                      "attr": "mfa",
+                      "left": {
+                        "Var": "context"
+                      }
+                    }
+                  },
+                  "kind": "unless"
+                }
+              ],
+              "effect": "forbid",
+              "principal": {
+                "op": "All"
+              },
+              "resource": {
+                "op": "All"
+              }
+            }
+          },
+          "templateLinks": [],
+          "templates": {}
+        },
+        "outcomes": [
+          {
+            "decision": "allow",
+            "errors": [],
+            "mfa": true,
+            "reasons": [
+              "allow-view"
+            ]
+          },
+          {
+            "decision": "deny",
+            "errors": [],
+            "mfa": false,
+            "reasons": [
+              "quote\"\nslash\\雪"
+            ]
+          }
+        ],
+        "passed": true,
+        "warnings": []
+      }
+    },
+    {
+      "add": {
+        "id": "quote\"\nslash\\雪",
+        "json": {
+          "action": {
+            "op": "All"
+          },
+          "conditions": [
+            {
+              "body": {
+                ".": {
+                  "attr": "missing",
+                  "left": {
+                    "Var": "resource"
+                  }
+                }
+              },
+              "kind": "when"
+            }
+          ],
+          "effect": "permit",
+          "principal": {
+            "op": "All"
+          },
+          "resource": {
+            "op": "All"
+          }
+        }
+      },
+      "base": {
+        "staticPolicies": {
+          "allow-view": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "owner": "security"
+            },
+            "conditions": [
+              {
+                "body": {
+                  ".": {
+                    "attr": "public",
+                    "left": {
+                      "Var": "resource"
+                    }
+                  }
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "permit",
+            "principal": {
+              "entity_type": "User",
+              "op": "is"
+            },
+            "resource": {
+              "entity_type": "Photo",
+              "op": "is"
+            }
+          }
+        },
+        "templateLinks": [],
+        "templates": {}
+      },
+      "error": null,
+      "name": "unusual-validation-id",
+      "other": null,
+      "remove": null,
+      "rename": false,
+      "renames": {},
+      "result": {
+        "errors": [
+          {
+            "message": "for policy `quote\\\"\\nslash\\\\雪`, attribute `missing` on entity type `Photo` not found (help: did you mean `public`?)",
+            "policy_id": "quote\"\nslash\\雪"
+          }
+        ],
+        "json": {
+          "staticPolicies": {
+            "allow-view": {
+              "action": {
+                "entity": {
+                  "id": "view",
+                  "type": "Action"
+                },
+                "op": "=="
+              },
+              "annotations": {
+                "owner": "security"
+              },
+              "conditions": [
+                {
+                  "body": {
+                    ".": {
+                      "attr": "public",
+                      "left": {
+                        "Var": "resource"
+                      }
+                    }
+                  },
+                  "kind": "when"
+                }
+              ],
+              "effect": "permit",
+              "principal": {
+                "entity_type": "User",
+                "op": "is"
+              },
+              "resource": {
+                "entity_type": "Photo",
+                "op": "is"
+              }
+            },
+            "quote\"\nslash\\雪": {
+              "action": {
+                "op": "All"
+              },
+              "conditions": [
+                {
+                  "body": {
+                    ".": {
+                      "attr": "missing",
+                      "left": {
+                        "Var": "resource"
+                      }
+                    }
+                  },
+                  "kind": "when"
+                }
+              ],
+              "effect": "permit",
+              "principal": {
+                "op": "All"
+              },
+              "resource": {
+                "op": "All"
+              }
+            }
+          },
+          "templateLinks": [],
+          "templates": {}
+        },
+        "outcomes": [
+          {
+            "decision": "allow",
+            "errors": [
+              {
+                "message": "`Photo::\"p\"` does not have the attribute `missing` (help: available attributes: [public])",
+                "policy_id": "quote\"\nslash\\雪"
+              }
+            ],
+            "mfa": true,
+            "reasons": [
+              "allow-view"
+            ]
+          },
+          {
+            "decision": "allow",
+            "errors": [
+              {
+                "message": "`Photo::\"p\"` does not have the attribute `missing` (help: available attributes: [public])",
+                "policy_id": "quote\"\nslash\\雪"
+              }
+            ],
+            "mfa": false,
+            "reasons": [
+              "allow-view"
+            ]
+          }
+        ],
+        "passed": false,
+        "warnings": []
+      }
+    },
+    {
+      "add": {
+        "id": "allow-view",
+        "json": {
+          "action": {
+            "op": "All"
+          },
+          "conditions": [
+            {
+              "body": {
+                ".": {
+                  "attr": "mfa",
+                  "left": {
+                    "Var": "context"
+                  }
+                }
+              },
+              "kind": "unless"
+            }
+          ],
+          "effect": "forbid",
+          "principal": {
+            "op": "All"
+          },
+          "resource": {
+            "op": "All"
+          }
+        }
+      },
+      "base": {
+        "staticPolicies": {
+          "allow-view": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "owner": "security"
+            },
+            "conditions": [
+              {
+                "body": {
+                  ".": {
+                    "attr": "public",
+                    "left": {
+                      "Var": "resource"
+                    }
+                  }
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "permit",
+            "principal": {
+              "entity_type": "User",
+              "op": "is"
+            },
+            "resource": {
+              "entity_type": "Photo",
+              "op": "is"
+            }
+          }
+        },
+        "templateLinks": [],
+        "templates": {}
+      },
+      "error": "duplicate template or policy id `allow-view`",
+      "name": "duplicate-add",
+      "other": null,
+      "remove": null,
+      "rename": false,
+      "renames": {},
+      "result": {
+        "errors": [],
+        "json": {
+          "staticPolicies": {
+            "allow-view": {
+              "action": {
+                "entity": {
+                  "id": "view",
+                  "type": "Action"
+                },
+                "op": "=="
+              },
+              "annotations": {
+                "owner": "security"
+              },
+              "conditions": [
+                {
+                  "body": {
+                    ".": {
+                      "attr": "public",
+                      "left": {
+                        "Var": "resource"
+                      }
+                    }
+                  },
+                  "kind": "when"
+                }
+              ],
+              "effect": "permit",
+              "principal": {
+                "entity_type": "User",
+                "op": "is"
+              },
+              "resource": {
+                "entity_type": "Photo",
+                "op": "is"
+              }
+            }
+          },
+          "templateLinks": [],
+          "templates": {}
+        },
+        "outcomes": [
+          {
+            "decision": "allow",
+            "errors": [],
+            "mfa": true,
+            "reasons": [
+              "allow-view"
+            ]
+          },
+          {
+            "decision": "allow",
+            "errors": [],
+            "mfa": false,
+            "reasons": [
+              "allow-view"
+            ]
+          }
+        ],
+        "passed": true,
+        "warnings": []
+      }
+    },
+    {
+      "add": null,
+      "base": {
+        "staticPolicies": {
+          "allow-view": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "owner": "security"
+            },
+            "conditions": [
+              {
+                "body": {
+                  ".": {
+                    "attr": "public",
+                    "left": {
+                      "Var": "resource"
+                    }
+                  }
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "permit",
+            "principal": {
+              "entity_type": "User",
+              "op": "is"
+            },
+            "resource": {
+              "entity_type": "Photo",
+              "op": "is"
+            }
+          }
+        },
+        "templateLinks": [],
+        "templates": {}
+      },
+      "error": "unable to remove static policy `absent` because it does not exist",
+      "name": "missing-remove",
+      "other": null,
+      "remove": "absent",
+      "rename": false,
+      "renames": {},
+      "result": {
+        "errors": [],
+        "json": {
+          "staticPolicies": {
+            "allow-view": {
+              "action": {
+                "entity": {
+                  "id": "view",
+                  "type": "Action"
+                },
+                "op": "=="
+              },
+              "annotations": {
+                "owner": "security"
+              },
+              "conditions": [
+                {
+                  "body": {
+                    ".": {
+                      "attr": "public",
+                      "left": {
+                        "Var": "resource"
+                      }
+                    }
+                  },
+                  "kind": "when"
+                }
+              ],
+              "effect": "permit",
+              "principal": {
+                "entity_type": "User",
+                "op": "is"
+              },
+              "resource": {
+                "entity_type": "Photo",
+                "op": "is"
+              }
+            }
+          },
+          "templateLinks": [],
+          "templates": {}
+        },
+        "outcomes": [
+          {
+            "decision": "allow",
+            "errors": [],
+            "mfa": true,
+            "reasons": [
+              "allow-view"
+            ]
+          },
+          {
+            "decision": "allow",
+            "errors": [],
+            "mfa": false,
+            "reasons": [
+              "allow-view"
+            ]
+          }
+        ],
+        "passed": true,
+        "warnings": []
+      }
+    },
+    {
+      "add": null,
+      "base": {
+        "staticPolicies": {
+          "allow-view": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "owner": "security"
+            },
+            "conditions": [
+              {
+                "body": {
+                  ".": {
+                    "attr": "public",
+                    "left": {
+                      "Var": "resource"
+                    }
+                  }
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "permit",
+            "principal": {
+              "entity_type": "User",
+              "op": "is"
+            },
+            "resource": {
+              "entity_type": "Photo",
+              "op": "is"
+            }
+          }
+        },
+        "templateLinks": [],
+        "templates": {}
+      },
+      "error": null,
+      "name": "remove",
+      "other": null,
+      "remove": "allow-view",
+      "rename": false,
+      "renames": {},
+      "result": {
+        "errors": [],
+        "json": {
+          "staticPolicies": {},
+          "templateLinks": [],
+          "templates": {}
+        },
+        "outcomes": [
+          {
+            "decision": "deny",
+            "errors": [],
+            "mfa": true,
+            "reasons": []
+          },
+          {
+            "decision": "deny",
+            "errors": [],
+            "mfa": false,
+            "reasons": []
+          }
+        ],
+        "passed": true,
+        "warnings": []
+      }
+    },
+    {
+      "add": null,
+      "base": {
+        "staticPolicies": {
+          "allow-view": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "owner": "security"
+            },
+            "conditions": [
+              {
+                "body": {
+                  ".": {
+                    "attr": "public",
+                    "left": {
+                      "Var": "resource"
+                    }
+                  }
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "permit",
+            "principal": {
+              "entity_type": "User",
+              "op": "is"
+            },
+            "resource": {
+              "entity_type": "Photo",
+              "op": "is"
+            }
+          }
+        },
+        "templateLinks": [],
+        "templates": {}
+      },
+      "error": null,
+      "name": "merge",
+      "other": {
+        "staticPolicies": {
+          "require-mfa": {
+            "action": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "body": {
+                  ".": {
+                    "attr": "mfa",
+                    "left": {
+                      "Var": "context"
+                    }
+                  }
+                },
+                "kind": "unless"
+              }
+            ],
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            }
+          }
+        },
+        "templateLinks": [],
+        "templates": {}
+      },
+      "remove": null,
+      "rename": false,
+      "renames": {},
+      "result": {
+        "errors": [],
+        "json": {
+          "staticPolicies": {
+            "allow-view": {
+              "action": {
+                "entity": {
+                  "id": "view",
+                  "type": "Action"
+                },
+                "op": "=="
+              },
+              "annotations": {
+                "owner": "security"
+              },
+              "conditions": [
+                {
+                  "body": {
+                    ".": {
+                      "attr": "public",
+                      "left": {
+                        "Var": "resource"
+                      }
+                    }
+                  },
+                  "kind": "when"
+                }
+              ],
+              "effect": "permit",
+              "principal": {
+                "entity_type": "User",
+                "op": "is"
+              },
+              "resource": {
+                "entity_type": "Photo",
+                "op": "is"
+              }
+            },
+            "require-mfa": {
+              "action": {
+                "op": "All"
+              },
+              "conditions": [
+                {
+                  "body": {
+                    ".": {
+                      "attr": "mfa",
+                      "left": {
+                        "Var": "context"
+                      }
+                    }
+                  },
+                  "kind": "unless"
+                }
+              ],
+              "effect": "forbid",
+              "principal": {
+                "op": "All"
+              },
+              "resource": {
+                "op": "All"
+              }
+            }
+          },
+          "templateLinks": [],
+          "templates": {}
+        },
+        "outcomes": [
+          {
+            "decision": "allow",
+            "errors": [],
+            "mfa": true,
+            "reasons": [
+              "allow-view"
+            ]
+          },
+          {
+            "decision": "deny",
+            "errors": [],
+            "mfa": false,
+            "reasons": [
+              "require-mfa"
+            ]
+          }
+        ],
+        "passed": true,
+        "warnings": []
+      }
+    },
+    {
+      "add": null,
+      "base": {
+        "staticPolicies": {
+          "allow-view": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "owner": "security"
+            },
+            "conditions": [
+              {
+                "body": {
+                  ".": {
+                    "attr": "public",
+                    "left": {
+                      "Var": "resource"
+                    }
+                  }
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "permit",
+            "principal": {
+              "entity_type": "User",
+              "op": "is"
+            },
+            "resource": {
+              "entity_type": "Photo",
+              "op": "is"
+            }
+          }
+        },
+        "templateLinks": [],
+        "templates": {}
+      },
+      "error": null,
+      "name": "merge-equal",
+      "other": {
+        "staticPolicies": {
+          "allow-view": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "owner": "security"
+            },
+            "conditions": [
+              {
+                "body": {
+                  ".": {
+                    "attr": "public",
+                    "left": {
+                      "Var": "resource"
+                    }
+                  }
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "permit",
+            "principal": {
+              "entity_type": "User",
+              "op": "is"
+            },
+            "resource": {
+              "entity_type": "Photo",
+              "op": "is"
+            }
+          }
+        },
+        "templateLinks": [],
+        "templates": {}
+      },
+      "remove": null,
+      "rename": false,
+      "renames": {},
+      "result": {
+        "errors": [],
+        "json": {
+          "staticPolicies": {
+            "allow-view": {
+              "action": {
+                "entity": {
+                  "id": "view",
+                  "type": "Action"
+                },
+                "op": "=="
+              },
+              "annotations": {
+                "owner": "security"
+              },
+              "conditions": [
+                {
+                  "body": {
+                    ".": {
+                      "attr": "public",
+                      "left": {
+                        "Var": "resource"
+                      }
+                    }
+                  },
+                  "kind": "when"
+                }
+              ],
+              "effect": "permit",
+              "principal": {
+                "entity_type": "User",
+                "op": "is"
+              },
+              "resource": {
+                "entity_type": "Photo",
+                "op": "is"
+              }
+            }
+          },
+          "templateLinks": [],
+          "templates": {}
+        },
+        "outcomes": [
+          {
+            "decision": "allow",
+            "errors": [],
+            "mfa": true,
+            "reasons": [
+              "allow-view"
+            ]
+          },
+          {
+            "decision": "allow",
+            "errors": [],
+            "mfa": false,
+            "reasons": [
+              "allow-view"
+            ]
+          }
+        ],
+        "passed": true,
+        "warnings": []
+      }
+    },
+    {
+      "add": null,
+      "base": {
+        "staticPolicies": {
+          "allow-view": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "owner": "security"
+            },
+            "conditions": [
+              {
+                "body": {
+                  ".": {
+                    "attr": "public",
+                    "left": {
+                      "Var": "resource"
+                    }
+                  }
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "permit",
+            "principal": {
+              "entity_type": "User",
+              "op": "is"
+            },
+            "resource": {
+              "entity_type": "Photo",
+              "op": "is"
+            }
+          }
+        },
+        "templateLinks": [],
+        "templates": {}
+      },
+      "error": "duplicate template or policy id `allow-view`",
+      "name": "merge-conflict",
+      "other": {
+        "staticPolicies": {
+          "allow-view": {
+            "action": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "body": {
+                  ".": {
+                    "attr": "mfa",
+                    "left": {
+                      "Var": "context"
+                    }
+                  }
+                },
+                "kind": "unless"
+              }
+            ],
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            }
+          }
+        },
+        "templateLinks": [],
+        "templates": {}
+      },
+      "remove": null,
+      "rename": false,
+      "renames": {},
+      "result": {
+        "errors": [],
+        "json": {
+          "staticPolicies": {
+            "allow-view": {
+              "action": {
+                "entity": {
+                  "id": "view",
+                  "type": "Action"
+                },
+                "op": "=="
+              },
+              "annotations": {
+                "owner": "security"
+              },
+              "conditions": [
+                {
+                  "body": {
+                    ".": {
+                      "attr": "public",
+                      "left": {
+                        "Var": "resource"
+                      }
+                    }
+                  },
+                  "kind": "when"
+                }
+              ],
+              "effect": "permit",
+              "principal": {
+                "entity_type": "User",
+                "op": "is"
+              },
+              "resource": {
+                "entity_type": "Photo",
+                "op": "is"
+              }
+            }
+          },
+          "templateLinks": [],
+          "templates": {}
+        },
+        "outcomes": [
+          {
+            "decision": "allow",
+            "errors": [],
+            "mfa": true,
+            "reasons": [
+              "allow-view"
+            ]
+          },
+          {
+            "decision": "allow",
+            "errors": [],
+            "mfa": false,
+            "reasons": [
+              "allow-view"
+            ]
+          }
+        ],
+        "passed": true,
+        "warnings": []
+      }
+    },
+    {
+      "add": null,
+      "base": {
+        "staticPolicies": {
+          "allow-view": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "owner": "security"
+            },
+            "conditions": [
+              {
+                "body": {
+                  ".": {
+                    "attr": "public",
+                    "left": {
+                      "Var": "resource"
+                    }
+                  }
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "permit",
+            "principal": {
+              "entity_type": "User",
+              "op": "is"
+            },
+            "resource": {
+              "entity_type": "Photo",
+              "op": "is"
+            }
+          }
+        },
+        "templateLinks": [],
+        "templates": {}
+      },
+      "error": null,
+      "name": "merge-rename",
+      "other": {
+        "staticPolicies": {
+          "allow-view": {
+            "action": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "body": {
+                  ".": {
+                    "attr": "mfa",
+                    "left": {
+                      "Var": "context"
+                    }
+                  }
+                },
+                "kind": "unless"
+              }
+            ],
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            }
+          }
+        },
+        "templateLinks": [],
+        "templates": {}
+      },
+      "remove": null,
+      "rename": true,
+      "renames": {
+        "allow-view": "policy0"
+      },
+      "result": {
+        "errors": [],
+        "json": {
+          "staticPolicies": {
+            "allow-view": {
+              "action": {
+                "entity": {
+                  "id": "view",
+                  "type": "Action"
+                },
+                "op": "=="
+              },
+              "annotations": {
+                "owner": "security"
+              },
+              "conditions": [
+                {
+                  "body": {
+                    ".": {
+                      "attr": "public",
+                      "left": {
+                        "Var": "resource"
+                      }
+                    }
+                  },
+                  "kind": "when"
+                }
+              ],
+              "effect": "permit",
+              "principal": {
+                "entity_type": "User",
+                "op": "is"
+              },
+              "resource": {
+                "entity_type": "Photo",
+                "op": "is"
+              }
+            },
+            "policy0": {
+              "action": {
+                "op": "All"
+              },
+              "conditions": [
+                {
+                  "body": {
+                    ".": {
+                      "attr": "mfa",
+                      "left": {
+                        "Var": "context"
+                      }
+                    }
+                  },
+                  "kind": "unless"
+                }
+              ],
+              "effect": "forbid",
+              "principal": {
+                "op": "All"
+              },
+              "resource": {
+                "op": "All"
+              }
+            }
+          },
+          "templateLinks": [],
+          "templates": {}
+        },
+        "outcomes": [
+          {
+            "decision": "allow",
+            "errors": [],
+            "mfa": true,
+            "reasons": [
+              "allow-view"
+            ]
+          },
+          {
+            "decision": "deny",
+            "errors": [],
+            "mfa": false,
+            "reasons": [
+              "policy0"
+            ]
+          }
+        ],
+        "passed": true,
+        "warnings": []
+      }
+    },
+    {
+      "add": {
+        "id": "bad-attribute",
+        "json": {
+          "action": {
+            "op": "All"
+          },
+          "conditions": [
+            {
+              "body": {
+                ".": {
+                  "attr": "missing",
+                  "left": {
+                    "Var": "resource"
+                  }
+                }
+              },
+              "kind": "when"
+            }
+          ],
+          "effect": "permit",
+          "principal": {
+            "op": "All"
+          },
+          "resource": {
+            "op": "All"
+          }
+        }
+      },
+      "base": {
+        "staticPolicies": {
+          "allow-view": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "owner": "security"
+            },
+            "conditions": [
+              {
+                "body": {
+                  ".": {
+                    "attr": "public",
+                    "left": {
+                      "Var": "resource"
+                    }
+                  }
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "permit",
+            "principal": {
+              "entity_type": "User",
+              "op": "is"
+            },
+            "resource": {
+              "entity_type": "Photo",
+              "op": "is"
+            }
+          }
+        },
+        "templateLinks": [],
+        "templates": {}
+      },
+      "error": null,
+      "name": "invalid-validation",
+      "other": null,
+      "remove": null,
+      "rename": false,
+      "renames": {},
+      "result": {
+        "errors": [
+          {
+            "message": "for policy `bad-attribute`, attribute `missing` on entity type `Photo` not found (help: did you mean `public`?)",
+            "policy_id": "bad-attribute"
+          }
+        ],
+        "json": {
+          "staticPolicies": {
+            "allow-view": {
+              "action": {
+                "entity": {
+                  "id": "view",
+                  "type": "Action"
+                },
+                "op": "=="
+              },
+              "annotations": {
+                "owner": "security"
+              },
+              "conditions": [
+                {
+                  "body": {
+                    ".": {
+                      "attr": "public",
+                      "left": {
+                        "Var": "resource"
+                      }
+                    }
+                  },
+                  "kind": "when"
+                }
+              ],
+              "effect": "permit",
+              "principal": {
+                "entity_type": "User",
+                "op": "is"
+              },
+              "resource": {
+                "entity_type": "Photo",
+                "op": "is"
+              }
+            },
+            "bad-attribute": {
+              "action": {
+                "op": "All"
+              },
+              "conditions": [
+                {
+                  "body": {
+                    ".": {
+                      "attr": "missing",
+                      "left": {
+                        "Var": "resource"
+                      }
+                    }
+                  },
+                  "kind": "when"
+                }
+              ],
+              "effect": "permit",
+              "principal": {
+                "op": "All"
+              },
+              "resource": {
+                "op": "All"
+              }
+            }
+          },
+          "templateLinks": [],
+          "templates": {}
+        },
+        "outcomes": [
+          {
+            "decision": "allow",
+            "errors": [
+              {
+                "message": "`Photo::\"p\"` does not have the attribute `missing` (help: available attributes: [public])",
+                "policy_id": "bad-attribute"
+              }
+            ],
+            "mfa": true,
+            "reasons": [
+              "allow-view"
+            ]
+          },
+          {
+            "decision": "allow",
+            "errors": [
+              {
+                "message": "`Photo::\"p\"` does not have the attribute `missing` (help: available attributes: [public])",
+                "policy_id": "bad-attribute"
+              }
+            ],
+            "mfa": false,
+            "reasons": [
+              "allow-view"
+            ]
+          }
+        ],
+        "passed": false,
+        "warnings": []
+      }
+    },
+    {
+      "add": null,
+      "base": {
+        "staticPolicies": {
+          "quote\"\nslash\\雪": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "owner": "security"
+            },
+            "conditions": [
+              {
+                "body": {
+                  ".": {
+                    "attr": "public",
+                    "left": {
+                      "Var": "resource"
+                    }
+                  }
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "permit",
+            "principal": {
+              "entity_type": "User",
+              "op": "is"
+            },
+            "resource": {
+              "entity_type": "Photo",
+              "op": "is"
+            }
+          }
+        },
+        "templateLinks": [],
+        "templates": {}
+      },
+      "error": null,
+      "name": "unusual-merge-id",
+      "other": {
+        "staticPolicies": {
+          "quote\"\nslash\\雪": {
+            "action": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "body": {
+                  ".": {
+                    "attr": "mfa",
+                    "left": {
+                      "Var": "context"
+                    }
+                  }
+                },
+                "kind": "unless"
+              }
+            ],
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            }
+          }
+        },
+        "templateLinks": [],
+        "templates": {}
+      },
+      "remove": null,
+      "rename": true,
+      "renames": {
+        "quote\"\nslash\\雪": "policy0"
+      },
+      "result": {
+        "errors": [],
+        "json": {
+          "staticPolicies": {
+            "policy0": {
+              "action": {
+                "op": "All"
+              },
+              "conditions": [
+                {
+                  "body": {
+                    ".": {
+                      "attr": "mfa",
+                      "left": {
+                        "Var": "context"
+                      }
+                    }
+                  },
+                  "kind": "unless"
+                }
+              ],
+              "effect": "forbid",
+              "principal": {
+                "op": "All"
+              },
+              "resource": {
+                "op": "All"
+              }
+            },
+            "quote\"\nslash\\雪": {
+              "action": {
+                "entity": {
+                  "id": "view",
+                  "type": "Action"
+                },
+                "op": "=="
+              },
+              "annotations": {
+                "owner": "security"
+              },
+              "conditions": [
+                {
+                  "body": {
+                    ".": {
+                      "attr": "public",
+                      "left": {
+                        "Var": "resource"
+                      }
+                    }
+                  },
+                  "kind": "when"
+                }
+              ],
+              "effect": "permit",
+              "principal": {
+                "entity_type": "User",
+                "op": "is"
+              },
+              "resource": {
+                "entity_type": "Photo",
+                "op": "is"
+              }
+            }
+          },
+          "templateLinks": [],
+          "templates": {}
+        },
+        "outcomes": [
+          {
+            "decision": "allow",
+            "errors": [],
+            "mfa": true,
+            "reasons": [
+              "quote\"\nslash\\雪"
+            ]
+          },
+          {
+            "decision": "deny",
+            "errors": [],
+            "mfa": false,
+            "reasons": [
+              "policy0"
+            ]
+          }
+        ],
+        "passed": true,
+        "warnings": []
+      }
+    }
+  ],
+  "linked": {
+    "json": {
+      "staticPolicies": {
+        "allow-view": {
+          "action": {
+            "entity": {
+              "id": "view",
+              "type": "Action"
+            },
+            "op": "=="
+          },
+          "annotations": {
+            "owner": "security"
+          },
+          "conditions": [
+            {
+              "body": {
+                ".": {
+                  "attr": "public",
+                  "left": {
+                    "Var": "resource"
+                  }
+                }
+              },
+              "kind": "when"
+            }
+          ],
+          "effect": "permit",
+          "principal": {
+            "entity_type": "User",
+            "op": "is"
+          },
+          "resource": {
+            "entity_type": "Photo",
+            "op": "is"
+          }
+        }
+      },
+      "templateLinks": [
+        {
+          "newId": "instance",
+          "templateId": "template",
+          "values": {
+            "?principal": {
+              "__entity": {
+                "id": "alice",
+                "type": "User"
+              }
+            }
+          }
+        }
+      ],
+      "templates": {
+        "template": {
+          "action": {
+            "op": "All"
+          },
+          "conditions": [],
+          "effect": "permit",
+          "principal": {
+            "op": "==",
+            "slot": "?principal"
+          },
+          "resource": {
+            "op": "All"
+          }
+        }
+      }
+    },
+    "remove_error": "unable to remove static policy `instance` because it does not exist",
+    "result": {
+      "errors": [],
+      "json": {
+        "staticPolicies": {
+          "allow-view": {
+            "action": {
+              "entity": {
+                "id": "view",
+                "type": "Action"
+              },
+              "op": "=="
+            },
+            "annotations": {
+              "owner": "security"
+            },
+            "conditions": [
+              {
+                "body": {
+                  ".": {
+                    "attr": "public",
+                    "left": {
+                      "Var": "resource"
+                    }
+                  }
+                },
+                "kind": "when"
+              }
+            ],
+            "effect": "permit",
+            "principal": {
+              "entity_type": "User",
+              "op": "is"
+            },
+            "resource": {
+              "entity_type": "Photo",
+              "op": "is"
+            }
+          }
+        },
+        "templateLinks": [
+          {
+            "newId": "instance",
+            "templateId": "template",
+            "values": {
+              "?principal": {
+                "__entity": {
+                  "id": "alice",
+                  "type": "User"
+                }
+              }
+            }
+          }
+        ],
+        "templates": {
+          "template": {
+            "action": {
+              "op": "All"
+            },
+            "conditions": [],
+            "effect": "permit",
+            "principal": {
+              "op": "==",
+              "slot": "?principal"
+            },
+            "resource": {
+              "op": "All"
+            }
+          }
+        }
+      },
+      "outcomes": [
+        {
+          "decision": "allow",
+          "errors": [],
+          "mfa": true,
+          "reasons": [
+            "allow-view",
+            "instance"
+          ]
+        },
+        {
+          "decision": "allow",
+          "errors": [],
+          "mfa": false,
+          "reasons": [
+            "allow-view",
+            "instance"
+          ]
+        }
+      ],
+      "passed": true,
+      "warnings": []
+    },
+    "template_remove_error": "unable to remove static policy `template` because it does not exist"
+  },
+  "parses": [
+    {
+      "error": null,
+      "id": "explicit/id",
+      "json": {
+        "action": {
+          "entity": {
+            "id": "view",
+            "type": "Action"
+          },
+          "op": "=="
+        },
+        "annotations": {
+          "owner": "security"
+        },
+        "conditions": [
+          {
+            "body": {
+              ".": {
+                "attr": "public",
+                "left": {
+                  "Var": "resource"
+                }
+              }
+            },
+            "kind": "when"
+          }
+        ],
+        "effect": "permit",
+        "principal": {
+          "entity_type": "User",
+          "op": "is"
+        },
+        "resource": {
+          "entity_type": "Photo",
+          "op": "is"
+        }
+      },
+      "pst_cedar": "@owner(\"security\")\npermit(\n  principal is User,\n  action == Action::\"view\",\n  resource is Photo\n) when {\n  resource.public\n};",
+      "pst_json": {
+        "action": {
+          "entity": {
+            "id": "view",
+            "type": "Action"
+          },
+          "op": "=="
+        },
+        "annotations": {
+          "owner": "security"
+        },
+        "conditions": [
+          {
+            "body": {
+              ".": {
+                "attr": "public",
+                "left": {
+                  "Var": "resource"
+                }
+              }
+            },
+            "kind": "when"
+          }
+        ],
+        "effect": "permit",
+        "principal": {
+          "entity_type": "User",
+          "op": "is"
+        },
+        "resource": {
+          "entity_type": "Photo",
+          "op": "is"
+        }
+      },
+      "rendered_json": {
+        "action": {
+          "entity": {
+            "id": "view",
+            "type": "Action"
+          },
+          "op": "=="
+        },
+        "annotations": {
+          "owner": "security"
+        },
+        "conditions": [
+          {
+            "body": {
+              ".": {
+                "attr": "public",
+                "left": {
+                  "Var": "resource"
+                }
+              }
+            },
+            "kind": "when"
+          }
+        ],
+        "effect": "permit",
+        "principal": {
+          "entity_type": "User",
+          "op": "is"
+        },
+        "resource": {
+          "entity_type": "Photo",
+          "op": "is"
+        }
+      },
+      "source": "@owner(\"security\") permit(principal is User, action == Action::\"view\", resource is Photo) when { resource.public };"
+    },
+    {
+      "error": null,
+      "id": "expressions",
+      "json": {
+        "action": {
+          "entity": {
+            "id": "view",
+            "type": "Action"
+          },
+          "op": "in"
+        },
+        "conditions": [
+          {
+            "body": {
+              "if-then-else": {
+                "else": {
+                  "&&": {
+                    "left": {
+                      "contains": {
+                        "left": {
+                          "Set": [
+                            {
+                              "Value": 1
+                            },
+                            {
+                              "Value": 2
+                            },
+                            {
+                              "Value": 3
+                            }
+                          ]
+                        },
+                        "right": {
+                          "Value": 2
+                        }
+                      }
+                    },
+                    "right": {
+                      ">=": {
+                        "left": {
+                          ".": {
+                            "attr": "x",
+                            "left": {
+                              "Record": {
+                                "x": {
+                                  "Value": 1
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "right": {
+                          "Value": -1
+                        }
+                      }
+                    }
+                  }
+                },
+                "if": {
+                  "has": {
+                    "attr": [
+                      "nested",
+                      "key"
+                    ],
+                    "left": {
+                      "Var": "context"
+                    }
+                  }
+                },
+                "then": {
+                  "like": {
+                    "left": {
+                      ".": {
+                        "attr": "key",
+                        "left": {
+                          ".": {
+                            "attr": "nested",
+                            "left": {
+                              "Var": "context"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "pattern": [
+                      {
+                        "Literal": "a"
+                      },
+                      "Wildcard",
+                      {
+                        "Literal": "*"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "kind": "when"
+          },
+          {
+            "body": {
+              "||": {
+                "left": {
+                  "||": {
+                    "left": {
+                      "lessThan": [
+                        {
+                          "decimal": [
+                            {
+                              "Value": "1.0"
+                            }
+                          ]
+                        },
+                        {
+                          "decimal": [
+                            {
+                              "Value": "0.0"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "right": {
+                      "isLoopback": [
+                        {
+                          "ip": [
+                            {
+                              "Value": "192.0.2.1"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                },
+                "right": {
+                  "<": {
+                    "left": {
+                      "offset": [
+                        {
+                          "datetime": [
+                            {
+                              "Value": "2026-10-01T00:00:00Z"
+                            }
+                          ]
+                        },
+                        {
+                          "duration": [
+                            {
+                              "Value": "1h"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "right": {
+                      "datetime": [
+                        {
+                          "Value": "2026-10-01T00:00:00Z"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "kind": "unless"
+          }
+        ],
+        "effect": "permit",
+        "principal": {
+          "entity": {
+            "id": "staff",
+            "type": "Group"
+          },
+          "op": "in"
+        },
+        "resource": {
+          "entity_type": "Photo",
+          "in": {
+            "entity": {
+              "id": "all",
+              "type": "Album"
+            }
+          },
+          "op": "is"
+        }
+      },
+      "pst_cedar": "permit(\n  principal in Group::\"staff\",\n  action in [Action::\"view\"],\n  resource is Photo in Album::\"all\"\n) when {\n  (if context has nested.key then context.nested.key like \"a*\\*\" else [1, 2, 3].contains(2) && (!({x: 1}.x < (-1)))) && (!(decimal(\"1.0\").lessThan(decimal(\"0.0\")) || ip(\"192.0.2.1\").isLoopback() || (datetime(\"2026-10-01T00:00:00Z\").offset(duration(\"1h\")) < datetime(\"2026-10-01T00:00:00Z\"))))\n};",
+      "pst_json": {
+        "action": {
+          "entity": {
+            "id": "view",
+            "type": "Action"
+          },
+          "op": "in"
+        },
+        "conditions": [
+          {
+            "body": {
+              "if-then-else": {
+                "else": {
+                  "&&": {
+                    "left": {
+                      "contains": {
+                        "left": {
+                          "Set": [
+                            {
+                              "Value": 1
+                            },
+                            {
+                              "Value": 2
+                            },
+                            {
+                              "Value": 3
+                            }
+                          ]
+                        },
+                        "right": {
+                          "Value": 2
+                        }
+                      }
+                    },
+                    "right": {
+                      ">=": {
+                        "left": {
+                          ".": {
+                            "attr": "x",
+                            "left": {
+                              "Record": {
+                                "x": {
+                                  "Value": 1
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "right": {
+                          "Value": -1
+                        }
+                      }
+                    }
+                  }
+                },
+                "if": {
+                  "has": {
+                    "attr": [
+                      "nested",
+                      "key"
+                    ],
+                    "left": {
+                      "Var": "context"
+                    }
+                  }
+                },
+                "then": {
+                  "like": {
+                    "left": {
+                      ".": {
+                        "attr": "key",
+                        "left": {
+                          ".": {
+                            "attr": "nested",
+                            "left": {
+                              "Var": "context"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "pattern": [
+                      {
+                        "Literal": "a"
+                      },
+                      "Wildcard",
+                      {
+                        "Literal": "*"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "kind": "when"
+          },
+          {
+            "body": {
+              "||": {
+                "left": {
+                  "||": {
+                    "left": {
+                      "lessThan": [
+                        {
+                          "decimal": [
+                            {
+                              "Value": "1.0"
+                            }
+                          ]
+                        },
+                        {
+                          "decimal": [
+                            {
+                              "Value": "0.0"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "right": {
+                      "isLoopback": [
+                        {
+                          "ip": [
+                            {
+                              "Value": "192.0.2.1"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                },
+                "right": {
+                  "<": {
+                    "left": {
+                      "offset": [
+                        {
+                          "datetime": [
+                            {
+                              "Value": "2026-10-01T00:00:00Z"
+                            }
+                          ]
+                        },
+                        {
+                          "duration": [
+                            {
+                              "Value": "1h"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "right": {
+                      "datetime": [
+                        {
+                          "Value": "2026-10-01T00:00:00Z"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "kind": "unless"
+          }
+        ],
+        "effect": "permit",
+        "principal": {
+          "entity": {
+            "id": "staff",
+            "type": "Group"
+          },
+          "op": "in"
+        },
+        "resource": {
+          "entity_type": "Photo",
+          "in": {
+            "entity": {
+              "id": "all",
+              "type": "Album"
+            }
+          },
+          "op": "is"
+        }
+      },
+      "rendered_json": {
+        "action": {
+          "entity": {
+            "id": "view",
+            "type": "Action"
+          },
+          "op": "in"
+        },
+        "conditions": [
+          {
+            "body": {
+              "&&": {
+                "left": {
+                  "if-then-else": {
+                    "else": {
+                      "&&": {
+                        "left": {
+                          "contains": {
+                            "left": {
+                              "Set": [
+                                {
+                                  "Value": 1
+                                },
+                                {
+                                  "Value": 2
+                                },
+                                {
+                                  "Value": 3
+                                }
+                              ]
+                            },
+                            "right": {
+                              "Value": 2
+                            }
+                          }
+                        },
+                        "right": {
+                          "!": {
+                            "arg": {
+                              "<": {
+                                "left": {
+                                  ".": {
+                                    "attr": "x",
+                                    "left": {
+                                      "Record": {
+                                        "x": {
+                                          "Value": 1
+                                        }
+                                      }
+                                    }
+                                  }
+                                },
+                                "right": {
+                                  "Value": -1
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "if": {
+                      "has": {
+                        "attr": [
+                          "nested",
+                          "key"
+                        ],
+                        "left": {
+                          "Var": "context"
+                        }
+                      }
+                    },
+                    "then": {
+                      "like": {
+                        "left": {
+                          ".": {
+                            "attr": "key",
+                            "left": {
+                              ".": {
+                                "attr": "nested",
+                                "left": {
+                                  "Var": "context"
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "pattern": [
+                          {
+                            "Literal": "a"
+                          },
+                          "Wildcard",
+                          {
+                            "Literal": "*"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                "right": {
+                  "!": {
+                    "arg": {
+                      "||": {
+                        "left": {
+                          "||": {
+                            "left": {
+                              "lessThan": [
+                                {
+                                  "decimal": [
+                                    {
+                                      "Value": "1.0"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "decimal": [
+                                    {
+                                      "Value": "0.0"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            "right": {
+                              "isLoopback": [
+                                {
+                                  "ip": [
+                                    {
+                                      "Value": "192.0.2.1"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          }
+                        },
+                        "right": {
+                          "<": {
+                            "left": {
+                              "offset": [
+                                {
+                                  "datetime": [
+                                    {
+                                      "Value": "2026-10-01T00:00:00Z"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "duration": [
+                                    {
+                                      "Value": "1h"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            "right": {
+                              "datetime": [
+                                {
+                                  "Value": "2026-10-01T00:00:00Z"
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "kind": "when"
+          }
+        ],
+        "effect": "permit",
+        "principal": {
+          "entity": {
+            "id": "staff",
+            "type": "Group"
+          },
+          "op": "in"
+        },
+        "resource": {
+          "entity_type": "Photo",
+          "in": {
+            "entity": {
+              "id": "all",
+              "type": "Album"
+            }
+          },
+          "op": "is"
+        }
+      },
+      "source": "permit(principal in Group::\"staff\", action in [Action::\"view\"], resource is Photo in Album::\"all\") when { if context has nested.key then context.nested.key like \"a*\\*\" else [1,2,3].contains(2) && {x: 1}[\"x\"] >= -1 } unless { decimal(\"1.0\").lessThan(decimal(\"0.0\")) || ip(\"192.0.2.1\").isLoopback() || datetime(\"2026-10-01T00:00:00Z\").offset(duration(\"1h\")) < datetime(\"2026-10-01T00:00:00Z\") };"
+    },
+    {
+      "error": null,
+      "id": "",
+      "json": {
+        "action": {
+          "op": "All"
+        },
+        "conditions": [
+          {
+            "body": {
+              ".": {
+                "attr": "mfa",
+                "left": {
+                  "Var": "context"
+                }
+              }
+            },
+            "kind": "unless"
+          }
+        ],
+        "effect": "forbid",
+        "principal": {
+          "op": "All"
+        },
+        "resource": {
+          "op": "All"
+        }
+      },
+      "pst_cedar": "forbid(\n  principal,\n  action,\n  resource\n) when {\n  !context.mfa\n};",
+      "pst_json": {
+        "action": {
+          "op": "All"
+        },
+        "conditions": [
+          {
+            "body": {
+              ".": {
+                "attr": "mfa",
+                "left": {
+                  "Var": "context"
+                }
+              }
+            },
+            "kind": "unless"
+          }
+        ],
+        "effect": "forbid",
+        "principal": {
+          "op": "All"
+        },
+        "resource": {
+          "op": "All"
+        }
+      },
+      "rendered_json": {
+        "action": {
+          "op": "All"
+        },
+        "conditions": [
+          {
+            "body": {
+              "!": {
+                "arg": {
+                  ".": {
+                    "attr": "mfa",
+                    "left": {
+                      "Var": "context"
+                    }
+                  }
+                }
+              }
+            },
+            "kind": "when"
+          }
+        ],
+        "effect": "forbid",
+        "principal": {
+          "op": "All"
+        },
+        "resource": {
+          "op": "All"
+        }
+      },
+      "source": "forbid(principal, action, resource) unless { context.mfa };"
+    },
+    {
+      "error": "unexpected token `}`",
+      "id": "bad",
+      "json": null,
+      "source": "permit(principal, action, resource) when { 1 + };"
+    },
+    {
+      "error": "expected a static policy, got a template containing the slot ?principal (help: try removing the template slot(s) from this policy)",
+      "id": "slot",
+      "json": null,
+      "source": "permit(principal == ?principal, action, resource);"
+    },
+    {
+      "error": "unexpected token `forbid`",
+      "id": "twice",
+      "json": null,
+      "source": "permit(principal,action,resource); forbid(principal,action,resource);"
+    },
+    {
+      "error": "integer literal `9223372036854775808` is too large (help: maximum allowed integer literal is `9223372036854775807`)",
+      "id": "overflow",
+      "json": null,
+      "source": "permit(principal,action,resource) when { 9223372036854775808 == 0 };"
+    },
+    {
+      "error": "duplicate annotation: @owner",
+      "id": "annotation",
+      "json": null,
+      "source": "@owner(\"one\") @owner(\"two\") permit(principal,action,resource);"
+    },
+    {
+      "error": null,
+      "id": "escapes\n雪",
+      "json": {
+        "action": {
+          "entities": [],
+          "op": "in"
+        },
+        "annotations": {
+          "empty": null,
+          "text": "quote\" and \n"
+        },
+        "conditions": [],
+        "effect": "permit",
+        "principal": {
+          "entity": {
+            "id": "a\"\n雪",
+            "type": "User"
+          },
+          "op": "=="
+        },
+        "resource": {
+          "entity_type": "Photo",
+          "op": "is"
+        }
+      },
+      "pst_cedar": "@empty(\"\")\n@text(\"quote\\\" and \\n\")\npermit(\n  principal == User::\"a\\\"\\n雪\",\n  action in [],\n  resource is Photo\n);",
+      "pst_json": {
+        "action": {
+          "entities": [],
+          "op": "in"
+        },
+        "annotations": {
+          "empty": null,
+          "text": "quote\" and \n"
+        },
+        "conditions": [],
+        "effect": "permit",
+        "principal": {
+          "entity": {
+            "id": "a\"\n雪",
+            "type": "User"
+          },
+          "op": "=="
+        },
+        "resource": {
+          "entity_type": "Photo",
+          "op": "is"
+        }
+      },
+      "rendered_json": {
+        "action": {
+          "entities": [],
+          "op": "in"
+        },
+        "annotations": {
+          "empty": "",
+          "text": "quote\" and \n"
+        },
+        "conditions": [],
+        "effect": "permit",
+        "principal": {
+          "entity": {
+            "id": "a\"\n雪",
+            "type": "User"
+          },
+          "op": "=="
+        },
+        "resource": {
+          "entity_type": "Photo",
+          "op": "is"
+        }
+      },
+      "source": "@empty @text(\"quote\\\" and \\n\") permit(principal == User::\"a\\\"\\n雪\", action in [], resource is Photo);"
+    }
+  ],
+  "rendering": {
+    "cedar": "@b permit(principal,action,resource);\n\n@a forbid(principal,action,resource);\n\npermit(principal == ?principal,action,resource);",
+    "source": "@b permit(principal,action,resource);\n@a forbid(principal,action,resource);\npermit(principal == ?principal,action,resource);"
+  },
+  "schema": "entity User; entity Photo { public: Bool }; action view appliesTo { principal: User, resource: Photo, context: { mfa: Bool } };",
+  "version": "4.13.0"
+}

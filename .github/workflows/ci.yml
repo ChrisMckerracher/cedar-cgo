@@ -102,7 +102,7 @@ jobs:
           go-version: "1.27.x"
       - name: Fuzz each target for 60 seconds
         run: |
-          for target in FuzzAuthorize FuzzPolicies FuzzEntities FuzzBatchedEntities FuzzSliceEntities; do
+          for target in FuzzAuthorize FuzzPolicies FuzzEntities FuzzBatchedEntities FuzzSliceEntities FuzzPolicySyntax; do
             go test -run '^$' -fuzz "^$target\$" -fuzztime 60s ./cedar
           done
 
@@ -137,6 +137,10 @@ jobs:
           cargo clippy --locked --release -p cgw-native-bench -- -D warnings
       - name: Verify native slicing fixtures
         run: scripts/slicing-fixtures.sh --check
+      - name: Policy construction native parity
+        run: |
+          cargo clippy --manifest-path rust/Cargo.toml --locked --release -p cgw-authorizer --example policies_oracle -- -D warnings
+          scripts/policies-parity.sh --check
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cargo/bin/cargo-deny

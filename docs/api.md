@@ -242,7 +242,7 @@ that are not `*cedar.Error`.
 |---|---|
 | `WithMemoryLimit(bytes)` | Maximum linear memory per instance |
 | `WithCompilationCache(cache)` | Reuse compiled machine code |
-| `WithMaxSourceBytes(bytes)` | Maximum encoded load, validation, or slicing input |
+| `WithMaxSourceBytes(bytes)` | Maximum encoded runtime operation input |
 
 | `Config.Limits` field | Purpose |
 |---|---|
@@ -262,9 +262,10 @@ implementation. See [versioning](maintenance.md#versioning).
 
 ## Supported operations
 
-The Go interface exposes static-policy authorization, strict validation,
-experimental request-specific entity slicing, and the policy comparisons in `analysis`. These execute Cedar's Rust
-implementation, including its core and extension value types.
+The Go interface exposes authorization, strict validation, parsed policy
+inspection and static policy edits, experimental on-demand entity loading and
+request-specific entity slicing, and the policy comparisons in `analysis`. These
+execute Cedar's Rust implementation, including its core and extension value types.
 
 Conformance results establish agreement for the tested operations. The Rust
 library also exposes APIs for template linking, partial evaluation, deprecated
@@ -340,3 +341,84 @@ with the context cause. Invalid entity data uses `KindEntities`. Rust TPE and
 iteration failures use `KindBatched`. See the executable
 `ExampleAuthorizer_AuthorizeBatched` and the native parity fixtures in
 `testdata/parity/batched`.
+
+## Parsed policies and static policy edits
+
+The existing `PoliciesFromCedar` and `PoliciesFromJSON` constructors still defer
+parsing. Use `Runtime.ParsePolicySet` for immediate parsing and an immutable
+`ParsedPolicySet`, or `Runtime.ParsePolicy(ctx, id, cedarText)` for one static
+policy with an explicit ID. `Runtime.PolicyFromJSON` accepts one policy's Cedar
+JSON and an explicit ID. Even the empty ID is preserved; `@id` is an annotation,
+not an instruction to set the policy ID.
+
+A `ParsedPolicy` exposes its ID, permit/forbid effect, annotations, principal,
+action and resource constraints, whether it has condition clauses, and whether
+it is linked to a template. `Policy(id)` looks up an ID without parsing again;
+`Policies()` lists static and linked policies in ID order, excluding templates.
+Snapshots are independent of the runtime's lifetime and safe to share. Returned
+maps, byte slices, syntax and constraints are copies. The zero `ParsedPolicySet`
+is empty; the zero `ParsedPolicy` is invalid.
+
+`Runtime.AddPolicy`, `RemovePolicy`, and `MergePolicySets` accept source-based
+`PolicySet` values and return new parsed snapshots. Feed their `Source()` into
+`NewAuthorizer`, `Validate`, template operations, or another edit. Rust performs
+all parsing and set operations. Addition rejects duplicate IDs. Removal accepts
+only static IDs; missing IDs, template IDs and linked policy IDs produce Rust's
+`remove_static` error. Merge follows Rust's equality/conflict handling and can
+rename conflicts, returning its old-to-new ID map. Failed edits leave the inputs
+unchanged. For replacement, remove the old static ID then add its replacement;
+keep the original snapshot until both operations succeed.
+
+```go
+policy, err := rt.ParsePolicy(ctx, "read-photos",
+    `@owner("photos") permit(principal, action == Action::"view", resource is Photo);`)
+if err != nil { return err }
+set, err := rt.AddPolicy(ctx, cedar.PoliciesFromCedar(""), policy)
+if err != nil { return err }
+// This source preserves "read-photos" in authorization and validation diagnostics.
+source := set.Source()
+```
+
+`PolicySyntax` and `Runtime.PolicyFromSyntax` are **experimental**. They expose a
+static-policy projection of Cedar 4.13's policy syntax tree (PST): ID, effect,
+annotations, typed head constraints, and ordered `when`/`unless` conditions.
+Rust constructs the actual upstream PST and calls `Policy::from_pst`; inspection
+calls `Policy::to_pst`. Upstream PST has no JSON serialization. Each condition
+body therefore uses Cedar's JSON policy expression format (`json.RawMessage`),
+with its full expression vocabulary and exact integer representation. No Cedar
+parser or evaluator is implemented in Go. `Syntax()` returns an editable copy;
+pass the modified value to `PolicyFromSyntax` to validate it. Scope constraints
+must specify their `Kind`; `eq`/`in` use `Entity`, `is` uses `EntityType`, and
+`is_in` uses both. Action `in` uses `Entities`, including an empty set. Unused
+constraint fields must be empty. Conditions are optional; malformed names,
+constraints, expressions, and slots are rejected by Rust. A parsed policy need
+not pass schema validation: call `Validate` before using it if schema validity
+is required.
+
+Persistence and display have different contracts:
+
+| Conversion | IDs and template links |
+| --- | --- |
+| `ParsedPolicySet.JSON()` / `Source()` | Preserve IDs, templates, and links; use for persistence |
+| `ParsedPolicy.JSON()` | One policy body only; ID must be supplied on reparse; linked bodies are materialized without link metadata |
+| `ParsedPolicy.Syntax()` | Static policies only; includes the explicit ID; PST normalization can change syntax spelling |
+| `Cedar()` on a policy or set | Omits IDs; reparsing a set assigns `policy0`, `policy1`, etc.; rejects linked policies to avoid silently discarding their representation |
+
+Set Cedar output sorts static policies by ID, followed by templates by ID.
+Cedar rendering is not a formatter and does not promise comment, whitespace,
+annotation spelling, or source order preservation. PST normalizes empty and
+valueless annotations. Use template operations for editing linked policies.
+
+All runtime policy operations use a fresh Wasm instance and honor cancellation,
+`WithMaxSourceBytes` (the whole encoded operation, including all inputs), memory
+limits, and response bounds. They have no implicit timeout: use a context deadline
+for untrusted input. Large snapshots repeat policy information, so response limits
+can be reached before source limits. Parse/edit failures return `*Error` with
+`KindPolicies`; malformed operation/syntax envelopes may return `KindInput`.
+New policy operation inputs must contain valid UTF-8; malformed bytes are rejected
+before Go JSON encoding could replace them and change an ID.
+Resource exhaustion and interrupted execution return faults; canceled operations
+do not invalidate other snapshots or the runtime.
+
+See the executable `ExampleRuntime_ParsePolicy` and
+`ExampleRuntime_PolicyFromSyntax` examples in `cedar/policies_example_test.go`.

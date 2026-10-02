@@ -11,6 +11,7 @@ use serde_json::value::RawValue;
 use std::cell::RefCell;
 
 mod batched;
+mod policies;
 mod slicing;
 
 cgw_abi::export_memory_functions!();
@@ -133,13 +134,16 @@ fn authorize(bytes: &[u8]) -> Result<AuthorizeOutput, OpError> {
             .authorizer
             .is_authorized(&request, &loaded.policies, entities);
         let diagnostics = response.diagnostics();
-        let mut reasons: Vec<String> = diagnostics.reason().map(ToString::to_string).collect();
+        let mut reasons: Vec<String> = diagnostics
+            .reason()
+            .map(|id| AsRef::<str>::as_ref(id).to_owned())
+            .collect();
         reasons.sort_unstable();
         let mut errors: Vec<PolicyMessage> = diagnostics
             .errors()
             .map(|e| match e {
                 cedar_policy::AuthorizationError::PolicyEvaluationError(pe) => PolicyMessage {
-                    policy_id: pe.policy_id().to_string(),
+                    policy_id: AsRef::<str>::as_ref(pe.policy_id()).to_owned(),
                     message: cgw_abi::diagnostics::render(pe.inner()),
                 },
             })
@@ -190,14 +194,14 @@ fn validate(bytes: &[u8]) -> Result<ValidateOutput, OpError> {
         errors: result
             .validation_errors()
             .map(|e| PolicyMessage {
-                policy_id: e.policy_id().to_string(),
+                policy_id: AsRef::<str>::as_ref(e.policy_id()).to_owned(),
                 message: cgw_abi::diagnostics::render(e),
             })
             .collect(),
         warnings: result
             .validation_warnings()
             .map(|w| PolicyMessage {
-                policy_id: w.policy_id().to_string(),
+                policy_id: AsRef::<str>::as_ref(w.policy_id()).to_owned(),
                 message: cgw_abi::diagnostics::render(w),
             })
             .collect(),
@@ -212,4 +216,14 @@ fn validate(bytes: &[u8]) -> Result<ValidateOutput, OpError> {
 pub unsafe extern "C" fn cgw_validate(ptr: u32, len: u32) -> u64 {
     // SAFETY: the host passes a buffer from `cgw_alloc(len)`.
     run(unsafe { take_input(ptr, len) }, validate)
+}
+
+/// Parses, inspects and edits policy sets with the upstream policy API.
+///
+/// # Safety
+/// `ptr` and `len` must come from one `cgw_alloc(len)` call.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn cgw_policies(ptr: u32, len: u32) -> u64 {
+    // SAFETY: the host passes a buffer from `cgw_alloc(len)`.
+    run(unsafe { take_input(ptr, len) }, policies::execute)
 }
