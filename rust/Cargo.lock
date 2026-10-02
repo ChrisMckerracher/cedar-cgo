@@ -267,6 +267,7 @@ name = "cgw-authorizer"
 version = "0.1.0"
 dependencies = [
  "cedar-policy",
+ "cedar-policy-core",
  "cgw-abi",
  "serde",
  "serde_json",
