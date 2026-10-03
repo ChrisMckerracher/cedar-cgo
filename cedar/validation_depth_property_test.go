@@ -2,7 +2,6 @@ package cedar_test
 
 import (
 	"context"
-	"reflect"
 	"testing"
 
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
@@ -25,8 +24,8 @@ func validateWithLevelAt(t *rapid.T, rt *cedar.Runtime, schema cedar.Schema, pol
 	return res
 }
 
-// Allowing one more dereference never turns a passing policy set into a failing
-// one, and every level re-check of the same set is byte-for-byte deterministic.
+// Increasing the level preserves successful validation. Diagnostic comparisons
+// exclude native hint choices and list order, as ordinary validation does.
 func TestPropertyValidationDepthMonotonic(t *testing.T) {
 	d := loadJoy(t)
 	rt := testRuntime(t)
@@ -34,9 +33,7 @@ func TestPropertyValidationDepthMonotonic(t *testing.T) {
 		policies := cedar.PoliciesFromCedar(propGenPolicySet(3).Draw(pt, "policies"))
 		for n := uint32(0); n < 5; n++ {
 			low := validateWithLevelAt(pt, rt, d.schema, policies, n)
-			if !reflect.DeepEqual(low, validateWithLevelAt(pt, rt, d.schema, policies, n)) {
-				pt.Fatalf("level %d is not deterministic\n%s", n, policies.Text())
-			}
+			propSameValidation(pt, low, validateWithLevelAt(pt, rt, d.schema, policies, n))
 			if low.Passed && !validateWithLevelAt(pt, rt, d.schema, policies, n+1).Passed {
 				pt.Fatalf("passes at level %d but fails at %d\n%s", n, n+1, policies.Text())
 			}
