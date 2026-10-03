@@ -293,6 +293,42 @@ level and uses Cedar 4.13.0's stable level validation API. Experimental upstream
 permissive and partial validation modes remain outside this API. Both methods
 return the same diagnostics and use the same context and resource limits.
 
+## Standalone expressions
+
+`Runtime.ParseExpression` parses a Cedar expression. `ParseRestrictedExpression`
+accepts literals, sets, records, and extension constructors. Convert its result
+with `RestrictedExpression.Expression()` before evaluation.
+
+`Runtime.EvalExpression` evaluates a parsed expression with an `ExpressionEnv`.
+The environment supplies principal, action, resource, context, and entities.
+Nil entity UIDs mean unknown variables. Unknown or invalid evaluation results
+return `KindExpression` and no value. A zero expression returns `KindInput`.
+
+```go
+expr, err := rt.ParseExpression(ctx, "principal.age + 1")
+if err != nil {
+    return err
+}
+value, err := rt.EvalExpression(ctx, expr, cedar.ExpressionEnv{
+    Principal: &principal,
+    Entities: entities,
+})
+if err != nil {
+    return err
+}
+age := int64(value.(cedar.Long))
+```
+
+`EvalResult` has seven variants: `Bool`, `Long`, `String`, `EntityUID`, `EvalSet`,
+`EvalRecord`, and `ExtensionValue`. `Long` preserves the full signed 64-bit range.
+Sets remove duplicates. Records retain attribute names and typed nested results.
+`ExtensionValue` preserves upstream's canonical restricted-expression string,
+such as `decimal("1.25")`. It does not convert extension values to numbers.
+
+Expression evaluation does not validate policies or grant authorization. Use
+`Authorize` for decisions. Evaluation uses a fresh instance, the runtime's source,
+memory, and response limits, and the caller's context deadline.
+
 ## Policy formatting
 
 `Runtime.FormatPolicies` is experimental and may change before v1. It invokes

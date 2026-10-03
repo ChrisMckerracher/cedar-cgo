@@ -132,6 +132,7 @@ The `cedar` package contains these Go fuzz targets:
 | `FuzzPartialEntities` | Unknown entity input and undecided results |
 | `FuzzPartialReauthorize` | Residual reauthorization against direct authorization with concrete values |
 | `FuzzFormatPolicies` | Policy/template text and layout options, malformed UTF-8, errors, idempotence, and decision preservation |
+| `FuzzEvalResult` | Decode typed expression results; reject malformed variants and preserve integer precision |
 | `FuzzUTF8Values` | Reject malformed UTF-8; preserve valid identity bytes, values, and record keys during JSON encoding |
 
 Each target rejects unexpected module faults; authorization errors must return

@@ -1,0 +1,208 @@
+[
+  {
+    "expression": "true",
+    "result": {
+      "bool": true
+    }
+  },
+  {
+    "expression": "false",
+    "result": {
+      "bool": false
+    }
+  },
+  {
+    "expression": "principal.age + 1",
+    "result": {
+      "long": 9007199254740994
+    }
+  },
+  {
+    "expression": "context.number",
+    "result": {
+      "long": 9007199254740993
+    }
+  },
+  {
+    "expression": "9223372036854775807",
+    "result": {
+      "long": 9223372036854775807
+    }
+  },
+  {
+    "expression": "-9223372036854775808",
+    "result": {
+      "long": -9223372036854775808
+    }
+  },
+  {
+    "expression": "\"雪😀\"",
+    "result": {
+      "string": "雪😀"
+    }
+  },
+  {
+    "expression": "principal",
+    "result": {
+      "entity_uid": {
+        "type": "User",
+        "id": "雪"
+      }
+    }
+  },
+  {
+    "expression": "[1, 1, 2]",
+    "result": {
+      "set": [
+        {
+          "long": 1
+        },
+        {
+          "long": 2
+        }
+      ]
+    }
+  },
+  {
+    "expression": "{a: 1, b: [true], c: \"雪\"}",
+    "result": {
+      "record": {
+        "a": {
+          "long": 1
+        },
+        "b": {
+          "set": [
+            {
+              "bool": true
+            }
+          ]
+        },
+        "c": {
+          "string": "雪"
+        }
+      }
+    }
+  },
+  {
+    "expression": "[]",
+    "result": {
+      "set": []
+    }
+  },
+  {
+    "expression": "{}",
+    "result": {
+      "record": {}
+    }
+  },
+  {
+    "expression": "decimal(\"1.25\")",
+    "result": {
+      "extension": "decimal(\"1.25\")"
+    }
+  },
+  {
+    "expression": "ip(\"127.0.0.1\")",
+    "result": {
+      "extension": "ip(\"127.0.0.1\")"
+    }
+  },
+  {
+    "expression": "duration(\"1s\")",
+    "result": {
+      "extension": "duration(\"1s\")"
+    }
+  },
+  {
+    "expression": "datetime(\"2026-10-01T12:00:00Z\")",
+    "result": {
+      "extension": "datetime(\"2026-10-01T12:00:00Z\")"
+    }
+  },
+  {
+    "expression": "{a: decimal(\"1.2\"), b: [ip(\"10.0.0.1\")] }",
+    "result": {
+      "record": {
+        "a": {
+          "extension": "decimal(\"1.2\")"
+        },
+        "b": {
+          "set": [
+            {
+              "extension": "ip(\"10.0.0.1\")"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "expression": "1 +",
+    "error_kind": "expression",
+    "message": "unexpected end of input"
+  },
+  {
+    "expression": "principal.missing",
+    "error_kind": "expression",
+    "message": "`User::\"雪\"` does not have the attribute `missing` (help: available attributes: [age])"
+  },
+  {
+    "expression": "9223372036854775807 + 1",
+    "error_kind": "expression",
+    "message": "integer overflow while attempting to add the values `9223372036854775807` and `1`"
+  },
+  {
+    "expression": "decimal(\"bad\")",
+    "error_kind": "expression",
+    "message": "error while evaluating `decimal` extension function: `bad` is not a well-formed decimal value (help: valid decimal strings look like `12.34`: digits are required on both sides of `.`, up to 4 fractional digits are allowed, and the value must be in range -922337203685477.5808 to 922337203685477.5807)"
+  },
+  {
+    "expression": "principal",
+    "error_kind": "expression",
+    "message": "not allowed to use variables in a restricted expression: `principal`"
+  },
+  {
+    "expression": "[1, decimal(\"1.25\")]",
+    "result": {
+      "set": [
+        {
+          "long": 1
+        },
+        {
+          "extension": "decimal(\"1.25\")"
+        }
+      ]
+    }
+  },
+  {
+    "expression": "principal",
+    "error_kind": "expression",
+    "message": "the expression contains unknown(s): `unknown(\"principal\")` (help: consider using the partial evaluation APIs)"
+  },
+  {
+    "expression": "true",
+    "result": {
+      "bool": true
+    }
+  },
+  {
+    "expression": "principal.age",
+    "error_kind": "expression",
+    "message": "the expression contains unknown(s): `unknown(\"principal\").age` (help: consider using the partial evaluation APIs)"
+  },
+  {
+    "expression": "resource",
+    "error_kind": "expression",
+    "message": "the expression contains unknown(s): `unknown(\"resource\")` (help: consider using the partial evaluation APIs)"
+  },
+  {
+    "expression": "action",
+    "error_kind": "expression",
+    "message": "the expression contains unknown(s): `unknown(\"action\")` (help: consider using the partial evaluation APIs)"
+  },
+  {
+    "expression": "principal == ?principal",
+    "error_kind": "expression",
+    "message": "template slot `?principal` was not linked"
+  }
+]

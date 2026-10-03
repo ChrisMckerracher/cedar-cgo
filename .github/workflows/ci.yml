@@ -102,7 +102,7 @@ jobs:
           go-version: "1.27.x"
       - name: Fuzz each target for 60 seconds
         run: |
-          for target in FuzzAuthorize FuzzPolicies FuzzEntities FuzzBatchedEntities FuzzBatchedDifferential FuzzSliceEntities FuzzPolicySyntax FuzzPolicyEdits FuzzTemplates FuzzPartialEntities FuzzPartialReauthorize FuzzFormatPolicies FuzzUTF8Values; do
+          for target in FuzzAuthorize FuzzPolicies FuzzEntities FuzzBatchedEntities FuzzBatchedDifferential FuzzSliceEntities FuzzPolicySyntax FuzzPolicyEdits FuzzTemplates FuzzPartialEntities FuzzPartialReauthorize FuzzFormatPolicies FuzzUTF8Values FuzzEvalResult; do
             go test -run '^$' -fuzz "^$target\$" -fuzztime 60s ./cedar
           done
 
@@ -155,6 +155,11 @@ jobs:
           set -euo pipefail
           cargo clippy --manifest-path rust/Cargo.toml --locked --release -p cgw-authorizer --example validation_depth -- -D warnings
           scripts/validation-depth-parity.sh --check
+      - name: Native expression parity and lint
+        run: |
+          set -euo pipefail
+          cargo clippy --manifest-path rust/Cargo.toml --locked --release -p cgw-authorizer --example expression_fixtures -- -D warnings
+          scripts/expression-parity.sh --check
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cargo/bin/cargo-deny
