@@ -3,6 +3,7 @@ package cedar_test
 import (
 	"context"
 	"testing"
+	"unicode/utf8"
 
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 )
@@ -24,6 +25,13 @@ func FuzzPartialEntities(f *testing.F) {
 		req.Entities = cedar.PartialEntitiesFromJSON(data)
 		r, err := a.PartialAuthorize(context.Background(), req)
 		checkNoFault(t, err)
+		if !utf8.Valid(data) {
+			requireUTF8InputError(t, err)
+			if r.Decision != cedar.Undecided {
+				t.Fatalf("malformed input decided: %+v", r)
+			}
+			return
+		}
 		if err != nil {
 			if r.Decision != cedar.Undecided {
 				t.Fatalf("error grants decision: %+v %v", r, err)
@@ -69,6 +77,13 @@ func FuzzPartialReauthorize(f *testing.F) {
 		}
 		residual, err := partial.Reauthorize(context.Background(), concrete)
 		checkNoFault(t, err)
+		if !utf8.ValidString(principalID) || !utf8.ValidString(resourceID) || !utf8.ValidString(ctxJSON) {
+			requireUTF8InputError(t, err)
+			if residual.Decision != cedar.Deny {
+				t.Fatalf("malformed input allowed: %+v", residual)
+			}
+			return
+		}
 		if err != nil && residual.Decision != cedar.Deny {
 			t.Fatalf("error came with %v: %v", residual.Decision, err)
 		}

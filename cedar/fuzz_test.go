@@ -157,6 +157,12 @@ forbid(
 		policies := cedar.PoliciesFromCedar(text)
 		_, err := rt.Validate(context.Background(), d.schema, policies)
 		checkNoFault(t, err)
+		if !utf8.ValidString(text) {
+			requireUTF8InputError(t, err)
+		}
+		if err != nil {
+			return
+		}
 		a, err := rt.NewAuthorizer(context.Background(), cedar.Config{Schema: &d.schema, Policies: policies, Entities: d.entities, Limits: fuzzLimits})
 		checkNoFault(t, err)
 		if err != nil {
@@ -184,6 +190,9 @@ func FuzzEntities(f *testing.F) {
 		for _, schema := range []*cedar.Schema{&d.schema, nil} {
 			a, err := rt.NewAuthorizer(context.Background(), cedar.Config{Schema: schema, Policies: d.old, Entities: cedar.EntitiesFromJSON([]byte(text)), Limits: fuzzLimits})
 			checkNoFault(t, err)
+			if !utf8.ValidString(text) {
+				requireUTF8InputError(t, err)
+			}
 			if err != nil {
 				continue
 			}

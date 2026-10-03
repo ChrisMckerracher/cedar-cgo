@@ -3,6 +3,7 @@ package cedar_test
 import (
 	"context"
 	"testing"
+	"unicode/utf8"
 
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 )
@@ -24,6 +25,13 @@ func FuzzSliceEntities(f *testing.F) {
 		defer cancel()
 		result, err := rt.SliceEntities(ctx, cfg, req)
 		checkNoFault(t, err)
+		if !utf8.Valid(entities) {
+			requireUTF8InputError(t, err)
+			if result.Decision != cedar.Deny || !result.Entities.IsZero() || len(result.Batches) != 0 {
+				t.Fatalf("malformed slice leaked result: %+v", result)
+			}
+			return
+		}
 		if err != nil {
 			if result.Decision != cedar.Deny || !result.Entities.IsZero() || len(result.Batches) != 0 {
 				t.Fatalf("failed slice leaked result: %+v, %v", result, err)
