@@ -52,6 +52,8 @@ for _, result := range report.Results {
 make the same decision for every request described by the schema.
 
 All operations require a schema and strictly valid static policies.
+Call `Runtime.Validate` to establish full-schema validity before analysis.
+Native compilation checks strict types only in the analyzed request environments.
 See the [complete example](../analysis/example_test.go).
 
 ## Check errors and matching
@@ -157,6 +159,8 @@ fmt.Println(report.Holds())
 ```
 
 `Compile` creates native compiled sets once for every selected environment.
+With an empty selection, it checks policy syntax and rejects templates, but does not check policy types.
+An empty report's `Holds()` result does not establish full-schema policy validity.
 The native session retains the original policies for concrete counterexample replay.
 `Equivalent`, `Implies`, and `Disjoint` reuse those sets and the same solver transport.
 Their `Report` and `Counterexample` types match the stateless API.
@@ -188,8 +192,9 @@ Their upstream contracts need additional validation and concrete replay rules be
 
 ## Configure the analyzer
 
-`Analyzer` is safe for concurrent use. Each call creates and closes its own
-module instance and solver session.
+`Analyzer` is safe for concurrent use. Each stateless call creates and closes
+its own module instance and solver session. A compiled session retains both
+resources until the session closes.
 
 | Option | Default |
 |---|---|
@@ -201,7 +206,7 @@ module instance and solver session.
 
 `Solver` and `Session` support custom solver integrations. `Command` runs
 an executable with explicit arguments and an empty environment. It closes
-the process when the call ends or the context expires. The solver remains
+the process when its session closes or its context expires. The solver remains
 a host process; see [Security model](security.md#solver-process).
 
 ## Implementation
