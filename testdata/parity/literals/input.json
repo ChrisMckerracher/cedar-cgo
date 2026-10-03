@@ -1,0 +1,99 @@
+[
+  {
+    "name": "simultaneous",
+    "policies": "@note(\"雪\") permit(principal == User::\"A\", action, resource == User::\"B\") when { \"User::\\\"A\\\"\" == \"User::\\\"A\\\"\" };",
+    "replacements": [
+      {
+        "from": {
+          "type": "User",
+          "id": "A"
+        },
+        "to": {
+          "type": "User",
+          "id": "B"
+        }
+      },
+      {
+        "from": {
+          "type": "User",
+          "id": "B"
+        },
+        "to": {
+          "type": "User",
+          "id": "C"
+        }
+      }
+    ]
+  },
+  {
+    "name": "self",
+    "policies": "permit(principal == User::\"A\", action, resource);",
+    "replacements": [
+      {
+        "from": {
+          "type": "User",
+          "id": "A"
+        },
+        "to": {
+          "type": "User",
+          "id": "A"
+        }
+      }
+    ]
+  },
+  {
+    "name": "empty",
+    "policies": "permit(principal, action, resource);",
+    "replacements": []
+  },
+  {
+    "name": "template-link",
+    "policies": "@note(\"雪\") permit(principal == ?principal, action, resource == User::\"A\");",
+    "replacements": [
+      {
+        "from": {
+          "type": "User",
+          "id": "A"
+        },
+        "to": {
+          "type": "User",
+          "id": "B"
+        }
+      }
+    ],
+    "link": {
+      "template_id": "policy0",
+      "id": "linked",
+      "principal": {
+        "type": "User",
+        "id": "A"
+      }
+    }
+  },
+  {
+    "name": "nested",
+    "policies": "permit(principal, action, resource) when { [User::\"A\", User::\"B\"].contains(principal) && {uid: User::\"A\"}.uid == principal };",
+    "replacements": [
+      {
+        "from": {
+          "type": "User",
+          "id": "A"
+        },
+        "to": {
+          "type": "User",
+          "id": "B"
+        }
+      },
+      {
+        "from": {
+          "type": "User",
+          "id": "B"
+        },
+        "to": {
+          "type": "User",
+          "id": "C"
+        }
+      }
+    ]
+  }
+]

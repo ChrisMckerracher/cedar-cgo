@@ -1,0 +1,367 @@
+[
+  {
+    "name": "simultaneous",
+    "before": {
+      "policies": {
+        "policy0": [
+          {
+            "type": "User",
+            "id": "A"
+          },
+          {
+            "type": "User",
+            "id": "B"
+          }
+        ]
+      },
+      "templates": {}
+    },
+    "after": {
+      "policies": {
+        "policy0": [
+          {
+            "type": "User",
+            "id": "B"
+          },
+          {
+            "type": "User",
+            "id": "C"
+          }
+        ]
+      },
+      "templates": {}
+    },
+    "policies": {
+      "templates": {},
+      "staticPolicies": {
+        "policy0": {
+          "effect": "permit",
+          "principal": {
+            "op": "==",
+            "entity": {
+              "__entity": {
+                "type": "User",
+                "id": "B"
+              }
+            }
+          },
+          "action": {
+            "op": "All"
+          },
+          "resource": {
+            "op": "==",
+            "entity": {
+              "__entity": {
+                "type": "User",
+                "id": "C"
+              }
+            }
+          },
+          "conditions": [
+            {
+              "kind": "when",
+              "body": {
+                "==": {
+                  "left": {
+                    "Value": "User::\"A\""
+                  },
+                  "right": {
+                    "Value": "User::\"A\""
+                  }
+                }
+              }
+            }
+          ],
+          "annotations": {
+            "note": "雪"
+          }
+        }
+      },
+      "templateLinks": []
+    }
+  },
+  {
+    "name": "self",
+    "before": {
+      "policies": {
+        "policy0": [
+          {
+            "type": "User",
+            "id": "A"
+          }
+        ]
+      },
+      "templates": {}
+    },
+    "after": {
+      "policies": {
+        "policy0": [
+          {
+            "type": "User",
+            "id": "A"
+          }
+        ]
+      },
+      "templates": {}
+    },
+    "policies": {
+      "templates": {},
+      "staticPolicies": {
+        "policy0": {
+          "effect": "permit",
+          "principal": {
+            "op": "==",
+            "entity": {
+              "__entity": {
+                "type": "User",
+                "id": "A"
+              }
+            }
+          },
+          "action": {
+            "op": "All"
+          },
+          "resource": {
+            "op": "All"
+          },
+          "conditions": []
+        }
+      },
+      "templateLinks": []
+    }
+  },
+  {
+    "name": "empty",
+    "before": {
+      "policies": {
+        "policy0": []
+      },
+      "templates": {}
+    },
+    "after": {
+      "policies": {
+        "policy0": []
+      },
+      "templates": {}
+    },
+    "policies": {
+      "templates": {},
+      "staticPolicies": {
+        "policy0": {
+          "effect": "permit",
+          "principal": {
+            "op": "All"
+          },
+          "action": {
+            "op": "All"
+          },
+          "resource": {
+            "op": "All"
+          },
+          "conditions": []
+        }
+      },
+      "templateLinks": []
+    }
+  },
+  {
+    "name": "template-link",
+    "before": {
+      "policies": {
+        "linked": [
+          {
+            "type": "User",
+            "id": "A"
+          }
+        ]
+      },
+      "templates": {
+        "policy0": [
+          {
+            "type": "User",
+            "id": "A"
+          }
+        ]
+      }
+    },
+    "after": {
+      "policies": {
+        "linked": [
+          {
+            "type": "User",
+            "id": "B"
+          }
+        ]
+      },
+      "templates": {
+        "policy0": [
+          {
+            "type": "User",
+            "id": "B"
+          }
+        ]
+      }
+    },
+    "policies": {
+      "templates": {
+        "policy0": {
+          "effect": "permit",
+          "principal": {
+            "op": "==",
+            "slot": "?principal"
+          },
+          "action": {
+            "op": "All"
+          },
+          "resource": {
+            "op": "==",
+            "entity": {
+              "__entity": {
+                "type": "User",
+                "id": "B"
+              }
+            }
+          },
+          "conditions": [],
+          "annotations": {
+            "note": "雪"
+          }
+        }
+      },
+      "staticPolicies": {},
+      "templateLinks": [
+        {
+          "templateId": "policy0",
+          "newId": "linked",
+          "values": {
+            "?principal": {
+              "__entity": {
+                "type": "User",
+                "id": "B"
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  {
+    "name": "nested",
+    "before": {
+      "policies": {
+        "policy0": [
+          {
+            "type": "User",
+            "id": "A"
+          },
+          {
+            "type": "User",
+            "id": "A"
+          },
+          {
+            "type": "User",
+            "id": "B"
+          }
+        ]
+      },
+      "templates": {}
+    },
+    "after": {
+      "policies": {
+        "policy0": [
+          {
+            "type": "User",
+            "id": "B"
+          },
+          {
+            "type": "User",
+            "id": "B"
+          },
+          {
+            "type": "User",
+            "id": "C"
+          }
+        ]
+      },
+      "templates": {}
+    },
+    "policies": {
+      "templates": {},
+      "staticPolicies": {
+        "policy0": {
+          "effect": "permit",
+          "principal": {
+            "op": "All"
+          },
+          "action": {
+            "op": "All"
+          },
+          "resource": {
+            "op": "All"
+          },
+          "conditions": [
+            {
+              "kind": "when",
+              "body": {
+                "&&": {
+                  "left": {
+                    "contains": {
+                      "left": {
+                        "Set": [
+                          {
+                            "Value": {
+                              "__entity": {
+                                "type": "User",
+                                "id": "B"
+                              }
+                            }
+                          },
+                          {
+                            "Value": {
+                              "__entity": {
+                                "type": "User",
+                                "id": "C"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      "right": {
+                        "Var": "principal"
+                      }
+                    }
+                  },
+                  "right": {
+                    "==": {
+                      "left": {
+                        ".": {
+                          "left": {
+                            "Record": {
+                              "uid": {
+                                "Value": {
+                                  "__entity": {
+                                    "type": "User",
+                                    "id": "B"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "attr": "uid"
+                        }
+                      },
+                      "right": {
+                        "Var": "principal"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "templateLinks": []
+    }
+  }
+]

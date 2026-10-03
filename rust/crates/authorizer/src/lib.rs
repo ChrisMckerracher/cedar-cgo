@@ -15,6 +15,7 @@ use std::cell::RefCell;
 mod batched;
 mod expressions;
 mod format;
+mod literals;
 mod policies;
 mod slicing;
 mod templates;
@@ -246,4 +247,14 @@ pub unsafe extern "C" fn cgw_policies(ptr: u32, len: u32) -> u64 {
 pub unsafe extern "C" fn cgw_expressions(ptr: u32, len: u32) -> u64 {
     // SAFETY: the host passes a buffer from `cgw_alloc(len)`.
     run(unsafe { take_input(ptr, len) }, expressions::execute)
+}
+
+/// Inspects and substitutes entity literals through native Cedar operations.
+///
+/// # Safety
+/// `ptr` and `len` must come from one `cgw_alloc(len)` call.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn cgw_literals(ptr: u32, len: u32) -> u64 {
+    // SAFETY: the host passes a buffer from `cgw_alloc(len)`.
+    run(unsafe { take_input(ptr, len) }, literals::execute)
 }

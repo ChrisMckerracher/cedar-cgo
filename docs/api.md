@@ -293,6 +293,27 @@ level and uses Cedar 4.13.0's stable level validation API. Experimental upstream
 permissive and partial validation modes remain outside this API. Both methods
 return the same diagnostics and use the same context and resource limits.
 
+## Entity literals
+
+`Runtime.EntityLiterals` lists sorted literal occurrences by policy and template
+ID. The method delegates inspection to Cedar's native syntax tree. Slot bindings
+are available through `Runtime.TemplateLinks`.
+
+`Runtime.SubstituteEntityLiterals` accepts a map from original UIDs to replacement
+UIDs. Cedar applies the map simultaneously. With `A → B` and `B → C`, the
+original `A` becomes `B`. String literals that contain entity-like text stay
+unchanged. Policy IDs, template IDs, annotations, slots, and link IDs retain their
+identities. Link bindings also receive one simultaneous lookup.
+
+Static policies use `Policy::sub_entity_literals`. Templates use the same native
+EST transformation, followed by `Template::from_json`. Cedar 4.13.0 has no
+separate public template substitution method. Reparse and authorization tests
+check the transformed template and its links.
+
+The result uses semantic Cedar JSON. Comments and source spacing are not part
+of this representation. Run `Validate` if replacements can change schema
+validity. Source, memory, response, and caller-context limits apply.
+
 ## Standalone expressions
 
 `Runtime.ParseExpression` parses a Cedar expression. `ParseRestrictedExpression`
