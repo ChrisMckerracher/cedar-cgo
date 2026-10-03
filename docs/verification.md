@@ -331,3 +331,10 @@ so identical inputs can render different hint text across calls. The property
 normalizes those `(help: did you mean ...)` substrings before comparing
 diagnostics; Passed, policy IDs, counts, and all remaining message text stay
 exact.
+
+`TestApplicabilityNativeFixtures` compares policy and template metadata with native Cedar enumeration.
+Fixtures cover unconstrained policies, action groups, type constraints, template slots, linked templates, multiple namespaces, and invalid conditions.
+`TestRequestEnvironmentJSONRoundTrip` checks action identity and slot metadata after JSON serialization.
+`TestApplicabilityBoundaries` checks empty schemas and malformed inputs.
+`TestApplicabilityDoesNotAuthorize` checks that applicability metadata can coexist with a denied request.
+Regenerate these fixtures with `scripts/applicability-parity.sh --write`.

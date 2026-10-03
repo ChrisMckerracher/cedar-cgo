@@ -1,0 +1,62 @@
+{
+  "schema": "namespace Acme { entity User in Group; entity Group; entity Photo; entity Album; action all; action view in [all] appliesTo { principal: [User, Group], resource: [Photo, Album], context: {} }; action edit appliesTo { principal: User, resource: Photo, context: {} }; }",
+  "cases": [
+    {
+      "name": "unconstrained",
+      "policies": "permit(principal, action, resource);"
+    },
+    {
+      "name": "head-action",
+      "policies": "permit(principal, action == Acme::Action::\"edit\", resource);"
+    },
+    {
+      "name": "head-types",
+      "policies": "permit(principal is Acme::User, action, resource is Acme::Photo);"
+    },
+    {
+      "name": "action-group",
+      "policies": "permit(principal, action in Acme::Action::\"all\", resource);"
+    },
+    {
+      "name": "false-condition",
+      "policies": "permit(principal, action, resource) when { false };"
+    },
+    {
+      "name": "invalid-condition",
+      "policies": "permit(principal, action, resource) when { principal.missing };"
+    },
+    {
+      "name": "template-slots",
+      "policies": "permit(principal == ?principal, action == Acme::Action::\"view\", resource == ?resource);"
+    },
+    {
+      "name": "template-type",
+      "policies": "permit(principal is Acme::User in ?principal, action, resource);"
+    },
+    {
+      "name": "linked-template",
+      "policies": "permit(principal == ?principal, action, resource == ?resource);",
+      "link": {
+        "template_id": "policy0",
+        "id": "bound",
+        "principal": {
+          "type": "Acme::User",
+          "id": "雪"
+        },
+        "resource": {
+          "type": "Acme::Photo",
+          "id": "雪"
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "policies": ""
+    },
+    {
+      "name": "multiple-namespaces",
+      "schema": "namespace A { entity Z; } namespace B { entity A; } entity Photo; action view appliesTo {principal: [A::Z, B::A], resource: Photo, context: {}};",
+      "policies": "permit(principal, action, resource);"
+    }
+  ]
+}

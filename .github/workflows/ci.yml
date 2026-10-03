@@ -165,6 +165,11 @@ jobs:
           set -euo pipefail
           cargo clippy --manifest-path rust/Cargo.toml --locked --release -p cgw-authorizer --example literal_fixtures -- -D warnings
           scripts/literal-parity.sh --check
+      - name: Native applicability parity and lint
+        run: |
+          set -euo pipefail
+          cargo clippy --manifest-path rust/Cargo.toml --locked --release -p cgw-authorizer --example applicability_fixtures -- -D warnings
+          scripts/applicability-parity.sh --check
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cargo/bin/cargo-deny

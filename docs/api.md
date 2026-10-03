@@ -628,3 +628,18 @@ Inspect `PartialResponse.Residuals`, then supply consistent concrete data with
 `PartialResponse.Reauthorize`. A schema is required. See
 [partial evaluation](partial-evaluation.md) for supported unknowns, limits,
 upstream experimental status, and the executable example.
+
+### Policy applicability
+
+`Runtime.ApplicableEnvironments` invokes Cedar's native `get_valid_request_envs` operation.
+It returns schema principal types, action UIDs, resource types, and template slot types.
+`PolicyApplicability` separates policy IDs and template IDs.
+Native enumeration also retains slot type metadata for linked policies.
+Environment lists retain native Cedar enumeration order.
+JSON serialization preserves flat action UID fields, including its type and ID.
+
+The result describes potential applicability. It does not grant access or provide a satisfying request.
+Use `Authorize` to decide access for a concrete request.
+An empty schema or an inapplicable policy produces an empty environment list.
+Malformed schemas and policies return their existing error kinds.
+Source, memory, response, and context limits apply.
