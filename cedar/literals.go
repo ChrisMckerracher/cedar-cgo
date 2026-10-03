@@ -17,6 +17,42 @@ type EntityLiteralInventory struct {
 	Templates map[string][]EntityUID `json:"templates"`
 }
 
+// MarshalJSON retains flat entity identities and raw policy IDs in metadata.
+func (inventory EntityLiteralInventory) MarshalJSON() ([]byte, error) {
+	convert := func(entries map[string][]EntityUID) (map[string][]wire.UID, error) {
+		if entries == nil {
+			return nil, nil
+		}
+		result := make(map[string][]wire.UID, len(entries))
+		for id, values := range entries {
+			if err := wire.CheckUTF8(id); err != nil {
+				return nil, err
+			}
+			var uids []wire.UID
+			if values != nil {
+				uids = make([]wire.UID, len(values))
+				for i, value := range values {
+					uids[i] = value.wire()
+				}
+			}
+			result[id] = uids
+		}
+		return result, nil
+	}
+	policies, err := convert(inventory.Policies)
+	if err != nil {
+		return nil, err
+	}
+	templates, err := convert(inventory.Templates)
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(struct {
+		Policies  map[string][]wire.UID `json:"policies"`
+		Templates map[string][]wire.UID `json:"templates"`
+	}{policies, templates})
+}
+
 type literalReplacement struct {
 	From wire.UID `json:"from"`
 	To   wire.UID `json:"to"`

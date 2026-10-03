@@ -30,7 +30,12 @@ fn sorted(mut literals: Vec<EntityUid>) -> Vec<Value> {
 fn inventory(set: &PolicySet) -> Value {
     let policies: BTreeMap<_, _> = set
         .policies()
-        .map(|p| (p.id().to_string(), sorted(p.entity_literals())))
+        .map(|p| {
+            (
+                AsRef::<str>::as_ref(p.id()).to_owned(),
+                sorted(p.entity_literals()),
+            )
+        })
         .collect();
     let templates: BTreeMap<_, _> = set
         .templates()
@@ -46,7 +51,7 @@ fn inventory(set: &PolicySet) -> Value {
                     _ => None,
                 })
                 .collect();
-            (t.id().to_string(), sorted(literals))
+            (AsRef::<str>::as_ref(t.id()).to_owned(), sorted(literals))
         })
         .collect();
     json!({"policies":policies,"templates":templates})

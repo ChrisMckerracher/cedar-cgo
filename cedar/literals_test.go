@@ -170,6 +170,7 @@ func TestPropertySimultaneousEntityLiteralSubstitution(t *testing.T) {
 func TestEntityLiteralNativeFixtures(t *testing.T) {
 	var input []struct {
 		Name, Policies string
+		PoliciesJSON   json.RawMessage `json:"policies_json"`
 		Replacements   []struct{ From, To cedar.EntityUID }
 		Link           *struct {
 			TemplateID string `json:"template_id"`
@@ -196,6 +197,9 @@ func TestEntityLiteralNativeFixtures(t *testing.T) {
 	for i, tc := range input {
 		t.Run(tc.Name, func(t *testing.T) {
 			source := cedar.PoliciesFromCedar(tc.Policies)
+			if len(tc.PoliciesJSON) != 0 {
+				source = cedar.PoliciesFromJSON(tc.PoliciesJSON)
+			}
 			if tc.Link != nil {
 				var err error
 				source, err = rt.LinkTemplate(ctx, source, tc.Link.TemplateID, tc.Link.ID, cedar.SlotBindings{cedar.PrincipalSlot: tc.Link.Principal})
@@ -249,4 +253,32 @@ func FuzzEntityLiteralSubstitution(f *testing.F) {
 			t.Fatal("substituted set cannot be inspected:", err)
 		}
 	})
+}
+
+func TestEntityLiteralInventoryJSONRoundTrip(t *testing.T) {
+	id := "quote\"\nslash\\\x00雪"
+	for _, input := range []cedar.EntityLiteralInventory{
+		{},
+		{Policies: map[string][]cedar.EntityUID{"": nil, id: {cedar.NewEntityUID("User", "雪\x00")}}, Templates: map[string][]cedar.EntityUID{"template": {}}},
+	} {
+		data, err := json.Marshal(input)
+		if err != nil {
+			t.Fatal(err)
+		}
+		var output cedar.EntityLiteralInventory
+		if err := json.Unmarshal(data, &output); err != nil || !reflect.DeepEqual(input, output) {
+			t.Fatalf("inventory identity changed: %+v %s %v", output, data, err)
+		}
+	}
+	bad := string([]byte{0xff})
+	for _, input := range []cedar.EntityLiteralInventory{
+		{Policies: map[string][]cedar.EntityUID{bad: {}}},
+		{Templates: map[string][]cedar.EntityUID{bad: {}}},
+		{Policies: map[string][]cedar.EntityUID{"x": {cedar.NewEntityUID(bad, "x")}}},
+		{Templates: map[string][]cedar.EntityUID{"x": {cedar.NewEntityUID("User", bad)}}},
+	} {
+		if data, err := json.Marshal(input); err == nil || data != nil {
+			t.Fatalf("invalid identity normalized: %s %v", data, err)
+		}
+	}
 }
