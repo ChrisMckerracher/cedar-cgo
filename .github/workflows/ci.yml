@@ -106,7 +106,7 @@ jobs:
           go-version: "1.27.x"
       - name: Fuzz each target for 60 seconds
         run: |
-          for target in FuzzAuthorize FuzzPolicies FuzzEntities FuzzBatchedEntities FuzzBatchedDifferential FuzzSliceEntities FuzzPolicySyntax FuzzPolicyEdits FuzzTemplates FuzzPartialEntities FuzzPartialReauthorize FuzzFormatPolicies FuzzUTF8Values FuzzEvalResult FuzzEntityLiteralSubstitution FuzzDiagnostics FuzzSchemaFragments FuzzEntityStoreUnrelatedDecisions FuzzNativeUIDRoundTrip FuzzResidualImport FuzzSourceTokenSpans FuzzValidationDepth; do
+          for target in FuzzAuthorize FuzzPolicies FuzzEntities FuzzBatchedEntities FuzzBatchedDifferential FuzzSliceEntities FuzzPolicySyntax FuzzPolicyEdits FuzzTemplates FuzzPartialEntities FuzzPartialReauthorize FuzzFormatPolicies FuzzUTF8Values FuzzEvalResult FuzzEntityLiteralSubstitution FuzzDiagnostics FuzzSchemaFragments FuzzEntityStoreUnrelatedDecisions FuzzNativeUIDRoundTrip FuzzResidualImport FuzzSourceTokenSpans FuzzValidationDepth FuzzConfusableStrings FuzzContextMerge FuzzScopeValidation; do
             go test -run '^$' -fuzz "^$target\$" -fuzztime 60s ./cedar
           done
 
