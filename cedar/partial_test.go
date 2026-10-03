@@ -49,6 +49,7 @@ type partialFixtureResult struct {
 	Residuals     []cedar.ResidualPolicy
 	ErrorPolicies []string `json:"error_policies"`
 	Completions   []partialFixtureResult
+	Projection    cedar.ResidualProjection
 }
 
 func TestPartialNativeFixtures(t *testing.T) {
@@ -105,11 +106,35 @@ func TestPartialNativeFixtures(t *testing.T) {
 			if got.Decision.String() != want.Result.Decision || !reflect.DeepEqual(got.Reasons, want.Result.Reasons) || !reflect.DeepEqual(got.Residuals, want.Result.Residuals) {
 				t.Fatalf("native/Wasm disagreement:\n got %+v\nwant %+v", got, want.Result)
 			}
+			gotProjection, err := json.Marshal(got.Projection())
+			if err != nil {
+				t.Fatal(err)
+			}
+			wantProjection, err := json.Marshal(want.Result.Projection)
+			if err != nil {
+				t.Fatal(err)
+			}
+			assertSchemaJSON(t, gotProjection, wantProjection)
+			exported, err := got.Export()
+			if err != nil {
+				t.Fatal(err)
+			}
+			imported, err := a.ImportPartialResponse(ctx, exported)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if imported.Decision != got.Decision || !reflect.DeepEqual(imported.Residuals, got.Residuals) {
+				t.Fatal("imported residual response differs")
+			}
 			if len(tc.Completions) != len(want.Result.Completions) {
 				t.Fatal("completion count mismatch")
 			}
 			for j, c := range tc.Completions {
 				r, err := got.Reauthorize(ctx, c.concrete())
+				replayed, replayErr := imported.Reauthorize(ctx, c.concrete())
+				if (err == nil) != (replayErr == nil) || !reflect.DeepEqual(r, replayed) {
+					t.Fatalf("imported replay differs: %+v %v; %+v %v", r, err, replayed, replayErr)
+				}
 				w := want.Result.Completions[j]
 				if w.ErrorStage != "" {
 					var ce *cedar.Error

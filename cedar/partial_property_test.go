@@ -38,7 +38,15 @@ func TestPropertyPartialReauthorizeMatchesDirect(t *testing.T) {
 		if err != nil {
 			pt.Fatalf("partial: %v\n%s", err, text)
 		}
-		resumed, err := res.Reauthorize(ctx, req)
+		exported, err := res.Export()
+		if err != nil {
+			pt.Fatalf("export: %v", err)
+		}
+		imported, err := a.ImportPartialResponse(ctx, exported)
+		if err != nil {
+			pt.Fatalf("import: %v", err)
+		}
+		resumed, err := imported.Reauthorize(ctx, req)
 		if err != nil {
 			pt.Fatalf("reauthorize: %v", err)
 		}

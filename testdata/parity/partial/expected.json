@@ -22,7 +22,34 @@
           ],
           "error_policies": []
         }
-      ]
+      ],
+      "projection": {
+        "version": 1,
+        "cedar_version": "4.13.0",
+        "policies": {
+          "policy0": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "Value": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      "nested_error_policies": []
     }
   },
   {
@@ -44,7 +71,34 @@
           "reasons": [],
           "error_policies": []
         }
-      ]
+      ],
+      "projection": {
+        "version": 1,
+        "cedar_version": "4.13.0",
+        "policies": {
+          "policy0": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "Value": false
+                }
+              }
+            ]
+          }
+        }
+      },
+      "nested_error_policies": []
     }
   },
   {
@@ -68,7 +122,56 @@
           ],
           "error_policies": []
         }
-      ]
+      ],
+      "projection": {
+        "version": 1,
+        "cedar_version": "4.13.0",
+        "policies": {
+          "policy0": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "==": {
+                    "left": {
+                      ".": {
+                        "left": {
+                          "Value": {
+                            "__entity": {
+                              "type": "Photo",
+                              "id": "beach"
+                            }
+                          }
+                        },
+                        "attr": "owner"
+                      }
+                    },
+                    "right": {
+                      "Value": {
+                        "__entity": {
+                          "type": "User",
+                          "id": "alice"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "nested_error_policies": []
     }
   },
   {
@@ -97,7 +200,51 @@
           "reasons": [],
           "error_policies": []
         }
-      ]
+      ],
+      "projection": {
+        "version": 1,
+        "cedar_version": "4.13.0",
+        "policies": {
+          "policy0": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "==": {
+                    "left": {
+                      ".": {
+                        "left": {
+                          "Value": {
+                            "__entity": {
+                              "type": "Photo",
+                              "id": "beach"
+                            }
+                          }
+                        },
+                        "attr": "owner"
+                      }
+                    },
+                    "right": {
+                      "Var": "principal"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "nested_error_policies": []
     }
   },
   {
@@ -121,7 +268,51 @@
           ],
           "error_policies": []
         }
-      ]
+      ],
+      "projection": {
+        "version": 1,
+        "cedar_version": "4.13.0",
+        "policies": {
+          "policy0": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "==": {
+                    "left": {
+                      ".": {
+                        "left": {
+                          "Var": "resource"
+                        },
+                        "attr": "owner"
+                      }
+                    },
+                    "right": {
+                      "Value": {
+                        "__entity": {
+                          "type": "User",
+                          "id": "alice"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "nested_error_policies": []
     }
   },
   {
@@ -150,7 +341,39 @@
           "reasons": [],
           "error_policies": []
         }
-      ]
+      ],
+      "projection": {
+        "version": 1,
+        "cedar_version": "4.13.0",
+        "policies": {
+          "policy0": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  ".": {
+                    "left": {
+                      "Var": "context"
+                    },
+                    "attr": "mfa"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "nested_error_policies": []
     }
   },
   {
@@ -174,7 +397,56 @@
           ],
           "error_policies": []
         }
-      ]
+      ],
+      "projection": {
+        "version": 1,
+        "cedar_version": "4.13.0",
+        "policies": {
+          "policy0": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "==": {
+                    "left": {
+                      ".": {
+                        "left": {
+                          "Value": {
+                            "__entity": {
+                              "type": "Photo",
+                              "id": "beach"
+                            }
+                          }
+                        },
+                        "attr": "owner"
+                      }
+                    },
+                    "right": {
+                      "Value": {
+                        "__entity": {
+                          "type": "User",
+                          "id": "alice"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "nested_error_policies": []
     }
   },
   {
@@ -200,7 +472,34 @@
           ],
           "error_policies": []
         }
-      ]
+      ],
+      "projection": {
+        "version": 1,
+        "cedar_version": "4.13.0",
+        "policies": {
+          "policy0": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "Value": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      "nested_error_policies": []
     }
   },
   {
@@ -237,7 +536,63 @@
           ],
           "error_policies": []
         }
-      ]
+      ],
+      "projection": {
+        "version": 1,
+        "cedar_version": "4.13.0",
+        "policies": {
+          "policy0": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "Value": true
+                }
+              }
+            ]
+          },
+          "policy1": {
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "!": {
+                    "arg": {
+                      ".": {
+                        "left": {
+                          "Var": "context"
+                        },
+                        "attr": "mfa"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "nested_error_policies": []
     }
   },
   {
@@ -269,7 +624,64 @@
           ],
           "error_policies": []
         }
-      ]
+      ],
+      "projection": {
+        "version": 1,
+        "cedar_version": "4.13.0",
+        "policies": {
+          "policy0": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  ".": {
+                    "left": {
+                      "Value": {
+                        "__entity": {
+                          "type": "Photo",
+                          "id": "beach"
+                        }
+                      }
+                    },
+                    "attr": "private"
+                  }
+                }
+              }
+            ]
+          },
+          "policy1": {
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "Value": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      "nested_error_policies": []
     }
   },
   {
@@ -293,7 +705,34 @@
             "policy0"
           ]
         }
-      ]
+      ],
+      "projection": {
+        "version": 1,
+        "cedar_version": "4.13.0",
+        "policies": {
+          "policy0": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "error": []
+                }
+              }
+            ]
+          }
+        }
+      },
+      "nested_error_policies": []
     }
   },
   {
@@ -327,7 +766,54 @@
             "policy1"
           ]
         }
-      ]
+      ],
+      "projection": {
+        "version": 1,
+        "cedar_version": "4.13.0",
+        "policies": {
+          "policy0": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "Value": true
+                }
+              }
+            ]
+          },
+          "policy1": {
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "error": []
+                }
+              }
+            ]
+          }
+        }
+      },
+      "nested_error_policies": []
     }
   },
   {
@@ -358,6 +844,47 @@
             "policy0"
           ]
         }
+      ],
+      "projection": {
+        "version": 1,
+        "cedar_version": "4.13.0",
+        "policies": {
+          "policy0": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "||": {
+                    "left": {
+                      ".": {
+                        "left": {
+                          "Var": "context"
+                        },
+                        "attr": "mfa"
+                      }
+                    },
+                    "right": {
+                      "error": []
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "nested_error_policies": [
+        "policy0"
       ]
     }
   },
@@ -380,7 +907,34 @@
         {
           "error_stage": "request"
         }
-      ]
+      ],
+      "projection": {
+        "version": 1,
+        "cedar_version": "4.13.0",
+        "policies": {
+          "policy0": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "Value": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      "nested_error_policies": []
     }
   },
   {
@@ -402,7 +956,34 @@
         {
           "error_stage": "request"
         }
-      ]
+      ],
+      "projection": {
+        "version": 1,
+        "cedar_version": "4.13.0",
+        "policies": {
+          "policy0": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "Value": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      "nested_error_policies": []
     }
   },
   {
@@ -424,7 +1005,34 @@
         {
           "error_stage": "request"
         }
-      ]
+      ],
+      "projection": {
+        "version": 1,
+        "cedar_version": "4.13.0",
+        "policies": {
+          "policy0": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "Value": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      "nested_error_policies": []
     }
   },
   {
@@ -446,7 +1054,34 @@
         {
           "error_stage": "request"
         }
-      ]
+      ],
+      "projection": {
+        "version": 1,
+        "cedar_version": "4.13.0",
+        "policies": {
+          "policy0": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "Value": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      "nested_error_policies": []
     }
   },
   {
@@ -508,7 +1143,34 @@
           ],
           "error_policies": []
         }
-      ]
+      ],
+      "projection": {
+        "version": 1,
+        "cedar_version": "4.13.0",
+        "policies": {
+          "policy0": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "Value": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      "nested_error_policies": []
     }
   },
   {
@@ -540,7 +1202,34 @@
           ],
           "error_policies": []
         }
-      ]
+      ],
+      "projection": {
+        "version": 1,
+        "cedar_version": "4.13.0",
+        "policies": {
+          "policy0": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "Value": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      "nested_error_policies": []
     }
   },
   {
@@ -555,7 +1244,13 @@
           "reasons": [],
           "error_policies": []
         }
-      ]
+      ],
+      "projection": {
+        "version": 1,
+        "cedar_version": "4.13.0",
+        "policies": {}
+      },
+      "nested_error_policies": []
     }
   },
   {
@@ -584,7 +1279,72 @@
           "reasons": [],
           "error_policies": []
         }
-      ]
+      ],
+      "projection": {
+        "version": 1,
+        "cedar_version": "4.13.0",
+        "policies": {
+          "policy0": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "&&": {
+                    "left": {
+                      "hasTag": {
+                        "left": {
+                          "Value": {
+                            "__entity": {
+                              "type": "User",
+                              "id": "alice"
+                            }
+                          }
+                        },
+                        "right": {
+                          "Value": "tier"
+                        }
+                      }
+                    },
+                    "right": {
+                      "==": {
+                        "left": {
+                          "getTag": {
+                            "left": {
+                              "Value": {
+                                "__entity": {
+                                  "type": "User",
+                                  "id": "alice"
+                                }
+                              }
+                            },
+                            "right": {
+                              "Value": "tier"
+                            }
+                          }
+                        },
+                        "right": {
+                          "Value": "gold"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "nested_error_policies": []
     }
   },
   {
@@ -613,7 +1373,51 @@
           "reasons": [],
           "error_policies": []
         }
-      ]
+      ],
+      "projection": {
+        "version": 1,
+        "cedar_version": "4.13.0",
+        "policies": {
+          "policy0": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "in": {
+                    "left": {
+                      "Value": {
+                        "__entity": {
+                          "type": "User",
+                          "id": "alice"
+                        }
+                      }
+                    },
+                    "right": {
+                      "Value": {
+                        "__entity": {
+                          "type": "Group",
+                          "id": "staff"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "nested_error_policies": []
     }
   },
   {
@@ -645,7 +1449,34 @@
           ],
           "error_policies": []
         }
-      ]
+      ],
+      "projection": {
+        "version": 1,
+        "cedar_version": "4.13.0",
+        "policies": {
+          "policy0": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "Value": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      "nested_error_policies": []
     }
   },
   {
@@ -677,7 +1508,34 @@
           ],
           "error_policies": []
         }
-      ]
+      ],
+      "projection": {
+        "version": 1,
+        "cedar_version": "4.13.0",
+        "policies": {
+          "policy0": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "Value": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      "nested_error_policies": []
     }
   },
   {
@@ -724,7 +1582,83 @@
             "error\"\n\\\u0000"
           ]
         }
-      ]
+      ],
+      "projection": {
+        "version": 1,
+        "cedar_version": "4.13.0",
+        "policies": {
+          "error\"\n\\\u0000": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "error": []
+                }
+              }
+            ]
+          },
+          "forbid\"\n\\\u0000": {
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "!": {
+                    "arg": {
+                      ".": {
+                        "left": {
+                          "Var": "context"
+                        },
+                        "attr": "mfa"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "permit\"\n\\\u0000": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "Value": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      "nested_error_policies": []
     }
   },
   {
@@ -764,7 +1698,74 @@
             "error\"\n\\\u0000"
           ]
         }
-      ]
+      ],
+      "projection": {
+        "version": 1,
+        "cedar_version": "4.13.0",
+        "policies": {
+          "error\"\n\\\u0000": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "error": []
+                }
+              }
+            ]
+          },
+          "forbid\"\n\\\u0000": {
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "Value": false
+                }
+              }
+            ]
+          },
+          "permit\"\n\\\u0000": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "Value": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      "nested_error_policies": []
     }
   },
   {
@@ -804,7 +1805,74 @@
             "error\"\n\\\u0000"
           ]
         }
-      ]
+      ],
+      "projection": {
+        "version": 1,
+        "cedar_version": "4.13.0",
+        "policies": {
+          "error\"\n\\\u0000": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "error": []
+                }
+              }
+            ]
+          },
+          "forbid\"\n\\\u0000": {
+            "effect": "forbid",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "Value": true
+                }
+              }
+            ]
+          },
+          "permit\"\n\\\u0000": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": [
+              {
+                "kind": "when",
+                "body": {
+                  "Value": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      "nested_error_policies": []
     }
   }
 ]

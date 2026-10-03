@@ -408,3 +408,26 @@ They reject missing fields, duplicate operations, and fields from other query op
 `TestPermissionQueryBoundaries` covers unknown types, missing schemas, and cancellation.
 `TestPermissionQueryLimitsBeforeGuest` checks input limits and invalid UTF-8 before guest execution.
 Regenerate native fixtures with `scripts/queries-parity.sh --write`.
+`TestSchemaNativeFixtures` compares conversion, inspection, action entities, and validation with pinned native Cedar.
+Fixtures include cross-fragment references, qualified namespaces, common types, optional attributes, extensions, and enumerated entity types.
+They also check empty schemas and invalid policy validation.
+`TestSchemaCompositionResolvesAfterCombining` checks a fragment that fails alone and succeeds after composition.
+It also checks authorization with the composed schema.
+Boundary tests cover duplicate declarations, cycles, annotations, UTF-8, and input limits.
+`FuzzSchemaFragments` checks that successful composition supports inspection and action extraction.
+Regenerate the native fixtures with `scripts/schema-parity.sh --write`.
+
+The partial evaluation oracle exports native PST through its JSON EST mapping.
+It compares each entry with `policy_set().policy(id)` and checks `residual_policies()` membership.
+It records nested residual errors through native `Expr::has_error`.
+Native PST replay must match native reauthorization and direct authorization.
+`partial::tests` runs the actual structured import helper with nested errors and empty or escaped IDs.
+The native tests reject changed versions, Cedar versions, effects, conditions, and missing policies.
+They compare exact diagnostics with native residual reauthorization.
+Direct authorization comparisons retain decisions, reasons, and error policy IDs because residual errors discard original error details.
+Go fixture tests also export, import, and replay every successful partial response.
+The partial authorization property checks randomized export and import before replay.
+Separate tests reject changed versions, policies, and effects.
+They also check copied projections and frozen exports.
+`TestResidualPolicyIDPresence` rejects missing or null policy IDs while preserving explicit empty IDs.
+`TestResidualRawPolicyIDs` checks export, import, and native replay with empty IDs and control characters.

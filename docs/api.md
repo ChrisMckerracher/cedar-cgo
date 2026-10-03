@@ -352,6 +352,19 @@ level and uses Cedar 4.13.0's stable level validation API. Experimental upstream
 permissive and partial validation modes remain outside this API. Both methods
 return the same diagnostics and use the same context and resource limits.
 
+## Structured residual export
+
+`PartialResponse.Projection()` exposes versioned native PST through Cedar's JSON EST mapping.
+Policies retain their original IDs, effects, annotations, and complete expression trees.
+`{"error":[]}` preserves a nested residual error expression.
+Display text is an inspection aid and is not a faithful residual serialization.
+
+`PartialResponse.Export()` captures the frozen partial input and native projection.
+`Authorizer.ImportPartialResponse()` verifies both versions and the complete projection against native evaluation.
+It rebuilds the matching native PST with the loaded schema and policies.
+Reauthorization checks consistency with known data before it evaluates the imported residual policies.
+See [partial evaluation](partial-evaluation.md) for the continuation rules.
+
 ## Schema operations
 
 `SchemaFragmentFromCedar` and `SchemaFragmentFromJSON` retain fragment source.

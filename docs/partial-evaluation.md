@@ -73,7 +73,31 @@ and works after an instance is recycled. It repeats the TPE cost on each call.
 The authorizer and runtime must remain open. Reauthorization is safe to call
 concurrently; callers must not concurrently mutate input records or slices.
 
-Residual display text is for inspection, not a portable serialized continuation:
+`PartialResponse.Projection()` returns a copy of the native residual structure.
+The projection contains a representation version, the Cedar version, and policies keyed by original ID.
+Each policy uses the JSON EST mapping of its native PST.
+The special expression `{"error":[]}` represents a residual error at any nesting depth.
+An unresolved condition can contain this node without always producing an error.
+Short-circuit evaluation can skip it.
+
+`PartialResponse.Export()` serializes the frozen partial input and projection.
+`Authorizer.ImportPartialResponse()` recomputes partial evaluation and requires the complete versioned projection to match.
+It then reconstructs the matching native PST through `PolicySet::from_pst`.
+Ordinary Cedar JSON parsing cannot accept internal residual error expressions.
+Unknown representation versions, different Cedar versions, and changed residual policies return `KindInput`.
+Import can use another authorizer with matching schema, policies, and loaded entities.
+Changes to the public decision, residual text, or projection copy do not change the export.
+
+Reauthorization checks the original known data through native `TpeResponse::reauthorize`.
+It then evaluates the imported native policy set.
+Its diagnostics match native residual reauthorization.
+Direct authorization has the same decisions, reasons, and error policy IDs.
+Its error messages can differ because residual errors discard the original error details.
+The original authorizer must stay open for its continuation.
+An imported continuation uses the authorizer that accepted the import.
+Request, response, memory, and cancellation limits also apply to import and replay.
+
+Residual display text does not serialize the full residual state.
 Cedar can emit internal residual-error expressions that ordinary source parsing
 does not accept. Editing the response's public fields does not change the
 private continuation. In particular, evaluating only the nontrivial residuals
@@ -97,7 +121,7 @@ timeout, caller cancellation, response-byte limit, and fault recycling.
 `MaxRequestBytes` bounds the full JSON envelope. For reauthorization that
 includes the original partial input **and** the concrete completion; reserve
 space for both when configuring this limit. Each response retains at most one
-bounded partial-input snapshot on the Go heap, with no guest handle cache.
+bounded partial-input snapshot and residual projection on the Go heap, with no guest handle cache.
 As with ordinary authorization, callers control how many responses they retain.
 Errors from partial evaluation return `Undecided`; reauthorization errors return
 `Deny`. No error or undecided result becomes Allow implicitly.

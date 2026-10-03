@@ -150,6 +150,74 @@ type PartialResponse struct {
 	Residuals  []ResidualPolicy
 	authorizer *Authorizer
 	input      json.RawMessage
+	projection ResidualProjection
+}
+
+// ResidualProjection stores native PST expressions through their Cedar EST mapping.
+// The error operator with no arguments preserves nested residual errors.
+type ResidualProjection struct {
+	Version      uint32                     `json:"version"`
+	CedarVersion string                     `json:"cedar_version"`
+	Policies     map[string]json.RawMessage `json:"policies"`
+}
+
+const ResidualProjectionVersion uint32 = 1
+
+// Projection returns a copy of the native residual representation.
+func (r PartialResponse) Projection() ResidualProjection {
+	result := ResidualProjection{Version: r.projection.Version, CedarVersion: r.projection.CedarVersion}
+	if r.projection.Policies != nil {
+		result.Policies = make(map[string]json.RawMessage, len(r.projection.Policies))
+		for id, policy := range r.projection.Policies {
+			result.Policies[id] = bytes.Clone(policy)
+		}
+	}
+	return result
+}
+
+// Export serializes the frozen partial input and native residual projection.
+// Changes to public inspection fields do not change the export.
+func (r PartialResponse) Export() ([]byte, error) {
+	if r.authorizer == nil || len(r.input) == 0 {
+		return nil, &Error{Kind: KindInput, Message: "partial response has no continuation"}
+	}
+	return json.Marshal(partialExport{ResidualProjectionVersion, CedarVersion, r.input, r.projection})
+}
+
+type partialExport struct {
+	Version      uint32             `json:"version"`
+	CedarVersion string             `json:"cedar_version"`
+	Partial      json.RawMessage    `json:"partial"`
+	Projection   ResidualProjection `json:"projection"`
+}
+
+// ImportPartialResponse checks an export against native evaluation in this authorizer.
+// Different policies, schemas, known inputs, or edited residuals can reject the export.
+func (a *Authorizer) ImportPartialResponse(ctx context.Context, data []byte) (PartialResponse, error) {
+	if len(data) > a.limits.MaxRequestBytes {
+		return PartialResponse{}, limitError("partial export", len(data), a.limits.MaxRequestBytes)
+	}
+	if err := wire.CheckUTF8(string(data)); err != nil {
+		return PartialResponse{}, &Error{Kind: KindInput, Message: err.Error()}
+	}
+	var exported partialExport
+	if err := json.Unmarshal(data, &exported); err != nil {
+		return PartialResponse{}, &Error{Kind: KindInput, Message: err.Error()}
+	}
+	if exported.Version != ResidualProjectionVersion || exported.CedarVersion != CedarVersion {
+		return PartialResponse{}, &Error{Kind: KindInput, Message: "unsupported partial export or Cedar version"}
+	}
+	var response PartialResponse
+	err := a.partialCall(ctx, "cgw_import_partial", data, func(out []byte) error {
+		var err error
+		response, err = decodePartial(out)
+		return err
+	})
+	if err != nil {
+		return PartialResponse{}, err
+	}
+	response.authorizer, response.input = a, bytes.Clone(exported.Partial)
+	return response, nil
 }
 
 type partialInput struct {
@@ -188,9 +256,10 @@ func (r PartialResponse) Reauthorize(ctx context.Context, req Request) (Response
 		return Response{}, &Error{Kind: KindInput, Message: "partial response has no continuation"}
 	}
 	in, err := json.Marshal(struct {
-		Partial json.RawMessage `json:"partial"`
-		Request authorizeInput  `json:"request"`
-	}{r.input, authorizeInput{req.Principal.wire(), req.Action.wire(), req.Resource.wire(), req.Context, req.Entities}})
+		Partial    json.RawMessage    `json:"partial"`
+		Request    authorizeInput     `json:"request"`
+		Projection ResidualProjection `json:"projection"`
+	}{r.input, authorizeInput{req.Principal.wire(), req.Action.wire(), req.Resource.wire(), req.Context, req.Entities}, r.projection})
 	if err != nil {
 		return Response{}, &Error{Kind: KindInput, Message: err.Error()}
 	}
@@ -234,11 +303,18 @@ func (a *Authorizer) partialCall(ctx context.Context, op string, in []byte, deco
 }
 
 func decodePartial(out []byte) (PartialResponse, error) {
+	type residualWire struct {
+		PolicyID *string       `json:"policy_id"`
+		Effect   string        `json:"effect"`
+		State    ResidualState `json:"state"`
+		Cedar    string        `json:"cedar"`
+	}
 	var w struct {
-		Decision  string           `json:"decision"`
-		Reasons   []string         `json:"reasons"`
-		Residuals []ResidualPolicy `json:"residuals"`
-		Error     *wire.Error      `json:"error"`
+		Decision   string              `json:"decision"`
+		Reasons    []string            `json:"reasons"`
+		Residuals  []residualWire      `json:"residuals"`
+		Error      *wire.Error         `json:"error"`
+		Projection *ResidualProjection `json:"projection"`
 	}
 	if err := json.Unmarshal(out, &w); err != nil {
 		return PartialResponse{}, faultError(fmt.Errorf("decode partial response: %w", err))
@@ -260,9 +336,13 @@ func decodePartial(out []byte) (PartialResponse, error) {
 	if w.Reasons == nil || w.Residuals == nil {
 		return PartialResponse{}, faultError(errors.New("partial response is missing reasons or residuals"))
 	}
+	if w.Projection == nil || w.Projection.Version != ResidualProjectionVersion || w.Projection.CedarVersion != CedarVersion || w.Projection.Policies == nil || len(w.Projection.Policies) != len(w.Residuals) {
+		return PartialResponse{}, faultError(errors.New("partial response has no supported residual projection"))
+	}
+	residuals := make([]ResidualPolicy, len(w.Residuals))
 	for i, p := range w.Residuals {
-		if (p.Effect != "permit" && p.Effect != "forbid") || p.Cedar == "" ||
-			(i > 0 && p.PolicyID <= w.Residuals[i-1].PolicyID) {
+		if p.PolicyID == nil || (p.Effect != "permit" && p.Effect != "forbid") || p.Cedar == "" ||
+			(i > 0 && *p.PolicyID <= residuals[i-1].PolicyID) {
 			return PartialResponse{}, faultError(errors.New("partial response has malformed residual policies"))
 		}
 		switch p.State {
@@ -270,6 +350,14 @@ func decodePartial(out []byte) (PartialResponse, error) {
 		default:
 			return PartialResponse{}, faultError(fmt.Errorf("partial response has residual state %q", p.State))
 		}
+		var projected struct {
+			Effect string `json:"effect"`
+		}
+		policy, ok := w.Projection.Policies[*p.PolicyID]
+		if !ok || !jsonObject(policy) || json.Unmarshal(policy, &projected) != nil || projected.Effect != p.Effect {
+			return PartialResponse{}, faultError(errors.New("partial residual projection has an inconsistent policy"))
+		}
+		residuals[i] = ResidualPolicy{PolicyID: *p.PolicyID, Effect: p.Effect, State: p.State, Cedar: p.Cedar}
 	}
-	return PartialResponse{Decision: decision, Reasons: w.Reasons, Residuals: w.Residuals}, nil
+	return PartialResponse{Decision: decision, Reasons: w.Reasons, Residuals: residuals, projection: *w.Projection}, nil
 }

@@ -102,7 +102,7 @@ jobs:
           go-version: "1.27.x"
       - name: Fuzz each target for 60 seconds
         run: |
-          for target in FuzzAuthorize FuzzPolicies FuzzEntities FuzzBatchedEntities FuzzBatchedDifferential FuzzSliceEntities FuzzPolicySyntax FuzzPolicyEdits FuzzTemplates FuzzPartialEntities FuzzPartialReauthorize FuzzFormatPolicies FuzzUTF8Values FuzzEvalResult FuzzEntityLiteralSubstitution FuzzDiagnostics FuzzSchemaFragments FuzzEntityStoreUnrelatedDecisions FuzzNativeUIDRoundTrip; do
+          for target in FuzzAuthorize FuzzPolicies FuzzEntities FuzzBatchedEntities FuzzBatchedDifferential FuzzSliceEntities FuzzPolicySyntax FuzzPolicyEdits FuzzTemplates FuzzPartialEntities FuzzPartialReauthorize FuzzFormatPolicies FuzzUTF8Values FuzzEvalResult FuzzEntityLiteralSubstitution FuzzDiagnostics FuzzSchemaFragments FuzzEntityStoreUnrelatedDecisions FuzzNativeUIDRoundTrip FuzzResidualImport; do
             go test -run '^$' -fuzz "^$target\$" -fuzztime 60s ./cedar
           done
 
@@ -146,6 +146,11 @@ jobs:
         run: |
           cargo clippy --locked --release --manifest-path rust/Cargo.toml -p cgw-native-bench --example partial_fixture -- -D warnings
           scripts/partial-fixtures.sh --check
+      - name: Native structured residual import checks
+        run: |
+          set -euo pipefail
+          cargo clippy --manifest-path rust/Cargo.toml --locked --release -p cgw-authorizer --tests -- -D warnings
+          cargo test --manifest-path rust/Cargo.toml --locked --release -p cgw-authorizer --lib partial::tests
       - name: Native formatting parity and lint
         run: |
           cargo clippy --manifest-path rust/Cargo.toml --locked --release -p cgw-authorizer --example format_parity -- -D warnings

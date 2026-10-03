@@ -5,7 +5,7 @@ use cedar_policy::{
     PartialEntityUid, PartialRequest, Policy, PolicyId, PolicySet, Request, Schema,
 };
 use serde_json::{Value, json};
-use std::{error::Error, io::Read};
+use std::{collections::BTreeMap, error::Error, io::Read};
 
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
@@ -137,6 +137,31 @@ fn case(v: &Value, schema: &Schema) -> Result<Value> {
         json!({"policy_id":AsRef::<str>::as_ref(id).to_owned(), "effect":policy.effect().to_string(), "state":state, "cedar":policy.to_string()})
     }).collect();
     residuals.sort_by(|a, b| a["policy_id"].as_str().cmp(&b["policy_id"].as_str()));
+    let residual_set = response.policy_set();
+    let mut projected = BTreeMap::new();
+    for policy in response.policies() {
+        let canonical = Policy::from_pst(policy.to_pst()?)?;
+        let json = canonical.to_json()?;
+        let stored = residual_set
+            .policy(policy.id())
+            .ok_or("missing residual policy")?;
+        assert_eq!(json, Policy::from_pst(stored.to_pst()?)?.to_json()?);
+        projected.insert(AsRef::<str>::as_ref(policy.id()).to_owned(), json);
+    }
+    let mut nested_errors = Vec::new();
+    for policy in response.residual_policies() {
+        let pst = policy.to_pst()?;
+        if pst.body().clauses().iter().any(|clause| match clause {
+            cedar_policy::pst::Clause::When(expr) | cedar_policy::pst::Clause::Unless(expr) => {
+                expr.has_error()
+            }
+        }) {
+            nested_errors.push(AsRef::<str>::as_ref(policy.id()).to_owned());
+        }
+        assert!(projected.contains_key(AsRef::<str>::as_ref(policy.id())));
+    }
+    nested_errors.sort();
+    let rebuilt = PolicySet::from_pst(residual_set.to_pst()?)?;
     let mut completions = Vec::new();
     for c in v["completions"].as_array().ok_or("completions array")? {
         let (req, entities) = completion(c, schema, &loaded)?;
@@ -144,6 +169,12 @@ fn case(v: &Value, schema: &Schema) -> Result<Value> {
             Ok(res) => {
                 let direct = Authorizer::new().is_authorized(&req, &policies, &entities);
                 let actual = response_json(&res);
+                let replay = Authorizer::new().is_authorized(&req, &rebuilt, &entities);
+                assert_eq!(
+                    actual,
+                    response_json(&replay),
+                    "native PST residual replay differs"
+                );
                 assert_eq!(
                     actual,
                     response_json(&direct),
@@ -155,7 +186,8 @@ fn case(v: &Value, schema: &Schema) -> Result<Value> {
             Err(_) => json!({"error_stage":"request"}),
         });
     }
-    let output = json!({"decision":response.decision().map(decision).unwrap_or("undecided"), "reasons":reasons, "residuals":residuals, "completions":completions});
+    let output = json!({"decision":response.decision().map(decision).unwrap_or("undecided"), "reasons":reasons, "residuals":residuals, "completions":completions,
+        "projection":{"version":1,"cedar_version":"4.13.0","policies":projected},"nested_error_policies":nested_errors});
     if let Some(named) = named {
         // Anchor the oracle to input keys so two escaped Display projections cannot agree unnoticed.
         let mut expected: Vec<_> = named.keys().map(String::as_str).collect();
