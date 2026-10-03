@@ -340,3 +340,15 @@ The tests compare result keys with source IDs independently of the native oracle
 `TestApplicabilityBoundaries` checks empty schemas and malformed inputs.
 `TestApplicabilityDoesNotAuthorize` checks that applicability metadata can coexist with a denied request.
 Regenerate these fixtures with `scripts/applicability-parity.sh --write`.
+
+`TestStructuredDiagnosticsNativeFixtures` compares diagnostic categories, severity, and byte spans with native Cedar.
+It checks schema shadowing warnings, Unicode source locations, policy type errors, and invalid action applicability.
+JSON policy fixtures check that temporary parser offsets do not become source spans.
+`TestDiagnosticJSONPolicySpans` checks the same contract after a policy set converts to JSON.
+`TestDiagnosticMetadataIgnoresSpellingHints` repeats validation with ambiguous spelling suggestions.
+It compares metadata after removing variable suggestion text.
+`TestDiagnosticMetadataIgnoresNativeOrder` compares errors with equal text and different source spans.
+`TestDiagnosticRawPolicyIDs` checks empty policy IDs and policy IDs with control characters.
+`FuzzDiagnostics` checks validation and schema-warning response decoders without guest execution.
+Malformed spans, missing fields, contradictory status, and invalid severity fail decoding.
+Regenerate native fixtures with `scripts/diagnostics-parity.sh --write`.

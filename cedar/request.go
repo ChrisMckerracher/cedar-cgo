@@ -36,6 +36,9 @@ type Response struct {
 }
 
 type PolicyMessage struct {
-	PolicyID string `json:"policy_id"`
-	Message  string `json:"message"`
+	PolicyID string             `json:"policy_id"`
+	Message  string             `json:"message"`
+	Category string             `json:"category,omitempty"`
+	Severity DiagnosticSeverity `json:"severity,omitempty"`
+	Spans    []SourceSpan       `json:"spans,omitempty"`
 }

@@ -188,14 +188,23 @@ struct ValidateInput {
 #[derive(Serialize)]
 struct ValidateOutput {
     passed: bool,
-    errors: Vec<PolicyMessage>,
-    warnings: Vec<PolicyMessage>,
+    errors: Vec<cgw_abi::structured::PolicyMessage>,
+    warnings: Vec<cgw_abi::structured::PolicyMessage>,
+    schema_warnings: Vec<cgw_abi::structured::Message>,
 }
 
 fn validate(bytes: &[u8]) -> Result<ValidateOutput, OpError> {
     let input: ValidateInput = parse_input(bytes)?;
-    let schema = parse_schema(&input.schema)?;
+    let (schema, schema_warnings) = cgw_abi::parse_schema_with_warnings(&input.schema)?;
     let policies = parse_policies(&input.policies)?;
+    let json_policies = matches!(input.policies.format, cgw_abi::Format::Json);
+    let project = |message: cgw_abi::structured::PolicyMessage| {
+        if json_policies {
+            message.without_spans()
+        } else {
+            message
+        }
+    };
     let validator = Validator::new(schema);
     let result = match input.max_dereference_level {
         Some(level) => validator.validate_with_level(&policies, ValidationMode::Strict, level),
@@ -205,19 +214,38 @@ fn validate(bytes: &[u8]) -> Result<ValidateOutput, OpError> {
         passed: result.validation_passed(),
         errors: result
             .validation_errors()
-            .map(|e| PolicyMessage {
-                policy_id: AsRef::<str>::as_ref(e.policy_id()).to_owned(),
-                message: cgw_abi::diagnostics::render(e),
-            })
+            .map(cgw_abi::structured::validation_error)
+            .map(project)
             .collect(),
         warnings: result
             .validation_warnings()
-            .map(|w| PolicyMessage {
-                policy_id: AsRef::<str>::as_ref(w.policy_id()).to_owned(),
-                message: cgw_abi::diagnostics::render(w),
-            })
+            .map(cgw_abi::structured::validation_warning)
+            .map(project)
             .collect(),
+        schema_warnings,
     })
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SchemaWarningsInput {
+    schema: Source,
+}
+
+fn schema_warnings(bytes: &[u8]) -> Result<serde_json::Value, OpError> {
+    let input: SchemaWarningsInput = parse_input(bytes)?;
+    let (_, warnings) = cgw_abi::parse_schema_with_warnings(&input.schema)?;
+    Ok(serde_json::json!({"warnings":warnings}))
+}
+
+/// Returns schema warnings with native source spans.
+///
+/// # Safety
+/// `ptr` and `len` must come from one `cgw_alloc(len)` call.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn cgw_schema_warnings(ptr: u32, len: u32) -> u64 {
+    // SAFETY: the host passes a buffer from `cgw_alloc(len)`.
+    run(unsafe { take_input(ptr, len) }, schema_warnings)
 }
 
 /// Validates a policy set against a schema in strict mode.

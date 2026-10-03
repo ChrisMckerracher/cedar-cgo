@@ -645,3 +645,26 @@ Use `Authorize` to decide access for a concrete request.
 An empty schema or an inapplicable policy produces an empty environment list.
 Malformed schemas and policies return their existing error kinds.
 Source, memory, response, and context limits apply.
+
+### Structured diagnostics
+
+`ValidationResult.Errors` and `ValidationResult.Warnings` include native diagnostic categories, severity, and source spans.
+`ValidationResult.SchemaWarnings` returns Cedar schema syntax warnings.
+`Runtime.SchemaWarnings` returns the same warnings without policy validation.
+JSON schemas produce no Cedar syntax warnings.
+
+`SourceSpan.Offset` and `SourceSpan.Length` count UTF-8 bytes in the original source.
+Use the policy source for policy spans. Use the schema source for schema spans.
+Some native diagnostics have no span. JSON policy inputs have no source spans.
+Native JSON policy offsets can refer to temporary parser sources. The bridge omits these offsets.
+For Cedar inputs, the bridge retains every native label span and omits label text.
+
+Categories use stable names for native variants, such as `unexpected_type`, `invalid_action_application`, and `shadows_builtin`.
+A future unknown native variant uses an `unknown_` category.
+Cedar 4.13.0 reports `invalid_action_application` as a warning. This warning does not fail validation.
+Cedar can choose spelling suggestions through hash iteration. Rendered suggestions can differ across runs.
+Categories and spans do not use these suggestions.
+Diagnostic policy IDs retain their original bytes. Rendered messages can escape control characters in these IDs.
+
+`PolicyMessage` now contains a span slice. Compare messages with `reflect.DeepEqual` instead of Go equality.
+Authorization evaluation messages retain their existing policy ID and text fields.

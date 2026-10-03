@@ -131,7 +131,7 @@ func checkPolicySnapshot(t *testing.T, rt *cedar.Runtime, schema string, set ced
 	sortMessages(want.Errors)
 	sortMessages(validation.Warnings)
 	sortMessages(want.Warnings)
-	if validation.Passed != want.Passed || !slices.Equal(validation.Errors, want.Errors) || !slices.Equal(validation.Warnings, want.Warnings) {
+	if validation.Passed != want.Passed || !reflect.DeepEqual(validation.Errors, want.Errors) || !reflect.DeepEqual(validation.Warnings, want.Warnings) {
 		t.Fatalf("validation differs: %+v vs %+v", validation, want)
 	}
 	a, err := rt.NewAuthorizer(ctx, cedar.Config{Policies: set.Source(), Entities: cedar.NewEntities(cedar.Entity{UID: cedar.NewEntityUID("Photo", "p"), Attrs: cedar.Record{"public": cedar.Bool(true)}})})
@@ -146,7 +146,7 @@ func checkPolicySnapshot(t *testing.T, rt *cedar.Runtime, schema string, set ced
 		}
 		sortMessages(response.Errors)
 		sortMessages(o.Errors)
-		if response.Decision.String() != o.Decision || !slices.Equal(response.Reasons, o.Reasons) || !slices.Equal(response.Errors, o.Errors) {
+		if response.Decision.String() != o.Decision || !slices.Equal(response.Reasons, o.Reasons) || !reflect.DeepEqual(response.Errors, o.Errors) {
 			t.Fatalf("authorization differs: %+v vs %+v", response, o)
 		}
 	}

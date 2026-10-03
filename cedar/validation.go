@@ -3,6 +3,7 @@ package cedar
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
 )
@@ -22,9 +23,10 @@ func (rt *Runtime) callOnce(ctx context.Context, op string, input []byte) ([]byt
 
 type ValidationResult struct {
 	// Passed can be true with warnings; only errors fail validation.
-	Passed   bool
-	Errors   []PolicyMessage
-	Warnings []PolicyMessage
+	Passed         bool
+	Errors         []PolicyMessage
+	Warnings       []PolicyMessage
+	SchemaWarnings []SchemaWarning `json:"schema_warnings"`
 }
 
 type validateInput struct {
@@ -34,10 +36,11 @@ type validateInput struct {
 }
 
 type validateOutput struct {
-	Passed   *bool           `json:"passed"`
-	Errors   []PolicyMessage `json:"errors"`
-	Warnings []PolicyMessage `json:"warnings"`
-	Error    *wire.Error     `json:"error"`
+	Passed         *bool           `json:"passed"`
+	Errors         []PolicyMessage `json:"errors"`
+	Warnings       []PolicyMessage `json:"warnings"`
+	SchemaWarnings []SchemaWarning `json:"schema_warnings"`
+	Error          *wire.Error     `json:"error"`
 }
 
 // Validate checks policies against a schema with Cedar's strict validator.
@@ -64,15 +67,13 @@ func (rt *Runtime) validate(ctx context.Context, schema Schema, policies PolicyS
 	if err != nil {
 		return ValidationResult{}, err
 	}
-	var resp validateOutput
-	if err := json.Unmarshal(out, &resp); err != nil {
+	result, err := decodeValidation(out, len(policies.text), len(schema.text))
+	if err != nil {
+		var ce *Error
+		if errors.As(err, &ce) {
+			return ValidationResult{}, err
+		}
 		return ValidationResult{}, faultError(fmt.Errorf("decode validation response: %w", err))
 	}
-	if resp.Error != nil {
-		return ValidationResult{}, moduleError(resp.Error)
-	}
-	if resp.Passed == nil {
-		return ValidationResult{}, faultError(fmt.Errorf("validation response has no result"))
-	}
-	return ValidationResult{Passed: *resp.Passed, Errors: resp.Errors, Warnings: resp.Warnings}, nil
+	return result, nil
 }

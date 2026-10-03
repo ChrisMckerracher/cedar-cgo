@@ -3,7 +3,8 @@
     "name": "strict",
     "passed": true,
     "errors": [],
-    "warnings": []
+    "warnings": [],
+    "schema_warnings": []
   },
   {
     "name": "zero",
@@ -11,10 +12,19 @@
     "errors": [
       {
         "policy_id": "policy0",
-        "message": "for policy `policy0`, this policy requires level 3, which exceeds the maximum allowed level (0)"
+        "category": "entity_dereference_level_violation",
+        "severity": "error",
+        "message": "for policy `policy0`, this policy requires level 3, which exceeds the maximum allowed level (0)",
+        "spans": [
+          {
+            "offset": 43,
+            "length": 27
+          }
+        ]
       }
     ],
-    "warnings": []
+    "warnings": [],
+    "schema_warnings": []
   },
   {
     "name": "one",
@@ -22,10 +32,19 @@
     "errors": [
       {
         "policy_id": "policy0",
-        "message": "for policy `policy0`, this policy requires level 3, which exceeds the maximum allowed level (1)"
+        "category": "entity_dereference_level_violation",
+        "severity": "error",
+        "message": "for policy `policy0`, this policy requires level 3, which exceeds the maximum allowed level (1)",
+        "spans": [
+          {
+            "offset": 43,
+            "length": 27
+          }
+        ]
       }
     ],
-    "warnings": []
+    "warnings": [],
+    "schema_warnings": []
   },
   {
     "name": "two",
@@ -33,22 +52,33 @@
     "errors": [
       {
         "policy_id": "policy0",
-        "message": "for policy `policy0`, this policy requires level 3, which exceeds the maximum allowed level (2)"
+        "category": "entity_dereference_level_violation",
+        "severity": "error",
+        "message": "for policy `policy0`, this policy requires level 3, which exceeds the maximum allowed level (2)",
+        "spans": [
+          {
+            "offset": 43,
+            "length": 27
+          }
+        ]
       }
     ],
-    "warnings": []
+    "warnings": [],
+    "schema_warnings": []
   },
   {
     "name": "three",
     "passed": true,
     "errors": [],
-    "warnings": []
+    "warnings": [],
+    "schema_warnings": []
   },
   {
     "name": "maximum",
     "passed": true,
     "errors": [],
-    "warnings": []
+    "warnings": [],
+    "schema_warnings": []
   },
   {
     "name": "type-error",
@@ -56,21 +86,32 @@
     "errors": [
       {
         "policy_id": "policy0",
-        "message": "the types Bool and Long are not compatible (help: for policy `policy0`, both operands to a `==` expression must have compatible types. Types must be exactly equal to be compatible)"
+        "category": "incompatible_types",
+        "severity": "error",
+        "message": "the types Bool and Long are not compatible (help: for policy `policy0`, both operands to a `==` expression must have compatible types. Types must be exactly equal to be compatible)",
+        "spans": [
+          {
+            "offset": 43,
+            "length": 20
+          }
+        ]
       }
     ],
-    "warnings": []
+    "warnings": [],
+    "schema_warnings": []
   },
   {
     "name": "constant",
     "passed": true,
     "errors": [],
-    "warnings": []
+    "warnings": [],
+    "schema_warnings": []
   },
   {
     "name": "empty",
     "passed": true,
     "errors": [],
-    "warnings": []
+    "warnings": [],
+    "schema_warnings": []
   }
 ]

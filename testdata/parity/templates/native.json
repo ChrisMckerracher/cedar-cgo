@@ -78,8 +78,10 @@
         "valid": true,
         "warnings": [
           {
+            "category": "impossible_policy",
             "message": "for policy `policy0`, policy is impossible: the policy expression evaluates to false for all valid requests",
-            "policy_id": "policy0"
+            "policy_id": "policy0",
+            "severity": "warning"
           }
         ]
       },
@@ -762,12 +764,16 @@
         "valid": true,
         "warnings": [
           {
+            "category": "invalid_action_application",
             "message": "for policy `new`, unable to find an applicable action given the policy scope constraints",
-            "policy_id": "new"
+            "policy_id": "new",
+            "severity": "warning"
           },
           {
+            "category": "impossible_policy",
             "message": "for policy `policy0`, policy is impossible: the policy expression evaluates to false for all valid requests",
-            "policy_id": "policy0"
+            "policy_id": "policy0",
+            "severity": "warning"
           }
         ]
       },
@@ -842,8 +848,10 @@
         "decision": "deny",
         "errors": [
           {
+            "category": "unrecognized_entity_type",
             "message": "for policy `new`, unrecognized entity type `Uzer` (help: did you mean `User`?)",
-            "policy_id": "new"
+            "policy_id": "new",
+            "severity": "error"
           }
         ],
         "policies": {
@@ -918,12 +926,16 @@
         "valid": false,
         "warnings": [
           {
+            "category": "invalid_action_application",
             "message": "for policy `new`, unable to find an applicable action given the policy scope constraints",
-            "policy_id": "new"
+            "policy_id": "new",
+            "severity": "warning"
           },
           {
+            "category": "impossible_policy",
             "message": "for policy `policy0`, policy is impossible: the policy expression evaluates to false for all valid requests",
-            "policy_id": "policy0"
+            "policy_id": "policy0",
+            "severity": "warning"
           }
         ]
       },
@@ -1050,8 +1062,10 @@
         "valid": true,
         "warnings": [
           {
+            "category": "impossible_policy",
             "message": "for policy `policy0`, policy is impossible: the policy expression evaluates to false for all valid requests",
-            "policy_id": "policy0"
+            "policy_id": "policy0",
+            "severity": "warning"
           }
         ]
       },
@@ -1397,8 +1411,10 @@
         "valid": true,
         "warnings": [
           {
+            "category": "impossible_policy",
             "message": "for policy `policy0`, policy is impossible: the policy expression evaluates to false for all valid requests",
-            "policy_id": "policy0"
+            "policy_id": "policy0",
+            "severity": "warning"
           }
         ]
       },
@@ -1831,8 +1847,10 @@
         "valid": true,
         "warnings": [
           {
+            "category": "impossible_policy",
             "message": "for policy `policy0`, policy is impossible: the policy expression evaluates to false for all valid requests",
-            "policy_id": "policy0"
+            "policy_id": "policy0",
+            "severity": "warning"
           }
         ]
       },
@@ -2255,8 +2273,10 @@
         "decision": "deny",
         "errors": [
           {
+            "category": "unrecognized_entity_type",
             "message": "for policy `link\\\\\\\"\\n\\0雪`, unrecognized entity type `Uzer` (help: did you mean `User`?)",
-            "policy_id": "link\\\"\n\u0000雪"
+            "policy_id": "link\\\"\n\u0000雪",
+            "severity": "error"
           }
         ],
         "policies": {
@@ -2310,8 +2330,10 @@
         "valid": false,
         "warnings": [
           {
+            "category": "invalid_action_application",
             "message": "for policy `link\\\\\\\"\\n\\0雪`, unable to find an applicable action given the policy scope constraints",
-            "policy_id": "link\\\"\n\u0000雪"
+            "policy_id": "link\\\"\n\u0000雪",
+            "severity": "warning"
           }
         ]
       },

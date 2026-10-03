@@ -1,0 +1,260 @@
+[
+  {
+    "name": "builtin-shadow",
+    "passed": true,
+    "errors": [],
+    "warnings": [],
+    "schema_warnings": [
+      {
+        "category": "shadows_builtin",
+        "severity": "warning",
+        "message": "The name `String` shadows a builtin Cedar name. You'll have to refer to the builtin as `__cedar::String`.",
+        "spans": [
+          {
+            "offset": 7,
+            "length": 6
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "entity-shadow",
+    "passed": true,
+    "errors": [],
+    "warnings": [],
+    "schema_warnings": [
+      {
+        "category": "shadows_entity",
+        "severity": "warning",
+        "message": "The common type name User shadows an entity name",
+        "spans": [
+          {
+            "offset": 7,
+            "length": 4
+          },
+          {
+            "offset": 18,
+            "length": 4
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "type-error-unicode",
+    "passed": false,
+    "errors": [
+      {
+        "policy_id": "policy0",
+        "category": "incompatible_types",
+        "severity": "error",
+        "message": "the types Bool and Long are not compatible (help: for policy `policy0`, both operands to a `==` expression must have compatible types. Types must be exactly equal to be compatible)",
+        "spans": [
+          {
+            "offset": 55,
+            "length": 20
+          }
+        ]
+      }
+    ],
+    "warnings": [],
+    "schema_warnings": []
+  },
+  {
+    "name": "invalid-action-warning",
+    "passed": true,
+    "errors": [],
+    "warnings": [
+      {
+        "policy_id": "policy0",
+        "category": "impossible_policy",
+        "severity": "warning",
+        "message": "for policy `policy0`, policy is impossible: the policy expression evaluates to false for all valid requests",
+        "spans": [
+          {
+            "offset": 0,
+            "length": 71
+          }
+        ]
+      },
+      {
+        "policy_id": "policy0",
+        "category": "invalid_action_application",
+        "severity": "warning",
+        "message": "for policy `policy0`, unable to find an applicable action given the policy scope constraints",
+        "spans": [
+          {
+            "offset": 0,
+            "length": 71
+          }
+        ]
+      }
+    ],
+    "schema_warnings": []
+  },
+  {
+    "name": "confusable-warning",
+    "passed": true,
+    "errors": [],
+    "warnings": [
+      {
+        "policy_id": "policy0",
+        "category": "impossible_policy",
+        "severity": "warning",
+        "message": "for policy `policy0`, policy is impossible: the policy expression evaluates to false for all valid requests",
+        "spans": [
+          {
+            "offset": 0,
+            "length": 65
+          }
+        ]
+      },
+      {
+        "policy_id": "policy0",
+        "category": "mixed_script_string",
+        "severity": "warning",
+        "message": "for policy `policy0`, string `\"pаypal\"` contains mixed scripts",
+        "spans": [
+          {
+            "offset": 42,
+            "length": 9
+          }
+        ]
+      }
+    ],
+    "schema_warnings": []
+  },
+  {
+    "name": "unknown-type",
+    "passed": false,
+    "errors": [
+      {
+        "policy_id": "policy0",
+        "category": "unrecognized_entity_type",
+        "severity": "error",
+        "message": "for policy `policy0`, unrecognized entity type `Uset`",
+        "spans": [
+          {
+            "offset": 20,
+            "length": 4
+          }
+        ]
+      }
+    ],
+    "warnings": [
+      {
+        "policy_id": "policy0",
+        "category": "impossible_policy",
+        "severity": "warning",
+        "message": "for policy `policy0`, policy is impossible: the policy expression evaluates to false for all valid requests",
+        "spans": [
+          {
+            "offset": 0,
+            "length": 44
+          }
+        ]
+      },
+      {
+        "policy_id": "policy0",
+        "category": "invalid_action_application",
+        "severity": "warning",
+        "message": "for policy `policy0`, unable to find an applicable action given the policy scope constraints",
+        "spans": [
+          {
+            "offset": 0,
+            "length": 44
+          }
+        ]
+      }
+    ],
+    "schema_warnings": []
+  },
+  {
+    "name": "empty",
+    "passed": true,
+    "errors": [],
+    "warnings": [],
+    "schema_warnings": []
+  },
+  {
+    "name": "json-is-unknown-type",
+    "passed": false,
+    "errors": [
+      {
+        "policy_id": "policy0",
+        "category": "unrecognized_entity_type",
+        "severity": "error",
+        "message": "for policy `policy0`, unrecognized entity type `Uset`"
+      }
+    ],
+    "warnings": [
+      {
+        "policy_id": "policy0",
+        "category": "impossible_policy",
+        "severity": "warning",
+        "message": "for policy `policy0`, policy is impossible: the policy expression evaluates to false for all valid requests"
+      },
+      {
+        "policy_id": "policy0",
+        "category": "invalid_action_application",
+        "severity": "warning",
+        "message": "for policy `policy0`, unable to find an applicable action given the policy scope constraints"
+      }
+    ],
+    "schema_warnings": []
+  },
+  {
+    "name": "json-eq-unknown-type",
+    "passed": false,
+    "errors": [
+      {
+        "policy_id": "policy0",
+        "category": "unrecognized_entity_type",
+        "severity": "error",
+        "message": "for policy `policy0`, unrecognized entity type `Uset`"
+      }
+    ],
+    "warnings": [
+      {
+        "policy_id": "policy0",
+        "category": "invalid_action_application",
+        "severity": "warning",
+        "message": "for policy `policy0`, unable to find an applicable action given the policy scope constraints"
+      }
+    ],
+    "schema_warnings": []
+  },
+  {
+    "name": "duplicate-type-errors",
+    "passed": false,
+    "errors": [
+      {
+        "policy_id": "policy0",
+        "category": "unexpected_type",
+        "severity": "error",
+        "message": "for policy `policy0`, unexpected type: expected Bool but saw Long",
+        "spans": [
+          {
+            "offset": 43,
+            "length": 1
+          }
+        ]
+      },
+      {
+        "policy_id": "policy0",
+        "category": "unexpected_type",
+        "severity": "error",
+        "message": "for policy `policy0`, unexpected type: expected Bool but saw Long",
+        "spans": [
+          {
+            "offset": 48,
+            "length": 1
+          }
+        ]
+      }
+    ],
+    "warnings": [],
+    "schema_warnings": []
+  }
+]

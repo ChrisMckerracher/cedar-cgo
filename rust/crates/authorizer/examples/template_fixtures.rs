@@ -63,8 +63,20 @@ fn case(
             let schema = Schema::from_cedarschema_str(SCHEMA).unwrap().0;
             let validation = Validator::new(schema.clone()).validate(&set, ValidationMode::Strict);
             let valid = validation.validation_passed();
-            let mut errors: Vec<_> = validation.validation_errors().map(|e| json!({"policy_id":AsRef::<str>::as_ref(e.policy_id()), "message":cgw_abi::diagnostics::render(e)})).collect();
-            let mut warnings: Vec<_> = validation.validation_warnings().map(|e| json!({"policy_id":AsRef::<str>::as_ref(e.policy_id()), "message":cgw_abi::diagnostics::render(e)})).collect();
+            let mut errors: Vec<_> = validation
+                .validation_errors()
+                .map(|e| {
+                    serde_json::to_value(cgw_abi::structured::validation_error(e).without_spans())
+                        .unwrap()
+                })
+                .collect();
+            let mut warnings: Vec<_> = validation
+                .validation_warnings()
+                .map(|e| {
+                    serde_json::to_value(cgw_abi::structured::validation_warning(e).without_spans())
+                        .unwrap()
+                })
+                .collect();
             errors.sort_by_key(Value::to_string);
             warnings.sort_by_key(Value::to_string);
             let req = cedar_policy::Request::new(
