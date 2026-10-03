@@ -172,6 +172,65 @@ Values marshal using Cedar's JSON conventions, including `__entity` and
 keys as the corresponding escape. `EntityUID.String()` is for display;
 use its fields or JSON representation when passing it to Cedar.
 
+### Parsed entity stores
+
+`Runtime.ParseEntityStore(ctx, entities, schema)` returns an immutable `ParsedEntityStore`.
+Pass a nil schema to omit schema validation.
+A supplied schema validates entities and inserts its action entities.
+The store remains tied to its runtime.
+Close the runtime when all operations finish.
+
+| Operation | Native result |
+| --- | --- |
+| `Get(ctx, uid)` | Entity values, direct parents, transitive ancestors, and an existence flag |
+| `Ancestors(ctx, uid)` | Transitive ancestors and an existence flag |
+| `IsAncestorOf(ctx, ancestor, descendant)` | Cedar membership, including equality for absent UIDs |
+| `DeepEqual(ctx, other)` | Equality of UIDs, values, tags, and transitive ancestor sets |
+| `Remove(ctx, uids...)` | A new store after deletion and edge cleanup |
+| `Upsert(ctx, additions)` | A new store after replacement, schema validation, and ancestry computation |
+| `Export()` | Native normalized entity JSON in an `Entities` value |
+
+`Get` returns typed `EvalRecord` attributes and tags.
+These values preserve signed 64-bit integers and extension results.
+`ParsedEntity.JSON()` returns a copy of the native normalized entity JSON.
+
+Mutations preserve the original store.
+An invalid update returns an error and leaves the original graph available.
+If an upsert contains duplicate UIDs, the last entity wins.
+Removal deletes graph edges, but preserves entity-valued attribute references.
+Native removal of an absent UID has no effect.
+
+Normalized JSON contains transitive ancestors in each `parents` array.
+Normalized exports sort JSON object keys.
+The opaque snapshot retains direct parents separately through the native AST.
+Use snapshot mutations to preserve those direct edges.
+Reparsing normalized JSON treats all exported ancestors as direct parents, as native Cedar does.
+Deep equality compares ancestry, so it does not distinguish these direct-parent histories.
+
+```go
+store, err := rt.ParseEntityStore(ctx, entities, &schema)
+if err != nil {
+    return err
+}
+changed, err := store.Remove(ctx, cedar.NewEntityUID("Group", "old"))
+if err != nil {
+    return err
+}
+entity, found, err := changed.Get(ctx, principal)
+if err != nil {
+    return err
+}
+if found {
+    fmt.Println(entity.Parents, entity.Ancestors)
+}
+normalized := changed.Export()
+```
+
+Operations reconstruct and mutate the graph in Rust.
+The Go snapshot contains no editable graph maps.
+Each call uses a fresh guest instance and the runtime's source, memory, and response limits.
+The caller's context bounds execution time.
+
 ## Authorization
 
 `Runtime.NewAuthorizer(ctx, Config)` parses the configuration and loads the

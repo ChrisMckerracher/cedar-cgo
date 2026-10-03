@@ -46,6 +46,7 @@ Ordinary Go tests compare the embedded guest with those fixtures:
 | Templates | `scripts/check-template-parity.sh` | `TestTemplateNativeParity` |
 | Partial evaluation | `scripts/partial-fixtures.sh --check` | `TestPartialNativeFixtures` |
 | Batched loading | `scripts/check-batched-parity.sh` | `TestBatchedNativeParity` |
+| Entity store mutations | `scripts/entity-store-parity.sh --check` | `TestEntityStoreNativeParity` |
 | Slicing | `scripts/slicing-fixtures.sh --check` | `TestSliceEntitiesNativeParity` |
 | Policy construction | `scripts/policies-parity.sh --check` | `TestPoliciesNativeParity` |
 | Formatting | `scripts/format-parity.sh --check` | `TestFormatNativeParity` |
@@ -122,6 +123,7 @@ The `cedar` package contains these Go fuzz targets:
 |---|---|
 | `FuzzAuthorize` | UIDs, contexts, per-request entities, and response handling |
 | `FuzzPolicies` | Policy parsing, strict validation, loading, and authorization, seeded with corpus-derived literals |
+| `FuzzEntityStoreUnrelatedDecisions` | Native mutation sequences preserve decisions for unrelated entities |
 | `FuzzEntities` | Entity parsing and authorization, with and without a schema |
 | `FuzzBatchedEntities` | Callback entity JSON, bounded loading, and fail-closed results |
 | `FuzzBatchedDifferential` | Batched loading against single-shot authorization with identical data, plus failing/oversized/malformed loaders |
@@ -361,3 +363,16 @@ It also checks authorization with the composed schema.
 Boundary tests cover duplicate declarations, cycles, annotations, UTF-8, and input limits.
 `FuzzSchemaFragments` checks that successful composition supports inspection and action extraction.
 Regenerate the native fixtures with `scripts/schema-parity.sh --write`.
+
+### Entity store mutation checks
+
+The entity-store oracle invokes native Cedar APIs directly.
+Its ten fixtures retain one native store across mutation sequences.
+The Go API compares normalized exports, direct parents, ancestry, membership, and deep equality at each step.
+Fixtures cover replacement, deletion, redundant direct edges, missing parents, duplicate upserts, cycles, and schema validation.
+They also check schema action deletion and exact integer, extension, Unicode, and tag values.
+
+The opaque snapshot records direct parents from the native AST.
+A chain deletion fixture detects accidental reconstruction from transitive normalized JSON.
+The mutation fuzz target changes an isolated graph component.
+It then checks that an unrelated authorization decision stays unchanged.

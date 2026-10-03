@@ -14,6 +14,7 @@ use std::cell::RefCell;
 
 mod applicability;
 mod batched;
+mod entity_store;
 mod expressions;
 mod format;
 mod literals;
@@ -71,6 +72,16 @@ fn load(bytes: &[u8]) -> Result<LoadOutput, OpError> {
         })
     });
     Ok(out)
+}
+
+/// Reads or updates an immutable native entity snapshot.
+///
+/// # Safety
+/// `ptr` and `len` must come from one `cgw_alloc(len)` call.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn cgw_entity_store(ptr: u32, len: u32) -> u64 {
+    // SAFETY: the host passes a buffer from `cgw_alloc(len)`.
+    run(unsafe { take_input(ptr, len) }, entity_store::execute)
 }
 
 /// Loads a schema, a policy set and entities into this instance.
