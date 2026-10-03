@@ -19,6 +19,18 @@ func (u EntityUID) String() string { return u.Type + "::" + strconv.Quote(u.ID) 
 
 func (u EntityUID) wire() wire.UID { return wire.UID{Type: u.Type, ID: u.ID} }
 
+// Metadata uses flat UID objects and preserves nil lists.
+func metadataUIDs(entities []EntityUID) []wire.UID {
+	if entities == nil {
+		return nil
+	}
+	result := make([]wire.UID, len(entities))
+	for i, entity := range entities {
+		result[i] = entity.wire()
+	}
+	return result
+}
+
 // MarshalJSON uses Cedar's explicit __entity form to distinguish UIDs from records.
 func (u EntityUID) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
