@@ -43,20 +43,10 @@ type ActionQueryResult struct {
 
 // MarshalJSON preserves the flat UID form used by native query results.
 func (r ActionQueryResult) MarshalJSON() ([]byte, error) {
-	uidList := func(entities []EntityUID) []wire.UID {
-		if entities == nil {
-			return nil
-		}
-		result := make([]wire.UID, len(entities))
-		for i, entity := range entities {
-			result[i] = entity.wire()
-		}
-		return result
-	}
 	return json.Marshal(struct {
 		Allowed   []wire.UID `json:"allowed"`
 		Undecided []wire.UID `json:"undecided"`
-	}{uidList(r.Allowed), uidList(r.Undecided)})
+	}{metadataUIDs(r.Allowed), metadataUIDs(r.Undecided)})
 }
 
 func decodeQueryUIDs(raw *json.RawMessage) ([]EntityUID, error) {

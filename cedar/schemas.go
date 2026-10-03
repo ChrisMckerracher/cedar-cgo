@@ -42,22 +42,12 @@ type SchemaInspection struct {
 
 // MarshalJSON preserves the flat UID form used by native schema results.
 func (s SchemaInspection) MarshalJSON() ([]byte, error) {
-	uidList := func(entities []EntityUID) []wire.UID {
-		if entities == nil {
-			return nil
-		}
-		result := make([]wire.UID, len(entities))
-		for i, entity := range entities {
-			result[i] = entity.wire()
-		}
-		return result
-	}
 	type inspection SchemaInspection
 	return json.Marshal(struct {
 		inspection
 		Actions      []wire.UID `json:"actions"`
 		ActionGroups []wire.UID `json:"action_groups"`
-	}{inspection(s), uidList(s.Actions), uidList(s.ActionGroups)})
+	}{inspection(s), metadataUIDs(s.Actions), metadataUIDs(s.ActionGroups)})
 }
 
 // ConvertSchemaFragment uses Cedar's native fragment conversions without resolving external declarations.
