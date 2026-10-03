@@ -293,6 +293,34 @@ level and uses Cedar 4.13.0's stable level validation API. Experimental upstream
 permissive and partial validation modes remain outside this API. Both methods
 return the same diagnostics and use the same context and resource limits.
 
+## Schema operations
+
+`SchemaFragmentFromCedar` and `SchemaFragmentFromJSON` retain fragment source.
+Fragments can reference declarations from other fragments.
+`Runtime.ConvertSchemaFragment` calls native `SchemaFragment` conversion for either output format.
+Conversion parses syntax but does not require external declarations to exist.
+It preserves declarations and annotations, but does not preserve comments or formatting.
+
+`Runtime.ComposeSchema` calls native `Schema::from_schema_fragments` before it combines declaration maps.
+Cedar resolves references after it collects all fragments.
+Undefined references, duplicate declarations, action hierarchy cycles, and common type cycles return `KindSchema`.
+Recursive entity type hierarchies follow native Cedar rules.
+The result is a normalized JSON `Schema` for validation, authorization, or inspection.
+Namespace annotations with the same key use the last fragment's value.
+
+`Runtime.InspectSchema` returns two native schema projections.
+`ResolvedSchema` retains common type declarations and classifies qualified references as entity types or common types.
+`ExpandedSchema` inlines common types in entity attributes and action contexts.
+The expanded projection omits annotations and common type declarations.
+It contains transitive hierarchy relationships.
+`Ancestors`, `Actions`, `ActionGroups`, and `Environments` provide sorted metadata.
+Request environments describe schema applicability and do not grant access.
+
+`Runtime.ActionEntities` returns Cedar's action entities, including their transitive parent relationships.
+Use the returned `Entities` with an authorizer or serialize it with `json.Marshal`.
+All schema operations enforce the runtime's input, response, memory, and cancellation limits.
+Invalid UTF-8 returns `KindInput` before module execution.
+
 ## Entity literals
 
 `Runtime.EntityLiterals` lists sorted literal occurrences by policy and template

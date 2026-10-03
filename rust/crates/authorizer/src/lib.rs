@@ -18,6 +18,7 @@ mod expressions;
 mod format;
 mod literals;
 mod policies;
+mod schemas;
 mod slicing;
 mod templates;
 
@@ -296,4 +297,14 @@ pub unsafe extern "C" fn cgw_literals(ptr: u32, len: u32) -> u64 {
 pub unsafe extern "C" fn cgw_applicability(ptr: u32, len: u32) -> u64 {
     // SAFETY: the host passes a buffer from `cgw_alloc(len)`.
     run(unsafe { take_input(ptr, len) }, applicability::execute)
+}
+
+/// Converts, composes, and inspects native Cedar schemas.
+///
+/// # Safety
+/// `ptr` and `len` must come from one `cgw_alloc(len)` call.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn cgw_schemas(ptr: u32, len: u32) -> u64 {
+    // SAFETY: the caller transfers the allocated input buffer.
+    run(unsafe { take_input(ptr, len) }, schemas::execute)
 }

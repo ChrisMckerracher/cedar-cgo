@@ -1,0 +1,1168 @@
+[
+  {
+    "name": "cross-fragment common and entity references",
+    "conversions": [
+      {
+        "json": {
+          "": {
+            "entityTypes": {
+              "Photo": {},
+              "User": {
+                "shape": {
+                  "type": "Record",
+                  "attributes": {
+                    "profile": {
+                      "type": "EntityOrCommon",
+                      "name": "Profile"
+                    },
+                    "team": {
+                      "type": "EntityOrCommon",
+                      "name": "Team"
+                    }
+                  }
+                }
+              }
+            },
+            "actions": {
+              "view": {
+                "appliesTo": {
+                  "resourceTypes": [
+                    "Photo"
+                  ],
+                  "principalTypes": [
+                    "User"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "cedar": "entity Photo;\n\nentity User = {\n  profile: Profile,\n  team: Team\n};\n\naction \"view\" appliesTo {\n  principal: [User],\n  resource: [Photo],\n  context: {}\n};\n"
+      },
+      {
+        "json": {
+          "": {
+            "commonTypes": {
+              "Profile": {
+                "type": "Record",
+                "attributes": {
+                  "active": {
+                    "type": "Boolean"
+                  },
+                  "name": {
+                    "type": "String"
+                  }
+                }
+              }
+            },
+            "entityTypes": {
+              "Team": {}
+            },
+            "actions": {}
+          }
+        },
+        "cedar": "type Profile = {\n  active: __cedar::Bool,\n  name: __cedar::String\n};\n\nentity Team;\n"
+      }
+    ],
+    "inspection": {
+      "resolved_schema": {
+        "": {
+          "commonTypes": {
+            "Profile": {
+              "type": "Record",
+              "attributes": {
+                "active": {
+                  "type": "Boolean"
+                },
+                "name": {
+                  "type": "String"
+                }
+              }
+            }
+          },
+          "entityTypes": {
+            "Photo": {},
+            "Team": {},
+            "User": {
+              "shape": {
+                "type": "Record",
+                "attributes": {
+                  "profile": {
+                    "type": "Profile"
+                  },
+                  "team": {
+                    "type": "Entity",
+                    "name": "Team"
+                  }
+                }
+              }
+            }
+          },
+          "actions": {
+            "view": {
+              "appliesTo": {
+                "resourceTypes": [
+                  "Photo"
+                ],
+                "principalTypes": [
+                  "User"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "expanded_schema": {
+        "": {
+          "entityTypes": {
+            "Photo": {},
+            "Team": {},
+            "User": {
+              "shape": {
+                "type": "Record",
+                "attributes": {
+                  "profile": {
+                    "type": "Record",
+                    "attributes": {
+                      "active": {
+                        "type": "Boolean"
+                      },
+                      "name": {
+                        "type": "String"
+                      }
+                    }
+                  },
+                  "team": {
+                    "type": "EntityOrCommon",
+                    "name": "Team"
+                  }
+                }
+              }
+            }
+          },
+          "actions": {
+            "view": {
+              "appliesTo": {
+                "resourceTypes": [
+                  "Photo"
+                ],
+                "principalTypes": [
+                  "User"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "ancestors": {
+        "Photo": [],
+        "Team": [],
+        "User": []
+      },
+      "actions": [
+        {
+          "type": "Action",
+          "id": "view"
+        }
+      ],
+      "action_groups": [],
+      "environments": [
+        {
+          "principal_type": "User",
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource_type": "Photo"
+        }
+      ]
+    },
+    "action_entities": [
+      {
+        "uid": {
+          "type": "Action",
+          "id": "view"
+        },
+        "attrs": {},
+        "parents": []
+      }
+    ],
+    "valid": true
+  },
+  {
+    "name": "qualified cross-namespace references and hierarchy",
+    "conversions": [
+      {
+        "json": {
+          "App": {
+            "entityTypes": {
+              "Photo": {},
+              "User": {
+                "memberOfTypes": [
+                  "Org::Team"
+                ],
+                "shape": {
+                  "type": "Record",
+                  "attributes": {
+                    "profile": {
+                      "type": "EntityOrCommon",
+                      "name": "Shared::Profile"
+                    }
+                  }
+                }
+              }
+            },
+            "actions": {
+              "all": {
+                "appliesTo": {
+                  "resourceTypes": [],
+                  "principalTypes": []
+                }
+              },
+              "view": {
+                "appliesTo": {
+                  "resourceTypes": [
+                    "Photo"
+                  ],
+                  "principalTypes": [
+                    "User"
+                  ],
+                  "context": {
+                    "type": "Shared::Context"
+                  }
+                },
+                "memberOf": [
+                  {
+                    "id": "all"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "cedar": "namespace App {\n  entity Photo;\n\n  entity User in [Org::Team] = {\n    profile: Shared::Profile\n  };\n\n  action \"all\";\n\n  action \"view\" in [Action::\"all\"] appliesTo {\n    principal: [User],\n    resource: [Photo],\n    context: Shared::Context\n  };\n}\n"
+      },
+      {
+        "json": {
+          "Org": {
+            "entityTypes": {
+              "Group": {},
+              "Team": {
+                "memberOfTypes": [
+                  "Group"
+                ]
+              }
+            },
+            "actions": {}
+          },
+          "Shared": {
+            "commonTypes": {
+              "Context": {
+                "type": "Record",
+                "attributes": {
+                  "mfa": {
+                    "type": "EntityOrCommon",
+                    "name": "Bool"
+                  }
+                }
+              },
+              "Profile": {
+                "type": "Record",
+                "attributes": {
+                  "name": {
+                    "type": "EntityOrCommon",
+                    "name": "String"
+                  }
+                }
+              }
+            },
+            "entityTypes": {},
+            "actions": {}
+          }
+        },
+        "cedar": "namespace Org {\n  entity Group;\n\n  entity Team in [Group];\n}\n\nnamespace Shared {\n  type Context = {\n    mfa: Bool\n  };\n\n  type Profile = {\n    name: String\n  };\n}\n"
+      }
+    ],
+    "inspection": {
+      "resolved_schema": {
+        "App": {
+          "entityTypes": {
+            "Photo": {},
+            "User": {
+              "memberOfTypes": [
+                "Org::Team"
+              ],
+              "shape": {
+                "type": "Record",
+                "attributes": {
+                  "profile": {
+                    "type": "Shared::Profile"
+                  }
+                }
+              }
+            }
+          },
+          "actions": {
+            "all": {
+              "appliesTo": {
+                "resourceTypes": [],
+                "principalTypes": []
+              }
+            },
+            "view": {
+              "appliesTo": {
+                "resourceTypes": [
+                  "App::Photo"
+                ],
+                "principalTypes": [
+                  "App::User"
+                ],
+                "context": {
+                  "type": "Shared::Context"
+                }
+              },
+              "memberOf": [
+                {
+                  "id": "all",
+                  "type": "App::Action"
+                }
+              ]
+            }
+          }
+        },
+        "Org": {
+          "entityTypes": {
+            "Group": {},
+            "Team": {
+              "memberOfTypes": [
+                "Org::Group"
+              ]
+            }
+          },
+          "actions": {}
+        },
+        "Shared": {
+          "commonTypes": {
+            "Context": {
+              "type": "Record",
+              "attributes": {
+                "mfa": {
+                  "type": "Bool"
+                }
+              }
+            },
+            "Profile": {
+              "type": "Record",
+              "attributes": {
+                "name": {
+                  "type": "String"
+                }
+              }
+            }
+          },
+          "entityTypes": {},
+          "actions": {}
+        }
+      },
+      "expanded_schema": {
+        "App": {
+          "entityTypes": {
+            "Photo": {},
+            "User": {
+              "memberOfTypes": [
+                "Org::Group",
+                "Org::Team"
+              ],
+              "shape": {
+                "type": "Record",
+                "attributes": {
+                  "profile": {
+                    "type": "Record",
+                    "attributes": {
+                      "name": {
+                        "type": "String"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "actions": {
+            "all": {
+              "appliesTo": {
+                "resourceTypes": [],
+                "principalTypes": []
+              }
+            },
+            "view": {
+              "appliesTo": {
+                "resourceTypes": [
+                  "App::Photo"
+                ],
+                "principalTypes": [
+                  "App::User"
+                ],
+                "context": {
+                  "type": "Record",
+                  "attributes": {
+                    "mfa": {
+                      "type": "Boolean"
+                    }
+                  }
+                }
+              },
+              "memberOf": [
+                {
+                  "id": "all",
+                  "type": "App::Action"
+                }
+              ]
+            }
+          }
+        },
+        "Org": {
+          "entityTypes": {
+            "Group": {},
+            "Team": {
+              "memberOfTypes": [
+                "Org::Group"
+              ]
+            }
+          },
+          "actions": {}
+        }
+      },
+      "ancestors": {
+        "App::Photo": [],
+        "App::User": [
+          "Org::Group",
+          "Org::Team"
+        ],
+        "Org::Group": [],
+        "Org::Team": [
+          "Org::Group"
+        ]
+      },
+      "actions": [
+        {
+          "type": "App::Action",
+          "id": "all"
+        },
+        {
+          "type": "App::Action",
+          "id": "view"
+        }
+      ],
+      "action_groups": [
+        {
+          "type": "App::Action",
+          "id": "all"
+        }
+      ],
+      "environments": [
+        {
+          "principal_type": "App::User",
+          "action": {
+            "type": "App::Action",
+            "id": "view"
+          },
+          "resource_type": "App::Photo"
+        }
+      ]
+    },
+    "action_entities": [
+      {
+        "uid": {
+          "type": "App::Action",
+          "id": "all"
+        },
+        "attrs": {},
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "App::Action",
+          "id": "view"
+        },
+        "attrs": {},
+        "parents": [
+          {
+            "type": "App::Action",
+            "id": "all"
+          }
+        ]
+      }
+    ],
+    "valid": true
+  },
+  {
+    "name": "extensions optional fields and enumerated entities",
+    "conversions": [
+      {
+        "json": {
+          "": {
+            "commonTypes": {
+              "Profile": {
+                "type": "Record",
+                "attributes": {
+                  "balance": {
+                    "type": "EntityOrCommon",
+                    "name": "decimal"
+                  },
+                  "source": {
+                    "type": "EntityOrCommon",
+                    "name": "ipaddr",
+                    "required": false
+                  }
+                }
+              }
+            },
+            "entityTypes": {
+              "Color": {
+                "enum": [
+                  "red",
+                  "雪"
+                ]
+              },
+              "User": {
+                "shape": {
+                  "type": "Record",
+                  "attributes": {
+                    "profile": {
+                      "type": "EntityOrCommon",
+                      "name": "Profile"
+                    }
+                  }
+                }
+              }
+            },
+            "actions": {
+              "inspect": {
+                "appliesTo": {
+                  "resourceTypes": [
+                    "Color"
+                  ],
+                  "principalTypes": [
+                    "User"
+                  ],
+                  "context": {
+                    "type": "Record",
+                    "attributes": {
+                      "stamp": {
+                        "type": "EntityOrCommon",
+                        "name": "datetime"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "cedar": "type Profile = {\n  balance: decimal,\n  source?: ipaddr\n};\n\nentity Color enum [\"red\", \"雪\"];\n\nentity User = {\n  profile: Profile\n};\n\naction \"inspect\" appliesTo {\n  principal: [User],\n  resource: [Color],\n  context: {\n    stamp: datetime\n  }\n};\n"
+      }
+    ],
+    "inspection": {
+      "resolved_schema": {
+        "": {
+          "commonTypes": {
+            "Profile": {
+              "type": "Record",
+              "attributes": {
+                "balance": {
+                  "type": "decimal"
+                },
+                "source": {
+                  "type": "ipaddr",
+                  "required": false
+                }
+              }
+            }
+          },
+          "entityTypes": {
+            "Color": {
+              "enum": [
+                "red",
+                "雪"
+              ]
+            },
+            "User": {
+              "shape": {
+                "type": "Record",
+                "attributes": {
+                  "profile": {
+                    "type": "Profile"
+                  }
+                }
+              }
+            }
+          },
+          "actions": {
+            "inspect": {
+              "appliesTo": {
+                "resourceTypes": [
+                  "Color"
+                ],
+                "principalTypes": [
+                  "User"
+                ],
+                "context": {
+                  "type": "Record",
+                  "attributes": {
+                    "stamp": {
+                      "type": "datetime"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "expanded_schema": {
+        "": {
+          "entityTypes": {
+            "Color": {
+              "enum": [
+                "red",
+                "雪"
+              ]
+            },
+            "User": {
+              "shape": {
+                "type": "Record",
+                "attributes": {
+                  "profile": {
+                    "type": "Record",
+                    "attributes": {
+                      "balance": {
+                        "type": "Extension",
+                        "name": "decimal"
+                      },
+                      "source": {
+                        "type": "Extension",
+                        "name": "ipaddr",
+                        "required": false
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "actions": {
+            "inspect": {
+              "appliesTo": {
+                "resourceTypes": [
+                  "Color"
+                ],
+                "principalTypes": [
+                  "User"
+                ],
+                "context": {
+                  "type": "Record",
+                  "attributes": {
+                    "stamp": {
+                      "type": "Extension",
+                      "name": "datetime"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "ancestors": {
+        "Color": [],
+        "User": []
+      },
+      "actions": [
+        {
+          "type": "Action",
+          "id": "inspect"
+        }
+      ],
+      "action_groups": [],
+      "environments": [
+        {
+          "principal_type": "User",
+          "action": {
+            "type": "Action",
+            "id": "inspect"
+          },
+          "resource_type": "Color"
+        }
+      ]
+    },
+    "action_entities": [
+      {
+        "uid": {
+          "type": "Action",
+          "id": "inspect"
+        },
+        "attrs": {},
+        "parents": []
+      }
+    ],
+    "valid": false
+  },
+  {
+    "name": "composed schema rejects invalid policy",
+    "conversions": [
+      {
+        "json": {
+          "": {
+            "entityTypes": {
+              "Photo": {},
+              "User": {
+                "shape": {
+                  "type": "Record",
+                  "attributes": {
+                    "profile": {
+                      "type": "EntityOrCommon",
+                      "name": "Profile"
+                    }
+                  }
+                }
+              }
+            },
+            "actions": {
+              "view": {
+                "appliesTo": {
+                  "resourceTypes": [
+                    "Photo"
+                  ],
+                  "principalTypes": [
+                    "User"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "cedar": "entity Photo;\n\nentity User = {\n  profile: Profile\n};\n\naction \"view\" appliesTo {\n  principal: [User],\n  resource: [Photo],\n  context: {}\n};\n"
+      },
+      {
+        "json": {
+          "": {
+            "commonTypes": {
+              "Profile": {
+                "type": "Record",
+                "attributes": {
+                  "name": {
+                    "type": "EntityOrCommon",
+                    "name": "String"
+                  }
+                }
+              }
+            },
+            "entityTypes": {},
+            "actions": {}
+          }
+        },
+        "cedar": "type Profile = {\n  name: String\n};\n"
+      }
+    ],
+    "inspection": {
+      "resolved_schema": {
+        "": {
+          "commonTypes": {
+            "Profile": {
+              "type": "Record",
+              "attributes": {
+                "name": {
+                  "type": "String"
+                }
+              }
+            }
+          },
+          "entityTypes": {
+            "Photo": {},
+            "User": {
+              "shape": {
+                "type": "Record",
+                "attributes": {
+                  "profile": {
+                    "type": "Profile"
+                  }
+                }
+              }
+            }
+          },
+          "actions": {
+            "view": {
+              "appliesTo": {
+                "resourceTypes": [
+                  "Photo"
+                ],
+                "principalTypes": [
+                  "User"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "expanded_schema": {
+        "": {
+          "entityTypes": {
+            "Photo": {},
+            "User": {
+              "shape": {
+                "type": "Record",
+                "attributes": {
+                  "profile": {
+                    "type": "Record",
+                    "attributes": {
+                      "name": {
+                        "type": "String"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "actions": {
+            "view": {
+              "appliesTo": {
+                "resourceTypes": [
+                  "Photo"
+                ],
+                "principalTypes": [
+                  "User"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "ancestors": {
+        "Photo": [],
+        "User": []
+      },
+      "actions": [
+        {
+          "type": "Action",
+          "id": "view"
+        }
+      ],
+      "action_groups": [],
+      "environments": [
+        {
+          "principal_type": "User",
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource_type": "Photo"
+        }
+      ]
+    },
+    "action_entities": [
+      {
+        "uid": {
+          "type": "Action",
+          "id": "view"
+        },
+        "attrs": {},
+        "parents": []
+      }
+    ],
+    "valid": false
+  },
+  {
+    "name": "empty schema",
+    "conversions": [],
+    "inspection": {
+      "resolved_schema": {},
+      "expanded_schema": {},
+      "ancestors": {},
+      "actions": [],
+      "action_groups": [],
+      "environments": []
+    },
+    "action_entities": [],
+    "valid": true
+  },
+  {
+    "name": "duplicate entity declarations",
+    "error": true
+  },
+  {
+    "name": "duplicate common type declarations",
+    "error": true
+  },
+  {
+    "name": "namespace declaration shadows empty namespace",
+    "error": true
+  },
+  {
+    "name": "unresolved reference",
+    "error": true
+  },
+  {
+    "name": "common type cycle",
+    "error": true
+  },
+  {
+    "name": "action hierarchy cycle",
+    "error": true
+  },
+  {
+    "name": "common type takes precedence over entity with same name",
+    "conversions": [
+      {
+        "json": {
+          "": {
+            "entityTypes": {
+              "User": {}
+            },
+            "actions": {}
+          }
+        },
+        "cedar": "entity User;\n"
+      },
+      {
+        "json": {
+          "": {
+            "commonTypes": {
+              "User": {
+                "type": "Record",
+                "attributes": {
+                  "name": {
+                    "type": "EntityOrCommon",
+                    "name": "String"
+                  }
+                }
+              }
+            },
+            "entityTypes": {
+              "Holder": {
+                "shape": {
+                  "type": "Record",
+                  "attributes": {
+                    "person": {
+                      "type": "EntityOrCommon",
+                      "name": "User"
+                    }
+                  }
+                }
+              }
+            },
+            "actions": {
+              "view": {
+                "appliesTo": {
+                  "resourceTypes": [
+                    "Holder"
+                  ],
+                  "principalTypes": [
+                    "Holder"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "cedar": "type User = {\n  name: String\n};\n\nentity Holder = {\n  person: User\n};\n\naction \"view\" appliesTo {\n  principal: [Holder],\n  resource: [Holder],\n  context: {}\n};\n"
+      }
+    ],
+    "inspection": {
+      "resolved_schema": {
+        "": {
+          "commonTypes": {
+            "User": {
+              "type": "Record",
+              "attributes": {
+                "name": {
+                  "type": "String"
+                }
+              }
+            }
+          },
+          "entityTypes": {
+            "Holder": {
+              "shape": {
+                "type": "Record",
+                "attributes": {
+                  "person": {
+                    "type": "User"
+                  }
+                }
+              }
+            },
+            "User": {}
+          },
+          "actions": {
+            "view": {
+              "appliesTo": {
+                "resourceTypes": [
+                  "Holder"
+                ],
+                "principalTypes": [
+                  "Holder"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "expanded_schema": {
+        "": {
+          "entityTypes": {
+            "Holder": {
+              "shape": {
+                "type": "Record",
+                "attributes": {
+                  "person": {
+                    "type": "Record",
+                    "attributes": {
+                      "name": {
+                        "type": "String"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "User": {}
+          },
+          "actions": {
+            "view": {
+              "appliesTo": {
+                "resourceTypes": [
+                  "Holder"
+                ],
+                "principalTypes": [
+                  "Holder"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "ancestors": {
+        "Holder": [],
+        "User": []
+      },
+      "actions": [
+        {
+          "type": "Action",
+          "id": "view"
+        }
+      ],
+      "action_groups": [],
+      "environments": [
+        {
+          "principal_type": "Holder",
+          "action": {
+            "type": "Action",
+            "id": "view"
+          },
+          "resource_type": "Holder"
+        }
+      ]
+    },
+    "action_entities": [
+      {
+        "uid": {
+          "type": "Action",
+          "id": "view"
+        },
+        "attrs": {},
+        "parents": []
+      }
+    ],
+    "valid": true
+  },
+  {
+    "name": "recursive entity type hierarchy",
+    "conversions": [
+      {
+        "json": {
+          "": {
+            "entityTypes": {
+              "A": {
+                "memberOfTypes": [
+                  "B"
+                ]
+              }
+            },
+            "actions": {}
+          }
+        },
+        "cedar": "entity A in [B];\n"
+      },
+      {
+        "json": {
+          "": {
+            "entityTypes": {
+              "B": {
+                "memberOfTypes": [
+                  "A"
+                ]
+              }
+            },
+            "actions": {}
+          }
+        },
+        "cedar": "entity B in [A];\n"
+      }
+    ],
+    "inspection": {
+      "resolved_schema": {
+        "": {
+          "entityTypes": {
+            "A": {
+              "memberOfTypes": [
+                "B"
+              ]
+            },
+            "B": {
+              "memberOfTypes": [
+                "A"
+              ]
+            }
+          },
+          "actions": {}
+        }
+      },
+      "expanded_schema": {
+        "": {
+          "entityTypes": {
+            "A": {
+              "memberOfTypes": [
+                "A",
+                "B"
+              ]
+            },
+            "B": {
+              "memberOfTypes": [
+                "A",
+                "B"
+              ]
+            }
+          },
+          "actions": {}
+        }
+      },
+      "ancestors": {
+        "A": [
+          "A",
+          "B"
+        ],
+        "B": [
+          "A",
+          "B"
+        ]
+      },
+      "actions": [],
+      "action_groups": [],
+      "environments": []
+    },
+    "action_entities": [],
+    "valid": true
+  }
+]

@@ -352,3 +352,12 @@ It compares metadata after removing variable suggestion text.
 `FuzzDiagnostics` checks validation and schema-warning response decoders without guest execution.
 Malformed spans, missing fields, contradictory status, and invalid severity fail decoding.
 Regenerate native fixtures with `scripts/diagnostics-parity.sh --write`.
+
+`TestSchemaNativeFixtures` compares conversion, inspection, action entities, and validation with pinned native Cedar.
+Fixtures include cross-fragment references, qualified namespaces, common types, optional attributes, extensions, and enumerated entity types.
+They also check empty schemas and invalid policy validation.
+`TestSchemaCompositionResolvesAfterCombining` checks a fragment that fails alone and succeeds after composition.
+It also checks authorization with the composed schema.
+Boundary tests cover duplicate declarations, cycles, annotations, UTF-8, and input limits.
+`FuzzSchemaFragments` checks that successful composition supports inspection and action extraction.
+Regenerate the native fixtures with `scripts/schema-parity.sh --write`.
