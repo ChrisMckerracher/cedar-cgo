@@ -6,6 +6,7 @@ import (
 	"errors"
 	"strings"
 	"testing"
+	"unicode/utf8"
 
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 )
@@ -28,6 +29,13 @@ func FuzzBatchedEntities(f *testing.F) {
 			return cedar.EntityLoadResult{Entities: json.RawMessage(data)}, nil
 		}), cedar.BatchedOptions{MaxIterations: 2, MaxBatchBytes: 8192})
 		checkNoFault(t, err)
+		if !utf8.Valid(data) {
+			requireUTF8InputError(t, err)
+			if decision != cedar.Deny {
+				t.Fatalf("malformed loader result allowed: %s", decision)
+			}
+			return
+		}
 		if err != nil && decision != cedar.Deny {
 			t.Fatalf("error allowed: %s %v", decision, err)
 		}
@@ -165,6 +173,16 @@ func FuzzBatchedDifferential(f *testing.F) {
 		})
 		decision, err := a.AuthorizeBatched(context.Background(), req, loader, cedar.BatchedOptions{MaxIterations: 4})
 		checkNoFault(t, err)
+		// The context gate mirrors the production path: structurally invalid
+		// JSON never reaches the wire, so only valid JSON can carry bad bytes.
+		if !utf8.ValidString(principalID) || !utf8.ValidString(resourceID) ||
+			(json.Valid([]byte(ctxJSON)) && !utf8.ValidString(ctxJSON)) {
+			requireUTF8InputError(t, err)
+			if decision != cedar.Deny {
+				t.Fatalf("malformed request allowed: %s", decision)
+			}
+			return
+		}
 		if err != nil && decision != cedar.Deny {
 			t.Fatalf("error allowed: %s %v", decision, err)
 		}

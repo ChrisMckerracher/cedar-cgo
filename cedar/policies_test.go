@@ -496,6 +496,15 @@ func TestPolicyInvalidUTF8(t *testing.T) {
 			_, e := rt.PolicyFromSyntax(ctx, s)
 			return e
 		},
+		func() error {
+			_, _, e := rt.MergePolicySets(ctx, cedar.PoliciesFromCedar(source+invalid), cedar.PoliciesFromCedar(source), false)
+			return e
+		},
+		func() error {
+			other := cedar.PoliciesFromJSON([]byte(`{"staticPolicies":{"` + invalid + `":{}}}`))
+			_, _, e := rt.MergePolicySets(ctx, cedar.PoliciesFromCedar(source), other, true)
+			return e
+		},
 	}
 	for i, run := range cases {
 		var e *cedar.Error
