@@ -172,6 +172,65 @@ Values marshal using Cedar's JSON conventions, including `__entity` and
 keys as the corresponding escape. `EntityUID.String()` is for display;
 use its fields or JSON representation when passing it to Cedar.
 
+### Parsed entity stores
+
+`Runtime.ParseEntityStore(ctx, entities, schema)` returns an immutable `ParsedEntityStore`.
+Pass a nil schema to omit schema validation.
+A supplied schema validates entities and inserts its action entities.
+The store remains tied to its runtime.
+Close the runtime when all operations finish.
+
+| Operation | Native result |
+| --- | --- |
+| `Get(ctx, uid)` | Entity values, direct parents, transitive ancestors, and an existence flag |
+| `Ancestors(ctx, uid)` | Transitive ancestors and an existence flag |
+| `IsAncestorOf(ctx, ancestor, descendant)` | Cedar membership, including equality for absent UIDs |
+| `DeepEqual(ctx, other)` | Equality of UIDs, values, tags, and transitive ancestor sets |
+| `Remove(ctx, uids...)` | A new store after deletion and edge cleanup |
+| `Upsert(ctx, additions)` | A new store after replacement, schema validation, and ancestry computation |
+| `Export()` | Native normalized entity JSON in an `Entities` value |
+
+`Get` returns typed `EvalRecord` attributes and tags.
+These values preserve signed 64-bit integers and extension results.
+`ParsedEntity.JSON()` returns a copy of the native normalized entity JSON.
+
+Mutations preserve the original store.
+An invalid update returns an error and leaves the original graph available.
+If an upsert contains duplicate UIDs, the last entity wins.
+Removal deletes graph edges, but preserves entity-valued attribute references.
+Native removal of an absent UID has no effect.
+
+Normalized JSON contains transitive ancestors in each `parents` array.
+Normalized exports sort JSON object keys.
+The opaque snapshot retains direct parents separately through the native AST.
+Use snapshot mutations to preserve those direct edges.
+Reparsing normalized JSON treats all exported ancestors as direct parents, as native Cedar does.
+Deep equality compares ancestry, so it does not distinguish these direct-parent histories.
+
+```go
+store, err := rt.ParseEntityStore(ctx, entities, &schema)
+if err != nil {
+    return err
+}
+changed, err := store.Remove(ctx, cedar.NewEntityUID("Group", "old"))
+if err != nil {
+    return err
+}
+entity, found, err := changed.Get(ctx, principal)
+if err != nil {
+    return err
+}
+if found {
+    fmt.Println(entity.Parents, entity.Ancestors)
+}
+normalized := changed.Export()
+```
+
+Operations reconstruct and mutate the graph in Rust.
+The Go snapshot contains no editable graph maps.
+Each call uses a fresh guest instance and the runtime's source, memory, and response limits.
+The caller's context bounds execution time.
+
 ## Authorization
 
 `Runtime.NewAuthorizer(ctx, Config)` parses the configuration and loads the
@@ -281,6 +340,219 @@ if !result.Passed {
 `PolicyMessage` has a `PolicyID` and `Message`. Warnings alone do not fail
 validation. Parse errors are returned as Go errors; type errors appear in
 the validation result. The caller's context bounds validation time.
+
+`Runtime.ValidateWithLevel(ctx, schema, policies, maxDereferenceLevel)` first runs
+strict validation. If that passes, Cedar checks the maximum entity dereference
+depth. An entity dereference reads an entity's attributes or hierarchy. Level
+zero permits no entity dereferences. A longer chain requires a higher level:
+`principal.photo.owner.admin` requires level three.
+
+`Validate` applies no depth limit. `ValidateWithLevel` accepts every `uint32`
+level and uses Cedar 4.13.0's stable level validation API. Experimental upstream
+permissive and partial validation modes remain outside this API. Both methods
+return the same diagnostics and use the same context and resource limits.
+
+## Full policy and template shape
+
+`ParsedPolicy.JSON`, `TemplateInfo.JSON`, and `ParsedPolicySet.JSON` expose the full ordinary JSON EST shape.
+They cover templates, links, slots, annotations, scope constraints, conditions, and expressions.
+The [PST mapping](pst-mapping.md) lists each native form and its JSON representation.
+Use full-set JSON to preserve policy IDs and template links.
+The versioned residual projection uses the same per-policy expression mapping.
+
+## Structured residual export
+
+`PartialResponse.Projection()` exposes versioned native PST through Cedar's JSON EST mapping.
+Policies retain their original IDs, effects, annotations, and complete expression trees.
+`{"error":[]}` preserves a nested residual error expression.
+Display text is an inspection aid and is not a faithful residual serialization.
+
+`PartialResponse.Export()` captures the frozen partial input and native projection.
+`Authorizer.ImportPartialResponse()` verifies both versions and the complete projection against native evaluation.
+It rebuilds the matching native PST with the loaded schema and policies.
+Reauthorization checks consistency with known data before it evaluates the imported residual policies.
+See [partial evaluation](partial-evaluation.md) for the continuation rules.
+
+## Schema operations
+
+`SchemaFragmentFromCedar` and `SchemaFragmentFromJSON` retain fragment source.
+Fragments can reference declarations from other fragments.
+`Runtime.ConvertSchemaFragment` calls native `SchemaFragment` conversion for either output format.
+Conversion parses syntax but does not require external declarations to exist.
+It preserves declarations and annotations, but does not preserve comments or formatting.
+
+`Runtime.ComposeSchema` calls native `Schema::from_schema_fragments` before it combines declaration maps.
+Cedar resolves references after it collects all fragments.
+Undefined references, duplicate declarations, action hierarchy cycles, and common type cycles return `KindSchema`.
+Recursive entity type hierarchies follow native Cedar rules.
+The result is a normalized JSON `Schema` for validation, authorization, or inspection.
+Namespace annotations with the same key use the last fragment's value.
+
+`Runtime.InspectSchema` returns two native schema projections.
+`ResolvedSchema` retains common type declarations and classifies qualified references as entity types or common types.
+`ExpandedSchema` inlines common types in entity attributes and action contexts.
+The expanded projection omits annotations and common type declarations.
+It contains transitive hierarchy relationships.
+`Ancestors`, `Actions`, `ActionGroups`, and `Environments` provide sorted metadata.
+Request environments describe schema applicability and do not grant access.
+
+`Runtime.ActionEntities` returns Cedar's action entities, including their transitive parent relationships.
+Use the returned `Entities` with an authorizer or serialize it with `json.Marshal`.
+All schema operations enforce the runtime's input, response, memory, and cancellation limits.
+Invalid UTF-8 returns `KindInput` before module execution.
+
+## Entity literals
+
+`Runtime.EntityLiterals` lists sorted literal occurrences by policy and template
+ID. The method delegates inspection to Cedar's native syntax tree. Slot bindings
+are available through `Runtime.TemplateLinks`.
+
+`Runtime.SubstituteEntityLiterals` accepts a map from original UIDs to replacement
+UIDs. Cedar applies the map simultaneously. With `A → B` and `B → C`, the
+original `A` becomes `B`. String literals that contain entity-like text stay
+unchanged. Policy IDs, template IDs, annotations, slots, and link IDs retain their
+identities. Link bindings also receive one simultaneous lookup.
+
+Static policies use `Policy::sub_entity_literals`. Templates use the same native
+EST transformation, followed by `Template::from_json`. Cedar 4.13.0 has no
+separate public template substitution method. Reparse and authorization tests
+check the transformed template and its links.
+
+The result uses semantic Cedar JSON. Comments and source spacing are not part
+of this representation. Run `Validate` if replacements can change schema
+validity. Source, memory, response, and caller-context limits apply.
+
+## Source tokens and comment preservation
+
+`Runtime.TokenizePolicies(ctx, text)` uses the pinned Cedar formatter lexer.
+It returns `SourceTokens` containing native tokens, comment summaries, and UTF-8 byte spans.
+`TokenSpan.Start` is the first byte offset.
+`TokenSpan.End` is the byte offset immediately after the token.
+Each token's `Text` exactly matches that source range.
+The decoder checks native lexical spelling, complete token coverage, and comment attachment.
+
+`SourceToken.Kind` is `identifier`, `number`, or `string` for those token variants.
+For other variants, the kind is the native token spelling, such as `permit`, `?principal`, or `==`.
+Whitespace and comments are not separate tokens.
+`LeadingComments`, `TrailingComment`, and final `TrailingComments` use the formatter's trimmed comment summaries.
+These summaries omit original indentation and trailing spaces.
+
+Keep the original source to preserve every byte of comments, line endings, and spacing.
+The ranges between tokens contain those original bytes.
+Apply an edit to one token range, then lex the changed source again.
+Old spans belong to the previous source snapshot.
+
+```go
+stream, err := rt.TokenizePolicies(ctx, source)
+if err != nil {
+    return err
+}
+for _, token := range stream.Tokens {
+    if token.Kind == "string" && token.Text == `"old"` {
+        source = source[:token.Span.Start] + `"new"` + source[token.Span.End:]
+        break
+    }
+}
+parsed, err := rt.ParsePolicySet(ctx, cedar.PoliciesFromCedar(source))
+```
+
+Lexing does not validate policy grammar or policy semantics.
+An incomplete source such as `permit(` can produce tokens.
+An invalid lexical character returns `KindPolicies` and no token stream.
+Use `ParsePolicySet` and schema-based `Validate` for the existing semantic checks.
+
+Source spans support comment-preserving editor operations; they do not replace the semantic JSON path.
+Parsed policy JSON remains the semantic authority for identity, templates, links, and authorization.
+JSON-based edits do not retain original comments or spacing.
+After a source edit, reparse it before you use the resulting policy JSON.
+Runtime source, memory, response, and caller context limits apply.
+
+## Context, request, and name utilities
+
+Context operations use native Cedar parsing and require a `Runtime`.
+`Context.Values(ctx, rt)` returns every attribute as an `EvalRecord`.
+`Context.Get(ctx, rt, key)` returns a value, a presence flag, and an error.
+A missing attribute returns `nil`, `false`, and no error.
+Readback preserves exact signed 64-bit integers, entity identities, nested values, and extension values.
+
+`Context.Merge(ctx, rt, other)` returns a new context containing both records.
+The operation rejects every overlapping top-level key, including keys with equal values.
+It performs no recursive merge and preserves both inputs.
+An empty context acts as the merge identity.
+The returned context uses native Cedar JSON value encoding.
+
+```go
+base := cedar.NewContext(cedar.Record{"count": cedar.Long(1)})
+extra := cedar.NewContext(cedar.Record{"enabled": cedar.Bool(true)})
+merged, err := base.Merge(ctx, rt, extra)
+if err != nil {
+    return err
+}
+count, found, err := merged.Get(ctx, rt, "count")
+```
+
+`Context.Validate(ctx, rt, schema, action)` checks an existing context against the action's schema.
+It parses without schema inference, then invokes native context validation.
+Use explicit `__entity` and `__extn` encodings when you supply raw context JSON.
+`Runtime.ValidateScopeVariables` checks principal, action, and resource independently of context.
+Both checks already occur when authorization constructs a schema-validated request.
+These methods let callers check each part before authorization.
+Context failures return `KindContext`; scope failures return `KindRequest`.
+
+`Runtime.ConfusableStrings(ctx, policies)` returns warnings without requiring a schema.
+It checks static policies and templates for native Cedar confusable-string warnings.
+Warnings retain raw policy IDs, native categories, and warning severity.
+Cedar policy inputs include native source spans. JSON policy inputs omit spans from temporary parser sources.
+Linked policies share their template's source and do not duplicate its warnings.
+`Runtime.Validate` already includes these checks with its schema-based policy validation.
+These warnings describe confusing text; they do not grant or deny access.
+
+`Runtime.ParseEntityUID(ctx, text)` parses Cedar's normalized UID syntax.
+`EntityUID.CedarText(ctx, rt)` renders that syntax with native Cedar escapes.
+Use `CedarText` for text that you must parse again.
+`EntityUID.String` remains a Go-quoted log representation; some escapes differ from Cedar.
+Invalid UID text or types return `KindEntityUID`.
+Invalid UTF-8 returns `KindInput` before guest execution.
+
+`Runtime.LanguageVersion(ctx)` returns the native Cedar language version, currently `4.5.0`.
+The language version differs from the pinned Cedar SDK version, `4.13.0`.
+Runtime source, memory, response, and caller context limits apply to every utility operation.
+
+## Standalone expressions
+
+`Runtime.ParseExpression` parses a Cedar expression. `ParseRestrictedExpression`
+accepts literals, sets, records, and extension constructors. Convert its result
+with `RestrictedExpression.Expression()` before evaluation.
+
+`Runtime.EvalExpression` evaluates a parsed expression with an `ExpressionEnv`.
+The environment supplies principal, action, resource, context, and entities.
+Nil entity UIDs mean unknown variables. Unknown or invalid evaluation results
+return `KindExpression` and no value. A zero expression returns `KindInput`.
+
+```go
+expr, err := rt.ParseExpression(ctx, "principal.age + 1")
+if err != nil {
+    return err
+}
+value, err := rt.EvalExpression(ctx, expr, cedar.ExpressionEnv{
+    Principal: &principal,
+    Entities: entities,
+})
+if err != nil {
+    return err
+}
+age := int64(value.(cedar.Long))
+```
+
+`EvalResult` has seven variants: `Bool`, `Long`, `String`, `EntityUID`, `EvalSet`,
+`EvalRecord`, and `ExtensionValue`. `Long` preserves the full signed 64-bit range.
+Sets remove duplicates. Records retain attribute names and typed nested results.
+`ExtensionValue` preserves upstream's canonical restricted-expression string,
+such as `decimal("1.25")`. It does not convert extension values to numbers.
+
+Expression evaluation does not validate policies or grant authorization. Use
+`Authorize` for decisions. Evaluation uses a fresh instance, the runtime's source,
+memory, and response limits, and the caller's context deadline.
 
 ## Policy formatting
 
@@ -560,3 +832,65 @@ Inspect `PartialResponse.Residuals`, then supply consistent concrete data with
 `PartialResponse.Reauthorize`. A schema is required. See
 [partial evaluation](partial-evaluation.md) for supported unknowns, limits,
 upstream experimental status, and the executable example.
+
+### Policy applicability
+
+`Runtime.ApplicableEnvironments` invokes Cedar's native `get_valid_request_envs` operation.
+It returns schema principal types, action UIDs, resource types, and template slot types.
+`PolicyApplicability` separates policy IDs and template IDs.
+Policy and template IDs preserve their source values, including empty IDs, control characters, and Unicode.
+Linked policy IDs also preserve their source values.
+Native enumeration also retains slot type metadata for linked policies.
+Environment lists retain native Cedar enumeration order.
+JSON serialization preserves flat action UID fields, including its type and ID.
+
+The result describes potential applicability. It does not grant access or provide a satisfying request.
+Use `Authorize` to decide access for a concrete request.
+An empty schema or an inapplicable policy produces an empty environment list.
+Malformed schemas and policies return their existing error kinds.
+Source, memory, response, and context limits apply.
+
+### Structured diagnostics
+
+`ValidationResult.Errors` and `ValidationResult.Warnings` include native diagnostic categories, severity, and source spans.
+`ValidationResult.SchemaWarnings` returns Cedar schema syntax warnings.
+`Runtime.SchemaWarnings` returns the same warnings without policy validation.
+JSON schemas produce no Cedar syntax warnings.
+
+`SourceSpan.Offset` and `SourceSpan.Length` count UTF-8 bytes in the original source.
+Use the policy source for policy spans. Use the schema source for schema spans.
+Some native diagnostics have no span. JSON policy inputs have no source spans.
+Native JSON policy offsets can refer to temporary parser sources. The bridge omits these offsets.
+For Cedar inputs, the bridge retains every native label span and omits label text.
+
+Categories use stable names for native variants, such as `unexpected_type`, `invalid_action_application`, and `shadows_builtin`.
+A future unknown native variant uses an `unknown_` category.
+Cedar 4.13.0 reports `invalid_action_application` as a warning. This warning does not fail validation.
+Cedar can choose spelling suggestions through hash iteration. Rendered suggestions can differ across runs.
+Categories and spans do not use these suggestions.
+Diagnostic policy IDs retain their original bytes. Rendered messages can escape control characters in these IDs.
+
+`PolicyMessage` now contains a span slice. Compare messages with `reflect.DeepEqual` instead of Go equality.
+Authorization evaluation messages retain their existing policy ID and text fields.
+
+### Permission queries
+
+Permission queries use Cedar's experimental type-aware partial evaluation API.
+Create an authorizer with a schema before you call these methods.
+The authorizer's request, memory, response, and time limits apply.
+
+`Authorizer.QueryResources` selects allowed resources of one type from the native entity store.
+Supply a concrete principal, action, and context.
+`Authorizer.QueryPrincipals` selects allowed principals of one type from the native entity store.
+Supply a concrete action, resource, and context.
+Per-query `Entities` augments the loaded store through Cedar's existing conflict checks.
+Both methods return only candidates that native Cedar permits.
+
+`Authorizer.QueryActions` enumerates applicable actions through the schema in Rust.
+Principal and resource types must be known. Their IDs can be unknown.
+A nil context is wholly unknown. A pointer to `Context{}` is known empty.
+The method returns separate `Allowed` and `Undecided` lists.
+`ActionQueryResult` JSON uses flat UID objects and preserves both lists during decoding.
+It excludes definite denial and requests that fail per-action schema validation.
+An undecided action does not prove that a satisfying completion exists.
+Use ordinary authorization for a concrete request before granting access.

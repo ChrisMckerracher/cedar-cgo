@@ -341,6 +341,8 @@ func policyInputUTF8(input map[string]any) bool {
 			if !valid(v) {
 				return false
 			}
+		case bool:
+			// Flag values carry no bytes; they are safe by construction.
 		case wire.Source:
 			if !valid(v.Text) {
 				return false
@@ -368,6 +370,9 @@ func policyInputUTF8(input map[string]any) bool {
 					return false
 				}
 			}
+		default:
+			// Fail closed: an unchecked value type must never reach the guest.
+			return false
 		}
 	}
 	return true

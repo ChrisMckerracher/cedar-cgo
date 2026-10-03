@@ -87,6 +87,10 @@ jobs:
           echo "$CVC5_SHA256  cvc5.zip" | sha256sum --check
           unzip -q cvc5.zip
       - run: CVC5="$PWD/cvc5-Linux-x86_64-static/bin/cvc5" go test -count=1 -v ./analysis/
+      - name: Native SymCC query parity
+        run: |
+          set -euo pipefail
+          CVC5="$PWD/cvc5-Linux-x86_64-static/bin/cvc5" scripts/analysis-queries-parity.sh --check
       - name: Prove the ABI arithmetic
         run: CVC5="$PWD/cvc5-Linux-x86_64-static/bin/cvc5" go test -count=1 -v ./internal/verification
 
@@ -102,7 +106,7 @@ jobs:
           go-version: "1.27.x"
       - name: Fuzz each target for 60 seconds
         run: |
-          for target in FuzzAuthorize FuzzPolicies FuzzEntities FuzzBatchedEntities FuzzBatchedDifferential FuzzSliceEntities FuzzPolicySyntax FuzzPolicyEdits FuzzTemplates FuzzPartialEntities FuzzPartialReauthorize FuzzFormatPolicies; do
+          for target in FuzzAuthorize FuzzPolicies FuzzEntities FuzzBatchedEntities FuzzBatchedDifferential FuzzSliceEntities FuzzPolicySyntax FuzzPolicyEdits FuzzTemplates FuzzPartialEntities FuzzPartialReauthorize FuzzFormatPolicies FuzzUTF8Values FuzzEvalResult FuzzEntityLiteralSubstitution FuzzDiagnostics FuzzSchemaFragments FuzzEntityStoreUnrelatedDecisions FuzzNativeUIDRoundTrip FuzzResidualImport FuzzSourceTokenSpans FuzzValidationDepth FuzzConfusableStrings FuzzContextMerge FuzzScopeValidation; do
             go test -run '^$' -fuzz "^$target\$" -fuzztime 60s ./cedar
           done
 
@@ -136,6 +140,13 @@ jobs:
           cargo clippy --locked --release --target wasm32-wasip1 -p cgw-abi -p cgw-authorizer -p cgw-analysis -- -D warnings
           cargo clippy --locked --release -p cgw-native-bench -- -D warnings
           cargo clippy --locked --release -p cgw-authorizer --example template_fixtures -- -D warnings
+      - name: Native compiled analysis session checks
+        run: |
+          set -euo pipefail
+          cargo clippy --manifest-path rust/Cargo.toml --locked --release -p cgw-analysis --tests -- -D warnings
+          cargo test --manifest-path rust/Cargo.toml --locked --release -p cgw-analysis --lib
+      - name: Native SymCC query oracle lint
+        run: cargo clippy --manifest-path rust/Cargo.toml --locked --release -p cgw-analysis --example analysis_queries -- -D warnings
       - name: Verify native slicing fixtures
         run: scripts/slicing-fixtures.sh --check
       - name: Policy construction native parity
@@ -146,10 +157,72 @@ jobs:
         run: |
           cargo clippy --locked --release --manifest-path rust/Cargo.toml -p cgw-native-bench --example partial_fixture -- -D warnings
           scripts/partial-fixtures.sh --check
+      - name: Native structured residual import checks
+        run: |
+          set -euo pipefail
+          cargo clippy --manifest-path rust/Cargo.toml --locked --release -p cgw-authorizer --tests -- -D warnings
+          cargo test --manifest-path rust/Cargo.toml --locked --release -p cgw-authorizer --lib partial::tests
       - name: Native formatting parity and lint
         run: |
           cargo clippy --manifest-path rust/Cargo.toml --locked --release -p cgw-authorizer --example format_parity -- -D warnings
           scripts/format-parity.sh --check
+      - name: Native validation depth parity and lint
+        run: |
+          set -euo pipefail
+          cargo clippy --manifest-path rust/Cargo.toml --locked --release -p cgw-authorizer --example validation_depth -- -D warnings
+          scripts/validation-depth-parity.sh --check
+      - name: Native expression parity and lint
+        run: |
+          set -euo pipefail
+          cargo clippy --manifest-path rust/Cargo.toml --locked --release -p cgw-authorizer --example expression_fixtures -- -D warnings
+          scripts/expression-parity.sh --check
+      - name: Native entity literal parity and lint
+        run: |
+          set -euo pipefail
+          cargo clippy --manifest-path rust/Cargo.toml --locked --release -p cgw-authorizer --example literal_fixtures -- -D warnings
+          scripts/literal-parity.sh --check
+      - name: Native applicability parity and lint
+        run: |
+          set -euo pipefail
+          cargo clippy --manifest-path rust/Cargo.toml --locked --release -p cgw-authorizer --example applicability_fixtures -- -D warnings
+          scripts/applicability-parity.sh --check
+      - name: Native diagnostic parity and lint
+        run: |
+          set -euo pipefail
+          cargo clippy --manifest-path rust/Cargo.toml --locked --release -p cgw-authorizer --example diagnostic_fixtures -- -D warnings
+          scripts/diagnostics-parity.sh --check
+      - name: Native schema parity and lint
+        run: |
+          set -euo pipefail
+          cargo clippy --manifest-path rust/Cargo.toml --locked --release -p cgw-authorizer --example schema_fixtures -- -D warnings
+          scripts/schema-parity.sh --check
+
+      - name: Native entity store parity and lint
+        run: |
+          set -euo pipefail
+          cargo clippy --manifest-path rust/Cargo.toml --locked --release -p cgw-authorizer --example entity_store_fixtures -- -D warnings
+          scripts/entity-store-parity.sh --check
+      - name: Native utility parity and lint
+        run: |
+          set -euo pipefail
+          cargo clippy --manifest-path rust/Cargo.toml --locked --release -p cgw-authorizer --example utility_fixtures -- -D warnings
+          scripts/utility-parity.sh --check
+      - name: Native permission query parity and lint
+        run: |
+          set -euo pipefail
+          cargo clippy --manifest-path rust/Cargo.toml --locked --release -p cgw-authorizer --example query_fixtures -- -D warnings
+          cargo test --manifest-path rust/Cargo.toml --locked --release -p cgw-authorizer --lib queries::tests
+          scripts/queries-parity.sh --check
+      - name: Native PST mapping parity and lint
+        run: |
+          set -euo pipefail
+          cargo clippy --manifest-path rust/Cargo.toml --locked --release -p cgw-authorizer --example pst_fixtures -- -D warnings
+          scripts/pst-parity.sh --check
+      - name: Native source token parity and lint
+        run: |
+          set -euo pipefail
+          cargo clippy --manifest-path rust/Cargo.toml --locked --release -p cgw-authorizer --example source_token_fixtures -- -D warnings
+          scripts/source-token-parity.sh --check
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cargo/bin/cargo-deny

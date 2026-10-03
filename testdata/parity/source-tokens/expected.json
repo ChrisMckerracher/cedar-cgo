@@ -1,0 +1,1151 @@
+[
+  {
+    "name": "empty",
+    "output": {
+      "tokens": [],
+      "trailing_comments": []
+    }
+  },
+  {
+    "name": "whitespace",
+    "output": {
+      "tokens": [],
+      "trailing_comments": []
+    }
+  },
+  {
+    "name": "comment only",
+    "output": {
+      "tokens": [],
+      "trailing_comments": [
+        "// 雪 😀",
+        "// final"
+      ]
+    }
+  },
+  {
+    "name": "comments annotations unicode",
+    "output": {
+      "tokens": [
+        {
+          "kind": "@",
+          "text": "@",
+          "span": {
+            "start": 15,
+            "end": 16
+          },
+          "leading_comments": [
+            "// leading 雪"
+          ],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "identifier",
+          "text": "note",
+          "span": {
+            "start": 16,
+            "end": 20
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "(",
+          "text": "(",
+          "span": {
+            "start": 20,
+            "end": 21
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "string",
+          "text": "\"😀\"",
+          "span": {
+            "start": 21,
+            "end": 27
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": ")",
+          "text": ")",
+          "span": {
+            "start": 27,
+            "end": 28
+          },
+          "leading_comments": [],
+          "trailing_comment": "// annotation comment"
+        },
+        {
+          "kind": "permit",
+          "text": "permit",
+          "span": {
+            "start": 51,
+            "end": 57
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "(",
+          "text": "(",
+          "span": {
+            "start": 57,
+            "end": 58
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "principal",
+          "text": "principal",
+          "span": {
+            "start": 61,
+            "end": 70
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "==",
+          "text": "==",
+          "span": {
+            "start": 71,
+            "end": 73
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "identifier",
+          "text": "NS",
+          "span": {
+            "start": 74,
+            "end": 76
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "::",
+          "text": "::",
+          "span": {
+            "start": 76,
+            "end": 78
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "identifier",
+          "text": "User",
+          "span": {
+            "start": 78,
+            "end": 82
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "::",
+          "text": "::",
+          "span": {
+            "start": 82,
+            "end": 84
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "string",
+          "text": "\"old\"",
+          "span": {
+            "start": 84,
+            "end": 89
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": ",",
+          "text": ",",
+          "span": {
+            "start": 89,
+            "end": 90
+          },
+          "leading_comments": [],
+          "trailing_comment": "// identity comment"
+        },
+        {
+          "kind": "action",
+          "text": "action",
+          "span": {
+            "start": 113,
+            "end": 119
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": ",",
+          "text": ",",
+          "span": {
+            "start": 119,
+            "end": 120
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "resource",
+          "text": "resource",
+          "span": {
+            "start": 121,
+            "end": 129
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": ")",
+          "text": ")",
+          "span": {
+            "start": 130,
+            "end": 131
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "when",
+          "text": "when",
+          "span": {
+            "start": 132,
+            "end": 136
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "{",
+          "text": "{",
+          "span": {
+            "start": 137,
+            "end": 138
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "string",
+          "text": "\"雪\"",
+          "span": {
+            "start": 139,
+            "end": 144
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "==",
+          "text": "==",
+          "span": {
+            "start": 145,
+            "end": 147
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "string",
+          "text": "\"雪\"",
+          "span": {
+            "start": 148,
+            "end": 153
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "}",
+          "text": "}",
+          "span": {
+            "start": 154,
+            "end": 155
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": ";",
+          "text": ";",
+          "span": {
+            "start": 155,
+            "end": 156
+          },
+          "leading_comments": [],
+          "trailing_comment": "// final token comment"
+        }
+      ],
+      "trailing_comments": [
+        "// end comment"
+      ]
+    }
+  },
+  {
+    "name": "crlf",
+    "output": {
+      "tokens": [
+        {
+          "kind": "permit",
+          "text": "permit",
+          "span": {
+            "start": 12,
+            "end": 18
+          },
+          "leading_comments": [
+            "// heading"
+          ],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "(",
+          "text": "(",
+          "span": {
+            "start": 18,
+            "end": 19
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "principal",
+          "text": "principal",
+          "span": {
+            "start": 19,
+            "end": 28
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": ",",
+          "text": ",",
+          "span": {
+            "start": 28,
+            "end": 29
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "action",
+          "text": "action",
+          "span": {
+            "start": 32,
+            "end": 38
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": ",",
+          "text": ",",
+          "span": {
+            "start": 38,
+            "end": 39
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "resource",
+          "text": "resource",
+          "span": {
+            "start": 40,
+            "end": 48
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": ")",
+          "text": ")",
+          "span": {
+            "start": 48,
+            "end": 49
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": ";",
+          "text": ";",
+          "span": {
+            "start": 49,
+            "end": 50
+          },
+          "leading_comments": [],
+          "trailing_comment": "// trailing"
+        }
+      ],
+      "trailing_comments": [
+        "// last"
+      ]
+    }
+  },
+  {
+    "name": "slots and operators",
+    "output": {
+      "tokens": [
+        {
+          "kind": "permit",
+          "text": "permit",
+          "span": {
+            "start": 0,
+            "end": 6
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "(",
+          "text": "(",
+          "span": {
+            "start": 6,
+            "end": 7
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "principal",
+          "text": "principal",
+          "span": {
+            "start": 7,
+            "end": 16
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "==",
+          "text": "==",
+          "span": {
+            "start": 17,
+            "end": 19
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "?principal",
+          "text": "?principal",
+          "span": {
+            "start": 20,
+            "end": 30
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": ",",
+          "text": ",",
+          "span": {
+            "start": 30,
+            "end": 31
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "action",
+          "text": "action",
+          "span": {
+            "start": 32,
+            "end": 38
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "in",
+          "text": "in",
+          "span": {
+            "start": 39,
+            "end": 41
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "[",
+          "text": "[",
+          "span": {
+            "start": 42,
+            "end": 43
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "identifier",
+          "text": "Action",
+          "span": {
+            "start": 43,
+            "end": 49
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "::",
+          "text": "::",
+          "span": {
+            "start": 49,
+            "end": 51
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "string",
+          "text": "\"view\"",
+          "span": {
+            "start": 51,
+            "end": 57
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "]",
+          "text": "]",
+          "span": {
+            "start": 57,
+            "end": 58
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": ",",
+          "text": ",",
+          "span": {
+            "start": 58,
+            "end": 59
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "resource",
+          "text": "resource",
+          "span": {
+            "start": 60,
+            "end": 68
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "==",
+          "text": "==",
+          "span": {
+            "start": 69,
+            "end": 71
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "?resource",
+          "text": "?resource",
+          "span": {
+            "start": 72,
+            "end": 81
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": ")",
+          "text": ")",
+          "span": {
+            "start": 81,
+            "end": 82
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "when",
+          "text": "when",
+          "span": {
+            "start": 83,
+            "end": 87
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "{",
+          "text": "{",
+          "span": {
+            "start": 88,
+            "end": 89
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "!",
+          "text": "!",
+          "span": {
+            "start": 90,
+            "end": 91
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "(",
+          "text": "(",
+          "span": {
+            "start": 91,
+            "end": 92
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "number",
+          "text": "1",
+          "span": {
+            "start": 92,
+            "end": 93
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "+",
+          "text": "+",
+          "span": {
+            "start": 93,
+            "end": 94
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "number",
+          "text": "2",
+          "span": {
+            "start": 94,
+            "end": 95
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "*",
+          "text": "*",
+          "span": {
+            "start": 95,
+            "end": 96
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "number",
+          "text": "3",
+          "span": {
+            "start": 96,
+            "end": 97
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "/",
+          "text": "/",
+          "span": {
+            "start": 97,
+            "end": 98
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "number",
+          "text": "4",
+          "span": {
+            "start": 98,
+            "end": 99
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "%",
+          "text": "%",
+          "span": {
+            "start": 99,
+            "end": 100
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "number",
+          "text": "5",
+          "span": {
+            "start": 100,
+            "end": 101
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "-",
+          "text": "-",
+          "span": {
+            "start": 101,
+            "end": 102
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "number",
+          "text": "6",
+          "span": {
+            "start": 102,
+            "end": 103
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "<=",
+          "text": "<=",
+          "span": {
+            "start": 104,
+            "end": 106
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "number",
+          "text": "7",
+          "span": {
+            "start": 107,
+            "end": 108
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": ")",
+          "text": ")",
+          "span": {
+            "start": 108,
+            "end": 109
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "||",
+          "text": "||",
+          "span": {
+            "start": 110,
+            "end": 112
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "context",
+          "text": "context",
+          "span": {
+            "start": 113,
+            "end": 120
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": ".",
+          "text": ".",
+          "span": {
+            "start": 120,
+            "end": 121
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "identifier",
+          "text": "a",
+          "span": {
+            "start": 121,
+            "end": 122
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "!=",
+          "text": "!=",
+          "span": {
+            "start": 123,
+            "end": 125
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "true",
+          "text": "true",
+          "span": {
+            "start": 126,
+            "end": 130
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "&&",
+          "text": "&&",
+          "span": {
+            "start": 131,
+            "end": 133
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "resource",
+          "text": "resource",
+          "span": {
+            "start": 134,
+            "end": 142
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "is",
+          "text": "is",
+          "span": {
+            "start": 143,
+            "end": 145
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "identifier",
+          "text": "Photo",
+          "span": {
+            "start": 146,
+            "end": 151
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "}",
+          "text": "}",
+          "span": {
+            "start": 152,
+            "end": 153
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": ";",
+          "text": ";",
+          "span": {
+            "start": 153,
+            "end": 154
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        }
+      ],
+      "trailing_comments": []
+    }
+  },
+  {
+    "name": "string escapes",
+    "output": {
+      "tokens": [
+        {
+          "kind": "@",
+          "text": "@",
+          "span": {
+            "start": 0,
+            "end": 1
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "identifier",
+          "text": "note",
+          "span": {
+            "start": 1,
+            "end": 5
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "(",
+          "text": "(",
+          "span": {
+            "start": 5,
+            "end": 6
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "string",
+          "text": "\"\\u{1f600}\\n\"",
+          "span": {
+            "start": 6,
+            "end": 19
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": ")",
+          "text": ")",
+          "span": {
+            "start": 19,
+            "end": 20
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "permit",
+          "text": "permit",
+          "span": {
+            "start": 21,
+            "end": 27
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "(",
+          "text": "(",
+          "span": {
+            "start": 27,
+            "end": 28
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "principal",
+          "text": "principal",
+          "span": {
+            "start": 28,
+            "end": 37
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": ",",
+          "text": ",",
+          "span": {
+            "start": 37,
+            "end": 38
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "action",
+          "text": "action",
+          "span": {
+            "start": 39,
+            "end": 45
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": ",",
+          "text": ",",
+          "span": {
+            "start": 45,
+            "end": 46
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "resource",
+          "text": "resource",
+          "span": {
+            "start": 47,
+            "end": 55
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": ")",
+          "text": ")",
+          "span": {
+            "start": 55,
+            "end": 56
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "when",
+          "text": "when",
+          "span": {
+            "start": 57,
+            "end": 61
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "{",
+          "text": "{",
+          "span": {
+            "start": 62,
+            "end": 63
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "string",
+          "text": "\"// literal\"",
+          "span": {
+            "start": 64,
+            "end": 76
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "like",
+          "text": "like",
+          "span": {
+            "start": 77,
+            "end": 81
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "string",
+          "text": "\"*\"",
+          "span": {
+            "start": 82,
+            "end": 85
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "}",
+          "text": "}",
+          "span": {
+            "start": 86,
+            "end": 87
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": ";",
+          "text": ";",
+          "span": {
+            "start": 87,
+            "end": 88
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        }
+      ],
+      "trailing_comments": []
+    }
+  },
+  {
+    "name": "semantic error still lexes",
+    "output": {
+      "tokens": [
+        {
+          "kind": "permit",
+          "text": "permit",
+          "span": {
+            "start": 0,
+            "end": 6
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        },
+        {
+          "kind": "(",
+          "text": "(",
+          "span": {
+            "start": 6,
+            "end": 7
+          },
+          "leading_comments": [],
+          "trailing_comment": ""
+        }
+      ],
+      "trailing_comments": []
+    }
+  },
+  {
+    "name": "lexical invalid character",
+    "output": {
+      "error": {
+        "kind": "policies",
+        "message": "formatter lexer rejected policy source"
+      }
+    }
+  },
+  {
+    "name": "lexical unterminated string",
+    "output": {
+      "error": {
+        "kind": "policies",
+        "message": "formatter lexer rejected policy source"
+      }
+    }
+  },
+  {
+    "name": "unicode identifier rejected",
+    "output": {
+      "error": {
+        "kind": "policies",
+        "message": "formatter lexer rejected policy source"
+      }
+    }
+  }
+]

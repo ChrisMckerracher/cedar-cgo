@@ -3,6 +3,8 @@ package cedar
 import (
 	"encoding/json"
 	"fmt"
+
+	"github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
 )
 
 // Value uses Cedar's JSON encoding; records with only "__entity" or "__extn"
@@ -50,7 +52,12 @@ func (v Bool) MarshalJSON() ([]byte, error) { return json.Marshal(bool(v)) }
 
 func (v Long) MarshalJSON() ([]byte, error) { return json.Marshal(int64(v)) }
 
-func (v String) MarshalJSON() ([]byte, error) { return json.Marshal(string(v)) }
+func (v String) MarshalJSON() ([]byte, error) {
+	if err := wire.CheckUTF8(string(v)); err != nil {
+		return nil, err
+	}
+	return json.Marshal(string(v))
+}
 
 func (v Set) MarshalJSON() ([]byte, error) {
 	if v == nil {
@@ -67,6 +74,9 @@ func (v Record) MarshalJSON() ([]byte, error) {
 		return []byte("{}"), nil
 	}
 	for k, e := range v {
+		if err := wire.CheckUTF8(k); err != nil {
+			return nil, err
+		}
 		if e == nil {
 			return nil, fmt.Errorf("cedar: record attribute %q is nil", k)
 		}
@@ -82,6 +92,9 @@ type extnJSON struct {
 }
 
 func marshalExtn(fn, arg string) ([]byte, error) {
+	if err := wire.CheckUTF8(arg); err != nil {
+		return nil, err
+	}
 	var e extnJSON
 	e.Extn.Fn, e.Extn.Arg = fn, arg
 	return json.Marshal(e)

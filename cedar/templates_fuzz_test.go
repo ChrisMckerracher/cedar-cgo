@@ -56,10 +56,34 @@ func FuzzTemplates(f *testing.F) {
 			}
 			return
 		}
-		// Binding-side UTF-8 rejection is covered by TestTemplateRejectsInvalidUTF8.
-		if !utf8.ValidString(linkID) || !utf8.ValidString(principalType) || !utf8.ValidString(principalID) ||
-			!utf8.ValidString(resourceType) || !utf8.ValidString(resourceID) || !utf8.ValidString(opSeed) {
-			t.Skip()
+		// Binding-side malformed UTF-8 must be rejected before the guest runs,
+		// exactly like the template-source leg above.
+		badBinding := !utf8.ValidString(linkID) || !utf8.ValidString(principalType) || !utf8.ValidString(principalID) ||
+			!utf8.ValidString(resourceType) || !utf8.ValidString(resourceID)
+		if badBinding || !utf8.ValidString(opSeed) {
+			base := cedar.PoliciesFromCedar(`permit(principal, action, resource);`)
+			set, err := rt.AddTemplate(ctx, base, "t", cedar.TemplateFromCedar(shareTemplate))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !utf8.ValidString(opSeed) {
+				_, err = rt.AddTemplate(ctx, set, "t2", cedar.TemplateFromJSON([]byte(opSeed)))
+				var ce *cedar.Error
+				if !errors.As(err, &ce) || ce.Kind != cedar.KindInput {
+					t.Fatalf("non-UTF-8 JSON template: %v", err)
+				}
+			}
+			if badBinding {
+				_, err = rt.LinkTemplate(ctx, set, "t", linkID, cedar.SlotBindings{
+					cedar.PrincipalSlot: cedar.NewEntityUID(principalType, principalID),
+					cedar.ResourceSlot:  cedar.NewEntityUID(resourceType, resourceID),
+				})
+				var ce *cedar.Error
+				if !errors.As(err, &ce) || ce.Kind != cedar.KindInput {
+					t.Fatalf("non-UTF-8 link input: %v", err)
+				}
+			}
+			return
 		}
 		if strings.HasPrefix(opSeed, "{") {
 			_, err := rt.AddTemplate(ctx, cedar.PolicySet{}, templateID, cedar.TemplateFromJSON([]byte(opSeed)))

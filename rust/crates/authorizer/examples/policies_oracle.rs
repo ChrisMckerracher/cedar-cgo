@@ -28,12 +28,17 @@ fn snapshot(set: &PolicySet) -> Value {
     let validation = Validator::new(schema).validate(set, ValidationMode::Strict);
     let mut errors = validation
         .validation_errors()
-        .map(|e| json!({"policy_id":raw_id(e.policy_id()),"message":diagnostic(e)}))
+        .map(|e| {
+            serde_json::to_value(cgw_abi::structured::validation_error(e).without_spans()).unwrap()
+        })
         .collect::<Vec<_>>();
     errors.sort_by_key(ToString::to_string);
     let mut warnings = validation
         .validation_warnings()
-        .map(|e| json!({"policy_id":raw_id(e.policy_id()),"message":diagnostic(e)}))
+        .map(|e| {
+            serde_json::to_value(cgw_abi::structured::validation_warning(e).without_spans())
+                .unwrap()
+        })
         .collect::<Vec<_>>();
     warnings.sort_by_key(ToString::to_string);
     let entities = Entities::from_json_str(

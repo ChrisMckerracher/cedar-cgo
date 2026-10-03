@@ -2,4 +2,4 @@
 
 package authorizer
 
-const SHA256 = "a6d02fbe6a9cef09d240d4228bb5f4ef8651128bf431b88ad9db96b521891941"
+const SHA256 = "9ef3546a6aff09c3e69ac600f7640e1a6899d23bd0bf97fa5e2e42805e9a511e"

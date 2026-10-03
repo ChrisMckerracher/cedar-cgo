@@ -234,6 +234,9 @@ func encodeEntityLoadResult(result EntityLoadResult, limit int) ([]byte, error) 
 	if remaining < 0 || len(result.Missing) > remaining/19 {
 		return nil, &Error{Kind: KindLimit, Message: "loader result exceeds byte limit"}
 	}
+	if err := wire.CheckUTF8(string(result.Entities)); err != nil {
+		return nil, &Error{Kind: KindInput, Message: err.Error()}
+	}
 	missing := make([]wire.UID, len(result.Missing))
 	for i, uid := range result.Missing {
 		if len(uid.Type) > remaining {
@@ -244,6 +247,9 @@ func encodeEntityLoadResult(result EntityLoadResult, limit int) ([]byte, error) 
 			return nil, &Error{Kind: KindLimit, Message: "loader UID exceeds byte limit"}
 		}
 		remaining -= len(uid.ID)
+		if err := wire.CheckUTF8(uid.Type, uid.ID); err != nil {
+			return nil, &Error{Kind: KindInput, Message: err.Error()}
+		}
 		missing[i] = uid.wire()
 	}
 	body, err := json.Marshal(struct {

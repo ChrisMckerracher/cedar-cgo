@@ -1,0 +1,1061 @@
+{
+  "version": 1,
+  "cedar_version": "4.13.0",
+  "cases": [
+    {
+      "name": "effects annotations and clause order",
+      "policies": {
+        "policy0": {
+          "effect": "permit",
+          "principal": {
+            "op": "All"
+          },
+          "action": {
+            "op": "All"
+          },
+          "resource": {
+            "op": "All"
+          },
+          "conditions": [
+            {
+              "kind": "when",
+              "body": {
+                ".": {
+                  "left": {
+                    "Var": "context"
+                  },
+                  "attr": "flag"
+                }
+              }
+            },
+            {
+              "kind": "unless",
+              "body": {
+                ".": {
+                  "left": {
+                    "Var": "resource"
+                  },
+                  "attr": "private"
+                }
+              }
+            }
+          ],
+          "annotations": {
+            "note": "雪"
+          }
+        },
+        "policy1": {
+          "effect": "forbid",
+          "principal": {
+            "op": "All"
+          },
+          "action": {
+            "op": "All"
+          },
+          "resource": {
+            "op": "All"
+          },
+          "conditions": [
+            {
+              "kind": "when",
+              "body": {
+                "!": {
+                  "arg": {
+                    ".": {
+                      "left": {
+                        "Var": "context"
+                      },
+                      "attr": "flag"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "templates": {},
+      "links": [],
+      "responses": [
+        {
+          "decision": "allow",
+          "reasons": [
+            "policy0"
+          ],
+          "error_policies": []
+        },
+        {
+          "decision": "deny",
+          "reasons": [
+            "policy1"
+          ],
+          "error_policies": []
+        }
+      ]
+    },
+    {
+      "name": "all scope forms and action sets",
+      "policies": {
+        "policy0": {
+          "effect": "permit",
+          "principal": {
+            "op": "is",
+            "entity_type": "User",
+            "in": {
+              "entity": {
+                "type": "Group",
+                "id": "staff"
+              }
+            }
+          },
+          "action": {
+            "op": "in",
+            "entities": [
+              {
+                "type": "Action",
+                "id": "view"
+              },
+              {
+                "type": "Action",
+                "id": "edit"
+              }
+            ]
+          },
+          "resource": {
+            "op": "==",
+            "entity": {
+              "type": "Photo",
+              "id": "one"
+            }
+          },
+          "conditions": []
+        },
+        "policy1": {
+          "effect": "permit",
+          "principal": {
+            "op": "==",
+            "entity": {
+              "type": "User",
+              "id": "alice"
+            }
+          },
+          "action": {
+            "op": "==",
+            "entity": {
+              "type": "Action",
+              "id": "view"
+            }
+          },
+          "resource": {
+            "op": "is",
+            "entity_type": "Photo"
+          },
+          "conditions": []
+        },
+        "policy2": {
+          "effect": "forbid",
+          "principal": {
+            "op": "in",
+            "entity": {
+              "type": "Group",
+              "id": "staff"
+            }
+          },
+          "action": {
+            "op": "in",
+            "entities": []
+          },
+          "resource": {
+            "op": "in",
+            "entity": {
+              "type": "Photo",
+              "id": "missing"
+            }
+          },
+          "conditions": []
+        }
+      },
+      "templates": {},
+      "links": [],
+      "responses": [
+        {
+          "decision": "allow",
+          "reasons": [
+            "policy0",
+            "policy1"
+          ],
+          "error_policies": []
+        },
+        {
+          "decision": "allow",
+          "reasons": [
+            "policy0",
+            "policy1"
+          ],
+          "error_policies": []
+        }
+      ]
+    },
+    {
+      "name": "template slots links and annotations",
+      "policies": {
+        "linked雪": {
+          "effect": "permit",
+          "principal": {
+            "op": "==",
+            "entity": {
+              "__entity": {
+                "type": "User",
+                "id": "alice"
+              }
+            }
+          },
+          "action": {
+            "op": "All"
+          },
+          "resource": {
+            "op": "==",
+            "entity": {
+              "__entity": {
+                "type": "Photo",
+                "id": "one"
+              }
+            }
+          },
+          "conditions": [
+            {
+              "kind": "when",
+              "body": {
+                ".": {
+                  "left": {
+                    "Var": "context"
+                  },
+                  "attr": "flag"
+                }
+              }
+            }
+          ],
+          "annotations": {
+            "note": "雪"
+          }
+        }
+      },
+      "templates": {
+        "policy0": {
+          "effect": "permit",
+          "principal": {
+            "op": "==",
+            "slot": "?principal"
+          },
+          "action": {
+            "op": "All"
+          },
+          "resource": {
+            "op": "==",
+            "slot": "?resource"
+          },
+          "conditions": [
+            {
+              "kind": "when",
+              "body": {
+                ".": {
+                  "left": {
+                    "Var": "context"
+                  },
+                  "attr": "flag"
+                }
+              }
+            }
+          ],
+          "annotations": {
+            "note": "雪"
+          }
+        }
+      },
+      "links": [
+        {
+          "template_id": "policy0",
+          "id": "linked雪",
+          "values": {
+            "?principal": {
+              "type": "User",
+              "id": "alice"
+            },
+            "?resource": {
+              "type": "Photo",
+              "id": "one"
+            }
+          }
+        }
+      ],
+      "responses": [
+        {
+          "decision": "allow",
+          "reasons": [
+            "linked雪"
+          ],
+          "error_policies": []
+        },
+        {
+          "decision": "deny",
+          "reasons": [],
+          "error_policies": []
+        }
+      ]
+    },
+    {
+      "name": "arithmetic comparison logical and conditionals",
+      "policies": {
+        "policy0": {
+          "effect": "permit",
+          "principal": {
+            "op": "All"
+          },
+          "action": {
+            "op": "All"
+          },
+          "resource": {
+            "op": "All"
+          },
+          "conditions": [
+            {
+              "kind": "when",
+              "body": {
+                "if-then-else": {
+                  "if": {
+                    ".": {
+                      "left": {
+                        "Var": "context"
+                      },
+                      "attr": "flag"
+                    }
+                  },
+                  "then": {
+                    "&&": {
+                      "left": {
+                        "&&": {
+                          "left": {
+                            "&&": {
+                              "left": {
+                                "&&": {
+                                  "left": {
+                                    ">=": {
+                                      "left": {
+                                        "-": {
+                                          "left": {
+                                            "+": {
+                                              "left": {
+                                                "neg": {
+                                                  "arg": {
+                                                    ".": {
+                                                      "left": {
+                                                        "Var": "context"
+                                                      },
+                                                      "attr": "n"
+                                                    }
+                                                  }
+                                                }
+                                              },
+                                              "right": {
+                                                "*": {
+                                                  "left": {
+                                                    "Value": 2
+                                                  },
+                                                  "right": {
+                                                    "Value": 3
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          },
+                                          "right": {
+                                            "Value": 1
+                                          }
+                                        }
+                                      },
+                                      "right": {
+                                        "Value": 0
+                                      }
+                                    }
+                                  },
+                                  "right": {
+                                    "<": {
+                                      "left": {
+                                        ".": {
+                                          "left": {
+                                            "Var": "context"
+                                          },
+                                          "attr": "n"
+                                        }
+                                      },
+                                      "right": {
+                                        "Value": 9223372036854775807
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "right": {
+                                "<=": {
+                                  "left": {
+                                    ".": {
+                                      "left": {
+                                        "Var": "context"
+                                      },
+                                      "attr": "n"
+                                    }
+                                  },
+                                  "right": {
+                                    "Value": 4
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "right": {
+                            "!=": {
+                              "left": {
+                                ".": {
+                                  "left": {
+                                    "Var": "context"
+                                  },
+                                  "attr": "n"
+                                }
+                              },
+                              "right": {
+                                "Value": 3
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "right": {
+                        ">": {
+                          "left": {
+                            "Value": 5
+                          },
+                          "right": {
+                            ".": {
+                              "left": {
+                                "Var": "context"
+                              },
+                              "attr": "n"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "else": {
+                    "||": {
+                      "left": {
+                        "Value": false
+                      },
+                      "right": {
+                        "==": {
+                          "left": {
+                            ".": {
+                              "left": {
+                                "Var": "context"
+                              },
+                              "attr": "n"
+                            }
+                          },
+                          "right": {
+                            "Value": 1
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "templates": {},
+      "links": [],
+      "responses": [
+        {
+          "decision": "allow",
+          "reasons": [
+            "policy0"
+          ],
+          "error_policies": []
+        },
+        {
+          "decision": "deny",
+          "reasons": [],
+          "error_policies": []
+        }
+      ]
+    },
+    {
+      "name": "records sets attributes patterns and tags",
+      "policies": {
+        "policy0": {
+          "effect": "permit",
+          "principal": {
+            "op": "All"
+          },
+          "action": {
+            "op": "All"
+          },
+          "resource": {
+            "op": "All"
+          },
+          "conditions": [
+            {
+              "kind": "when",
+              "body": {
+                "&&": {
+                  "left": {
+                    "&&": {
+                      "left": {
+                        "&&": {
+                          "left": {
+                            "&&": {
+                              "left": {
+                                "&&": {
+                                  "left": {
+                                    "&&": {
+                                      "left": {
+                                        "&&": {
+                                          "left": {
+                                            "&&": {
+                                              "left": {
+                                                "&&": {
+                                                  "left": {
+                                                    "has": {
+                                                      "left": {
+                                                        "Var": "principal"
+                                                      },
+                                                      "attr": [
+                                                        "profile",
+                                                        "name"
+                                                      ]
+                                                    }
+                                                  },
+                                                  "right": {
+                                                    "like": {
+                                                      "left": {
+                                                        ".": {
+                                                          "left": {
+                                                            "Var": "principal"
+                                                          },
+                                                          "attr": "name"
+                                                        }
+                                                      },
+                                                      "pattern": [
+                                                        {
+                                                          "Literal": "雪"
+                                                        },
+                                                        "Wildcard",
+                                                        {
+                                                          "Literal": "j"
+                                                        },
+                                                        {
+                                                          "Literal": "p"
+                                                        },
+                                                        {
+                                                          "Literal": "g"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                }
+                                              },
+                                              "right": {
+                                                "==": {
+                                                  "left": {
+                                                    ".": {
+                                                      "left": {
+                                                        ".": {
+                                                          "left": {
+                                                            "Record": {
+                                                              "nested": {
+                                                                "Record": {
+                                                                  "name": {
+                                                                    ".": {
+                                                                      "left": {
+                                                                        ".": {
+                                                                          "left": {
+                                                                            "Var": "principal"
+                                                                          },
+                                                                          "attr": "profile"
+                                                                        }
+                                                                      },
+                                                                      "attr": "name"
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          },
+                                                          "attr": "nested"
+                                                        }
+                                                      },
+                                                      "attr": "name"
+                                                    }
+                                                  },
+                                                  "right": {
+                                                    "Value": "雪"
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          },
+                                          "right": {
+                                            "contains": {
+                                              "left": {
+                                                "Set": [
+                                                  {
+                                                    "Value": 1
+                                                  },
+                                                  {
+                                                    "Value": 2
+                                                  }
+                                                ]
+                                              },
+                                              "right": {
+                                                "Value": 1
+                                              }
+                                            }
+                                          }
+                                        }
+                                      },
+                                      "right": {
+                                        "containsAll": {
+                                          "left": {
+                                            "Set": [
+                                              {
+                                                "Value": 1
+                                              },
+                                              {
+                                                "Value": 2
+                                              }
+                                            ]
+                                          },
+                                          "right": {
+                                            "Set": [
+                                              {
+                                                "Value": 1
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "right": {
+                                    "containsAny": {
+                                      "left": {
+                                        "Set": [
+                                          {
+                                            "Value": 1
+                                          }
+                                        ]
+                                      },
+                                      "right": {
+                                        "Set": [
+                                          {
+                                            "Value": 1
+                                          },
+                                          {
+                                            "Value": 3
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "right": {
+                                "isEmpty": {
+                                  "arg": {
+                                    "Set": []
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "right": {
+                            "hasTag": {
+                              "left": {
+                                "Var": "resource"
+                              },
+                              "right": {
+                                "Value": "env"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "right": {
+                        "==": {
+                          "left": {
+                            "getTag": {
+                              "left": {
+                                "Var": "resource"
+                              },
+                              "right": {
+                                "Value": "env"
+                              }
+                            }
+                          },
+                          "right": {
+                            "Value": "prod"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "right": {
+                    "is": {
+                      "left": {
+                        "Var": "principal"
+                      },
+                      "entity_type": "User",
+                      "in": {
+                        "Value": {
+                          "__entity": {
+                            "type": "Group",
+                            "id": "staff"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "templates": {},
+      "links": [],
+      "responses": [
+        {
+          "decision": "allow",
+          "reasons": [
+            "policy0"
+          ],
+          "error_policies": []
+        },
+        {
+          "decision": "allow",
+          "reasons": [
+            "policy0"
+          ],
+          "error_policies": []
+        }
+      ]
+    },
+    {
+      "name": "extensions and exact long values",
+      "policies": {
+        "policy0": {
+          "effect": "permit",
+          "principal": {
+            "op": "All"
+          },
+          "action": {
+            "op": "All"
+          },
+          "resource": {
+            "op": "All"
+          },
+          "conditions": [
+            {
+              "kind": "when",
+              "body": {
+                "&&": {
+                  "left": {
+                    "&&": {
+                      "left": {
+                        "&&": {
+                          "left": {
+                            "greaterThan": [
+                              {
+                                "decimal": [
+                                  {
+                                    "Value": "1.25"
+                                  }
+                                ]
+                              },
+                              {
+                                "decimal": [
+                                  {
+                                    "Value": "1"
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "right": {
+                            "isInRange": [
+                              {
+                                "ip": [
+                                  {
+                                    "Value": "10.0.0.1"
+                                  }
+                                ]
+                              },
+                              {
+                                "ip": [
+                                  {
+                                    "Value": "10.0.0.0/24"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      "right": {
+                        "==": {
+                          "left": {
+                            "offset": [
+                              {
+                                "datetime": [
+                                  {
+                                    "Value": "2024-01-01"
+                                  }
+                                ]
+                              },
+                              {
+                                "duration": [
+                                  {
+                                    "Value": "1d"
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "right": {
+                            "datetime": [
+                              {
+                                "Value": "2024-01-02"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "right": {
+                    "==": {
+                      "left": {
+                        "Value": 9007199254740993
+                      },
+                      "right": {
+                        "Value": 9007199254740993
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "templates": {},
+      "links": [],
+      "responses": [
+        {
+          "decision": "deny",
+          "reasons": [],
+          "error_policies": [
+            "policy0"
+          ]
+        },
+        {
+          "decision": "deny",
+          "reasons": [],
+          "error_policies": [
+            "policy0"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "in and is-in slots",
+      "policies": {
+        "linked-in-0": {
+          "effect": "permit",
+          "principal": {
+            "op": "in",
+            "entity": {
+              "__entity": {
+                "type": "Group",
+                "id": "staff"
+              }
+            }
+          },
+          "action": {
+            "op": "in",
+            "entity": {
+              "type": "Action",
+              "id": "view"
+            }
+          },
+          "resource": {
+            "op": "in",
+            "entity": {
+              "__entity": {
+                "type": "Photo",
+                "id": "one"
+              }
+            }
+          },
+          "conditions": []
+        },
+        "linked-in-1": {
+          "effect": "permit",
+          "principal": {
+            "op": "is",
+            "entity_type": "User",
+            "in": {
+              "entity": {
+                "__entity": {
+                  "type": "Group",
+                  "id": "staff"
+                }
+              }
+            }
+          },
+          "action": {
+            "op": "==",
+            "entity": {
+              "type": "Action",
+              "id": "view"
+            }
+          },
+          "resource": {
+            "op": "is",
+            "entity_type": "Photo",
+            "in": {
+              "entity": {
+                "__entity": {
+                  "type": "Photo",
+                  "id": "one"
+                }
+              }
+            }
+          },
+          "conditions": []
+        }
+      },
+      "templates": {
+        "policy0": {
+          "effect": "permit",
+          "principal": {
+            "op": "in",
+            "slot": "?principal"
+          },
+          "action": {
+            "op": "in",
+            "entity": {
+              "type": "Action",
+              "id": "view"
+            }
+          },
+          "resource": {
+            "op": "in",
+            "slot": "?resource"
+          },
+          "conditions": []
+        },
+        "policy1": {
+          "effect": "permit",
+          "principal": {
+            "op": "is",
+            "entity_type": "User",
+            "in": {
+              "slot": "?principal"
+            }
+          },
+          "action": {
+            "op": "==",
+            "entity": {
+              "type": "Action",
+              "id": "view"
+            }
+          },
+          "resource": {
+            "op": "is",
+            "entity_type": "Photo",
+            "in": {
+              "slot": "?resource"
+            }
+          },
+          "conditions": []
+        }
+      },
+      "links": [
+        {
+          "template_id": "policy0",
+          "id": "linked-in-0",
+          "values": {
+            "?principal": {
+              "type": "Group",
+              "id": "staff"
+            },
+            "?resource": {
+              "type": "Photo",
+              "id": "one"
+            }
+          }
+        },
+        {
+          "template_id": "policy1",
+          "id": "linked-in-1",
+          "values": {
+            "?principal": {
+              "type": "Group",
+              "id": "staff"
+            },
+            "?resource": {
+              "type": "Photo",
+              "id": "one"
+            }
+          }
+        }
+      ],
+      "responses": [
+        {
+          "decision": "allow",
+          "reasons": [
+            "linked-in-0",
+            "linked-in-1"
+          ],
+          "error_policies": []
+        },
+        {
+          "decision": "allow",
+          "reasons": [
+            "linked-in-0",
+            "linked-in-1"
+          ],
+          "error_policies": []
+        }
+      ]
+    }
+  ],
+  "special_expressions": {
+    "unknown": {
+      "unknown": [
+        {
+          "Value": "x"
+        }
+      ]
+    },
+    "residual_error": {
+      "error": []
+    },
+    "slot": {
+      "Slot": "?principal"
+    }
+  }
+}

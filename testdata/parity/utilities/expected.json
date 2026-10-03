@@ -1,0 +1,363 @@
+[
+  {
+    "name": "uid basic",
+    "output": {
+      "uid": {
+        "type": "User",
+        "id": "alice"
+      }
+    }
+  },
+  {
+    "name": "uid namespace and unicode",
+    "output": {
+      "uid": {
+        "type": "NS::User",
+        "id": "雪😀"
+      }
+    }
+  },
+  {
+    "name": "uid rejects noncanonical Unicode null",
+    "output": {
+      "error": {
+        "kind": "entity_uid",
+        "message": "`Entity UID` needs to be normalized (e.g., whitespace removed): User::\"\\u{0}\\t\\n\\r\\\"\\\\\" (help: the normalized form is `User::\"\\0\\t\\n\\r\\\"\\\\\"`)"
+      }
+    }
+  },
+  {
+    "name": "uid rejects Go escape",
+    "output": {
+      "error": {
+        "kind": "entity_uid",
+        "message": "the input `\\a` is not a valid escape"
+      }
+    }
+  },
+  {
+    "name": "uid rejects extra spaces",
+    "output": {
+      "error": {
+        "kind": "entity_uid",
+        "message": "`Entity UID` needs to be normalized (e.g., whitespace removed):  User::\"alice\" (help: the normalized form is `User::\"alice\"`)"
+      }
+    }
+  },
+  {
+    "name": "uid render controls",
+    "output": {
+      "text": "NS::User::\"\\0\\u{7}\\u{8}\\u{c}\\t\\n\\r\\\"\\\\雪😀\""
+    }
+  },
+  {
+    "name": "uid render empty id",
+    "output": {
+      "text": "User::\"\""
+    }
+  },
+  {
+    "name": "uid invalid type",
+    "output": {
+      "error": {
+        "kind": "entity_uid",
+        "message": "failed to parse escape `__entity`: {\n  \"type\": \"not a type\",\n  \"id\": \"alice\"\n}, errors: unexpected token `a` (help: an __entity escape should have a value like `{ \"type\": \"SomeType\", \"id\": \"SomeId\" }`)"
+      }
+    }
+  },
+  {
+    "name": "context empty readback",
+    "output": {
+      "values": {}
+    }
+  },
+  {
+    "name": "context typed readback",
+    "output": {
+      "values": {
+        "ip": {
+          "extension": "ip(\"10.0.0.1\")"
+        },
+        "large": {
+          "long": 9007199254740993
+        },
+        "max": {
+          "long": 9223372036854775807
+        },
+        "member": {
+          "entity_uid": {
+            "type": "NS::User",
+            "id": "雪"
+          }
+        },
+        "min": {
+          "long": -9223372036854775808
+        },
+        "nested": {
+          "record": {
+            "decimal": {
+              "extension": "decimal(\"1.25\")"
+            },
+            "set": {
+              "set": [
+                {
+                  "bool": false
+                },
+                {
+                  "bool": true
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "name": "context get value",
+    "output": {
+      "found": true,
+      "value": {
+        "long": 9007199254740993
+      }
+    }
+  },
+  {
+    "name": "context get absent",
+    "output": {
+      "found": false,
+      "value": null
+    }
+  },
+  {
+    "name": "context malformed array",
+    "output": {
+      "error": {
+        "kind": "context",
+        "message": "expression is not a record: []"
+      }
+    }
+  },
+  {
+    "name": "context merge disjoint",
+    "output": {
+      "context": {
+        "a": 1,
+        "b": "雪",
+        "decimal": {
+          "__extn": {
+            "fn": "decimal",
+            "arg": "1.25"
+          }
+        },
+        "nested": {
+          "x": true
+        }
+      }
+    }
+  },
+  {
+    "name": "context merge duplicate equal",
+    "output": {
+      "error": {
+        "kind": "context",
+        "message": "duplicate key `a` in context"
+      }
+    }
+  },
+  {
+    "name": "context merge duplicate nested",
+    "output": {
+      "error": {
+        "kind": "context",
+        "message": "duplicate key `nested` in context"
+      }
+    }
+  },
+  {
+    "name": "context validate correct",
+    "output": {
+      "valid": true
+    }
+  },
+  {
+    "name": "context validate wrong type",
+    "output": {
+      "error": {
+        "kind": "context",
+        "message": "context `{count: \"3\"}` is not valid for `Action::\"view\"`"
+      }
+    }
+  },
+  {
+    "name": "context validate missing attribute",
+    "output": {
+      "error": {
+        "kind": "context",
+        "message": "context `{}` is not valid for `Action::\"view\"`"
+      }
+    }
+  },
+  {
+    "name": "context validate extra attribute",
+    "output": {
+      "error": {
+        "kind": "context",
+        "message": "context `{count: 3, extra: true}` is not valid for `Action::\"view\"`"
+      }
+    }
+  },
+  {
+    "name": "context validate unknown action",
+    "output": {
+      "error": {
+        "kind": "context",
+        "message": "request's action `Action::\"missing\"` is not declared in the schema"
+      }
+    }
+  },
+  {
+    "name": "scope valid",
+    "output": {
+      "valid": true
+    }
+  },
+  {
+    "name": "scope wrong principal",
+    "output": {
+      "error": {
+        "kind": "request",
+        "message": "principal type `Photo` is not valid for `Action::\"view\"` (help: valid principal types for `Action::\"view\"`: `User`)"
+      }
+    }
+  },
+  {
+    "name": "scope wrong resource",
+    "output": {
+      "error": {
+        "kind": "request",
+        "message": "resource type `User` is not valid for `Action::\"view\"` (help: valid resource types for `Action::\"view\"`: `Photo`)"
+      }
+    }
+  },
+  {
+    "name": "scope unknown action",
+    "output": {
+      "error": {
+        "kind": "request",
+        "message": "request's action `Action::\"missing\"` is not declared in the schema"
+      }
+    }
+  },
+  {
+    "name": "confusable empty",
+    "output": {
+      "warnings": []
+    }
+  },
+  {
+    "name": "confusable plain",
+    "output": {
+      "warnings": []
+    }
+  },
+  {
+    "name": "confusable static and template",
+    "output": {
+      "warnings": [
+        {
+          "policy_id": "policy0",
+          "category": "mixed_script_string",
+          "severity": "warning",
+          "message": "for policy `policy0`, string `\"aа\"` contains mixed scripts",
+          "spans": [
+            {
+              "offset": 43,
+              "length": 5
+            }
+          ]
+        },
+        {
+          "policy_id": "policy0",
+          "category": "mixed_script_string",
+          "severity": "warning",
+          "message": "for policy `policy0`, string `\"aа\"` contains mixed scripts",
+          "spans": [
+            {
+              "offset": 52,
+              "length": 5
+            }
+          ]
+        },
+        {
+          "policy_id": "policy1",
+          "category": "mixed_script_string",
+          "severity": "warning",
+          "message": "for policy `policy1`, string `\"aа\"` contains mixed scripts",
+          "spans": [
+            {
+              "offset": 118,
+              "length": 5
+            }
+          ]
+        },
+        {
+          "policy_id": "policy1",
+          "category": "mixed_script_string",
+          "severity": "warning",
+          "message": "for policy `policy1`, string `\"aа\"` contains mixed scripts",
+          "spans": [
+            {
+              "offset": 127,
+              "length": 5
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "language version",
+    "output": {
+      "version": "4.5.0"
+    }
+  },
+  {
+    "name": "confusable JSON empty policy ID",
+    "output": {
+      "warnings": [
+        {
+          "policy_id": "",
+          "category": "mixed_script_string",
+          "severity": "warning",
+          "message": "for policy ``, string `\"aа\"` contains mixed scripts"
+        },
+        {
+          "policy_id": "",
+          "category": "mixed_script_string",
+          "severity": "warning",
+          "message": "for policy ``, string `\"aа\"` contains mixed scripts"
+        }
+      ]
+    }
+  },
+  {
+    "name": "confusable JSON control policy ID",
+    "output": {
+      "warnings": [
+        {
+          "policy_id": "quote\"\nslash\\\u0000雪",
+          "category": "mixed_script_string",
+          "severity": "warning",
+          "message": "for policy `quote\\\"\\nslash\\\\\\0雪`, string `\"aа\"` contains mixed scripts"
+        },
+        {
+          "policy_id": "quote\"\nslash\\\u0000雪",
+          "category": "mixed_script_string",
+          "severity": "warning",
+          "message": "for policy `quote\\\"\\nslash\\\\\\0雪`, string `\"aа\"` contains mixed scripts"
+        }
+      ]
+    }
+  }
+]

@@ -1,0 +1,849 @@
+[
+  {
+    "expression": "true",
+    "environment": {
+      "principal": {
+        "type": "User",
+        "id": "雪"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "p"
+      },
+      "context": {
+        "number": 9007199254740993
+      },
+      "entities": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "雪"
+          },
+          "attrs": {
+            "age": 9007199254740993
+          },
+          "parents": []
+        }
+      ]
+    },
+    "restricted": false
+  },
+  {
+    "expression": "false",
+    "environment": {
+      "principal": {
+        "type": "User",
+        "id": "雪"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "p"
+      },
+      "context": {
+        "number": 9007199254740993
+      },
+      "entities": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "雪"
+          },
+          "attrs": {
+            "age": 9007199254740993
+          },
+          "parents": []
+        }
+      ]
+    },
+    "restricted": false
+  },
+  {
+    "expression": "principal.age + 1",
+    "environment": {
+      "principal": {
+        "type": "User",
+        "id": "雪"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "p"
+      },
+      "context": {
+        "number": 9007199254740993
+      },
+      "entities": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "雪"
+          },
+          "attrs": {
+            "age": 9007199254740993
+          },
+          "parents": []
+        }
+      ]
+    },
+    "restricted": false
+  },
+  {
+    "expression": "context.number",
+    "environment": {
+      "principal": {
+        "type": "User",
+        "id": "雪"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "p"
+      },
+      "context": {
+        "number": 9007199254740993
+      },
+      "entities": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "雪"
+          },
+          "attrs": {
+            "age": 9007199254740993
+          },
+          "parents": []
+        }
+      ]
+    },
+    "restricted": false
+  },
+  {
+    "expression": "9223372036854775807",
+    "environment": {
+      "principal": {
+        "type": "User",
+        "id": "雪"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "p"
+      },
+      "context": {
+        "number": 9007199254740993
+      },
+      "entities": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "雪"
+          },
+          "attrs": {
+            "age": 9007199254740993
+          },
+          "parents": []
+        }
+      ]
+    },
+    "restricted": false
+  },
+  {
+    "expression": "-9223372036854775808",
+    "environment": {
+      "principal": {
+        "type": "User",
+        "id": "雪"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "p"
+      },
+      "context": {
+        "number": 9007199254740993
+      },
+      "entities": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "雪"
+          },
+          "attrs": {
+            "age": 9007199254740993
+          },
+          "parents": []
+        }
+      ]
+    },
+    "restricted": false
+  },
+  {
+    "expression": "\"雪😀\"",
+    "environment": {
+      "principal": {
+        "type": "User",
+        "id": "雪"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "p"
+      },
+      "context": {
+        "number": 9007199254740993
+      },
+      "entities": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "雪"
+          },
+          "attrs": {
+            "age": 9007199254740993
+          },
+          "parents": []
+        }
+      ]
+    },
+    "restricted": false
+  },
+  {
+    "expression": "principal",
+    "environment": {
+      "principal": {
+        "type": "User",
+        "id": "雪"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "p"
+      },
+      "context": {
+        "number": 9007199254740993
+      },
+      "entities": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "雪"
+          },
+          "attrs": {
+            "age": 9007199254740993
+          },
+          "parents": []
+        }
+      ]
+    },
+    "restricted": false
+  },
+  {
+    "expression": "[1, 1, 2]",
+    "environment": {
+      "principal": {
+        "type": "User",
+        "id": "雪"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "p"
+      },
+      "context": {
+        "number": 9007199254740993
+      },
+      "entities": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "雪"
+          },
+          "attrs": {
+            "age": 9007199254740993
+          },
+          "parents": []
+        }
+      ]
+    },
+    "restricted": false
+  },
+  {
+    "expression": "{a: 1, b: [true], c: \"雪\"}",
+    "environment": {
+      "principal": {
+        "type": "User",
+        "id": "雪"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "p"
+      },
+      "context": {
+        "number": 9007199254740993
+      },
+      "entities": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "雪"
+          },
+          "attrs": {
+            "age": 9007199254740993
+          },
+          "parents": []
+        }
+      ]
+    },
+    "restricted": false
+  },
+  {
+    "expression": "[]",
+    "environment": {
+      "principal": {
+        "type": "User",
+        "id": "雪"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "p"
+      },
+      "context": {
+        "number": 9007199254740993
+      },
+      "entities": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "雪"
+          },
+          "attrs": {
+            "age": 9007199254740993
+          },
+          "parents": []
+        }
+      ]
+    },
+    "restricted": false
+  },
+  {
+    "expression": "{}",
+    "environment": {
+      "principal": {
+        "type": "User",
+        "id": "雪"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "p"
+      },
+      "context": {
+        "number": 9007199254740993
+      },
+      "entities": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "雪"
+          },
+          "attrs": {
+            "age": 9007199254740993
+          },
+          "parents": []
+        }
+      ]
+    },
+    "restricted": false
+  },
+  {
+    "expression": "decimal(\"1.25\")",
+    "environment": {
+      "principal": {
+        "type": "User",
+        "id": "雪"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "p"
+      },
+      "context": {
+        "number": 9007199254740993
+      },
+      "entities": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "雪"
+          },
+          "attrs": {
+            "age": 9007199254740993
+          },
+          "parents": []
+        }
+      ]
+    },
+    "restricted": false
+  },
+  {
+    "expression": "ip(\"127.0.0.1\")",
+    "environment": {
+      "principal": {
+        "type": "User",
+        "id": "雪"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "p"
+      },
+      "context": {
+        "number": 9007199254740993
+      },
+      "entities": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "雪"
+          },
+          "attrs": {
+            "age": 9007199254740993
+          },
+          "parents": []
+        }
+      ]
+    },
+    "restricted": false
+  },
+  {
+    "expression": "duration(\"1s\")",
+    "environment": {
+      "principal": {
+        "type": "User",
+        "id": "雪"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "p"
+      },
+      "context": {
+        "number": 9007199254740993
+      },
+      "entities": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "雪"
+          },
+          "attrs": {
+            "age": 9007199254740993
+          },
+          "parents": []
+        }
+      ]
+    },
+    "restricted": false
+  },
+  {
+    "expression": "datetime(\"2026-10-01T12:00:00Z\")",
+    "environment": {
+      "principal": {
+        "type": "User",
+        "id": "雪"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "p"
+      },
+      "context": {
+        "number": 9007199254740993
+      },
+      "entities": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "雪"
+          },
+          "attrs": {
+            "age": 9007199254740993
+          },
+          "parents": []
+        }
+      ]
+    },
+    "restricted": false
+  },
+  {
+    "expression": "{a: decimal(\"1.2\"), b: [ip(\"10.0.0.1\")] }",
+    "environment": {
+      "principal": {
+        "type": "User",
+        "id": "雪"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "p"
+      },
+      "context": {
+        "number": 9007199254740993
+      },
+      "entities": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "雪"
+          },
+          "attrs": {
+            "age": 9007199254740993
+          },
+          "parents": []
+        }
+      ]
+    },
+    "restricted": false
+  },
+  {
+    "expression": "1 +",
+    "environment": {
+      "principal": {
+        "type": "User",
+        "id": "雪"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "p"
+      },
+      "context": {
+        "number": 9007199254740993
+      },
+      "entities": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "雪"
+          },
+          "attrs": {
+            "age": 9007199254740993
+          },
+          "parents": []
+        }
+      ]
+    },
+    "restricted": false
+  },
+  {
+    "expression": "principal.missing",
+    "environment": {
+      "principal": {
+        "type": "User",
+        "id": "雪"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "p"
+      },
+      "context": {
+        "number": 9007199254740993
+      },
+      "entities": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "雪"
+          },
+          "attrs": {
+            "age": 9007199254740993
+          },
+          "parents": []
+        }
+      ]
+    },
+    "restricted": false
+  },
+  {
+    "expression": "9223372036854775807 + 1",
+    "environment": {
+      "principal": {
+        "type": "User",
+        "id": "雪"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "p"
+      },
+      "context": {
+        "number": 9007199254740993
+      },
+      "entities": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "雪"
+          },
+          "attrs": {
+            "age": 9007199254740993
+          },
+          "parents": []
+        }
+      ]
+    },
+    "restricted": false
+  },
+  {
+    "expression": "decimal(\"bad\")",
+    "environment": {
+      "principal": {
+        "type": "User",
+        "id": "雪"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "p"
+      },
+      "context": {
+        "number": 9007199254740993
+      },
+      "entities": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "雪"
+          },
+          "attrs": {
+            "age": 9007199254740993
+          },
+          "parents": []
+        }
+      ]
+    },
+    "restricted": false
+  },
+  {
+    "expression": "principal",
+    "environment": {
+      "principal": {
+        "type": "User",
+        "id": "雪"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "p"
+      },
+      "context": {
+        "number": 9007199254740993
+      },
+      "entities": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "雪"
+          },
+          "attrs": {
+            "age": 9007199254740993
+          },
+          "parents": []
+        }
+      ]
+    },
+    "restricted": true
+  },
+  {
+    "expression": "[1, decimal(\"1.25\")]",
+    "environment": {
+      "principal": {
+        "type": "User",
+        "id": "雪"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "p"
+      },
+      "context": {
+        "number": 9007199254740993
+      },
+      "entities": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "雪"
+          },
+          "attrs": {
+            "age": 9007199254740993
+          },
+          "parents": []
+        }
+      ]
+    },
+    "restricted": true
+  },
+  {
+    "expression": "principal",
+    "environment": {
+      "principal": null,
+      "action": null,
+      "resource": null,
+      "context": {},
+      "entities": []
+    },
+    "restricted": false
+  },
+  {
+    "expression": "true",
+    "environment": {
+      "principal": null,
+      "action": null,
+      "resource": null,
+      "context": {},
+      "entities": []
+    },
+    "restricted": false
+  },
+  {
+    "expression": "principal.age",
+    "environment": {
+      "principal": null,
+      "action": null,
+      "resource": null,
+      "context": {},
+      "entities": []
+    },
+    "restricted": false
+  },
+  {
+    "expression": "resource",
+    "environment": {
+      "principal": null,
+      "action": null,
+      "resource": null,
+      "context": {},
+      "entities": []
+    },
+    "restricted": false
+  },
+  {
+    "expression": "action",
+    "environment": {
+      "principal": null,
+      "action": null,
+      "resource": null,
+      "context": {},
+      "entities": []
+    },
+    "restricted": false
+  },
+  {
+    "expression": "principal == ?principal",
+    "environment": {
+      "principal": {
+        "type": "User",
+        "id": "雪"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "p"
+      },
+      "context": {
+        "number": 9007199254740993
+      },
+      "entities": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "雪"
+          },
+          "attrs": {
+            "age": 9007199254740993
+          },
+          "parents": []
+        }
+      ]
+    },
+    "restricted": false
+  }
+]

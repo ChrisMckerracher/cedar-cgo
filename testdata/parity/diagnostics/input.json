@@ -1,0 +1,12 @@
+[
+ {"name":"builtin-shadow", "schema":"entity String; entity User; action view appliesTo {principal: User, resource: User, context: {}};", "policies":"permit(principal, action, resource);"},
+ {"name":"entity-shadow", "schema":"entity User; type User = {name: String}; action view appliesTo {principal: User, resource: User, context: {}};", "policies":""},
+ {"name":"type-error-unicode", "schema":"entity User {admin: Bool}; action view appliesTo {principal: User, resource: User, context: {}};", "policies":"@note(\"雪\") permit(principal, action, resource) when {principal.admin == 1};"},
+ {"name":"invalid-action-warning", "schema":"entity User; entity Photo; action view appliesTo {principal: User, resource: Photo, context: {}};", "policies":"permit(principal is Photo, action == Action::\"view\", resource is User);"},
+ {"name":"confusable-warning", "schema":"entity User; action view appliesTo {principal: User, resource: User, context: {}};", "policies":"permit(principal, action, resource) when {\"pаypal\" == \"paypal\"};"},
+ {"name":"unknown-type", "schema":"entity User; entity Uses; action view appliesTo {principal: User, resource: User, context: {}};", "policies":"permit(principal is Uset, action, resource);"},
+ {"name":"empty", "schema":"", "policies":""},
+ {"name":"json-is-unknown-type", "schema":"entity User; action view appliesTo {principal: User, resource: User, context: {}};", "policies_json":{"templates":{},"staticPolicies":{"policy0":{"effect":"permit","principal":{"op":"is","entity_type":"Uset"},"action":{"op":"All"},"resource":{"op":"All"},"conditions":[]}},"templateLinks":[]}},
+ {"name":"json-eq-unknown-type", "schema":"entity User; action view appliesTo {principal: User, resource: User, context: {}};", "policies_json":{"templates":{},"staticPolicies":{"policy0":{"effect":"permit","principal":{"op":"==","entity":{"type":"Uset","id":"x"}},"action":{"op":"All"},"resource":{"op":"All"},"conditions":[]}},"templateLinks":[]}},
+ {"name":"duplicate-type-errors", "schema":"entity User; action view appliesTo {principal: User, resource: User, context: {}};", "policies":"permit(principal, action, resource) when { 1 && 2 };"}
+]

@@ -12,13 +12,14 @@ import (
 	"github.com/ChrisMckerracher/cedar-go-wasm/internal/capbuf"
 )
 
-// Solver sessions are created and closed per analysis call.
+// Solver sessions serve stateless calls or explicitly owned compiled sessions.
 type Solver interface {
 	// Start must provide interactive SMT-LIB 2 replies, as "cvc5 --lang smt" does.
 	Start(ctx context.Context) (Session, error)
 }
 
 // Session writes solver input and reads solver output.
+// Close must unblock current Read and Write operations.
 type Session interface {
 	io.Reader
 	io.Writer
@@ -77,7 +78,11 @@ func (p *process) Close() error {
 		err := p.cmd.Wait()
 		var exit *exec.ExitError
 		if err != nil && !errors.As(err, &exit) {
-			p.err = err
+			// CommandContext can report cancellation after the process exits successfully.
+			canceled := err == context.Canceled || err == context.DeadlineExceeded
+			if state := p.cmd.ProcessState; !canceled || state == nil || !state.Success() {
+				p.err = err
+			}
 		}
 	})
 	return p.err

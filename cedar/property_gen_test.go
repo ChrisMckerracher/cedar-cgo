@@ -371,7 +371,7 @@ func propAssertStrictlyValid(t *rapid.T, rt *cedar.Runtime, schema cedar.Schema,
 
 // propResponseEqual compares decisions, reasons, and error diagnostics exactly.
 func propResponseEqual(a, b cedar.Response) bool {
-	return a.Decision == b.Decision && slices.Equal(a.Reasons, b.Reasons) && slices.Equal(a.Errors, b.Errors)
+	return a.Decision == b.Decision && slices.Equal(a.Reasons, b.Reasons) && reflect.DeepEqual(a.Errors, b.Errors)
 }
 
 // propSameJSON mirrors policies_test.go's sameJSON for rapid's T, preserving

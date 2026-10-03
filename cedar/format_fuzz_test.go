@@ -5,6 +5,7 @@ import (
 	"errors"
 	"testing"
 	"time"
+	"unicode/utf8"
 
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 )
@@ -30,6 +31,9 @@ func FuzzFormatPolicies(f *testing.F) {
 		if err != nil {
 			if out != "" || errors.Is(err, cedar.ErrFault) {
 				t.Fatalf("bounded format failed: %q, %v", out, err)
+			}
+			if !utf8.ValidString(text) {
+				requireUTF8InputError(t, err)
 			}
 			return
 		}

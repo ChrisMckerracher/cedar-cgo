@@ -24,7 +24,7 @@ func TestBatchedProofSource(t *testing.T) {
 			"entityLoaderState":      "329f1433c14a880785396a433c40f17ffd1dcb0ff6a9fd1992cc8f520036e5c4",
 			"charge":                 "c5ca032a105efe396ee4745fb0b36561faad5f68900d577c7809ca1cb17d7a83",
 			"loadEntityBatch":        "6a8e0f705af595bea6bdeeb519e02caf10a68cd3ac0b8d07a5d89a93b95a2130",
-			"encodeEntityLoadResult": "c7b0800facadf9519518a780337045fd4f1532c08a777b190a98b76928fbaba7",
+			"encodeEntityLoadResult": "7c9f83fd575004c1c257b8d87e7b058343d58dad90e04c9d89b9e7008ca4a21e",
 			"DefaultMaxBatchBytes":   "6cdd837b8a317898f0d862fa1357be0ff89d16521839b8c22fa8073b724f457c",
 			"DefaultMaxLoaderBytes":  "e470d69e046e1be25c080a6f112920f5a61d0c97b4e085e1668b4c4b3bc07bf7",
 		},

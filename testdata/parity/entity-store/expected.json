@@ -1,0 +1,1535 @@
+[
+  {
+    "name": "chain-middle-deletion",
+    "stages": [
+      {
+        "result": {
+          "normalized": [
+            {
+              "attrs": {},
+              "parents": [],
+              "uid": {
+                "id": "c",
+                "type": "Node"
+              }
+            },
+            {
+              "attrs": {},
+              "parents": [
+                {
+                  "id": "b",
+                  "type": "Node"
+                },
+                {
+                  "id": "c",
+                  "type": "Node"
+                }
+              ],
+              "uid": {
+                "id": "a",
+                "type": "Node"
+              }
+            },
+            {
+              "attrs": {},
+              "parents": [
+                {
+                  "id": "c",
+                  "type": "Node"
+                }
+              ],
+              "uid": {
+                "id": "b",
+                "type": "Node"
+              }
+            }
+          ],
+          "entity": {
+            "attrs": {},
+            "parents": [
+              {
+                "id": "b",
+                "type": "Node"
+              },
+              {
+                "id": "c",
+                "type": "Node"
+              }
+            ],
+            "uid": {
+              "id": "a",
+              "type": "Node"
+            }
+          },
+          "parents": [
+            {
+              "type": "Node",
+              "id": "b"
+            }
+          ],
+          "ancestors": [
+            {
+              "type": "Node",
+              "id": "b"
+            },
+            {
+              "type": "Node",
+              "id": "c"
+            }
+          ],
+          "is_ancestor": true,
+          "normalized_deep_equal": true
+        }
+      },
+      {
+        "result": {
+          "normalized": [
+            {
+              "attrs": {},
+              "parents": [],
+              "uid": {
+                "id": "a",
+                "type": "Node"
+              }
+            },
+            {
+              "attrs": {},
+              "parents": [],
+              "uid": {
+                "id": "c",
+                "type": "Node"
+              }
+            }
+          ],
+          "entity": {
+            "attrs": {},
+            "parents": [],
+            "uid": {
+              "id": "a",
+              "type": "Node"
+            }
+          },
+          "parents": [],
+          "ancestors": [],
+          "is_ancestor": false,
+          "normalized_deep_equal": true
+        }
+      },
+      {
+        "result": {
+          "normalized": [
+            {
+              "attrs": {},
+              "parents": [],
+              "uid": {
+                "id": "a",
+                "type": "Node"
+              }
+            },
+            {
+              "attrs": {},
+              "parents": [],
+              "uid": {
+                "id": "c",
+                "type": "Node"
+              }
+            },
+            {
+              "attrs": {},
+              "parents": [
+                {
+                  "id": "c",
+                  "type": "Node"
+                }
+              ],
+              "uid": {
+                "id": "b",
+                "type": "Node"
+              }
+            }
+          ],
+          "entity": {
+            "attrs": {},
+            "parents": [],
+            "uid": {
+              "id": "a",
+              "type": "Node"
+            }
+          },
+          "parents": [],
+          "ancestors": [],
+          "is_ancestor": false,
+          "normalized_deep_equal": true
+        }
+      },
+      {
+        "result": {
+          "normalized": [
+            {
+              "attrs": {},
+              "parents": [],
+              "uid": {
+                "id": "c",
+                "type": "Node"
+              }
+            },
+            {
+              "attrs": {},
+              "parents": [
+                {
+                  "id": "b",
+                  "type": "Node"
+                },
+                {
+                  "id": "c",
+                  "type": "Node"
+                }
+              ],
+              "uid": {
+                "id": "a",
+                "type": "Node"
+              }
+            },
+            {
+              "attrs": {},
+              "parents": [
+                {
+                  "id": "c",
+                  "type": "Node"
+                }
+              ],
+              "uid": {
+                "id": "b",
+                "type": "Node"
+              }
+            }
+          ],
+          "entity": {
+            "attrs": {},
+            "parents": [
+              {
+                "id": "b",
+                "type": "Node"
+              },
+              {
+                "id": "c",
+                "type": "Node"
+              }
+            ],
+            "uid": {
+              "id": "a",
+              "type": "Node"
+            }
+          },
+          "parents": [
+            {
+              "type": "Node",
+              "id": "b"
+            }
+          ],
+          "ancestors": [
+            {
+              "type": "Node",
+              "id": "b"
+            },
+            {
+              "type": "Node",
+              "id": "c"
+            }
+          ],
+          "is_ancestor": true,
+          "normalized_deep_equal": true
+        }
+      }
+    ]
+  },
+  {
+    "name": "replace-parent-recomputes-descendants",
+    "stages": [
+      {
+        "result": {
+          "normalized": [
+            {
+              "attrs": {},
+              "parents": [],
+              "uid": {
+                "id": "c",
+                "type": "Node"
+              }
+            },
+            {
+              "attrs": {},
+              "parents": [],
+              "uid": {
+                "id": "d",
+                "type": "Node"
+              }
+            },
+            {
+              "attrs": {},
+              "parents": [
+                {
+                  "id": "b",
+                  "type": "Node"
+                },
+                {
+                  "id": "c",
+                  "type": "Node"
+                }
+              ],
+              "uid": {
+                "id": "a",
+                "type": "Node"
+              }
+            },
+            {
+              "attrs": {},
+              "parents": [
+                {
+                  "id": "c",
+                  "type": "Node"
+                }
+              ],
+              "uid": {
+                "id": "b",
+                "type": "Node"
+              }
+            }
+          ],
+          "entity": {
+            "attrs": {},
+            "parents": [
+              {
+                "id": "b",
+                "type": "Node"
+              },
+              {
+                "id": "c",
+                "type": "Node"
+              }
+            ],
+            "uid": {
+              "id": "a",
+              "type": "Node"
+            }
+          },
+          "parents": [
+            {
+              "type": "Node",
+              "id": "b"
+            }
+          ],
+          "ancestors": [
+            {
+              "type": "Node",
+              "id": "b"
+            },
+            {
+              "type": "Node",
+              "id": "c"
+            }
+          ],
+          "is_ancestor": true,
+          "normalized_deep_equal": true
+        }
+      },
+      {
+        "result": {
+          "normalized": [
+            {
+              "attrs": {
+                "n": 9
+              },
+              "parents": [
+                {
+                  "id": "d",
+                  "type": "Node"
+                }
+              ],
+              "uid": {
+                "id": "b",
+                "type": "Node"
+              }
+            },
+            {
+              "attrs": {},
+              "parents": [],
+              "uid": {
+                "id": "c",
+                "type": "Node"
+              }
+            },
+            {
+              "attrs": {},
+              "parents": [],
+              "uid": {
+                "id": "d",
+                "type": "Node"
+              }
+            },
+            {
+              "attrs": {},
+              "parents": [
+                {
+                  "id": "b",
+                  "type": "Node"
+                },
+                {
+                  "id": "d",
+                  "type": "Node"
+                }
+              ],
+              "uid": {
+                "id": "a",
+                "type": "Node"
+              }
+            }
+          ],
+          "entity": {
+            "attrs": {},
+            "parents": [
+              {
+                "id": "b",
+                "type": "Node"
+              },
+              {
+                "id": "d",
+                "type": "Node"
+              }
+            ],
+            "uid": {
+              "id": "a",
+              "type": "Node"
+            }
+          },
+          "parents": [
+            {
+              "type": "Node",
+              "id": "b"
+            }
+          ],
+          "ancestors": [
+            {
+              "type": "Node",
+              "id": "b"
+            },
+            {
+              "type": "Node",
+              "id": "d"
+            }
+          ],
+          "is_ancestor": false,
+          "normalized_deep_equal": true
+        }
+      },
+      {
+        "result": {
+          "normalized": [
+            {
+              "attrs": {
+                "n": 9
+              },
+              "parents": [],
+              "uid": {
+                "id": "b",
+                "type": "Node"
+              }
+            },
+            {
+              "attrs": {},
+              "parents": [],
+              "uid": {
+                "id": "c",
+                "type": "Node"
+              }
+            },
+            {
+              "attrs": {},
+              "parents": [
+                {
+                  "id": "b",
+                  "type": "Node"
+                }
+              ],
+              "uid": {
+                "id": "a",
+                "type": "Node"
+              }
+            }
+          ],
+          "entity": {
+            "attrs": {},
+            "parents": [
+              {
+                "id": "b",
+                "type": "Node"
+              }
+            ],
+            "uid": {
+              "id": "a",
+              "type": "Node"
+            }
+          },
+          "parents": [
+            {
+              "type": "Node",
+              "id": "b"
+            }
+          ],
+          "ancestors": [
+            {
+              "type": "Node",
+              "id": "b"
+            }
+          ],
+          "is_ancestor": false,
+          "normalized_deep_equal": true
+        }
+      },
+      {
+        "result": {
+          "normalized": [
+            {
+              "attrs": {},
+              "parents": [],
+              "uid": {
+                "id": "c",
+                "type": "Node"
+              }
+            },
+            {
+              "attrs": {},
+              "parents": [
+                {
+                  "id": "b",
+                  "type": "Node"
+                },
+                {
+                  "id": "c",
+                  "type": "Node"
+                }
+              ],
+              "uid": {
+                "id": "a",
+                "type": "Node"
+              }
+            },
+            {
+              "attrs": {},
+              "parents": [
+                {
+                  "id": "c",
+                  "type": "Node"
+                }
+              ],
+              "uid": {
+                "id": "b",
+                "type": "Node"
+              }
+            }
+          ],
+          "entity": {
+            "attrs": {},
+            "parents": [
+              {
+                "id": "b",
+                "type": "Node"
+              },
+              {
+                "id": "c",
+                "type": "Node"
+              }
+            ],
+            "uid": {
+              "id": "a",
+              "type": "Node"
+            }
+          },
+          "parents": [
+            {
+              "type": "Node",
+              "id": "b"
+            }
+          ],
+          "ancestors": [
+            {
+              "type": "Node",
+              "id": "b"
+            },
+            {
+              "type": "Node",
+              "id": "c"
+            }
+          ],
+          "is_ancestor": true,
+          "normalized_deep_equal": true
+        }
+      }
+    ]
+  },
+  {
+    "name": "direct-edge-survives-other-path-deletion",
+    "stages": [
+      {
+        "result": {
+          "normalized": [
+            {
+              "attrs": {},
+              "parents": [],
+              "uid": {
+                "id": "c",
+                "type": "Node"
+              }
+            },
+            {
+              "attrs": {},
+              "parents": [
+                {
+                  "id": "b",
+                  "type": "Node"
+                },
+                {
+                  "id": "c",
+                  "type": "Node"
+                }
+              ],
+              "uid": {
+                "id": "a",
+                "type": "Node"
+              }
+            },
+            {
+              "attrs": {},
+              "parents": [
+                {
+                  "id": "c",
+                  "type": "Node"
+                }
+              ],
+              "uid": {
+                "id": "b",
+                "type": "Node"
+              }
+            }
+          ],
+          "entity": {
+            "attrs": {},
+            "parents": [
+              {
+                "id": "b",
+                "type": "Node"
+              },
+              {
+                "id": "c",
+                "type": "Node"
+              }
+            ],
+            "uid": {
+              "id": "a",
+              "type": "Node"
+            }
+          },
+          "parents": [
+            {
+              "type": "Node",
+              "id": "b"
+            },
+            {
+              "type": "Node",
+              "id": "c"
+            }
+          ],
+          "ancestors": [
+            {
+              "type": "Node",
+              "id": "b"
+            },
+            {
+              "type": "Node",
+              "id": "c"
+            }
+          ],
+          "is_ancestor": true,
+          "normalized_deep_equal": true
+        }
+      },
+      {
+        "result": {
+          "normalized": [
+            {
+              "attrs": {},
+              "parents": [],
+              "uid": {
+                "id": "c",
+                "type": "Node"
+              }
+            },
+            {
+              "attrs": {},
+              "parents": [
+                {
+                  "id": "c",
+                  "type": "Node"
+                }
+              ],
+              "uid": {
+                "id": "a",
+                "type": "Node"
+              }
+            }
+          ],
+          "entity": {
+            "attrs": {},
+            "parents": [
+              {
+                "id": "c",
+                "type": "Node"
+              }
+            ],
+            "uid": {
+              "id": "a",
+              "type": "Node"
+            }
+          },
+          "parents": [
+            {
+              "type": "Node",
+              "id": "c"
+            }
+          ],
+          "ancestors": [
+            {
+              "type": "Node",
+              "id": "c"
+            }
+          ],
+          "is_ancestor": true,
+          "normalized_deep_equal": true
+        }
+      },
+      {
+        "result": {
+          "normalized": [
+            {
+              "attrs": {},
+              "parents": [],
+              "uid": {
+                "id": "a",
+                "type": "Node"
+              }
+            }
+          ],
+          "entity": {
+            "attrs": {},
+            "parents": [],
+            "uid": {
+              "id": "a",
+              "type": "Node"
+            }
+          },
+          "parents": [],
+          "ancestors": [],
+          "is_ancestor": false,
+          "normalized_deep_equal": true
+        }
+      }
+    ]
+  },
+  {
+    "name": "missing-parent-native-removal",
+    "stages": [
+      {
+        "result": {
+          "normalized": [
+            {
+              "attrs": {},
+              "parents": [
+                {
+                  "id": "b",
+                  "type": "Node"
+                }
+              ],
+              "uid": {
+                "id": "a",
+                "type": "Node"
+              }
+            }
+          ],
+          "entity": {
+            "attrs": {},
+            "parents": [
+              {
+                "id": "b",
+                "type": "Node"
+              }
+            ],
+            "uid": {
+              "id": "a",
+              "type": "Node"
+            }
+          },
+          "parents": [
+            {
+              "type": "Node",
+              "id": "b"
+            }
+          ],
+          "ancestors": [
+            {
+              "type": "Node",
+              "id": "b"
+            }
+          ],
+          "is_ancestor": false,
+          "normalized_deep_equal": true
+        }
+      },
+      {
+        "result": {
+          "normalized": [
+            {
+              "attrs": {},
+              "parents": [
+                {
+                  "id": "b",
+                  "type": "Node"
+                }
+              ],
+              "uid": {
+                "id": "a",
+                "type": "Node"
+              }
+            }
+          ],
+          "entity": {
+            "attrs": {},
+            "parents": [
+              {
+                "id": "b",
+                "type": "Node"
+              }
+            ],
+            "uid": {
+              "id": "a",
+              "type": "Node"
+            }
+          },
+          "parents": [
+            {
+              "type": "Node",
+              "id": "b"
+            }
+          ],
+          "ancestors": [
+            {
+              "type": "Node",
+              "id": "b"
+            }
+          ],
+          "is_ancestor": false,
+          "normalized_deep_equal": true
+        }
+      },
+      {
+        "result": {
+          "normalized": [
+            {
+              "attrs": {},
+              "parents": [
+                {
+                  "id": "b",
+                  "type": "Node"
+                },
+                {
+                  "id": "c",
+                  "type": "Node"
+                }
+              ],
+              "uid": {
+                "id": "a",
+                "type": "Node"
+              }
+            },
+            {
+              "attrs": {},
+              "parents": [
+                {
+                  "id": "c",
+                  "type": "Node"
+                }
+              ],
+              "uid": {
+                "id": "b",
+                "type": "Node"
+              }
+            }
+          ],
+          "entity": {
+            "attrs": {},
+            "parents": [
+              {
+                "id": "b",
+                "type": "Node"
+              },
+              {
+                "id": "c",
+                "type": "Node"
+              }
+            ],
+            "uid": {
+              "id": "a",
+              "type": "Node"
+            }
+          },
+          "parents": [
+            {
+              "type": "Node",
+              "id": "b"
+            }
+          ],
+          "ancestors": [
+            {
+              "type": "Node",
+              "id": "b"
+            },
+            {
+              "type": "Node",
+              "id": "c"
+            }
+          ],
+          "is_ancestor": true,
+          "normalized_deep_equal": true
+        }
+      },
+      {
+        "result": {
+          "normalized": [
+            {
+              "attrs": {},
+              "parents": [],
+              "uid": {
+                "id": "a",
+                "type": "Node"
+              }
+            }
+          ],
+          "entity": {
+            "attrs": {},
+            "parents": [],
+            "uid": {
+              "id": "a",
+              "type": "Node"
+            }
+          },
+          "parents": [],
+          "ancestors": [],
+          "is_ancestor": false,
+          "normalized_deep_equal": true
+        }
+      }
+    ]
+  },
+  {
+    "name": "duplicate-upsert-last-wins",
+    "stages": [
+      {
+        "result": {
+          "normalized": [
+            {
+              "attrs": {
+                "n": 0
+              },
+              "parents": [],
+              "uid": {
+                "id": "a",
+                "type": "Node"
+              }
+            }
+          ],
+          "entity": {
+            "attrs": {
+              "n": 0
+            },
+            "parents": [],
+            "uid": {
+              "id": "a",
+              "type": "Node"
+            }
+          },
+          "parents": [],
+          "ancestors": [],
+          "is_ancestor": false,
+          "normalized_deep_equal": true
+        }
+      },
+      {
+        "result": {
+          "normalized": [
+            {
+              "attrs": {
+                "n": 2
+              },
+              "parents": [],
+              "uid": {
+                "id": "a",
+                "type": "Node"
+              }
+            }
+          ],
+          "entity": {
+            "attrs": {
+              "n": 2
+            },
+            "parents": [],
+            "uid": {
+              "id": "a",
+              "type": "Node"
+            }
+          },
+          "parents": [],
+          "ancestors": [],
+          "is_ancestor": false,
+          "normalized_deep_equal": true
+        }
+      },
+      {
+        "result": {
+          "normalized": [
+            {
+              "attrs": {
+                "n": 2
+              },
+              "parents": [],
+              "uid": {
+                "id": "a",
+                "type": "Node"
+              }
+            }
+          ],
+          "entity": {
+            "attrs": {
+              "n": 2
+            },
+            "parents": [],
+            "uid": {
+              "id": "a",
+              "type": "Node"
+            }
+          },
+          "parents": [],
+          "ancestors": [],
+          "is_ancestor": false,
+          "normalized_deep_equal": true
+        }
+      },
+      {
+        "result": {
+          "normalized": [
+            {
+              "attrs": {
+                "n": 2
+              },
+              "parents": [],
+              "uid": {
+                "id": "a",
+                "type": "Node"
+              }
+            }
+          ],
+          "entity": {
+            "attrs": {
+              "n": 2
+            },
+            "parents": [],
+            "uid": {
+              "id": "a",
+              "type": "Node"
+            }
+          },
+          "parents": [],
+          "ancestors": [],
+          "is_ancestor": false,
+          "normalized_deep_equal": true
+        }
+      }
+    ]
+  },
+  {
+    "name": "cycle-error-preserves-snapshot",
+    "stages": [
+      {
+        "result": {
+          "normalized": [
+            {
+              "attrs": {},
+              "parents": [],
+              "uid": {
+                "id": "b",
+                "type": "Node"
+              }
+            },
+            {
+              "attrs": {},
+              "parents": [
+                {
+                  "id": "b",
+                  "type": "Node"
+                }
+              ],
+              "uid": {
+                "id": "a",
+                "type": "Node"
+              }
+            }
+          ],
+          "entity": {
+            "attrs": {},
+            "parents": [
+              {
+                "id": "b",
+                "type": "Node"
+              }
+            ],
+            "uid": {
+              "id": "a",
+              "type": "Node"
+            }
+          },
+          "parents": [
+            {
+              "type": "Node",
+              "id": "b"
+            }
+          ],
+          "ancestors": [
+            {
+              "type": "Node",
+              "id": "b"
+            }
+          ],
+          "is_ancestor": false,
+          "normalized_deep_equal": true
+        }
+      },
+      {
+        "error_kind": "entities",
+        "result": {
+          "normalized": [
+            {
+              "attrs": {},
+              "parents": [],
+              "uid": {
+                "id": "b",
+                "type": "Node"
+              }
+            },
+            {
+              "attrs": {},
+              "parents": [
+                {
+                  "id": "b",
+                  "type": "Node"
+                }
+              ],
+              "uid": {
+                "id": "a",
+                "type": "Node"
+              }
+            }
+          ],
+          "entity": {
+            "attrs": {},
+            "parents": [
+              {
+                "id": "b",
+                "type": "Node"
+              }
+            ],
+            "uid": {
+              "id": "a",
+              "type": "Node"
+            }
+          },
+          "parents": [
+            {
+              "type": "Node",
+              "id": "b"
+            }
+          ],
+          "ancestors": [
+            {
+              "type": "Node",
+              "id": "b"
+            }
+          ],
+          "is_ancestor": false,
+          "normalized_deep_equal": true
+        }
+      },
+      {
+        "result": {
+          "normalized": [
+            {
+              "attrs": {},
+              "parents": [],
+              "uid": {
+                "id": "a",
+                "type": "Node"
+              }
+            }
+          ],
+          "entity": {
+            "attrs": {},
+            "parents": [],
+            "uid": {
+              "id": "a",
+              "type": "Node"
+            }
+          },
+          "parents": [],
+          "ancestors": [],
+          "is_ancestor": false,
+          "normalized_deep_equal": true
+        }
+      }
+    ]
+  },
+  {
+    "name": "unicode-long-extension-tags",
+    "stages": [
+      {
+        "result": {
+          "normalized": [
+            {
+              "attrs": {
+                "ip": {
+                  "__extn": {
+                    "arg": "10.0.0.1",
+                    "fn": "ip"
+                  }
+                },
+                "n": 9223372036854775807,
+                "name": "雪"
+              },
+              "parents": [],
+              "tags": {
+                "target": {
+                  "__entity": {
+                    "id": "z",
+                    "type": "Node"
+                  }
+                }
+              },
+              "uid": {
+                "id": "a",
+                "type": "Node"
+              }
+            }
+          ],
+          "entity": {
+            "attrs": {
+              "ip": {
+                "__extn": {
+                  "arg": "10.0.0.1",
+                  "fn": "ip"
+                }
+              },
+              "n": 9223372036854775807,
+              "name": "雪"
+            },
+            "parents": [],
+            "tags": {
+              "target": {
+                "__entity": {
+                  "id": "z",
+                  "type": "Node"
+                }
+              }
+            },
+            "uid": {
+              "id": "a",
+              "type": "Node"
+            }
+          },
+          "parents": [],
+          "ancestors": [],
+          "is_ancestor": false,
+          "normalized_deep_equal": true
+        }
+      },
+      {
+        "result": {
+          "normalized": [
+            {
+              "attrs": {
+                "ip": {
+                  "__extn": {
+                    "arg": "10.0.0.1",
+                    "fn": "ip"
+                  }
+                },
+                "n": 9223372036854775807,
+                "name": "雪"
+              },
+              "parents": [],
+              "tags": {
+                "target": {
+                  "__entity": {
+                    "id": "z",
+                    "type": "Node"
+                  }
+                }
+              },
+              "uid": {
+                "id": "a",
+                "type": "Node"
+              }
+            },
+            {
+              "attrs": {},
+              "parents": [],
+              "uid": {
+                "id": "z",
+                "type": "Node"
+              }
+            }
+          ],
+          "entity": {
+            "attrs": {
+              "ip": {
+                "__extn": {
+                  "arg": "10.0.0.1",
+                  "fn": "ip"
+                }
+              },
+              "n": 9223372036854775807,
+              "name": "雪"
+            },
+            "parents": [],
+            "tags": {
+              "target": {
+                "__entity": {
+                  "id": "z",
+                  "type": "Node"
+                }
+              }
+            },
+            "uid": {
+              "id": "a",
+              "type": "Node"
+            }
+          },
+          "parents": [],
+          "ancestors": [],
+          "is_ancestor": false,
+          "normalized_deep_equal": true
+        }
+      }
+    ]
+  },
+  {
+    "name": "missing-query-reflexivity",
+    "stages": [
+      {
+        "result": {
+          "normalized": [],
+          "entity": null,
+          "parents": null,
+          "ancestors": null,
+          "is_ancestor": true,
+          "normalized_deep_equal": true
+        }
+      },
+      {
+        "result": {
+          "normalized": [],
+          "entity": null,
+          "parents": null,
+          "ancestors": null,
+          "is_ancestor": true,
+          "normalized_deep_equal": true
+        }
+      }
+    ]
+  },
+  {
+    "name": "schema-validates-updates",
+    "stages": [
+      {
+        "result": {
+          "normalized": [
+            {
+              "attrs": {
+                "n": 0
+              },
+              "parents": [],
+              "uid": {
+                "id": "a",
+                "type": "User"
+              }
+            },
+            {
+              "attrs": {},
+              "parents": [],
+              "uid": {
+                "id": "view",
+                "type": "Action"
+              }
+            }
+          ],
+          "entity": {
+            "attrs": {
+              "n": 0
+            },
+            "parents": [],
+            "uid": {
+              "id": "a",
+              "type": "User"
+            }
+          },
+          "parents": [],
+          "ancestors": [],
+          "is_ancestor": false,
+          "normalized_deep_equal": true
+        }
+      },
+      {
+        "error_kind": "entities",
+        "result": {
+          "normalized": [
+            {
+              "attrs": {
+                "n": 0
+              },
+              "parents": [],
+              "uid": {
+                "id": "a",
+                "type": "User"
+              }
+            },
+            {
+              "attrs": {},
+              "parents": [],
+              "uid": {
+                "id": "view",
+                "type": "Action"
+              }
+            }
+          ],
+          "entity": {
+            "attrs": {
+              "n": 0
+            },
+            "parents": [],
+            "uid": {
+              "id": "a",
+              "type": "User"
+            }
+          },
+          "parents": [],
+          "ancestors": [],
+          "is_ancestor": false,
+          "normalized_deep_equal": true
+        }
+      },
+      {
+        "result": {
+          "normalized": [
+            {
+              "attrs": {
+                "n": 5
+              },
+              "parents": [],
+              "uid": {
+                "id": "a",
+                "type": "User"
+              }
+            },
+            {
+              "attrs": {},
+              "parents": [],
+              "uid": {
+                "id": "view",
+                "type": "Action"
+              }
+            }
+          ],
+          "entity": {
+            "attrs": {
+              "n": 5
+            },
+            "parents": [],
+            "uid": {
+              "id": "a",
+              "type": "User"
+            }
+          },
+          "parents": [],
+          "ancestors": [],
+          "is_ancestor": false,
+          "normalized_deep_equal": true
+        }
+      }
+    ]
+  },
+  {
+    "name": "deleted-schema-action-stays-deleted",
+    "stages": [
+      {
+        "result": {
+          "normalized": [
+            {
+              "attrs": {},
+              "parents": [],
+              "uid": {
+                "id": "view",
+                "type": "Action"
+              }
+            }
+          ],
+          "entity": {
+            "attrs": {},
+            "parents": [],
+            "uid": {
+              "id": "view",
+              "type": "Action"
+            }
+          },
+          "parents": [],
+          "ancestors": [],
+          "is_ancestor": false,
+          "normalized_deep_equal": true
+        }
+      },
+      {
+        "result": {
+          "normalized": [],
+          "entity": null,
+          "parents": null,
+          "ancestors": null,
+          "is_ancestor": true,
+          "normalized_deep_equal": true
+        }
+      },
+      {
+        "result": {
+          "normalized": [
+            {
+              "attrs": {},
+              "parents": [],
+              "uid": {
+                "id": "a",
+                "type": "User"
+              }
+            }
+          ],
+          "entity": null,
+          "parents": null,
+          "ancestors": null,
+          "is_ancestor": true,
+          "normalized_deep_equal": true
+        }
+      }
+    ]
+  }
+]

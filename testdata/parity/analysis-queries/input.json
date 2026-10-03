@@ -1,0 +1,186 @@
+[
+  {
+    "name": "never-errors-overflow",
+    "query": "never_errors",
+    "schema": "entity User; entity Document; action view appliesTo { principal: User, resource: Document, context: { n: Long } };",
+    "a": "forbid(principal, action, resource) when { context.n + 1 > 0 };",
+    "b": ""
+  },
+  {
+    "name": "never-errors-safe",
+    "query": "never_errors",
+    "schema": "entity User; entity Document; action view appliesTo { principal: User, resource: Document, context: { n: Long } };",
+    "a": "permit(principal, action, resource) when { context.n < 0 };",
+    "b": ""
+  },
+  {
+    "name": "always-matches",
+    "query": "always_matches",
+    "schema": "entity User; entity Document; action view appliesTo { principal: User, resource: Document, context: { n: Long } };",
+    "a": "forbid(principal, action, resource);",
+    "b": ""
+  },
+  {
+    "name": "not-always-matches",
+    "query": "always_matches",
+    "schema": "entity User; entity Document; action view appliesTo { principal: User, resource: Document, context: { n: Long } };",
+    "a": "forbid(principal, action, resource) when { context.n < 0 };",
+    "b": ""
+  },
+  {
+    "name": "never-matches",
+    "query": "never_matches",
+    "schema": "entity User; entity Document; action view appliesTo { principal: User, resource: Document, context: { n: Long } };",
+    "a": "forbid(principal, action, resource) when { false };",
+    "b": ""
+  },
+  {
+    "name": "does-match",
+    "query": "never_matches",
+    "schema": "entity User; entity Document; action view appliesTo { principal: User, resource: Document, context: { n: Long } };",
+    "a": "forbid(principal, action, resource) when { context.n < 0 };",
+    "b": ""
+  },
+  {
+    "name": "equivalent-match-mixed-effects",
+    "query": "matches_equivalent",
+    "schema": "entity User; entity Document; action view appliesTo { principal: User, resource: Document, context: { n: Long } };",
+    "a": "permit(principal, action, resource) when { context.n < 0 };",
+    "b": "forbid(principal, action, resource) when { context.n < 0 };"
+  },
+  {
+    "name": "different-match-both-forbid",
+    "query": "matches_equivalent",
+    "schema": "entity User; entity Document; action view appliesTo { principal: User, resource: Document, context: { n: Long } };",
+    "a": "forbid(principal, action, resource) when { context.n < 0 };",
+    "b": "forbid(principal, action, resource) when { context.n >= 0 };"
+  },
+  {
+    "name": "matching-implication",
+    "query": "matches_implies",
+    "schema": "entity User; entity Document; action view appliesTo { principal: User, resource: Document, context: { n: Long } };",
+    "a": "forbid(principal, action, resource) when { context.n < 0 };",
+    "b": "permit(principal, action, resource) when { context.n < 1 };"
+  },
+  {
+    "name": "matching-implication-fails",
+    "query": "matches_implies",
+    "schema": "entity User; entity Document; action view appliesTo { principal: User, resource: Document, context: { n: Long } };",
+    "a": "forbid(principal, action, resource) when { context.n < 1 };",
+    "b": "permit(principal, action, resource) when { context.n < 0 };"
+  },
+  {
+    "name": "matching-disjoint",
+    "query": "matches_disjoint",
+    "schema": "entity User; entity Document; action view appliesTo { principal: User, resource: Document, context: { n: Long } };",
+    "a": "forbid(principal, action, resource) when { context.n < 0 };",
+    "b": "forbid(principal, action, resource) when { context.n >= 0 };"
+  },
+  {
+    "name": "matching-overlap-both-forbid",
+    "query": "matches_disjoint",
+    "schema": "entity User; entity Document; action view appliesTo { principal: User, resource: Document, context: { n: Long } };",
+    "a": "forbid(principal, action, resource) when { context.n < 0 };",
+    "b": "forbid(principal, action, resource) when { context.n < 1 };"
+  },
+  {
+    "name": "allow-disjoint",
+    "query": "disjoint",
+    "schema": "entity User; entity Document; action view appliesTo { principal: User, resource: Document, context: { n: Long } };",
+    "a": "permit(principal, action, resource) when { context.n < 0 };",
+    "b": "permit(principal, action, resource) when { context.n >= 0 };"
+  },
+  {
+    "name": "allow-overlap",
+    "query": "disjoint",
+    "schema": "entity User; entity Document; action view appliesTo { principal: User, resource: Document, context: { n: Long } };",
+    "a": "permit(principal, action, resource) when { context.n < 0 };",
+    "b": "permit(principal, action, resource) when { context.n < 1 };"
+  },
+  {
+    "name": "forbid-sets-disjoint",
+    "query": "disjoint",
+    "schema": "entity User; entity Document; action view appliesTo { principal: User, resource: Document, context: { n: Long } };",
+    "a": "forbid(principal, action, resource);",
+    "b": "forbid(principal, action, resource);"
+  },
+  {
+    "name": "never-errors-empty-policy-id",
+    "query": "never_errors",
+    "schema": "entity User; entity Document; action view appliesTo { principal: User, resource: Document, context: { n: Long } };",
+    "a_format": "json",
+    "a": "{\"staticPolicies\":{\"\":{\"effect\":\"forbid\",\"principal\":{\"op\":\"All\"},\"action\":{\"op\":\"All\"},\"resource\":{\"op\":\"All\"},\"conditions\":[{\"kind\":\"when\",\"body\":{\">\":{\"left\":{\"+\":{\"left\":{\".\":{\"left\":{\"Var\":\"context\"},\"attr\":\"n\"}},\"right\":{\"Value\":1}}},\"right\":{\"Value\":0}}}}]}},\"templates\":{},\"templateLinks\":[]}",
+    "b": ""
+  },
+  {
+    "name": "never-errors-escaped-policy-id",
+    "query": "never_errors",
+    "schema": "entity User; entity Document; action view appliesTo { principal: User, resource: Document, context: { n: Long } };",
+    "a_format": "json",
+    "a": "{\"staticPolicies\":{\"quoted\\\"\\n\\\\\\u0000\":{\"effect\":\"forbid\",\"principal\":{\"op\":\"All\"},\"action\":{\"op\":\"All\"},\"resource\":{\"op\":\"All\"},\"conditions\":[{\"kind\":\"when\",\"body\":{\">\":{\"left\":{\"+\":{\"left\":{\".\":{\"left\":{\"Var\":\"context\"},\"attr\":\"n\"}},\"right\":{\"Value\":1}}},\"right\":{\"Value\":0}}}}]}},\"templates\":{},\"templateLinks\":[]}",
+    "b": ""
+  },
+  {
+    "name": "disjoint-empty-schema-template-a",
+    "query": "disjoint",
+    "schema": "",
+    "a": "permit(principal == ?principal, action, resource);",
+    "b": "permit(principal, action, resource);"
+  },
+  {
+    "name": "disjoint-empty-schema-template-b",
+    "query": "disjoint",
+    "schema": "",
+    "a": "permit(principal, action, resource);",
+    "b": "permit(principal == ?principal, action, resource);"
+  },
+  {
+    "name": "disjoint-empty-schema-static-vacuity",
+    "query": "disjoint",
+    "schema": "",
+    "a": "permit(principal, action, resource);",
+    "b": ""
+  },
+  {
+    "name": "equivalent-empty-schema-template-a",
+    "query": "equivalent",
+    "schema": "",
+    "a": "permit(principal == ?principal, action, resource);",
+    "b": "permit(principal, action, resource);"
+  },
+  {
+    "name": "equivalent-empty-schema-template-b",
+    "query": "equivalent",
+    "schema": "",
+    "a": "permit(principal, action, resource);",
+    "b": "permit(principal == ?principal, action, resource);"
+  },
+  {
+    "name": "equivalent-empty-schema-static-vacuity",
+    "query": "equivalent",
+    "schema": "",
+    "a": "permit(principal, action, resource);",
+    "b": ""
+  },
+  {
+    "name": "implies-empty-schema-template-a",
+    "query": "implies",
+    "schema": "",
+    "a": "permit(principal == ?principal, action, resource);",
+    "b": "permit(principal, action, resource);"
+  },
+  {
+    "name": "implies-empty-schema-template-b",
+    "query": "implies",
+    "schema": "",
+    "a": "permit(principal, action, resource);",
+    "b": "permit(principal == ?principal, action, resource);"
+  },
+  {
+    "name": "implies-empty-schema-static-vacuity",
+    "query": "implies",
+    "schema": "",
+    "a": "permit(principal, action, resource);",
+    "b": ""
+  }
+]

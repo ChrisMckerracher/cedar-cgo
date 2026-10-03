@@ -528,8 +528,10 @@
       "result": {
         "errors": [
           {
+            "category": "unsafe_attribute_access",
             "message": "for policy `quote\\\"\\nslash\\\\雪`, attribute `missing` on entity type `Photo` not found (help: did you mean `public`?)",
-            "policy_id": "quote\"\nslash\\雪"
+            "policy_id": "quote\"\nslash\\雪",
+            "severity": "error"
           }
         ],
         "json": {
@@ -1660,8 +1662,10 @@
       "result": {
         "errors": [
           {
+            "category": "unsafe_attribute_access",
             "message": "for policy `bad-attribute`, attribute `missing` on entity type `Photo` not found (help: did you mean `public`?)",
-            "policy_id": "bad-attribute"
+            "policy_id": "bad-attribute",
+            "severity": "error"
           }
         ],
         "json": {

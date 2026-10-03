@@ -6,6 +6,7 @@ import (
 	"slices"
 	"testing"
 	"time"
+	"unicode/utf8"
 
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 )
@@ -27,6 +28,9 @@ func FuzzPolicySyntax(f *testing.F) {
 			// Invalid Go syntax envelopes still exercise the Rust policy JSON parser.
 			_, err := rt.PolicyFromJSON(ctx, "fuzz", []byte(input))
 			checkNoFault(t, err)
+			if !utf8.ValidString(input) {
+				requireUTF8InputError(t, err)
+			}
 			return
 		}
 		p, err := rt.PolicyFromSyntax(ctx, syntax)
@@ -83,6 +87,12 @@ func FuzzPolicyEdits(f *testing.F) {
 		snapshot := cedar.ParsedPolicySet{}
 		var added []string
 		for _, input := range []struct{ id, source string }{{idA, sourceA}, {idB, sourceB}} {
+			if !utf8.ValidString(input.id) || !utf8.ValidString(input.source) {
+				_, err := rt.ParsePolicy(ctx, input.id, input.source)
+				checkNoFault(t, err)
+				requireUTF8InputError(t, err)
+				continue
+			}
 			p, err := rt.ParsePolicy(ctx, input.id, input.source)
 			checkNoFault(t, err)
 			if err != nil {
@@ -109,6 +119,10 @@ func FuzzPolicyEdits(f *testing.F) {
 		}
 		next, err := rt.RemovePolicy(ctx, set, removeID)
 		checkNoFault(t, err)
+		if !utf8.ValidString(removeID) {
+			requireUTF8InputError(t, err)
+			return
+		}
 		if err != nil {
 			// The set only ever contains successful static adds, so a present
 			// ID must be removable.

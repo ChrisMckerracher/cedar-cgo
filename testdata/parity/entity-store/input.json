@@ -1,0 +1,633 @@
+[
+  {
+    "name": "chain-middle-deletion",
+    "schema": null,
+    "entities": [
+      {
+        "uid": {
+          "type": "Node",
+          "id": "a"
+        },
+        "parents": [
+          {
+            "type": "Node",
+            "id": "b"
+          }
+        ],
+        "attrs": {}
+      },
+      {
+        "uid": {
+          "type": "Node",
+          "id": "b"
+        },
+        "parents": [
+          {
+            "type": "Node",
+            "id": "c"
+          }
+        ],
+        "attrs": {}
+      },
+      {
+        "uid": {
+          "type": "Node",
+          "id": "c"
+        },
+        "parents": [],
+        "attrs": {}
+      }
+    ],
+    "steps": [
+      {
+        "operation": "remove",
+        "uids": [
+          {
+            "type": "Node",
+            "id": "b"
+          }
+        ]
+      },
+      {
+        "operation": "upsert",
+        "entities": [
+          {
+            "uid": {
+              "type": "Node",
+              "id": "b"
+            },
+            "parents": [
+              {
+                "type": "Node",
+                "id": "c"
+              }
+            ],
+            "attrs": {}
+          }
+        ]
+      },
+      {
+        "operation": "upsert",
+        "entities": [
+          {
+            "uid": {
+              "type": "Node",
+              "id": "a"
+            },
+            "parents": [
+              {
+                "type": "Node",
+                "id": "b"
+              }
+            ],
+            "attrs": {}
+          }
+        ]
+      }
+    ],
+    "uid": {
+      "type": "Node",
+      "id": "a"
+    },
+    "ancestor": {
+      "type": "Node",
+      "id": "c"
+    }
+  },
+  {
+    "name": "replace-parent-recomputes-descendants",
+    "schema": null,
+    "entities": [
+      {
+        "uid": {
+          "type": "Node",
+          "id": "a"
+        },
+        "parents": [
+          {
+            "type": "Node",
+            "id": "b"
+          }
+        ],
+        "attrs": {}
+      },
+      {
+        "uid": {
+          "type": "Node",
+          "id": "b"
+        },
+        "parents": [
+          {
+            "type": "Node",
+            "id": "c"
+          }
+        ],
+        "attrs": {}
+      },
+      {
+        "uid": {
+          "type": "Node",
+          "id": "c"
+        },
+        "parents": [],
+        "attrs": {}
+      },
+      {
+        "uid": {
+          "type": "Node",
+          "id": "d"
+        },
+        "parents": [],
+        "attrs": {}
+      }
+    ],
+    "steps": [
+      {
+        "operation": "upsert",
+        "entities": [
+          {
+            "uid": {
+              "type": "Node",
+              "id": "b"
+            },
+            "parents": [
+              {
+                "type": "Node",
+                "id": "d"
+              }
+            ],
+            "attrs": {
+              "n": 9
+            }
+          }
+        ]
+      },
+      {
+        "operation": "remove",
+        "uids": [
+          {
+            "type": "Node",
+            "id": "d"
+          }
+        ]
+      },
+      {
+        "operation": "upsert",
+        "entities": [
+          {
+            "uid": {
+              "type": "Node",
+              "id": "b"
+            },
+            "parents": [
+              {
+                "type": "Node",
+                "id": "c"
+              }
+            ],
+            "attrs": {}
+          }
+        ]
+      }
+    ],
+    "uid": {
+      "type": "Node",
+      "id": "a"
+    },
+    "ancestor": {
+      "type": "Node",
+      "id": "c"
+    }
+  },
+  {
+    "name": "direct-edge-survives-other-path-deletion",
+    "schema": null,
+    "entities": [
+      {
+        "uid": {
+          "type": "Node",
+          "id": "a"
+        },
+        "parents": [
+          {
+            "type": "Node",
+            "id": "b"
+          },
+          {
+            "type": "Node",
+            "id": "c"
+          }
+        ],
+        "attrs": {}
+      },
+      {
+        "uid": {
+          "type": "Node",
+          "id": "b"
+        },
+        "parents": [
+          {
+            "type": "Node",
+            "id": "c"
+          }
+        ],
+        "attrs": {}
+      },
+      {
+        "uid": {
+          "type": "Node",
+          "id": "c"
+        },
+        "parents": [],
+        "attrs": {}
+      }
+    ],
+    "steps": [
+      {
+        "operation": "remove",
+        "uids": [
+          {
+            "type": "Node",
+            "id": "b"
+          }
+        ]
+      },
+      {
+        "operation": "remove",
+        "uids": [
+          {
+            "type": "Node",
+            "id": "c"
+          }
+        ]
+      }
+    ],
+    "uid": {
+      "type": "Node",
+      "id": "a"
+    },
+    "ancestor": {
+      "type": "Node",
+      "id": "c"
+    }
+  },
+  {
+    "name": "missing-parent-native-removal",
+    "schema": null,
+    "entities": [
+      {
+        "uid": {
+          "type": "Node",
+          "id": "a"
+        },
+        "parents": [
+          {
+            "type": "Node",
+            "id": "b"
+          }
+        ],
+        "attrs": {}
+      }
+    ],
+    "steps": [
+      {
+        "operation": "remove",
+        "uids": [
+          {
+            "type": "Node",
+            "id": "b"
+          }
+        ]
+      },
+      {
+        "operation": "upsert",
+        "entities": [
+          {
+            "uid": {
+              "type": "Node",
+              "id": "b"
+            },
+            "parents": [
+              {
+                "type": "Node",
+                "id": "c"
+              }
+            ],
+            "attrs": {}
+          }
+        ]
+      },
+      {
+        "operation": "remove",
+        "uids": [
+          {
+            "type": "Node",
+            "id": "b"
+          }
+        ]
+      }
+    ],
+    "uid": {
+      "type": "Node",
+      "id": "a"
+    },
+    "ancestor": {
+      "type": "Node",
+      "id": "c"
+    }
+  },
+  {
+    "name": "duplicate-upsert-last-wins",
+    "schema": null,
+    "entities": [
+      {
+        "uid": {
+          "type": "Node",
+          "id": "a"
+        },
+        "parents": [],
+        "attrs": {
+          "n": 0
+        }
+      }
+    ],
+    "steps": [
+      {
+        "operation": "upsert",
+        "entities": [
+          {
+            "uid": {
+              "type": "Node",
+              "id": "a"
+            },
+            "parents": [],
+            "attrs": {
+              "n": 1
+            }
+          },
+          {
+            "uid": {
+              "type": "Node",
+              "id": "a"
+            },
+            "parents": [],
+            "attrs": {
+              "n": 2
+            }
+          }
+        ]
+      },
+      {
+        "operation": "remove",
+        "uids": []
+      },
+      {
+        "operation": "upsert",
+        "entities": []
+      }
+    ],
+    "uid": {
+      "type": "Node",
+      "id": "a"
+    },
+    "ancestor": {
+      "type": "Node",
+      "id": "c"
+    }
+  },
+  {
+    "name": "cycle-error-preserves-snapshot",
+    "schema": null,
+    "entities": [
+      {
+        "uid": {
+          "type": "Node",
+          "id": "a"
+        },
+        "parents": [
+          {
+            "type": "Node",
+            "id": "b"
+          }
+        ],
+        "attrs": {}
+      },
+      {
+        "uid": {
+          "type": "Node",
+          "id": "b"
+        },
+        "parents": [],
+        "attrs": {}
+      }
+    ],
+    "steps": [
+      {
+        "operation": "upsert",
+        "entities": [
+          {
+            "uid": {
+              "type": "Node",
+              "id": "b"
+            },
+            "parents": [
+              {
+                "type": "Node",
+                "id": "a"
+              }
+            ],
+            "attrs": {}
+          }
+        ]
+      },
+      {
+        "operation": "remove",
+        "uids": [
+          {
+            "type": "Node",
+            "id": "b"
+          }
+        ]
+      }
+    ],
+    "uid": {
+      "type": "Node",
+      "id": "a"
+    },
+    "ancestor": {
+      "type": "Node",
+      "id": "c"
+    }
+  },
+  {
+    "name": "unicode-long-extension-tags",
+    "schema": null,
+    "entities": [
+      {
+        "uid": {
+          "type": "Node",
+          "id": "a"
+        },
+        "parents": [],
+        "attrs": {
+          "n": 9223372036854775807,
+          "name": "雪",
+          "ip": {
+            "__extn": {
+              "fn": "ip",
+              "arg": "10.0.0.1"
+            }
+          }
+        },
+        "tags": {
+          "target": {
+            "__entity": {
+              "type": "Node",
+              "id": "z"
+            }
+          }
+        }
+      }
+    ],
+    "steps": [
+      {
+        "operation": "upsert",
+        "entities": [
+          {
+            "uid": {
+              "type": "Node",
+              "id": "z"
+            },
+            "parents": [],
+            "attrs": {}
+          }
+        ]
+      }
+    ],
+    "uid": {
+      "type": "Node",
+      "id": "a"
+    },
+    "ancestor": {
+      "type": "Node",
+      "id": "c"
+    }
+  },
+  {
+    "name": "missing-query-reflexivity",
+    "schema": null,
+    "entities": [],
+    "steps": [
+      {
+        "operation": "remove",
+        "uids": [
+          {
+            "type": "Node",
+            "id": "x"
+          }
+        ]
+      }
+    ],
+    "uid": {
+      "type": "Node",
+      "id": "missing"
+    },
+    "ancestor": {
+      "type": "Node",
+      "id": "missing"
+    }
+  },
+  {
+    "name": "schema-validates-updates",
+    "schema": "entity User { n: Long }; action view appliesTo { principal: User, resource: User, context: {} };",
+    "entities": [
+      {
+        "uid": {
+          "type": "User",
+          "id": "a"
+        },
+        "parents": [],
+        "attrs": {
+          "n": 0
+        }
+      }
+    ],
+    "steps": [
+      {
+        "operation": "upsert",
+        "entities": [
+          {
+            "uid": {
+              "type": "User",
+              "id": "a"
+            },
+            "parents": [],
+            "attrs": {
+              "n": "wrong"
+            }
+          }
+        ]
+      },
+      {
+        "operation": "upsert",
+        "entities": [
+          {
+            "uid": {
+              "type": "User",
+              "id": "a"
+            },
+            "parents": [],
+            "attrs": {
+              "n": 5
+            }
+          }
+        ]
+      }
+    ],
+    "uid": {
+      "type": "User",
+      "id": "a"
+    },
+    "ancestor": {
+      "type": "User",
+      "id": "a"
+    }
+  },
+  {
+    "name": "deleted-schema-action-stays-deleted",
+    "schema": "entity User; action view appliesTo { principal: User, resource: User, context: {} };",
+    "entities": [],
+    "steps": [
+      {
+        "operation": "remove",
+        "uids": [
+          {
+            "type": "Action",
+            "id": "view"
+          }
+        ]
+      },
+      {
+        "operation": "upsert",
+        "entities": [
+          {
+            "uid": {
+              "type": "User",
+              "id": "a"
+            },
+            "parents": [],
+            "attrs": {}
+          }
+        ]
+      }
+    ],
+    "uid": {
+      "type": "Action",
+      "id": "view"
+    },
+    "ancestor": {
+      "type": "Action",
+      "id": "view"
+    }
+  }
+]

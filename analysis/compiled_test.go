@@ -1,0 +1,72 @@
+package analysis_test
+
+import (
+	"context"
+	"github.com/ChrisMckerracher/cedar-go-wasm/analysis"
+	"os"
+	"sync"
+	"sync/atomic"
+	"testing"
+)
+
+type countingSolver struct {
+	base   analysis.Solver
+	starts atomic.Int32
+	closes atomic.Int32
+}
+
+func (s *countingSolver) Start(ctx context.Context) (analysis.Session, error) {
+	transport, err := s.base.Start(ctx)
+	if err != nil {
+		return nil, err
+	}
+	s.starts.Add(1)
+	return &countingTransport{Session: transport, owner: s}, nil
+}
+
+type countingTransport struct {
+	analysis.Session
+	owner *countingSolver
+	once  sync.Once
+	err   error
+}
+
+func (s *countingTransport) Close() error {
+	s.once.Do(func() { s.owner.closes.Add(1); s.err = s.Session.Close() })
+	return s.err
+}
+
+func compiledAnalyzer(t testing.TB, options ...analysis.Option) (*analysis.Analyzer, *countingSolver) {
+	t.Helper()
+	path := os.Getenv("CVC5")
+	if path == "" {
+		t.Skip("CVC5 is not set to the pinned solver executable")
+	}
+	solver := &countingSolver{base: analysis.CVC5(path)}
+	a, err := analysis.New(context.Background(), solver, options...)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = a.Close(context.Background()) })
+	return a, solver
+}
+
+func sameCompiledResults(t testing.TB, compiled, stateless analysis.Report) {
+	t.Helper()
+	key := func(result analysis.Result) string {
+		return result.PrincipalType + "\x00" + result.Action.String() + "\x00" + result.ResourceType
+	}
+	expected := make(map[string]bool, len(stateless.Results))
+	for _, result := range stateless.Results {
+		expected[key(result)] = result.Holds
+	}
+	if len(compiled.Results) != len(expected) {
+		t.Fatal("compiled environment count differs")
+	}
+	for _, result := range compiled.Results {
+		holds, exists := expected[key(result)]
+		if !exists || holds != result.Holds {
+			t.Fatalf("compiled result differs %+v", result)
+		}
+	}
+}

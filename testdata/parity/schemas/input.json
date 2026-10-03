@@ -1,0 +1,226 @@
+[
+  {
+    "name": "cross-fragment common and entity references",
+    "fragments": [
+      {
+        "format": "cedar",
+        "text": "entity User {profile: Profile, team: Team}; entity Photo; action view appliesTo {principal: User, resource: Photo, context: {}};"
+      },
+      {
+        "format": "json",
+        "text": "{\"\":{\"commonTypes\":{\"Profile\":{\"type\":\"Record\",\"attributes\":{\"name\":{\"type\":\"String\"},\"active\":{\"type\":\"Boolean\"}}}},\"entityTypes\":{\"Team\":{}},\"actions\":{}}}"
+      }
+    ],
+    "schema": "type Profile = {name: String, active: Bool}; entity Team; entity User {profile: Profile, team: Team}; entity Photo; action view appliesTo {principal: User, resource: Photo, context: {}};",
+    "policies": "permit(principal, action, resource) when { principal.profile.active && principal.profile.name == \"雪\" && principal.team == Team::\"a\" };",
+    "schema_json": {
+      "": {
+        "commonTypes": {
+          "Profile": {
+            "type": "Record",
+            "attributes": {
+              "name": {
+                "type": "String"
+              },
+              "active": {
+                "type": "Boolean"
+              }
+            }
+          }
+        },
+        "entityTypes": {
+          "Team": {},
+          "Photo": {},
+          "User": {
+            "shape": {
+              "type": "Record",
+              "attributes": {
+                "profile": {
+                  "type": "EntityOrCommon",
+                  "name": "Profile"
+                },
+                "team": {
+                  "type": "EntityOrCommon",
+                  "name": "Team"
+                }
+              }
+            }
+          }
+        },
+        "actions": {
+          "view": {
+            "appliesTo": {
+              "principalTypes": [
+                "User"
+              ],
+              "resourceTypes": [
+                "Photo"
+              ],
+              "context": {
+                "type": "Record",
+                "attributes": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "name": "qualified cross-namespace references and hierarchy",
+    "fragments": [
+      {
+        "format": "cedar",
+        "text": "namespace App { entity User in Org::Team {profile: Shared::Profile}; entity Photo; action all; action view in all appliesTo {principal: User, resource: Photo, context: Shared::Context}; }"
+      },
+      {
+        "format": "cedar",
+        "text": "namespace Org { entity Group; entity Team in Group; } namespace Shared { type Profile = {name: String}; type Context = {mfa: Bool}; }"
+      }
+    ],
+    "schema": "namespace App { entity User in Org::Team {profile: Shared::Profile}; entity Photo; action all; action view in all appliesTo {principal: User, resource: Photo, context: Shared::Context}; } namespace Org { entity Group; entity Team in Group; } namespace Shared { type Profile = {name: String}; type Context = {mfa: Bool}; }",
+    "policies": "permit(principal, action == App::Action::\"view\", resource) when { context.mfa };"
+  },
+  {
+    "name": "extensions optional fields and enumerated entities",
+    "fragments": [
+      {
+        "format": "cedar",
+        "text": "type Profile = {balance: decimal, source?: ipaddr}; entity User {profile: Profile}; entity Color enum [\"red\", \"雪\"]; action inspect appliesTo {principal: User, resource: Color, context: {stamp: datetime}};"
+      }
+    ],
+    "schema": "type Profile = {balance: decimal, source?: ipaddr}; entity User {profile: Profile}; entity Color enum [\"red\", \"雪\"]; action inspect appliesTo {principal: User, resource: Color, context: {stamp: datetime}};",
+    "policies": "permit(principal, action, resource) when { principal.profile.balance > decimal(\"0\") };"
+  },
+  {
+    "name": "composed schema rejects invalid policy",
+    "fragments": [
+      {
+        "format": "cedar",
+        "text": "entity User {profile: Profile}; entity Photo; action view appliesTo {principal: User, resource: Photo};"
+      },
+      {
+        "format": "cedar",
+        "text": "type Profile = {name: String};"
+      }
+    ],
+    "schema": "type Profile = {name: String}; entity User {profile: Profile}; entity Photo; action view appliesTo {principal: User, resource: Photo};",
+    "policies": "permit(principal, action, resource) when { principal.profile.name > 0 };"
+  },
+  {
+    "name": "empty schema",
+    "fragments": [],
+    "schema": "",
+    "policies": ""
+  },
+  {
+    "name": "duplicate entity declarations",
+    "fragments": [
+      {
+        "format": "cedar",
+        "text": "entity User;"
+      },
+      {
+        "format": "cedar",
+        "text": "entity User;"
+      }
+    ],
+    "error": true
+  },
+  {
+    "name": "duplicate common type declarations",
+    "fragments": [
+      {
+        "format": "cedar",
+        "text": "type Profile = {name: String};"
+      },
+      {
+        "format": "cedar",
+        "text": "type Profile = {active: Bool};"
+      }
+    ],
+    "error": true
+  },
+  {
+    "name": "namespace declaration shadows empty namespace",
+    "fragments": [
+      {
+        "format": "cedar",
+        "text": "entity User;"
+      },
+      {
+        "format": "cedar",
+        "text": "namespace App { entity User; }"
+      }
+    ],
+    "error": true
+  },
+  {
+    "name": "unresolved reference",
+    "fragments": [
+      {
+        "format": "cedar",
+        "text": "entity User {profile: Profile};"
+      }
+    ],
+    "error": true
+  },
+  {
+    "name": "common type cycle",
+    "fragments": [
+      {
+        "format": "cedar",
+        "text": "type A = B;"
+      },
+      {
+        "format": "cedar",
+        "text": "type B = A;"
+      }
+    ],
+    "error": true
+  },
+  {
+    "name": "action hierarchy cycle",
+    "fragments": [
+      {
+        "format": "cedar",
+        "text": "action A in B;"
+      },
+      {
+        "format": "cedar",
+        "text": "action B in A;"
+      }
+    ],
+    "error": true
+  },
+  {
+    "name": "common type takes precedence over entity with same name",
+    "fragments": [
+      {
+        "format": "cedar",
+        "text": "entity User;"
+      },
+      {
+        "format": "cedar",
+        "text": "type User = {name: String}; entity Holder {person: User}; action view appliesTo {principal: Holder, resource: Holder};"
+      }
+    ],
+    "schema": "entity User; type User = {name: String}; entity Holder {person: User}; action view appliesTo {principal: Holder, resource: Holder};",
+    "policies": "permit(principal, action, resource) when {principal.person.name == \"Alice\"};"
+  },
+  {
+    "name": "recursive entity type hierarchy",
+    "fragments": [
+      {
+        "format": "cedar",
+        "text": "entity A in B;"
+      },
+      {
+        "format": "cedar",
+        "text": "entity B in A;"
+      }
+    ],
+    "schema": "entity A in B; entity B in A;",
+    "policies": ""
+  }
+]

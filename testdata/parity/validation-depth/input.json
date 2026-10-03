@@ -1,0 +1,14 @@
+{
+  "schema": "entity User { admin: Bool, photo: Photo }; entity Photo { owner: User }; action view appliesTo { principal: User, resource: Photo, context: {} };",
+  "cases": [
+    {"name":"strict", "policies":"permit(principal, action, resource) when { principal.photo.owner.admin };", "level":null},
+    {"name":"zero", "policies":"permit(principal, action, resource) when { principal.photo.owner.admin };", "level":0},
+    {"name":"one", "policies":"permit(principal, action, resource) when { principal.photo.owner.admin };", "level":1},
+    {"name":"two", "policies":"permit(principal, action, resource) when { principal.photo.owner.admin };", "level":2},
+    {"name":"three", "policies":"permit(principal, action, resource) when { principal.photo.owner.admin };", "level":3},
+    {"name":"maximum", "policies":"permit(principal, action, resource) when { principal.photo.owner.admin };", "level":4294967295},
+    {"name":"type-error", "policies":"permit(principal, action, resource) when { principal.admin == 1 };", "level":3},
+    {"name":"constant", "policies":"permit(principal, action, resource);", "level":0},
+    {"name":"empty", "policies":"", "level":0}
+  ]
+}

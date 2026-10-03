@@ -46,6 +46,7 @@ Ordinary Go tests compare the embedded guest with those fixtures:
 | Templates | `scripts/check-template-parity.sh` | `TestTemplateNativeParity` |
 | Partial evaluation | `scripts/partial-fixtures.sh --check` | `TestPartialNativeFixtures` |
 | Batched loading | `scripts/check-batched-parity.sh` | `TestBatchedNativeParity` |
+| Entity store mutations | `scripts/entity-store-parity.sh --check` | `TestEntityStoreNativeParity` |
 | Slicing | `scripts/slicing-fixtures.sh --check` | `TestSliceEntitiesNativeParity` |
 | Policy construction | `scripts/policies-parity.sh --check` | `TestPoliciesNativeParity` |
 | Formatting | `scripts/format-parity.sh --check` | `TestFormatNativeParity` |
@@ -122,6 +123,7 @@ The `cedar` package contains these Go fuzz targets:
 |---|---|
 | `FuzzAuthorize` | UIDs, contexts, per-request entities, and response handling |
 | `FuzzPolicies` | Policy parsing, strict validation, loading, and authorization, seeded with corpus-derived literals |
+| `FuzzEntityStoreUnrelatedDecisions` | Native mutation sequences preserve decisions for unrelated entities |
 | `FuzzEntities` | Entity parsing and authorization, with and without a schema |
 | `FuzzBatchedEntities` | Callback entity JSON, bounded loading, and fail-closed results |
 | `FuzzBatchedDifferential` | Batched loading against single-shot authorization with identical data, plus failing/oversized/malformed loaders |
@@ -132,6 +134,11 @@ The `cedar` package contains these Go fuzz targets:
 | `FuzzPartialEntities` | Unknown entity input and undecided results |
 | `FuzzPartialReauthorize` | Residual reauthorization against direct authorization with concrete values |
 | `FuzzFormatPolicies` | Policy/template text and layout options, malformed UTF-8, errors, idempotence, and decision preservation |
+| `FuzzEntityLiteralSubstitution` | Native simultaneous substitutions, successful reparse and inspection, malformed source and targets |
+| `FuzzEvalResult` | Decode typed expression results; reject malformed variants and preserve integer precision |
+| `FuzzNativeUIDRoundTrip` | Native UID render/parse equality for arbitrary valid UTF-8 identifiers; reject malformed UTF-8 |
+| `FuzzSourceTokenSpans` | Native lexer results, valid byte spans, exact source reconstruction, and malformed UTF-8 rejection |
+| `FuzzUTF8Values` | Reject malformed UTF-8; preserve valid identity bytes, values, and record keys during JSON encoding |
 
 Each target rejects unexpected module faults; authorization errors must return
 `Deny`, partial-evaluation errors return `Undecided`, and formatting errors return
@@ -328,3 +335,214 @@ so identical inputs can render different hint text across calls. The property
 normalizes those `(help: did you mean ...)` substrings before comparing
 diagnostics; Passed, policy IDs, counts, and all remaining message text stay
 exact.
+
+`TestApplicabilityNativeFixtures` compares policy and template metadata with native Cedar enumeration.
+Fixtures cover unconstrained policies, action groups, type constraints, template slots, linked templates, multiple namespaces, and invalid conditions.
+JSON fixtures cover empty IDs, quotes, newlines, backslashes, NUL characters, and Unicode for static, template, and linked policies.
+The tests compare result keys with source IDs independently of the native oracle.
+`TestRequestEnvironmentJSONRoundTrip` checks action identity and slot metadata after JSON serialization.
+`TestApplicabilityBoundaries` checks empty schemas and malformed inputs.
+`TestApplicabilityDoesNotAuthorize` checks that applicability metadata can coexist with a denied request.
+Regenerate these fixtures with `scripts/applicability-parity.sh --write`.
+
+`TestStructuredDiagnosticsNativeFixtures` compares diagnostic categories, severity, and byte spans with native Cedar.
+It checks schema shadowing warnings, Unicode source locations, policy type errors, and invalid action applicability.
+JSON policy fixtures check that temporary parser offsets do not become source spans.
+`TestDiagnosticJSONPolicySpans` checks the same contract after a policy set converts to JSON.
+`TestDiagnosticMetadataIgnoresSpellingHints` repeats validation with ambiguous spelling suggestions.
+It compares metadata after removing variable suggestion text.
+`TestDiagnosticMetadataIgnoresNativeOrder` compares errors with equal text and different source spans.
+`TestDiagnosticRawPolicyIDs` checks empty policy IDs and policy IDs with control characters.
+`FuzzDiagnostics` checks validation and schema-warning response decoders without guest execution.
+Malformed spans, missing fields, contradictory status, and invalid severity fail decoding.
+Regenerate native fixtures with `scripts/diagnostics-parity.sh --write`.
+
+`TestSchemaNativeFixtures` compares conversion, inspection, action entities, and validation with pinned native Cedar.
+Fixtures include cross-fragment references, qualified namespaces, common types, optional attributes, extensions, and enumerated entity types.
+They also check empty schemas and invalid policy validation.
+`TestSchemaCompositionResolvesAfterCombining` checks a fragment that fails alone and succeeds after composition.
+It also checks authorization with the composed schema.
+Boundary tests cover duplicate declarations, cycles, annotations, UTF-8, and input limits.
+`FuzzSchemaFragments` checks that successful composition supports inspection and action extraction.
+Regenerate the native fixtures with `scripts/schema-parity.sh --write`.
+
+### Entity store mutation checks
+
+The entity-store oracle invokes native Cedar APIs directly.
+Its ten fixtures retain one native store across mutation sequences.
+The Go API compares normalized exports, direct parents, ancestry, membership, and deep equality at each step.
+Fixtures cover replacement, deletion, redundant direct edges, missing parents, duplicate upserts, cycles, and schema validation.
+They also check schema action deletion and exact integer, extension, Unicode, and tag values.
+
+The opaque snapshot records direct parents from the native AST.
+A chain deletion fixture detects accidental reconstruction from transitive normalized JSON.
+The mutation fuzz target changes an isolated graph component.
+It then checks that an unrelated authorization decision stays unchanged.
+
+### Context, request, and name utilities
+
+`testdata/parity/utilities` records results from direct native Cedar operations.
+The fixtures cover UID parsing, native escapes, typed context readback, merge errors, context validation, scope validation, confusable warnings, and language metadata.
+Confusable tests check structured warnings, raw policy IDs, and omitted spans for JSON policy inputs.
+Malformed warning categories, severity, and source spans fail response decoding.
+Regenerate these fixtures with `scripts/utility-parity.sh --write`.
+`TestUtilityNativeFixtures` compares the Wasm results against every native result.
+The comparison preserves JSON integer text instead of converting integers to floating-point values.
+
+`TestNativeUIDRoundTripProperty` checks native render/parse equality and stable normalized text.
+`TestContextMergeContract` checks duplicate rejection, nested-value preservation, unchanged inputs, extensions, and the empty-context identity.
+`TestContextMergeDisjointProperty` checks arbitrary integer and string values after a disjoint merge.
+`TestUtilityReadbackExactIntegers` checks readback and merge with integers beyond floating-point precision and both signed 64-bit bounds.
+`TestUtilityContextInputProtocol` checks missing fields, unexpected fields, and explicit null context values.
+`TestUtilityPreflight` checks UTF-8 rejection and source limits before guest execution.
+
+`TestPermissionQueryNativeFixtures` compares all three query operations with direct native TPE calls.
+Twenty cases cover schema-driven action enumeration, known and unknown context, unknown IDs, empty results, and unsatisfiable residual conditions.
+The additional cases distinguish loaded entities from per-query concrete or partial additions.
+The oracle converts loaded entities with native `PartialEntities::from_concrete` before it adds partial query entities.
+They check UID conflicts, unknown attributes, and unchanged loaded entities after successful or failed queries.
+Concrete resource, principal, and action query results are replayed through ordinary authorization.
+`TestActionQueryResultJSONRoundTrip` checks flat UID fields, exact Unicode values, empty lists, and invalid UTF-8.
+Native ABI decoding tests check all query operations before direct native execution.
+They preserve raw context and entity JSON, including exact signed 64-bit integers and escaped Unicode.
+They reject missing fields, duplicate operations, and fields from other query operations.
+`TestPermissionQueryBoundaries` covers unknown types, missing schemas, and cancellation.
+`TestPermissionQueryLimitsBeforeGuest` checks input limits and invalid UTF-8 before guest execution.
+Regenerate native fixtures with `scripts/queries-parity.sh --write`.
+`TestSchemaNativeFixtures` compares conversion, inspection, action entities, and validation with pinned native Cedar.
+Fixtures include cross-fragment references, qualified namespaces, common types, optional attributes, extensions, and enumerated entity types.
+They also check empty schemas and invalid policy validation.
+`TestSchemaCompositionResolvesAfterCombining` checks a fragment that fails alone and succeeds after composition.
+It also checks authorization with the composed schema.
+Boundary tests cover duplicate declarations, cycles, annotations, UTF-8, and input limits.
+`FuzzSchemaFragments` checks that successful composition supports inspection and action extraction.
+Regenerate the native fixtures with `scripts/schema-parity.sh --write`.
+
+The partial evaluation oracle exports native PST through its JSON EST mapping.
+It compares each entry with `policy_set().policy(id)` and checks `residual_policies()` membership.
+It records nested residual errors through native `Expr::has_error`.
+Native PST replay must match native reauthorization and direct authorization.
+`partial::tests` runs the actual structured import helper with nested errors and empty or escaped IDs.
+The native tests reject changed versions, Cedar versions, effects, conditions, and missing policies.
+They compare exact diagnostics with native residual reauthorization.
+Direct authorization comparisons retain decisions, reasons, and error policy IDs because residual errors discard original error details.
+Go fixture tests also export, import, and replay every successful partial response.
+The partial authorization property checks randomized export and import before replay.
+Separate tests reject changed versions, policies, and effects.
+They also check copied projections and frozen exports.
+`TestResidualPolicyIDPresence` rejects missing or null policy IDs while preserving explicit empty IDs.
+`TestResidualRawPolicyIDs` checks export, import, and native replay with empty IDs and control characters.
+
+`pst_fixtures` compares policy and template EST with native PST bodies.
+It checks template links through native `PolicySet::to_pst`.
+Native authorization must remain equal after `PolicySet::from_pst` reconstruction.
+Go tests compare the mapped JSON and verify authorization after full-set JSON reconstruction.
+The randomized set property checks the same authorization result across both source forms.
+Special expression fixtures verify the residual error, unknown, and slot mappings.
+Regenerate them with `scripts/pst-parity.sh --write`.
+
+### Source tokens and comment preservation
+
+`testdata/parity/source-tokens` records native formatter lexer results.
+The fixtures cover comments, annotations, Unicode, CRLF, slots, operators, incomplete grammar, and lexical errors.
+Regenerate these fixtures with `scripts/source-token-parity.sh --write`.
+`TestSourceTokenNativeFixtures` compares every token, byte span, and comment summary against the native result.
+
+`TestSourceTokensPreserveCommentsAndSpacing` reconstructs the original source, then replaces one entity ID token.
+The edit preserves every other source byte, including comments and spacing.
+The test reparses the result and compares authorization through the edited source and its semantic JSON representation.
+`TestSourceTokensSeparateLexingFromValidation` checks incomplete grammar and malformed lexical input.
+`TestMalformedSourceTokenResponses` rejects invalid spans, overlapping tokens, source mismatches, and spans that split UTF-8.
+Comment-field tests reject missing or null strings and null array entries.
+Lexical response tests reject omitted tokens, incorrect token kinds, and truncated native tokens.
+Native spelling tests preserve Unicode whitespace, lone-CR comments, raw string line breaks, and unsupported semantic escapes.
+`TestSourceTokenPreflight` checks input encoding and source limits before guest execution.
+
+### Entity store mutation checks
+
+The entity-store oracle invokes native Cedar APIs directly.
+Its ten fixtures retain one native store across mutation sequences.
+The Go API compares normalized exports, direct parents, ancestry, membership, and deep equality at each step.
+Fixtures cover replacement, deletion, redundant direct edges, missing parents, duplicate upserts, cycles, and schema validation.
+They also check schema action deletion and exact integer, extension, Unicode, and tag values.
+
+The opaque snapshot records direct parents from the native AST.
+A chain deletion fixture detects accidental reconstruction from transitive normalized JSON.
+The mutation fuzz target changes an isolated graph component.
+It then checks that an unrelated authorization decision stays unchanged.
+
+### Symbolic error and matching checks
+
+`scripts/analysis-queries-parity.sh --check` requires the pinned cvc5 executable.
+Its native oracle runs optimized boolean queries and their counterexample variants.
+The oracle confirms each failed property with the concrete authorizer.
+`TestAnalysisQueriesNativeParity` compares the Wasm results with these native fixtures.
+
+The cvc5-gated tests cover safe policies, integer overflow, unconditional matches, and nonmatches.
+They also cover pairwise matching and policy-set disjointness.
+Empty-schema cases reject templates in either set and retain vacuous results for valid static sets.
+Response decoding requires property flags and action ID fields.
+Explicit false flags and empty action IDs remain valid.
+Counterexample requests require complete UIDs that match their reported request environment.
+Context objects and entity arrays retain their original JSON bytes and exact integer values.
+Entity records require complete flat UIDs, attribute objects, parent UID arrays, and optional tag objects.
+The decoder checks these containers without interpreting Cedar values or graph semantics.
+Forbid fixtures preserve distinct matching conditions while both final decisions deny.
+Generated tests compare matching thresholds and replay each returned counterexample.
+The response decoder rejects missing evaluations and evidence that does not violate the queried property.
+It requires Deny for singleton nonmatches and errors, and permits at most one error per singleton policy.
+Unary queries require Deny and no evaluation for the unused second policy set.
+It also rejects missing results, incomplete environment types, and incomplete error messages.
+An explicit empty result list remains valid for a schema with no request environments.
+Native fixtures check real error evidence with empty policy IDs and IDs containing quotes, newlines, backslashes, and NUL.
+The Go comparison preserves those raw IDs and compares native error messages.
+
+### Compiled analysis sessions
+
+Native session tests cover environment selection, handle ownership, monotonic IDs, release, and the 128-handle limit.
+They also check repeated native queries and solver-fault invalidation.
+Go tests check blocked solver reads, active timeouts, queued cancellation, malformed responses, and foreign handles.
+Session creation rejects missing or null action ID fields, while preserving explicit empty IDs.
+Malformed environment responses close the solver and invalidate the session.
+Malformed error records also invalidate the session; complete compilation errors leave it usable.
+Mixed success/error envelopes, nested report errors, and invalid UTF-8 replies close both session resources.
+Delayed solver startup tests preserve cancellation and late cleanup errors through construction and analyzer closure.
+Real CVC5 tests cancel 100 session lifetimes and require successful resource cleanup.
+Deterministic process tests cover cancellation, deadlines, wrapped cleanup errors, and repeated waits.
+Solver cleanup suppresses a direct cancellation error only when the process exits successfully.
+Wrapped cancellation errors and other cleanup errors remain observable.
+Run these ownership tests with `go test -race ./analysis -run '^TestCompiled'`.
+
+The cvc5-gated integration tests compare compiled checks with stateless checks.
+They replay returned counterexamples through the concrete authorization runtime.
+They check one solver start across repeated compiled calls and cleanup after analyzer closure.
+The output-limit test verifies whole-session invalidation.
+
+`BenchmarkRepeatedEquivalent` compares repeated equivalence checks through both APIs.
+Its policies use `context.n < 0` and `context.n <= -1` under one schema environment.
+The compiled benchmark excludes session creation and compilation, and performs one warm-up check.
+Run `go test ./analysis -run '^$' -bench '^BenchmarkRepeatedEquivalent$' -benchmem -benchtime=10x` with CVC5 set.
+Record timings, allocations, tool versions, and iterations with the final module artifacts.
+The final native preflight passed four session tests and all 26 query fixtures.
+The normal CVC5 guest suite passed in 108.482 seconds.
+The lifetime guest test also passed twice under the race detector in 91.318 seconds.
+
+The final artifact measurement used three samples with ten iterations each on 2026-10-03 at 06:43 UTC.
+It used Linux/amd64, an AMD Ryzen 5 5600X, Go 1.27.1, Rust 1.99.0, and cvc5 1.3.1.
+The analysis guest SHA-256 was `8a9598239fbc7f23969ac613098e7489ab89ffb86379504cb1136b8f3ea031cd`.
+The authorizer guest SHA-256 was `9ef3546a6aff09c3e69ac600f7640e1a6899d23bd0bf97fa5e2e42805e9a511e`.
+Analyzer construction was excluded from both paths.
+The compiled path also excluded session creation, handle compilation, and one warm-up check.
+
+| Path | Sample | Time per check | Bytes per check | Allocations per check |
+| --- | --- | --- | --- | --- |
+| Stateless | 1 | 32.11 ms | 20,539,621 | 5,810 |
+| Stateless | 2 | 35.34 ms | 20,537,971 | 5,806 |
+| Stateless | 3 | 29.89 ms | 20,536,812 | 5,803 |
+| Compiled | 1 | 2.41 ms | 13,616 | 69 |
+| Compiled | 2 | 2.55 ms | 13,808 | 70 |
+| Compiled | 3 | 2.31 ms | 13,617 | 69 |
+
+The stateless median was 32.11 ms; the compiled median was 2.41 ms.
+The compiled median was 13.31 times faster for these inputs.
+These short samples do not establish performance for other schemas or policies.

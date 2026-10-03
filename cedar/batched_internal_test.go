@@ -14,6 +14,21 @@ type batchMemory struct {
 	bytes []byte
 }
 
+func TestEntityLoaderRejectsInvalidUTF8(t *testing.T) {
+	bad := string([]byte{0xff})
+	for _, result := range []EntityLoadResult{
+		{Entities: json.RawMessage(`[{"uid":{"type":"User","id":"` + bad + `"}}]`)},
+		{Missing: []EntityUID{{Type: "User", ID: bad}}},
+		{Missing: []EntityUID{{Type: bad, ID: "a"}}},
+	} {
+		body, err := encodeEntityLoadResult(result, 4096)
+		var e *Error
+		if body != nil || !errors.As(err, &e) || e.Kind != KindInput {
+			t.Fatalf("malformed loader result: %s %v; want KindInput", body, err)
+		}
+	}
+}
+
 func (m batchMemory) Read(ptr, n uint32) ([]byte, bool) {
 	if uint64(ptr)+uint64(n) > uint64(len(m.bytes)) {
 		return nil, false

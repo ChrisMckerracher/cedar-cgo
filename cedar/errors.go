@@ -11,17 +11,19 @@ type ErrorKind string
 
 // Kinds distinguish Cedar input errors from bridge resource and protocol failures.
 const (
-	KindSchema    ErrorKind = "schema"    // The schema does not parse.
-	KindPolicies  ErrorKind = "policies"  // Policy parsing, editing, or TPE validation failed.
-	KindEntities  ErrorKind = "entities"  // The entities do not parse or do not match the schema.
-	KindContext   ErrorKind = "context"   // The context does not parse or does not match the schema.
-	KindRequest   ErrorKind = "request"   // The request is invalid or inconsistent with partial inputs.
-	KindPrincipal ErrorKind = "principal" // The principal UID does not parse.
-	KindAction    ErrorKind = "action"    // The action UID does not parse.
-	KindResource  ErrorKind = "resource"  // The resource UID does not parse.
-	KindInput     ErrorKind = "input"     // The module rejected the input envelope.
-	KindLimit     ErrorKind = "limit"     // An input or formatted output exceeds a size limit.
-	KindFault     ErrorKind = "fault"     // The module trapped, exited, timed out or broke the ABI.
+	KindEntityUID  ErrorKind = "entity_uid" // A standalone entity UID does not parse.
+	KindExpression ErrorKind = "expression" // Expression parsing or evaluation failed.
+	KindSchema     ErrorKind = "schema"     // The schema does not parse.
+	KindPolicies   ErrorKind = "policies"   // Policy parsing, editing, or TPE validation failed.
+	KindEntities   ErrorKind = "entities"   // The entities do not parse or do not match the schema.
+	KindContext    ErrorKind = "context"    // The context does not parse or does not match the schema.
+	KindRequest    ErrorKind = "request"    // The request is invalid or inconsistent with partial inputs.
+	KindPrincipal  ErrorKind = "principal"  // The principal UID does not parse.
+	KindAction     ErrorKind = "action"     // The action UID does not parse.
+	KindResource   ErrorKind = "resource"   // The resource UID does not parse.
+	KindInput      ErrorKind = "input"      // The module rejected the input envelope.
+	KindLimit      ErrorKind = "limit"      // An input or formatted output exceeds a size limit.
+	KindFault      ErrorKind = "fault"      // The module trapped, exited, timed out or broke the ABI.
 )
 
 // Error always accompanies Deny when returned by Authorize.
@@ -57,7 +59,7 @@ func limitError(what string, n, limit int) *Error {
 // Unknown guest error kinds are faults so the instance cannot return to the pool.
 func moduleError(w *wire.Error) *Error {
 	switch k := ErrorKind(w.Kind); k {
-	case KindSchema, KindPolicies, KindEntities, KindContext, KindRequest,
+	case KindEntityUID, KindExpression, KindSchema, KindPolicies, KindEntities, KindContext, KindRequest,
 		KindPrincipal, KindAction, KindResource, KindInput, KindSlicing:
 		return &Error{Kind: k, Message: w.Message}
 	}

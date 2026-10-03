@@ -1,6 +1,8 @@
 //! Operations consume host-allocated JSON input and transfer JSON response ownership
 //! back to the host, which copies the bytes before calling `cgw_free`.
 
+pub mod structured;
+
 use cedar_policy::{PolicySet, Schema};
 use serde::{Deserialize, Serialize};
 use std::alloc::Layout;
@@ -157,11 +159,24 @@ pub struct Source {
 }
 
 pub fn parse_schema(src: &Source) -> Result<Schema, OpError> {
+    parse_schema_with_warnings(src).map(|(schema, _)| schema)
+}
+
+pub fn parse_schema_with_warnings(
+    src: &Source,
+) -> Result<(Schema, Vec<structured::Message>), OpError> {
     match src.format {
         Format::Cedar => Schema::from_cedarschema_str(&src.text)
-            .map(|(schema, _warnings)| schema)
+            .map(|(schema, warnings)| {
+                (
+                    schema,
+                    warnings.map(|w| structured::schema_warning(&w)).collect(),
+                )
+            })
             .map_err(|e| OpError::new("schema", &e)),
-        Format::Json => Schema::from_json_str(&src.text).map_err(|e| OpError::new("schema", &e)),
+        Format::Json => Schema::from_json_str(&src.text)
+            .map(|schema| (schema, Vec::new()))
+            .map_err(|e| OpError::new("schema", &e)),
     }
 }
 

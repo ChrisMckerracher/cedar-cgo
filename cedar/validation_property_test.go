@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"reflect"
 	"regexp"
 	"slices"
 	"strings"
@@ -31,10 +32,9 @@ func propStripHints(messages []cedar.PolicyMessage) []cedar.PolicyMessage {
 func propSortedMessages(messages []cedar.PolicyMessage) []cedar.PolicyMessage {
 	out := slices.Clone(messages)
 	slices.SortFunc(out, func(a, b cedar.PolicyMessage) int {
-		if a.PolicyID != b.PolicyID {
-			return strings.Compare(a.PolicyID, b.PolicyID)
-		}
-		return strings.Compare(a.Message, b.Message)
+		x, _ := json.Marshal(a)
+		y, _ := json.Marshal(b)
+		return strings.Compare(string(x), string(y))
 	})
 	return out
 }
@@ -42,8 +42,8 @@ func propSortedMessages(messages []cedar.PolicyMessage) []cedar.PolicyMessage {
 func propSameValidation(t *rapid.T, a, b cedar.ValidationResult) {
 	t.Helper()
 	if a.Passed != b.Passed ||
-		!slices.Equal(propSortedMessages(propStripHints(a.Errors)), propSortedMessages(propStripHints(b.Errors))) ||
-		!slices.Equal(propSortedMessages(propStripHints(a.Warnings)), propSortedMessages(propStripHints(b.Warnings))) {
+		!reflect.DeepEqual(propSortedMessages(propStripHints(a.Errors)), propSortedMessages(propStripHints(b.Errors))) ||
+		!reflect.DeepEqual(propSortedMessages(propStripHints(a.Warnings)), propSortedMessages(propStripHints(b.Warnings))) {
 		t.Fatalf("validation is not deterministic: %+v vs %+v", a, b)
 	}
 }
