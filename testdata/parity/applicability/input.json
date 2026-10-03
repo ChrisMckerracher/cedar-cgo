@@ -57,6 +57,159 @@
       "name": "multiple-namespaces",
       "schema": "namespace A { entity Z; } namespace B { entity A; } entity Photo; action view appliesTo {principal: [A::Z, B::A], resource: Photo, context: {}};",
       "policies": "permit(principal, action, resource);"
+    },
+    {
+      "name": "static-raw-ids",
+      "format": "json",
+      "policies": {
+        "staticPolicies": {
+          "": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": []
+          },
+          "static quote\" newline\n slash\\ NUL\u0000 雪": {
+            "effect": "permit",
+            "principal": {
+              "op": "All"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "All"
+            },
+            "conditions": []
+          }
+        },
+        "templates": {},
+        "templateLinks": []
+      }
+    },
+    {
+      "name": "template-raw-ids",
+      "format": "json",
+      "policies": {
+        "staticPolicies": {},
+        "templates": {
+          "": {
+            "effect": "permit",
+            "principal": {
+              "op": "==",
+              "slot": "?principal"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "==",
+              "slot": "?resource"
+            },
+            "conditions": []
+          },
+          "template quote\" newline\n slash\\ NUL\u0000 雪": {
+            "effect": "permit",
+            "principal": {
+              "op": "==",
+              "slot": "?principal"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "==",
+              "slot": "?resource"
+            },
+            "conditions": []
+          }
+        },
+        "templateLinks": []
+      }
+    },
+    {
+      "name": "linked-raw-ids",
+      "format": "json",
+      "policies": {
+        "staticPolicies": {},
+        "templates": {
+          "empty-link-source": {
+            "effect": "permit",
+            "principal": {
+              "op": "==",
+              "slot": "?principal"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "==",
+              "slot": "?resource"
+            },
+            "conditions": []
+          },
+          "source template quote\" newline\n slash\\ NUL\u0000 雪": {
+            "effect": "permit",
+            "principal": {
+              "op": "==",
+              "slot": "?principal"
+            },
+            "action": {
+              "op": "All"
+            },
+            "resource": {
+              "op": "==",
+              "slot": "?resource"
+            },
+            "conditions": []
+          }
+        },
+        "templateLinks": [
+          {
+            "templateId": "empty-link-source",
+            "newId": "",
+            "values": {
+              "?principal": {
+                "__entity": {
+                  "type": "Acme::User",
+                  "id": "alice/雪"
+                }
+              },
+              "?resource": {
+                "__entity": {
+                  "type": "Acme::Photo",
+                  "id": "photo/雪"
+                }
+              }
+            }
+          },
+          {
+            "templateId": "source template quote\" newline\n slash\\ NUL\u0000 雪",
+            "newId": "linked quote\" newline\n slash\\ NUL\u0000 雪",
+            "values": {
+              "?principal": {
+                "__entity": {
+                  "type": "Acme::User",
+                  "id": "alice/雪"
+                }
+              },
+              "?resource": {
+                "__entity": {
+                  "type": "Acme::Photo",
+                  "id": "photo/雪"
+                }
+              }
+            }
+          }
+        ]
+      }
     }
   ]
 }

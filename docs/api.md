@@ -634,6 +634,8 @@ upstream experimental status, and the executable example.
 `Runtime.ApplicableEnvironments` invokes Cedar's native `get_valid_request_envs` operation.
 It returns schema principal types, action UIDs, resource types, and template slot types.
 `PolicyApplicability` separates policy IDs and template IDs.
+Policy and template IDs preserve their source values, including empty IDs, control characters, and Unicode.
+Linked policy IDs also preserve their source values.
 Native enumeration also retains slot type metadata for linked policies.
 Environment lists retain native Cedar enumeration order.
 JSON serialization preserves flat action UID fields, including its type and ID.

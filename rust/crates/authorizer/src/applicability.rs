@@ -41,7 +41,7 @@ pub fn execute(bytes: &[u8]) -> Result<Value, OpError> {
         .policies()
         .map(|p| {
             (
-                p.id().to_string(),
+                AsRef::<str>::as_ref(p.id()).to_owned(),
                 environments(p.get_valid_request_envs(&schema)),
             )
         })
@@ -50,7 +50,7 @@ pub fn execute(bytes: &[u8]) -> Result<Value, OpError> {
         .templates()
         .map(|t| {
             (
-                t.id().to_string(),
+                AsRef::<str>::as_ref(t.id()).to_owned(),
                 environments(t.get_valid_request_envs(&schema)),
             )
         })

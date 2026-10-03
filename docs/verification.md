@@ -334,6 +334,8 @@ exact.
 
 `TestApplicabilityNativeFixtures` compares policy and template metadata with native Cedar enumeration.
 Fixtures cover unconstrained policies, action groups, type constraints, template slots, linked templates, multiple namespaces, and invalid conditions.
+JSON fixtures cover empty IDs, quotes, newlines, backslashes, NUL characters, and Unicode for static, template, and linked policies.
+The tests compare result keys with source IDs independently of the native oracle.
 `TestRequestEnvironmentJSONRoundTrip` checks action identity and slot metadata after JSON serialization.
 `TestApplicabilityBoundaries` checks empty schemas and malformed inputs.
 `TestApplicabilityDoesNotAuthorize` checks that applicability metadata can coexist with a denied request.

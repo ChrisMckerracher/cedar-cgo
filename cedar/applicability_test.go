@@ -14,9 +14,10 @@ func TestApplicabilityNativeFixtures(t *testing.T) {
 	var input struct {
 		Schema string
 		Cases  []struct {
-			Name, Policies string
-			Schema         *string
-			Link           *struct {
+			Name, Format string
+			Policies     json.RawMessage
+			Schema       *string
+			Link         *struct {
 				TemplateID          string `json:"template_id"`
 				ID                  string
 				Principal, Resource cedar.EntityUID
@@ -40,7 +41,16 @@ func TestApplicabilityNativeFixtures(t *testing.T) {
 	ctx := context.Background()
 	for i, tc := range input.Cases {
 		t.Run(tc.Name, func(t *testing.T) {
-			policies := cedar.PoliciesFromCedar(tc.Policies)
+			var policies cedar.PolicySet
+			if tc.Format == "json" {
+				policies = cedar.PoliciesFromJSON(tc.Policies)
+			} else {
+				var text string
+				if err := json.Unmarshal(tc.Policies, &text); err != nil {
+					t.Fatal(err)
+				}
+				policies = cedar.PoliciesFromCedar(text)
+			}
 			if tc.Link != nil {
 				var err error
 				policies, err = rt.LinkTemplate(ctx, policies, tc.Link.TemplateID, tc.Link.ID, cedar.SlotBindings{cedar.PrincipalSlot: tc.Link.Principal, cedar.ResourceSlot: tc.Link.Resource})
@@ -59,7 +69,75 @@ func TestApplicabilityNativeFixtures(t *testing.T) {
 			if tc.Name != expected[i].Name || !reflect.DeepEqual(got, expected[i].Applicability) {
 				t.Fatalf("Go %+v; native %+v", got, expected[i])
 			}
+			if tc.Format == "json" {
+				assertApplicabilitySourceIDs(t, tc.Policies, got)
+			}
 		})
+	}
+}
+
+func assertApplicabilitySourceIDs(t testing.TB, policies []byte, metadata cedar.PolicyApplicability) {
+	t.Helper()
+	var input struct {
+		StaticPolicies map[string]json.RawMessage `json:"staticPolicies"`
+		Templates      map[string]json.RawMessage
+		TemplateLinks  []struct{ NewID string } `json:"templateLinks"`
+	}
+	if err := json.Unmarshal(policies, &input); err != nil {
+		t.Fatal(err)
+	}
+	if len(metadata.Policies) != len(input.StaticPolicies)+len(input.TemplateLinks) || len(metadata.Templates) != len(input.Templates) {
+		t.Fatal("applicability source ID count differs")
+	}
+	for id := range input.StaticPolicies {
+		if _, found := metadata.Policies[id]; !found {
+			t.Fatalf("static source ID changed: %q", id)
+		}
+	}
+	for id := range input.Templates {
+		if _, found := metadata.Templates[id]; !found {
+			t.Fatalf("template source ID changed: %q", id)
+		}
+	}
+	for _, link := range input.TemplateLinks {
+		if _, found := metadata.Policies[link.NewID]; !found {
+			t.Fatalf("linked source ID changed: %q", link.NewID)
+		}
+	}
+}
+
+func TestApplicabilityRawIDFixtures(t *testing.T) {
+	var input struct {
+		Cases []struct {
+			Name, Format string
+			Policies     json.RawMessage
+		}
+	}
+	var expected []struct {
+		Name          string
+		Applicability cedar.PolicyApplicability
+	}
+	if err := json.Unmarshal(readFile(t, "../testdata/parity/applicability/input.json"), &input); err != nil {
+		t.Fatal(err)
+	}
+	if err := json.Unmarshal(readFile(t, "../testdata/parity/applicability/expected.json"), &expected); err != nil {
+		t.Fatal(err)
+	}
+	if len(input.Cases) != len(expected) {
+		t.Fatal("fixture count differs")
+	}
+	checked := 0
+	for i, test := range input.Cases {
+		if test.Format == "json" {
+			if test.Name != expected[i].Name {
+				t.Fatal("fixture name differs")
+			}
+			assertApplicabilitySourceIDs(t, test.Policies, expected[i].Applicability)
+			checked++
+		}
+	}
+	if checked != 3 {
+		t.Fatalf("wanted static, template, and linked raw-ID fixtures; found %d", checked)
 	}
 }
 

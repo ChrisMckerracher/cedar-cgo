@@ -412,5 +412,426 @@
       },
       "templates": {}
     }
+  },
+  {
+    "name": "static-raw-ids",
+    "applicability": {
+      "policies": {
+        "": [
+          {
+            "principal_type": "Acme::Group",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Album"
+          },
+          {
+            "principal_type": "Acme::Group",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Photo"
+          },
+          {
+            "principal_type": "Acme::User",
+            "action": {
+              "type": "Acme::Action",
+              "id": "edit"
+            },
+            "resource_type": "Acme::Photo"
+          },
+          {
+            "principal_type": "Acme::User",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Album"
+          },
+          {
+            "principal_type": "Acme::User",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Photo"
+          }
+        ],
+        "static quote\" newline\n slash\\ NUL\u0000 雪": [
+          {
+            "principal_type": "Acme::Group",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Album"
+          },
+          {
+            "principal_type": "Acme::Group",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Photo"
+          },
+          {
+            "principal_type": "Acme::User",
+            "action": {
+              "type": "Acme::Action",
+              "id": "edit"
+            },
+            "resource_type": "Acme::Photo"
+          },
+          {
+            "principal_type": "Acme::User",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Album"
+          },
+          {
+            "principal_type": "Acme::User",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Photo"
+          }
+        ]
+      },
+      "templates": {}
+    }
+  },
+  {
+    "name": "template-raw-ids",
+    "applicability": {
+      "policies": {},
+      "templates": {
+        "": [
+          {
+            "principal_type": "Acme::Group",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Album",
+            "principal_slot_type": "Acme::Group",
+            "resource_slot_type": "Acme::Album"
+          },
+          {
+            "principal_type": "Acme::Group",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Photo",
+            "principal_slot_type": "Acme::Group",
+            "resource_slot_type": "Acme::Photo"
+          },
+          {
+            "principal_type": "Acme::User",
+            "action": {
+              "type": "Acme::Action",
+              "id": "edit"
+            },
+            "resource_type": "Acme::Photo",
+            "principal_slot_type": "Acme::User",
+            "resource_slot_type": "Acme::Photo"
+          },
+          {
+            "principal_type": "Acme::User",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Album",
+            "principal_slot_type": "Acme::User",
+            "resource_slot_type": "Acme::Album"
+          },
+          {
+            "principal_type": "Acme::User",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Photo",
+            "principal_slot_type": "Acme::User",
+            "resource_slot_type": "Acme::Photo"
+          }
+        ],
+        "template quote\" newline\n slash\\ NUL\u0000 雪": [
+          {
+            "principal_type": "Acme::Group",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Album",
+            "principal_slot_type": "Acme::Group",
+            "resource_slot_type": "Acme::Album"
+          },
+          {
+            "principal_type": "Acme::Group",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Photo",
+            "principal_slot_type": "Acme::Group",
+            "resource_slot_type": "Acme::Photo"
+          },
+          {
+            "principal_type": "Acme::User",
+            "action": {
+              "type": "Acme::Action",
+              "id": "edit"
+            },
+            "resource_type": "Acme::Photo",
+            "principal_slot_type": "Acme::User",
+            "resource_slot_type": "Acme::Photo"
+          },
+          {
+            "principal_type": "Acme::User",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Album",
+            "principal_slot_type": "Acme::User",
+            "resource_slot_type": "Acme::Album"
+          },
+          {
+            "principal_type": "Acme::User",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Photo",
+            "principal_slot_type": "Acme::User",
+            "resource_slot_type": "Acme::Photo"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "linked-raw-ids",
+    "applicability": {
+      "policies": {
+        "": [
+          {
+            "principal_type": "Acme::Group",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Album",
+            "principal_slot_type": "Acme::Group",
+            "resource_slot_type": "Acme::Album"
+          },
+          {
+            "principal_type": "Acme::Group",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Photo",
+            "principal_slot_type": "Acme::Group",
+            "resource_slot_type": "Acme::Photo"
+          },
+          {
+            "principal_type": "Acme::User",
+            "action": {
+              "type": "Acme::Action",
+              "id": "edit"
+            },
+            "resource_type": "Acme::Photo",
+            "principal_slot_type": "Acme::User",
+            "resource_slot_type": "Acme::Photo"
+          },
+          {
+            "principal_type": "Acme::User",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Album",
+            "principal_slot_type": "Acme::User",
+            "resource_slot_type": "Acme::Album"
+          },
+          {
+            "principal_type": "Acme::User",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Photo",
+            "principal_slot_type": "Acme::User",
+            "resource_slot_type": "Acme::Photo"
+          }
+        ],
+        "linked quote\" newline\n slash\\ NUL\u0000 雪": [
+          {
+            "principal_type": "Acme::Group",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Album",
+            "principal_slot_type": "Acme::Group",
+            "resource_slot_type": "Acme::Album"
+          },
+          {
+            "principal_type": "Acme::Group",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Photo",
+            "principal_slot_type": "Acme::Group",
+            "resource_slot_type": "Acme::Photo"
+          },
+          {
+            "principal_type": "Acme::User",
+            "action": {
+              "type": "Acme::Action",
+              "id": "edit"
+            },
+            "resource_type": "Acme::Photo",
+            "principal_slot_type": "Acme::User",
+            "resource_slot_type": "Acme::Photo"
+          },
+          {
+            "principal_type": "Acme::User",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Album",
+            "principal_slot_type": "Acme::User",
+            "resource_slot_type": "Acme::Album"
+          },
+          {
+            "principal_type": "Acme::User",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Photo",
+            "principal_slot_type": "Acme::User",
+            "resource_slot_type": "Acme::Photo"
+          }
+        ]
+      },
+      "templates": {
+        "empty-link-source": [
+          {
+            "principal_type": "Acme::Group",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Album",
+            "principal_slot_type": "Acme::Group",
+            "resource_slot_type": "Acme::Album"
+          },
+          {
+            "principal_type": "Acme::Group",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Photo",
+            "principal_slot_type": "Acme::Group",
+            "resource_slot_type": "Acme::Photo"
+          },
+          {
+            "principal_type": "Acme::User",
+            "action": {
+              "type": "Acme::Action",
+              "id": "edit"
+            },
+            "resource_type": "Acme::Photo",
+            "principal_slot_type": "Acme::User",
+            "resource_slot_type": "Acme::Photo"
+          },
+          {
+            "principal_type": "Acme::User",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Album",
+            "principal_slot_type": "Acme::User",
+            "resource_slot_type": "Acme::Album"
+          },
+          {
+            "principal_type": "Acme::User",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Photo",
+            "principal_slot_type": "Acme::User",
+            "resource_slot_type": "Acme::Photo"
+          }
+        ],
+        "source template quote\" newline\n slash\\ NUL\u0000 雪": [
+          {
+            "principal_type": "Acme::Group",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Album",
+            "principal_slot_type": "Acme::Group",
+            "resource_slot_type": "Acme::Album"
+          },
+          {
+            "principal_type": "Acme::Group",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Photo",
+            "principal_slot_type": "Acme::Group",
+            "resource_slot_type": "Acme::Photo"
+          },
+          {
+            "principal_type": "Acme::User",
+            "action": {
+              "type": "Acme::Action",
+              "id": "edit"
+            },
+            "resource_type": "Acme::Photo",
+            "principal_slot_type": "Acme::User",
+            "resource_slot_type": "Acme::Photo"
+          },
+          {
+            "principal_type": "Acme::User",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Album",
+            "principal_slot_type": "Acme::User",
+            "resource_slot_type": "Acme::Album"
+          },
+          {
+            "principal_type": "Acme::User",
+            "action": {
+              "type": "Acme::Action",
+              "id": "view"
+            },
+            "resource_type": "Acme::Photo",
+            "principal_slot_type": "Acme::User",
+            "resource_slot_type": "Acme::Photo"
+          }
+        ]
+      }
+    }
   }
 ]

@@ -30,7 +30,11 @@ fn main() {
                     .0
             });
             let schema = case_schema.as_ref().unwrap_or(&default_schema);
-            let mut policies: PolicySet = case["policies"].as_str().unwrap().parse().unwrap();
+            let mut policies: PolicySet = if case["format"].as_str() == Some("json") {
+                PolicySet::from_json_value(case["policies"].clone()).unwrap()
+            } else {
+                case["policies"].as_str().unwrap().parse().unwrap()
+            };
             if let Some(link) = case.get("link") {
                 policies
                     .link(
@@ -51,11 +55,21 @@ fn main() {
             }
             let results: BTreeMap<_, _> = policies
                 .policies()
-                .map(|p| (p.id().to_string(), envs(p.get_valid_request_envs(schema))))
+                .map(|p| {
+                    (
+                        AsRef::<str>::as_ref(p.id()).to_owned(),
+                        envs(p.get_valid_request_envs(schema)),
+                    )
+                })
                 .collect();
             let templates: BTreeMap<_, _> = policies
                 .templates()
-                .map(|t| (t.id().to_string(), envs(t.get_valid_request_envs(schema))))
+                .map(|t| {
+                    (
+                        AsRef::<str>::as_ref(t.id()).to_owned(),
+                        envs(t.get_valid_request_envs(schema)),
+                    )
+                })
                 .collect();
             json!({"name":case["name"],"applicability":{"policies":results,"templates":templates}})
         })
