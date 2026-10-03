@@ -13,7 +13,7 @@ fn refs(set: &PolicySet) -> Value {
             let mut values = p.entity_literals();
             values.sort();
             (
-                p.id().to_string(),
+                AsRef::<str>::as_ref(p.id()).to_owned(),
                 values.into_iter().map(uid).collect::<Vec<_>>(),
             )
         })
@@ -34,7 +34,7 @@ fn refs(set: &PolicySet) -> Value {
                 .collect();
             values.sort();
             (
-                t.id().to_string(),
+                AsRef::<str>::as_ref(t.id()).to_owned(),
                 values.into_iter().map(uid).collect::<Vec<_>>(),
             )
         })
@@ -47,7 +47,7 @@ fn main() {
     io::stdin().read_to_string(&mut text).unwrap();
     let input: Value = serde_json::from_str(&text).unwrap();
     let expected:Vec<_>=input.as_array().unwrap().iter().map(|case| {
-        let mut source:PolicySet=case["policies"].as_str().unwrap().parse().unwrap();
+        let mut source:PolicySet=if let Some(value)=case.get("policies_json") { PolicySet::from_json_value(value.clone()).unwrap() } else { case["policies"].as_str().unwrap().parse().unwrap() };
         if !case["link"].is_null() {
             let link=&case["link"];
             let bindings=std::collections::HashMap::from([(SlotId::principal(),EntityUid::from_json(link["principal"].clone()).unwrap())]);

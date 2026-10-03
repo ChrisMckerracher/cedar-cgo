@@ -95,5 +95,101 @@
         }
       }
     ]
+  },
+  {
+    "name": "raw-policy-ids",
+    "policies_json": {
+      "templates": {
+        "quote\"line\n\\\u0000雪template": {
+          "effect": "permit",
+          "principal": {
+            "op": "==",
+            "slot": "?principal"
+          },
+          "action": {
+            "op": "All"
+          },
+          "resource": {
+            "op": "==",
+            "entity": {
+              "__entity": {
+                "type": "User",
+                "id": "B"
+              }
+            }
+          },
+          "conditions": [],
+          "annotations": {
+            "note": "雪"
+          }
+        }
+      },
+      "staticPolicies": {
+        "": {
+          "effect": "permit",
+          "principal": {
+            "op": "==",
+            "entity": {
+              "__entity": {
+                "type": "User",
+                "id": "A"
+              }
+            }
+          },
+          "action": {
+            "op": "All"
+          },
+          "resource": {
+            "op": "All"
+          },
+          "conditions": []
+        },
+        "quote\"line\n\\\u0000雪static": {
+          "effect": "permit",
+          "principal": {
+            "op": "==",
+            "entity": {
+              "__entity": {
+                "type": "User",
+                "id": "A"
+              }
+            }
+          },
+          "action": {
+            "op": "All"
+          },
+          "resource": {
+            "op": "All"
+          },
+          "conditions": []
+        }
+      },
+      "templateLinks": [
+        {
+          "templateId": "quote\"line\n\\\u0000雪template",
+          "newId": "quote\"line\n\\\u0000雪linked",
+          "values": {
+            "?principal": {
+              "__entity": {
+                "type": "User",
+                "id": "B"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "replacements": [
+      {
+        "from": {
+          "type": "User",
+          "id": "A"
+        },
+        "to": {
+          "type": "User",
+          "id": "B"
+        }
+      }
+    ]
   }
 ]
