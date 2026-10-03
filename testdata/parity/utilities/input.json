@@ -1,0 +1,352 @@
+[
+  {
+    "name": "uid basic",
+    "operation": "parse_uid",
+    "text": "User::\"alice\""
+  },
+  {
+    "name": "uid namespace and unicode",
+    "operation": "parse_uid",
+    "text": "NS::User::\"雪😀\""
+  },
+  {
+    "name": "uid rejects noncanonical Unicode null",
+    "operation": "parse_uid",
+    "text": "User::\"\\u{0}\\t\\n\\r\\\"\\\\\""
+  },
+  {
+    "name": "uid rejects Go escape",
+    "operation": "parse_uid",
+    "text": "User::\"\\a\""
+  },
+  {
+    "name": "uid rejects extra spaces",
+    "operation": "parse_uid",
+    "text": " User::\"alice\""
+  },
+  {
+    "name": "uid render controls",
+    "operation": "render_uid",
+    "uid": {
+      "type": "NS::User",
+      "id": "\u0000\u0007\b\f\t\n\r\"\\雪😀"
+    }
+  },
+  {
+    "name": "uid render empty id",
+    "operation": "render_uid",
+    "uid": {
+      "type": "User",
+      "id": ""
+    }
+  },
+  {
+    "name": "uid invalid type",
+    "operation": "render_uid",
+    "uid": {
+      "type": "not a type",
+      "id": "alice"
+    }
+  },
+  {
+    "name": "context empty readback",
+    "operation": "context_values",
+    "context": {}
+  },
+  {
+    "name": "context typed readback",
+    "operation": "context_values",
+    "context": {
+      "min": -9223372036854775808,
+      "max": 9223372036854775807,
+      "large": 9007199254740993,
+      "member": {
+        "__entity": {
+          "type": "NS::User",
+          "id": "雪"
+        }
+      },
+      "ip": {
+        "__extn": {
+          "fn": "ip",
+          "arg": "10.0.0.1"
+        }
+      },
+      "nested": {
+        "set": [
+          true,
+          false
+        ],
+        "decimal": {
+          "__extn": {
+            "fn": "decimal",
+            "arg": "1.25"
+          }
+        }
+      }
+    }
+  },
+  {
+    "name": "context get value",
+    "operation": "context_get",
+    "context": {
+      "a": 9007199254740993
+    },
+    "key": "a"
+  },
+  {
+    "name": "context get absent",
+    "operation": "context_get",
+    "context": {
+      "a": true
+    },
+    "key": "missing"
+  },
+  {
+    "name": "context malformed array",
+    "operation": "context_get",
+    "context": [],
+    "key": "a"
+  },
+  {
+    "name": "context merge disjoint",
+    "operation": "context_merge",
+    "context": {
+      "a": 1,
+      "nested": {
+        "x": true
+      }
+    },
+    "other": {
+      "b": "雪",
+      "decimal": {
+        "__extn": {
+          "fn": "decimal",
+          "arg": "1.25"
+        }
+      }
+    }
+  },
+  {
+    "name": "context merge duplicate equal",
+    "operation": "context_merge",
+    "context": {
+      "a": 1
+    },
+    "other": {
+      "a": 1
+    }
+  },
+  {
+    "name": "context merge duplicate nested",
+    "operation": "context_merge",
+    "context": {
+      "nested": {
+        "x": true
+      }
+    },
+    "other": {
+      "nested": {
+        "y": false
+      }
+    }
+  },
+  {
+    "name": "context validate correct",
+    "operation": "context_validate",
+    "context": {
+      "count": 3
+    },
+    "schema": {
+      "format": "cedar",
+      "text": "entity User; entity Photo; action \"view\" appliesTo { principal: User, resource: Photo, context: {count: Long} };"
+    },
+    "action": {
+      "type": "Action",
+      "id": "view"
+    }
+  },
+  {
+    "name": "context validate wrong type",
+    "operation": "context_validate",
+    "context": {
+      "count": "3"
+    },
+    "schema": {
+      "format": "cedar",
+      "text": "entity User; entity Photo; action \"view\" appliesTo { principal: User, resource: Photo, context: {count: Long} };"
+    },
+    "action": {
+      "type": "Action",
+      "id": "view"
+    }
+  },
+  {
+    "name": "context validate missing attribute",
+    "operation": "context_validate",
+    "context": {},
+    "schema": {
+      "format": "cedar",
+      "text": "entity User; entity Photo; action \"view\" appliesTo { principal: User, resource: Photo, context: {count: Long} };"
+    },
+    "action": {
+      "type": "Action",
+      "id": "view"
+    }
+  },
+  {
+    "name": "context validate extra attribute",
+    "operation": "context_validate",
+    "context": {
+      "count": 3,
+      "extra": true
+    },
+    "schema": {
+      "format": "cedar",
+      "text": "entity User; entity Photo; action \"view\" appliesTo { principal: User, resource: Photo, context: {count: Long} };"
+    },
+    "action": {
+      "type": "Action",
+      "id": "view"
+    }
+  },
+  {
+    "name": "context validate unknown action",
+    "operation": "context_validate",
+    "context": {
+      "count": 3
+    },
+    "schema": {
+      "format": "cedar",
+      "text": "entity User; entity Photo; action \"view\" appliesTo { principal: User, resource: Photo, context: {count: Long} };"
+    },
+    "action": {
+      "type": "Action",
+      "id": "missing"
+    }
+  },
+  {
+    "name": "scope valid",
+    "operation": "scope_validate",
+    "schema": {
+      "format": "cedar",
+      "text": "entity User; entity Photo; action \"view\" appliesTo { principal: User, resource: Photo, context: {count: Long} };"
+    },
+    "principal": {
+      "type": "User",
+      "id": "alice"
+    },
+    "action": {
+      "type": "Action",
+      "id": "view"
+    },
+    "resource": {
+      "type": "Photo",
+      "id": "p"
+    }
+  },
+  {
+    "name": "scope wrong principal",
+    "operation": "scope_validate",
+    "schema": {
+      "format": "cedar",
+      "text": "entity User; entity Photo; action \"view\" appliesTo { principal: User, resource: Photo, context: {count: Long} };"
+    },
+    "principal": {
+      "type": "Photo",
+      "id": "alice"
+    },
+    "action": {
+      "type": "Action",
+      "id": "view"
+    },
+    "resource": {
+      "type": "Photo",
+      "id": "p"
+    }
+  },
+  {
+    "name": "scope wrong resource",
+    "operation": "scope_validate",
+    "schema": {
+      "format": "cedar",
+      "text": "entity User; entity Photo; action \"view\" appliesTo { principal: User, resource: Photo, context: {count: Long} };"
+    },
+    "principal": {
+      "type": "User",
+      "id": "alice"
+    },
+    "action": {
+      "type": "Action",
+      "id": "view"
+    },
+    "resource": {
+      "type": "User",
+      "id": "p"
+    }
+  },
+  {
+    "name": "scope unknown action",
+    "operation": "scope_validate",
+    "schema": {
+      "format": "cedar",
+      "text": "entity User; entity Photo; action \"view\" appliesTo { principal: User, resource: Photo, context: {count: Long} };"
+    },
+    "principal": {
+      "type": "User",
+      "id": "alice"
+    },
+    "action": {
+      "type": "Action",
+      "id": "missing"
+    },
+    "resource": {
+      "type": "Photo",
+      "id": "p"
+    }
+  },
+  {
+    "name": "confusable empty",
+    "operation": "confusables",
+    "policies": {
+      "format": "cedar",
+      "text": ""
+    }
+  },
+  {
+    "name": "confusable plain",
+    "operation": "confusables",
+    "policies": {
+      "format": "cedar",
+      "text": "permit(principal, action, resource) when { \"plain\" == \"plain\" };"
+    }
+  },
+  {
+    "name": "confusable static and template",
+    "operation": "confusables",
+    "policies": {
+      "format": "cedar",
+      "text": "permit(principal, action, resource) when { \"aа\" == \"aа\" }; permit(principal == ?principal, action, resource) when { \"aа\" == \"aа\" };"
+    }
+  },
+  {
+    "name": "language version",
+    "operation": "language_version"
+  },
+  {
+    "name": "confusable JSON empty policy ID",
+    "operation": "confusables",
+    "policies": {
+      "format": "json",
+      "text": "{\"templates\":{},\"staticPolicies\":{\"\":{\"effect\":\"permit\",\"principal\":{\"op\":\"All\"},\"action\":{\"op\":\"All\"},\"resource\":{\"op\":\"All\"},\"conditions\":[{\"kind\":\"when\",\"body\":{\"==\":{\"left\":{\"Value\":\"aа\"},\"right\":{\"Value\":\"aа\"}}}}]}},\"templateLinks\":[]}"
+    }
+  },
+  {
+    "name": "confusable JSON control policy ID",
+    "operation": "confusables",
+    "policies": {
+      "format": "json",
+      "text": "{\"templates\":{},\"staticPolicies\":{\"quote\\\"\\nslash\\\\\\u0000雪\":{\"effect\":\"permit\",\"principal\":{\"op\":\"All\"},\"action\":{\"op\":\"All\"},\"resource\":{\"op\":\"All\"},\"conditions\":[{\"kind\":\"when\",\"body\":{\"==\":{\"left\":{\"Value\":\"aа\"},\"right\":{\"Value\":\"aа\"}}}}]}},\"templateLinks\":[]}"
+    }
+  }
+]

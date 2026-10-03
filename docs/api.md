@@ -401,6 +401,57 @@ The result uses semantic Cedar JSON. Comments and source spacing are not part
 of this representation. Run `Validate` if replacements can change schema
 validity. Source, memory, response, and caller-context limits apply.
 
+## Context, request, and name utilities
+
+Context operations use native Cedar parsing and require a `Runtime`.
+`Context.Values(ctx, rt)` returns every attribute as an `EvalRecord`.
+`Context.Get(ctx, rt, key)` returns a value, a presence flag, and an error.
+A missing attribute returns `nil`, `false`, and no error.
+Readback preserves exact signed 64-bit integers, entity identities, nested values, and extension values.
+
+`Context.Merge(ctx, rt, other)` returns a new context containing both records.
+The operation rejects every overlapping top-level key, including keys with equal values.
+It performs no recursive merge and preserves both inputs.
+An empty context acts as the merge identity.
+The returned context uses native Cedar JSON value encoding.
+
+```go
+base := cedar.NewContext(cedar.Record{"count": cedar.Long(1)})
+extra := cedar.NewContext(cedar.Record{"enabled": cedar.Bool(true)})
+merged, err := base.Merge(ctx, rt, extra)
+if err != nil {
+    return err
+}
+count, found, err := merged.Get(ctx, rt, "count")
+```
+
+`Context.Validate(ctx, rt, schema, action)` checks an existing context against the action's schema.
+It parses without schema inference, then invokes native context validation.
+Use explicit `__entity` and `__extn` encodings when you supply raw context JSON.
+`Runtime.ValidateScopeVariables` checks principal, action, and resource independently of context.
+Both checks already occur when authorization constructs a schema-validated request.
+These methods let callers check each part before authorization.
+Context failures return `KindContext`; scope failures return `KindRequest`.
+
+`Runtime.ConfusableStrings(ctx, policies)` returns warnings without requiring a schema.
+It checks static policies and templates for native Cedar confusable-string warnings.
+Warnings retain raw policy IDs, native categories, and warning severity.
+Cedar policy inputs include native source spans. JSON policy inputs omit spans from temporary parser sources.
+Linked policies share their template's source and do not duplicate its warnings.
+`Runtime.Validate` already includes these checks with its schema-based policy validation.
+These warnings describe confusing text; they do not grant or deny access.
+
+`Runtime.ParseEntityUID(ctx, text)` parses Cedar's normalized UID syntax.
+`EntityUID.CedarText(ctx, rt)` renders that syntax with native Cedar escapes.
+Use `CedarText` for text that you must parse again.
+`EntityUID.String` remains a Go-quoted log representation; some escapes differ from Cedar.
+Invalid UID text or types return `KindEntityUID`.
+Invalid UTF-8 returns `KindInput` before guest execution.
+
+`Runtime.LanguageVersion(ctx)` returns the native Cedar language version, currently `4.5.0`.
+The language version differs from the pinned Cedar SDK version, `4.13.0`.
+Runtime source, memory, response, and caller context limits apply to every utility operation.
+
 ## Standalone expressions
 
 `Runtime.ParseExpression` parses a Cedar expression. `ParseRestrictedExpression`

@@ -136,6 +136,7 @@ The `cedar` package contains these Go fuzz targets:
 | `FuzzFormatPolicies` | Policy/template text and layout options, malformed UTF-8, errors, idempotence, and decision preservation |
 | `FuzzEntityLiteralSubstitution` | Native simultaneous substitutions, successful reparse and inspection, malformed source and targets |
 | `FuzzEvalResult` | Decode typed expression results; reject malformed variants and preserve integer precision |
+| `FuzzNativeUIDRoundTrip` | Native UID render/parse equality for arbitrary valid UTF-8 identifiers; reject malformed UTF-8 |
 | `FuzzUTF8Values` | Reject malformed UTF-8; preserve valid identity bytes, values, and record keys during JSON encoding |
 
 Each target rejects unexpected module faults; authorization errors must return
@@ -376,3 +377,20 @@ The opaque snapshot records direct parents from the native AST.
 A chain deletion fixture detects accidental reconstruction from transitive normalized JSON.
 The mutation fuzz target changes an isolated graph component.
 It then checks that an unrelated authorization decision stays unchanged.
+
+### Context, request, and name utilities
+
+`testdata/parity/utilities` records results from direct native Cedar operations.
+The fixtures cover UID parsing, native escapes, typed context readback, merge errors, context validation, scope validation, confusable warnings, and language metadata.
+Confusable tests check structured warnings, raw policy IDs, and omitted spans for JSON policy inputs.
+Malformed warning categories, severity, and source spans fail response decoding.
+Regenerate these fixtures with `scripts/utility-parity.sh --write`.
+`TestUtilityNativeFixtures` compares the Wasm results against every native result.
+The comparison preserves JSON integer text instead of converting integers to floating-point values.
+
+`TestNativeUIDRoundTripProperty` checks native render/parse equality and stable normalized text.
+`TestContextMergeContract` checks duplicate rejection, nested-value preservation, unchanged inputs, extensions, and the empty-context identity.
+`TestContextMergeDisjointProperty` checks arbitrary integer and string values after a disjoint merge.
+`TestUtilityReadbackExactIntegers` checks readback and merge with integers beyond floating-point precision and both signed 64-bit bounds.
+`TestUtilityContextInputProtocol` checks missing fields, unexpected fields, and explicit null context values.
+`TestUtilityPreflight` checks UTF-8 rejection and source limits before guest execution.

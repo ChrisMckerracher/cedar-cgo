@@ -22,6 +22,7 @@ mod policies;
 mod schemas;
 mod slicing;
 mod templates;
+mod utilities;
 
 cgw_abi::export_memory_functions!();
 
@@ -318,4 +319,14 @@ pub unsafe extern "C" fn cgw_applicability(ptr: u32, len: u32) -> u64 {
 pub unsafe extern "C" fn cgw_schemas(ptr: u32, len: u32) -> u64 {
     // SAFETY: the caller transfers the allocated input buffer.
     run(unsafe { take_input(ptr, len) }, schemas::execute)
+}
+
+/// Runs native context, request, UID, and language utilities.
+///
+/// # Safety
+/// `ptr` and `len` must come from one `cgw_alloc(len)` call.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn cgw_utilities(ptr: u32, len: u32) -> u64 {
+    // SAFETY: the host passes a buffer from `cgw_alloc(len)`.
+    run(unsafe { take_input(ptr, len) }, utilities::execute)
 }

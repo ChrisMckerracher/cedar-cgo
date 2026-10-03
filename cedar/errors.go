@@ -11,6 +11,7 @@ type ErrorKind string
 
 // Kinds distinguish Cedar input errors from bridge resource and protocol failures.
 const (
+	KindEntityUID  ErrorKind = "entity_uid" // A standalone entity UID does not parse.
 	KindExpression ErrorKind = "expression" // Expression parsing or evaluation failed.
 	KindSchema     ErrorKind = "schema"     // The schema does not parse.
 	KindPolicies   ErrorKind = "policies"   // Policy parsing, editing, or TPE validation failed.
@@ -58,7 +59,7 @@ func limitError(what string, n, limit int) *Error {
 // Unknown guest error kinds are faults so the instance cannot return to the pool.
 func moduleError(w *wire.Error) *Error {
 	switch k := ErrorKind(w.Kind); k {
-	case KindExpression, KindSchema, KindPolicies, KindEntities, KindContext, KindRequest,
+	case KindEntityUID, KindExpression, KindSchema, KindPolicies, KindEntities, KindContext, KindRequest,
 		KindPrincipal, KindAction, KindResource, KindInput, KindSlicing:
 		return &Error{Kind: k, Message: w.Message}
 	}
