@@ -137,6 +137,7 @@ The `cedar` package contains these Go fuzz targets:
 | `FuzzEntityLiteralSubstitution` | Native simultaneous substitutions, successful reparse and inspection, malformed source and targets |
 | `FuzzEvalResult` | Decode typed expression results; reject malformed variants and preserve integer precision |
 | `FuzzNativeUIDRoundTrip` | Native UID render/parse equality for arbitrary valid UTF-8 identifiers; reject malformed UTF-8 |
+| `FuzzSourceTokenSpans` | Native lexer results, valid byte spans, exact source reconstruction, and malformed UTF-8 rejection |
 | `FuzzUTF8Values` | Reject malformed UTF-8; preserve valid identity bytes, values, and record keys during JSON encoding |
 
 Each target rejects unexpected module faults; authorization errors must return
@@ -439,3 +440,20 @@ Go tests compare the mapped JSON and verify authorization after full-set JSON re
 The randomized set property checks the same authorization result across both source forms.
 Special expression fixtures verify the residual error, unknown, and slot mappings.
 Regenerate them with `scripts/pst-parity.sh --write`.
+
+### Source tokens and comment preservation
+
+`testdata/parity/source-tokens` records native formatter lexer results.
+The fixtures cover comments, annotations, Unicode, CRLF, slots, operators, incomplete grammar, and lexical errors.
+Regenerate these fixtures with `scripts/source-token-parity.sh --write`.
+`TestSourceTokenNativeFixtures` compares every token, byte span, and comment summary against the native result.
+
+`TestSourceTokensPreserveCommentsAndSpacing` reconstructs the original source, then replaces one entity ID token.
+The edit preserves every other source byte, including comments and spacing.
+The test reparses the result and compares authorization through the edited source and its semantic JSON representation.
+`TestSourceTokensSeparateLexingFromValidation` checks incomplete grammar and malformed lexical input.
+`TestMalformedSourceTokenResponses` rejects invalid spans, overlapping tokens, source mismatches, and spans that split UTF-8.
+Comment-field tests reject missing or null strings and null array entries.
+Lexical response tests reject omitted tokens, incorrect token kinds, and truncated native tokens.
+Native spelling tests preserve Unicode whitespace, lone-CR comments, raw string line breaks, and unsupported semantic escapes.
+`TestSourceTokenPreflight` checks input encoding and source limits before guest execution.

@@ -422,6 +422,51 @@ The result uses semantic Cedar JSON. Comments and source spacing are not part
 of this representation. Run `Validate` if replacements can change schema
 validity. Source, memory, response, and caller-context limits apply.
 
+## Source tokens and comment preservation
+
+`Runtime.TokenizePolicies(ctx, text)` uses the pinned Cedar formatter lexer.
+It returns `SourceTokens` containing native tokens, comment summaries, and UTF-8 byte spans.
+`TokenSpan.Start` is the first byte offset.
+`TokenSpan.End` is the byte offset immediately after the token.
+Each token's `Text` exactly matches that source range.
+The decoder checks native lexical spelling, complete token coverage, and comment attachment.
+
+`SourceToken.Kind` is `identifier`, `number`, or `string` for those token variants.
+For other variants, the kind is the native token spelling, such as `permit`, `?principal`, or `==`.
+Whitespace and comments are not separate tokens.
+`LeadingComments`, `TrailingComment`, and final `TrailingComments` use the formatter's trimmed comment summaries.
+These summaries omit original indentation and trailing spaces.
+
+Keep the original source to preserve every byte of comments, line endings, and spacing.
+The ranges between tokens contain those original bytes.
+Apply an edit to one token range, then lex the changed source again.
+Old spans belong to the previous source snapshot.
+
+```go
+stream, err := rt.TokenizePolicies(ctx, source)
+if err != nil {
+    return err
+}
+for _, token := range stream.Tokens {
+    if token.Kind == "string" && token.Text == `"old"` {
+        source = source[:token.Span.Start] + `"new"` + source[token.Span.End:]
+        break
+    }
+}
+parsed, err := rt.ParsePolicySet(ctx, cedar.PoliciesFromCedar(source))
+```
+
+Lexing does not validate policy grammar or policy semantics.
+An incomplete source such as `permit(` can produce tokens.
+An invalid lexical character returns `KindPolicies` and no token stream.
+Use `ParsePolicySet` and schema-based `Validate` for the existing semantic checks.
+
+Source spans support comment-preserving editor operations; they do not replace the semantic JSON path.
+Parsed policy JSON remains the semantic authority for identity, templates, links, and authorization.
+JSON-based edits do not retain original comments or spacing.
+After a source edit, reparse it before you use the resulting policy JSON.
+Runtime source, memory, response, and caller context limits apply.
+
 ## Context, request, and name utilities
 
 Context operations use native Cedar parsing and require a `Runtime`.

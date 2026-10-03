@@ -1,0 +1,46 @@
+[
+  {
+    "name": "empty",
+    "text": ""
+  },
+  {
+    "name": "whitespace",
+    "text": " \t\r\n  "
+  },
+  {
+    "name": "comment only",
+    "text": "  // 雪 😀  \r\n\t// final  "
+  },
+  {
+    "name": "comments annotations unicode",
+    "text": "// leading 雪\n@note(\"😀\") // annotation comment\npermit(\n  principal == NS::User::\"old\", // identity comment\n  action, resource\n) when { \"雪\" == \"雪\" }; // final token comment\n// end comment  \n"
+  },
+  {
+    "name": "crlf",
+    "text": "// heading\r\npermit(principal,\r\n action, resource);\t// trailing\r\n// last\r\n"
+  },
+  {
+    "name": "slots and operators",
+    "text": "permit(principal == ?principal, action in [Action::\"view\"], resource == ?resource) when { !(1+2*3/4%5-6 <= 7) || context.a != true && resource is Photo };"
+  },
+  {
+    "name": "string escapes",
+    "text": "@note(\"\\u{1f600}\\n\") permit(principal, action, resource) when { \"// literal\" like \"*\" };"
+  },
+  {
+    "name": "semantic error still lexes",
+    "text": "permit("
+  },
+  {
+    "name": "lexical invalid character",
+    "text": "permit(principal, action, resource) $;"
+  },
+  {
+    "name": "lexical unterminated string",
+    "text": "permit(principal == User::\"unterminated, action, resource);"
+  },
+  {
+    "name": "unicode identifier rejected",
+    "text": "permit(principal, action, resource) when { context.雪 == true };"
+  }
+]

@@ -102,7 +102,7 @@ jobs:
           go-version: "1.27.x"
       - name: Fuzz each target for 60 seconds
         run: |
-          for target in FuzzAuthorize FuzzPolicies FuzzEntities FuzzBatchedEntities FuzzBatchedDifferential FuzzSliceEntities FuzzPolicySyntax FuzzPolicyEdits FuzzTemplates FuzzPartialEntities FuzzPartialReauthorize FuzzFormatPolicies FuzzUTF8Values FuzzEvalResult FuzzEntityLiteralSubstitution FuzzDiagnostics FuzzSchemaFragments FuzzEntityStoreUnrelatedDecisions FuzzNativeUIDRoundTrip FuzzResidualImport; do
+          for target in FuzzAuthorize FuzzPolicies FuzzEntities FuzzBatchedEntities FuzzBatchedDifferential FuzzSliceEntities FuzzPolicySyntax FuzzPolicyEdits FuzzTemplates FuzzPartialEntities FuzzPartialReauthorize FuzzFormatPolicies FuzzUTF8Values FuzzEvalResult FuzzEntityLiteralSubstitution FuzzDiagnostics FuzzSchemaFragments FuzzEntityStoreUnrelatedDecisions FuzzNativeUIDRoundTrip FuzzResidualImport FuzzSourceTokenSpans; do
             go test -run '^$' -fuzz "^$target\$" -fuzztime 60s ./cedar
           done
 
@@ -207,6 +207,11 @@ jobs:
           set -euo pipefail
           cargo clippy --manifest-path rust/Cargo.toml --locked --release -p cgw-authorizer --example pst_fixtures -- -D warnings
           scripts/pst-parity.sh --check
+      - name: Native source token parity and lint
+        run: |
+          set -euo pipefail
+          cargo clippy --manifest-path rust/Cargo.toml --locked --release -p cgw-authorizer --example source_token_fixtures -- -D warnings
+          scripts/source-token-parity.sh --check
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cargo/bin/cargo-deny
