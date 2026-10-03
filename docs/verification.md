@@ -496,3 +496,53 @@ It also rejects missing results, incomplete environment types, and incomplete er
 An explicit empty result list remains valid for a schema with no request environments.
 Native fixtures check real error evidence with empty policy IDs and IDs containing quotes, newlines, backslashes, and NUL.
 The Go comparison preserves those raw IDs and compares native error messages.
+
+### Compiled analysis sessions
+
+Native session tests cover environment selection, handle ownership, monotonic IDs, release, and the 128-handle limit.
+They also check repeated native queries and solver-fault invalidation.
+Go tests check blocked solver reads, active timeouts, queued cancellation, malformed responses, and foreign handles.
+Session creation rejects missing or null action ID fields, while preserving explicit empty IDs.
+Malformed environment responses close the solver and invalidate the session.
+Malformed error records also invalidate the session; complete compilation errors leave it usable.
+Mixed success/error envelopes, nested report errors, and invalid UTF-8 replies close both session resources.
+Delayed solver startup tests preserve cancellation and late cleanup errors through construction and analyzer closure.
+Real CVC5 tests cancel 100 session lifetimes and require successful resource cleanup.
+Deterministic process tests cover cancellation, deadlines, wrapped cleanup errors, and repeated waits.
+Solver cleanup suppresses a direct cancellation error only when the process exits successfully.
+Wrapped cancellation errors and other cleanup errors remain observable.
+Run these ownership tests with `go test -race ./analysis -run '^TestCompiled'`.
+
+The cvc5-gated integration tests compare compiled checks with stateless checks.
+They replay returned counterexamples through the concrete authorization runtime.
+They check one solver start across repeated compiled calls and cleanup after analyzer closure.
+The output-limit test verifies whole-session invalidation.
+
+`BenchmarkRepeatedEquivalent` compares repeated equivalence checks through both APIs.
+Its policies use `context.n < 0` and `context.n <= -1` under one schema environment.
+The compiled benchmark excludes session creation and compilation, and performs one warm-up check.
+Run `go test ./analysis -run '^$' -bench '^BenchmarkRepeatedEquivalent$' -benchmem -benchtime=10x` with CVC5 set.
+Record timings, allocations, tool versions, and iterations with the final module artifacts.
+The final native preflight passed four session tests and all 26 query fixtures.
+The normal CVC5 guest suite passed in 108.482 seconds.
+The lifetime guest test also passed twice under the race detector in 91.318 seconds.
+
+The final artifact measurement used three samples with ten iterations each on 2026-10-03 at 06:43 UTC.
+It used Linux/amd64, an AMD Ryzen 5 5600X, Go 1.27.1, Rust 1.99.0, and cvc5 1.3.1.
+The analysis guest SHA-256 was `8a9598239fbc7f23969ac613098e7489ab89ffb86379504cb1136b8f3ea031cd`.
+The authorizer guest SHA-256 was `9ef3546a6aff09c3e69ac600f7640e1a6899d23bd0bf97fa5e2e42805e9a511e`.
+Analyzer construction was excluded from both paths.
+The compiled path also excluded session creation, handle compilation, and one warm-up check.
+
+| Path | Sample | Time per check | Bytes per check | Allocations per check |
+| --- | --- | --- | --- | --- |
+| Stateless | 1 | 32.11 ms | 20,539,621 | 5,810 |
+| Stateless | 2 | 35.34 ms | 20,537,971 | 5,806 |
+| Stateless | 3 | 29.89 ms | 20,536,812 | 5,803 |
+| Compiled | 1 | 2.41 ms | 13,616 | 69 |
+| Compiled | 2 | 2.55 ms | 13,808 | 70 |
+| Compiled | 3 | 2.31 ms | 13,617 | 69 |
+
+The stateless median was 32.11 ms; the compiled median was 2.41 ms.
+The compiled median was 13.31 times faster for these inputs.
+These short samples do not establish performance for other schemas or policies.

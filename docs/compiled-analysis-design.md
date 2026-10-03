@@ -75,3 +75,21 @@ Test cancellation while waiting and during an active solver call.
 Test session and analyzer closure, output limits, malformed responses, and ordinary compilation failures.
 Measure repeated checks with a benchmark after excluding initial session creation and compilation.
 Record benchmark input, tool versions, iterations, timings, and allocations.
+
+## Implementation refinement
+
+The Go call gate covers resource construction as well as regular calls.
+Register a session before construction so analyzer closure can cancel pending solver startup.
+Cancel the session lifetime and close its solver before waiting for the guest call gate.
+This order unblocks an active host read before guest cleanup.
+Each native check retains the original policies and uses the existing concrete replay helper.
+Native solver failures also discard the native session state.
+Go rejects non-monotonic returned handle IDs, including IDs of released handles.
+Cache one native default `SymEnv` for each selected request environment.
+All handles compile with clones of those terms and share the same symbolic request variables.
+`CompiledSchema::sym_env` preserves the native default environment contract.
+Tests compare the cached environment with `SymEnv::new` and compare distinct conditional policies.
+Host transport faults invalidate the session before ordinary native errors are processed.
+Response envelopes contain one success field or one complete error record.
+Go rejects invalid UTF-8 and error fields inside compiled reports before decoding results.
+Late solver cleanup errors join construction errors and remain available to analyzer closure.

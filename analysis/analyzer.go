@@ -9,16 +9,22 @@ import (
 	analysismodule "github.com/ChrisMckerracher/cedar-go-wasm/internal/modules/analysis"
 	"github.com/ChrisMckerracher/cedar-go-wasm/internal/wasmhost"
 	"github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	"sync"
 	"time"
 )
 
-// Analyzer is safe for concurrent use; each call owns its instance and solver session.
+// Analyzer supports concurrent stateless calls and explicitly owned compiled sessions.
 type Analyzer struct {
 	module          *wasmhost.Module
 	solver          Solver
 	timeout         time.Duration
 	maxSourceBytes  int
 	maxSolverOutput int64
+	mu              sync.Mutex
+	sessions        map[*CompiledSession]struct{}
+	closed          bool
+	closeOnce       sync.Once
+	closeErr        error
 }
 
 // New enforces integrity and capability checks before any guest execution.
@@ -43,7 +49,7 @@ func New(ctx context.Context, solver Solver, opts ...Option) (*Analyzer, error) 
 		Cache:            cfg.cache,
 		AllowedImports:   analysisImports,
 		HostModules:      defineHostModule,
-		Exports:          []string{"cgw_analyze"},
+		Exports:          []string{"cgw_analyze", "cgw_compiled"},
 	})
 	if err != nil {
 		return nil, fmt.Errorf("analysis: %w", err)
@@ -57,7 +63,24 @@ func New(ctx context.Context, solver Solver, opts ...Option) (*Analyzer, error) 
 	}, nil
 }
 
-func (a *Analyzer) Close(ctx context.Context) error { return a.module.Close(ctx) }
+func (a *Analyzer) Close(ctx context.Context) error {
+	a.closeOnce.Do(func() {
+		a.mu.Lock()
+		a.closed = true
+		sessions := make([]*CompiledSession, 0, len(a.sessions))
+		for session := range a.sessions {
+			sessions = append(sessions, session)
+		}
+		a.mu.Unlock()
+		for _, session := range sessions {
+			a.closeErr = errors.Join(a.closeErr, session.Close())
+		}
+		if a.module != nil {
+			a.closeErr = errors.Join(a.closeErr, a.module.Close(ctx))
+		}
+	})
+	return a.closeErr
+}
 
 func ModuleSHA256() string { return analysismodule.SHA256 }
 

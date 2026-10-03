@@ -140,6 +140,11 @@ jobs:
           cargo clippy --locked --release --target wasm32-wasip1 -p cgw-abi -p cgw-authorizer -p cgw-analysis -- -D warnings
           cargo clippy --locked --release -p cgw-native-bench -- -D warnings
           cargo clippy --locked --release -p cgw-authorizer --example template_fixtures -- -D warnings
+      - name: Native compiled analysis session checks
+        run: |
+          set -euo pipefail
+          cargo clippy --manifest-path rust/Cargo.toml --locked --release -p cgw-analysis --tests -- -D warnings
+          cargo test --manifest-path rust/Cargo.toml --locked --release -p cgw-analysis --lib
       - name: Native SymCC query oracle lint
         run: cargo clippy --manifest-path rust/Cargo.toml --locked --release -p cgw-analysis --example analysis_queries -- -D warnings
       - name: Verify native slicing fixtures

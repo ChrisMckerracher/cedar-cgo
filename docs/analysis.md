@@ -125,6 +125,67 @@ such as a `Long` of 2^63−1 or a datetime before 1970. A successful property
 result depends on SymCC's encoding and the solver's `unsat` answer; see
 [Verification](verification.md#upstream-assurance).
 
+## Reuse compiled policy sets
+
+`Analyzer.OpenCompiled(ctx, schema, selection)` creates a reusable `CompiledSession`.
+The constructor context controls the whole session lifetime.
+Pass nil to select all schema request environments.
+Pass an explicit list to select particular environments.
+An empty list selects none.
+Duplicate and unknown environments fail.
+`Environments()` returns a copy of the native selection.
+
+```go
+session, err := analyzer.OpenCompiled(ctx, schema, nil)
+if err != nil {
+    return err
+}
+defer session.Close()
+first, err := session.Compile(ctx, before)
+if err != nil {
+    return err
+}
+second, err := session.Compile(ctx, after)
+if err != nil {
+    return err
+}
+report, err := session.Equivalent(ctx, first, second)
+if err != nil {
+    return err
+}
+fmt.Println(report.Holds())
+```
+
+`Compile` creates native compiled sets once for every selected environment.
+The native session retains the original policies for concrete counterexample replay.
+`Equivalent`, `Implies`, and `Disjoint` reuse those sets and the same solver transport.
+Their `Report` and `Counterexample` types match the stateless API.
+`Implies(first, second)` checks whether every request allowed by the first set is also allowed by the second.
+
+Handles belong to one session.
+`Release(ctx, handle)` removes a handle's native data.
+Foreign, zero, and released handles fail before guest execution.
+Native handle IDs increase and are never reused within a session.
+Each session supports 128 active handles.
+The analyzer's source, response, memory, and solver-output limits still apply.
+
+Calls use an exclusive gate.
+A canceled caller that waits for the gate leaves the active call and solver unchanged.
+The analyzer timeout starts after the caller acquires the gate.
+An active cancellation or timeout closes the solver and invalidates the entire session.
+A solver failure, guest fault, or malformed response also invalidates it.
+Create a new session after these failures.
+Ordinary input or compilation errors preserve the session.
+
+`Close` interrupts an active call and releases all session resources.
+`Analyzer.Close` also closes its compiled sessions.
+Custom solver transports must unblock active reads and writes when `Close` runs.
+Stateless calls continue to create their own instances and solver transports.
+
+The [ownership design](compiled-analysis-design.md) records the API scope before implementation.
+Raw symbolic terms, custom assertions, and custom symbolic environments remain native internals.
+Their upstream contracts need additional validation and concrete replay rules before public exposure.
+
 ## Configure the analyzer
 
 `Analyzer` is safe for concurrent use. Each call creates and closes its own

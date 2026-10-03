@@ -10,8 +10,11 @@ use cgw_abi::{OpError, Source, parse_input, parse_policies, parse_schema, run, t
 use serde::{Deserialize, Serialize};
 use std::io::{BufRead, BufReader, Read};
 
+mod sessions;
+
 cgw_abi::export_memory_functions!();
 
+#[cfg(not(test))]
 #[link(wasm_import_module = "cgw_host")]
 unsafe extern "C" {
     /// Returns 0 on success or a negative value on error.
@@ -19,6 +22,48 @@ unsafe extern "C" {
     /// Returns at most `cap` bytes, 0 at EOF, or a negative value on error.
     fn solver_read(ptr: *mut u8, cap: u32) -> i32;
 }
+
+#[cfg(test)]
+mod test_solver {
+    use std::cell::RefCell;
+    use std::collections::VecDeque;
+    thread_local! { static REPLIES:RefCell<Option<VecDeque<u8>>>=const {RefCell::new(None)}; }
+    pub fn set_unsat(enabled: bool) {
+        REPLIES.with(|s| *s.borrow_mut() = enabled.then(VecDeque::new));
+    }
+    pub unsafe fn write(ptr: *const u8, len: u32) -> i32 {
+        // SAFETY: HostSolver supplies a valid input buffer.
+        let input = unsafe { std::slice::from_raw_parts(ptr, len as usize) };
+        REPLIES.with(|s| {
+            let mut state = s.borrow_mut();
+            let Some(replies) = state.as_mut() else {
+                return -1;
+            };
+            if input.windows(11).any(|part| part == b"(check-sat)") {
+                replies.extend(b"unsat\n");
+            }
+            0
+        })
+    }
+    pub unsafe fn read(ptr: *mut u8, cap: u32) -> i32 {
+        REPLIES.with(|s| {
+            let mut state = s.borrow_mut();
+            let Some(replies) = state.as_mut() else {
+                return -1;
+            };
+            let count = (cap as usize).min(replies.len());
+            for index in 0..count {
+                // SAFETY: HostReader supplies a valid output buffer of at least cap bytes.
+                unsafe {
+                    ptr.add(index).write(replies.pop_front().unwrap());
+                }
+            }
+            count as i32
+        })
+    }
+}
+#[cfg(test)]
+use test_solver::{read as solver_read, write as solver_write};
 
 struct HostReader;
 
@@ -510,4 +555,14 @@ fn analyze(bytes: &[u8]) -> Result<AnalyzeOutput, OpError> {
 pub unsafe extern "C" fn cgw_analyze(ptr: u32, len: u32) -> u64 {
     // SAFETY: the host passes a buffer from `cgw_alloc(len)`.
     run(unsafe { take_input(ptr, len) }, analyze)
+}
+
+/// Reuses native policy compilation and one solver transport within an instance.
+///
+/// # Safety
+/// `ptr` and `len` must come from one `cgw_alloc(len)` call.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn cgw_compiled(ptr: u32, len: u32) -> u64 {
+    // SAFETY: the host passes a buffer from `cgw_alloc(len)`.
+    run(unsafe { take_input(ptr, len) }, sessions::execute)
 }
