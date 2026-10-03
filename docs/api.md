@@ -352,6 +352,14 @@ level and uses Cedar 4.13.0's stable level validation API. Experimental upstream
 permissive and partial validation modes remain outside this API. Both methods
 return the same diagnostics and use the same context and resource limits.
 
+## Full policy and template shape
+
+`ParsedPolicy.JSON`, `TemplateInfo.JSON`, and `ParsedPolicySet.JSON` expose the full ordinary JSON EST shape.
+They cover templates, links, slots, annotations, scope constraints, conditions, and expressions.
+The [PST mapping](pst-mapping.md) lists each native form and its JSON representation.
+Use full-set JSON to preserve policy IDs and template links.
+The versioned residual projection uses the same per-policy expression mapping.
+
 ## Structured residual export
 
 `PartialResponse.Projection()` exposes versioned native PST through Cedar's JSON EST mapping.

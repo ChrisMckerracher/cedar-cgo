@@ -1,0 +1,664 @@
+[
+  {
+    "name": "effects annotations and clause order",
+    "policies": "@note(\"雪\") permit(principal, action, resource) when {context.flag} unless {resource.private}; forbid(principal, action, resource) when {!context.flag};",
+    "entities": [
+      {
+        "uid": {
+          "type": "User",
+          "id": "alice"
+        },
+        "attrs": {
+          "name": "雪photo.jpg",
+          "profile": {
+            "active": true,
+            "name": "雪"
+          },
+          "score": 4
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "staff"
+          }
+        ],
+        "tags": {
+          "team": "blue"
+        }
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "staff"
+        },
+        "attrs": {},
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Photo",
+          "id": "one"
+        },
+        "attrs": {
+          "private": false
+        },
+        "parents": [],
+        "tags": {
+          "env": "prod"
+        }
+      }
+    ],
+    "requests": [
+      {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "one"
+        },
+        "context": {
+          "flag": true,
+          "n": 4
+        }
+      },
+      {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "one"
+        },
+        "context": {
+          "flag": false,
+          "n": 4
+        }
+      }
+    ]
+  },
+  {
+    "name": "all scope forms and action sets",
+    "policies": "permit(principal is User in Group::\"staff\", action in [Action::\"view\", Action::\"edit\"], resource == Photo::\"one\"); permit(principal == User::\"alice\", action == Action::\"view\", resource is Photo); forbid(principal in Group::\"staff\", action in [], resource in Photo::\"missing\");",
+    "entities": [
+      {
+        "uid": {
+          "type": "User",
+          "id": "alice"
+        },
+        "attrs": {
+          "name": "雪photo.jpg",
+          "profile": {
+            "active": true,
+            "name": "雪"
+          },
+          "score": 4
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "staff"
+          }
+        ],
+        "tags": {
+          "team": "blue"
+        }
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "staff"
+        },
+        "attrs": {},
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Photo",
+          "id": "one"
+        },
+        "attrs": {
+          "private": false
+        },
+        "parents": [],
+        "tags": {
+          "env": "prod"
+        }
+      }
+    ],
+    "requests": [
+      {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "one"
+        },
+        "context": {
+          "flag": true,
+          "n": 4
+        }
+      },
+      {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "one"
+        },
+        "context": {
+          "flag": false,
+          "n": 4
+        }
+      }
+    ]
+  },
+  {
+    "name": "template slots links and annotations",
+    "policies": "@note(\"雪\") permit(principal == ?principal, action, resource == ?resource) when {context.flag};",
+    "links": [
+      {
+        "template_id": "policy0",
+        "id": "linked雪",
+        "values": {
+          "?principal": {
+            "type": "User",
+            "id": "alice"
+          },
+          "?resource": {
+            "type": "Photo",
+            "id": "one"
+          }
+        }
+      }
+    ],
+    "entities": [
+      {
+        "uid": {
+          "type": "User",
+          "id": "alice"
+        },
+        "attrs": {
+          "name": "雪photo.jpg",
+          "profile": {
+            "active": true,
+            "name": "雪"
+          },
+          "score": 4
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "staff"
+          }
+        ],
+        "tags": {
+          "team": "blue"
+        }
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "staff"
+        },
+        "attrs": {},
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Photo",
+          "id": "one"
+        },
+        "attrs": {
+          "private": false
+        },
+        "parents": [],
+        "tags": {
+          "env": "prod"
+        }
+      }
+    ],
+    "requests": [
+      {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "one"
+        },
+        "context": {
+          "flag": true,
+          "n": 4
+        }
+      },
+      {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "one"
+        },
+        "context": {
+          "flag": false,
+          "n": 4
+        }
+      }
+    ]
+  },
+  {
+    "name": "arithmetic comparison logical and conditionals",
+    "policies": "permit(principal, action, resource) when {if context.flag then (-(context.n) + 2 * 3 - 1 >= 0 && context.n < 9223372036854775807 && context.n <= 4 && context.n != 3 && 5 > context.n) else (false || context.n == 1)};",
+    "entities": [
+      {
+        "uid": {
+          "type": "User",
+          "id": "alice"
+        },
+        "attrs": {
+          "name": "雪photo.jpg",
+          "profile": {
+            "active": true,
+            "name": "雪"
+          },
+          "score": 4
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "staff"
+          }
+        ],
+        "tags": {
+          "team": "blue"
+        }
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "staff"
+        },
+        "attrs": {},
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Photo",
+          "id": "one"
+        },
+        "attrs": {
+          "private": false
+        },
+        "parents": [],
+        "tags": {
+          "env": "prod"
+        }
+      }
+    ],
+    "requests": [
+      {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "one"
+        },
+        "context": {
+          "flag": true,
+          "n": 4
+        }
+      },
+      {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "one"
+        },
+        "context": {
+          "flag": false,
+          "n": 4
+        }
+      }
+    ]
+  },
+  {
+    "name": "records sets attributes patterns and tags",
+    "policies": "permit(principal, action, resource) when {principal has profile.name && principal.name like \"雪*jpg\" && {nested: {name: principal.profile.name}}.nested.name == \"雪\" && [1,2].contains(1) && [1,2].containsAll([1]) && [1].containsAny([1,3]) && [].isEmpty() && resource.hasTag(\"env\") && resource.getTag(\"env\") == \"prod\" && principal is User in Group::\"staff\"};",
+    "entities": [
+      {
+        "uid": {
+          "type": "User",
+          "id": "alice"
+        },
+        "attrs": {
+          "name": "雪photo.jpg",
+          "profile": {
+            "active": true,
+            "name": "雪"
+          },
+          "score": 4
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "staff"
+          }
+        ],
+        "tags": {
+          "team": "blue"
+        }
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "staff"
+        },
+        "attrs": {},
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Photo",
+          "id": "one"
+        },
+        "attrs": {
+          "private": false
+        },
+        "parents": [],
+        "tags": {
+          "env": "prod"
+        }
+      }
+    ],
+    "requests": [
+      {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "one"
+        },
+        "context": {
+          "flag": true,
+          "n": 4
+        }
+      },
+      {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "one"
+        },
+        "context": {
+          "flag": false,
+          "n": 4
+        }
+      }
+    ]
+  },
+  {
+    "name": "extensions and exact long values",
+    "policies": "permit(principal, action, resource) when {decimal(\"1.25\").greaterThan(decimal(\"1\")) && ip(\"10.0.0.1\").isInRange(ip(\"10.0.0.0/24\")) && datetime(\"2024-01-01\").offset(duration(\"1d\")) == datetime(\"2024-01-02\") && 9007199254740993 == 9007199254740993};",
+    "entities": [
+      {
+        "uid": {
+          "type": "User",
+          "id": "alice"
+        },
+        "attrs": {
+          "name": "雪photo.jpg",
+          "profile": {
+            "active": true,
+            "name": "雪"
+          },
+          "score": 4
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "staff"
+          }
+        ],
+        "tags": {
+          "team": "blue"
+        }
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "staff"
+        },
+        "attrs": {},
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Photo",
+          "id": "one"
+        },
+        "attrs": {
+          "private": false
+        },
+        "parents": [],
+        "tags": {
+          "env": "prod"
+        }
+      }
+    ],
+    "requests": [
+      {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "one"
+        },
+        "context": {
+          "flag": true,
+          "n": 4
+        }
+      },
+      {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "one"
+        },
+        "context": {
+          "flag": false,
+          "n": 4
+        }
+      }
+    ]
+  },
+  {
+    "name": "in and is-in slots",
+    "policies": "permit(principal in ?principal, action in [Action::\"view\"], resource in ?resource); permit(principal is User in ?principal, action == Action::\"view\", resource is Photo in ?resource);",
+    "links": [
+      {
+        "template_id": "policy0",
+        "id": "linked-in-0",
+        "values": {
+          "?principal": {
+            "type": "Group",
+            "id": "staff"
+          },
+          "?resource": {
+            "type": "Photo",
+            "id": "one"
+          }
+        }
+      },
+      {
+        "template_id": "policy1",
+        "id": "linked-in-1",
+        "values": {
+          "?principal": {
+            "type": "Group",
+            "id": "staff"
+          },
+          "?resource": {
+            "type": "Photo",
+            "id": "one"
+          }
+        }
+      }
+    ],
+    "entities": [
+      {
+        "uid": {
+          "type": "User",
+          "id": "alice"
+        },
+        "attrs": {
+          "name": "雪photo.jpg",
+          "profile": {
+            "active": true,
+            "name": "雪"
+          },
+          "score": 4
+        },
+        "parents": [
+          {
+            "type": "Group",
+            "id": "staff"
+          }
+        ],
+        "tags": {
+          "team": "blue"
+        }
+      },
+      {
+        "uid": {
+          "type": "Group",
+          "id": "staff"
+        },
+        "attrs": {},
+        "parents": []
+      },
+      {
+        "uid": {
+          "type": "Photo",
+          "id": "one"
+        },
+        "attrs": {
+          "private": false
+        },
+        "parents": [],
+        "tags": {
+          "env": "prod"
+        }
+      }
+    ],
+    "requests": [
+      {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "one"
+        },
+        "context": {
+          "flag": true,
+          "n": 4
+        }
+      },
+      {
+        "principal": {
+          "type": "User",
+          "id": "alice"
+        },
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource": {
+          "type": "Photo",
+          "id": "one"
+        },
+        "context": {
+          "flag": false,
+          "n": 4
+        }
+      }
+    ]
+  }
+]

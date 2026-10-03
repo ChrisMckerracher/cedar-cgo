@@ -431,3 +431,11 @@ Separate tests reject changed versions, policies, and effects.
 They also check copied projections and frozen exports.
 `TestResidualPolicyIDPresence` rejects missing or null policy IDs while preserving explicit empty IDs.
 `TestResidualRawPolicyIDs` checks export, import, and native replay with empty IDs and control characters.
+
+`pst_fixtures` compares policy and template EST with native PST bodies.
+It checks template links through native `PolicySet::to_pst`.
+Native authorization must remain equal after `PolicySet::from_pst` reconstruction.
+Go tests compare the mapped JSON and verify authorization after full-set JSON reconstruction.
+The randomized set property checks the same authorization result across both source forms.
+Special expression fixtures verify the residual error, unknown, and slot mappings.
+Regenerate them with `scripts/pst-parity.sh --write`.
