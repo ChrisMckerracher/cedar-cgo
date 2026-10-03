@@ -28,8 +28,9 @@ type ValidationResult struct {
 }
 
 type validateInput struct {
-	Schema   wire.Source `json:"schema"`
-	Policies wire.Source `json:"policies"`
+	Schema              wire.Source `json:"schema"`
+	Policies            wire.Source `json:"policies"`
+	MaxDereferenceLevel *uint32     `json:"max_dereference_level,omitempty"`
 }
 
 type validateOutput struct {
@@ -42,7 +43,17 @@ type validateOutput struct {
 // Validate checks policies against a schema with Cedar's strict validator.
 // It returns an [*Error] if the schema or the policies do not parse.
 func (rt *Runtime) Validate(ctx context.Context, schema Schema, policies PolicySet) (ValidationResult, error) {
-	in, err := json.Marshal(validateInput{Schema: schema.wire(), Policies: policies.wire()})
+	return rt.validate(ctx, schema, policies, nil)
+}
+
+// ValidateWithLevel runs strict validation, then limits entity dereference depth.
+// Zero permits no entity dereferences. This uses Cedar's stable level validation API.
+func (rt *Runtime) ValidateWithLevel(ctx context.Context, schema Schema, policies PolicySet, maxDereferenceLevel uint32) (ValidationResult, error) {
+	return rt.validate(ctx, schema, policies, &maxDereferenceLevel)
+}
+
+func (rt *Runtime) validate(ctx context.Context, schema Schema, policies PolicySet, level *uint32) (ValidationResult, error) {
+	in, err := json.Marshal(validateInput{Schema: schema.wire(), Policies: policies.wire(), MaxDereferenceLevel: level})
 	if err != nil {
 		return ValidationResult{}, &Error{Kind: KindInput, Message: err.Error()}
 	}

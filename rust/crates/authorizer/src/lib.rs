@@ -179,6 +179,7 @@ pub unsafe extern "C" fn cgw_authorize(ptr: u32, len: u32) -> u64 {
 struct ValidateInput {
     schema: Source,
     policies: Source,
+    max_dereference_level: Option<u32>,
 }
 
 #[derive(Serialize)]
@@ -192,7 +193,11 @@ fn validate(bytes: &[u8]) -> Result<ValidateOutput, OpError> {
     let input: ValidateInput = parse_input(bytes)?;
     let schema = parse_schema(&input.schema)?;
     let policies = parse_policies(&input.policies)?;
-    let result = Validator::new(schema).validate(&policies, ValidationMode::Strict);
+    let validator = Validator::new(schema);
+    let result = match input.max_dereference_level {
+        Some(level) => validator.validate_with_level(&policies, ValidationMode::Strict, level),
+        None => validator.validate(&policies, ValidationMode::Strict),
+    };
     Ok(ValidateOutput {
         passed: result.validation_passed(),
         errors: result

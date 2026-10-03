@@ -282,6 +282,17 @@ if !result.Passed {
 validation. Parse errors are returned as Go errors; type errors appear in
 the validation result. The caller's context bounds validation time.
 
+`Runtime.ValidateWithLevel(ctx, schema, policies, maxDereferenceLevel)` first runs
+strict validation. If that passes, Cedar checks the maximum entity dereference
+depth. An entity dereference reads an entity's attributes or hierarchy. Level
+zero permits no entity dereferences. A longer chain requires a higher level:
+`principal.photo.owner.admin` requires level three.
+
+`Validate` applies no depth limit. `ValidateWithLevel` accepts every `uint32`
+level and uses Cedar 4.13.0's stable level validation API. Experimental upstream
+permissive and partial validation modes remain outside this API. Both methods
+return the same diagnostics and use the same context and resource limits.
+
 ## Policy formatting
 
 `Runtime.FormatPolicies` is experimental and may change before v1. It invokes
