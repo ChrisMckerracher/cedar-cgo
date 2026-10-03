@@ -74,7 +74,7 @@ func NewRuntime(ctx context.Context, opts ...RuntimeOption) (*Runtime, error) {
 		Cache:            cfg.cache,
 		AllowedImports:   authorizerImports,
 		HostModules:      defineEntityLoaderModule,
-		Exports:          []string{"cgw_load", "cgw_authorize", "cgw_validate", "cgw_authorize_batched", "cgw_slice_entities", "cgw_policies", "cgw_templates", "cgw_partial_authorize", "cgw_reauthorize", "cgw_format", "cgw_expressions", "cgw_literals", "cgw_applicability", "cgw_schema_warnings", "cgw_schemas", "cgw_entity_store", "cgw_utilities"},
+		Exports:          []string{"cgw_load", "cgw_authorize", "cgw_validate", "cgw_authorize_batched", "cgw_slice_entities", "cgw_policies", "cgw_templates", "cgw_partial_authorize", "cgw_reauthorize", "cgw_format", "cgw_expressions", "cgw_literals", "cgw_applicability", "cgw_schema_warnings", "cgw_schemas", "cgw_entity_store", "cgw_utilities", "cgw_queries"},
 	})
 	if err != nil {
 		return nil, fmt.Errorf("cedar: %w", err)

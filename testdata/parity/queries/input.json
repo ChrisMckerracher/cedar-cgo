@@ -1,0 +1,519 @@
+{
+  "schema": "entity User {admin: Bool}; entity Photo {public: Bool}; action view, edit, never appliesTo {principal: User, resource: Photo, context: {mfa: Bool}}; action other appliesTo {principal: Photo, resource: User, context: {}};",
+  "policies": "permit(principal, action == Action::\"view\", resource) when {resource.public}; permit(principal, action == Action::\"edit\", resource) when {principal.admin && context.mfa}; forbid(principal, action == Action::\"never\", resource);",
+  "entities": [
+    {
+      "uid": {
+        "type": "User",
+        "id": "alice"
+      },
+      "attrs": {
+        "admin": true
+      },
+      "parents": []
+    },
+    {
+      "uid": {
+        "type": "User",
+        "id": "bob"
+      },
+      "attrs": {
+        "admin": false
+      },
+      "parents": []
+    },
+    {
+      "uid": {
+        "type": "Photo",
+        "id": "public"
+      },
+      "attrs": {
+        "public": true
+      },
+      "parents": []
+    },
+    {
+      "uid": {
+        "type": "Photo",
+        "id": "private"
+      },
+      "attrs": {
+        "public": false
+      },
+      "parents": []
+    }
+  ],
+  "cases": [
+    {
+      "name": "resources",
+      "operation": "resource",
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource_type": "Photo",
+      "context": {
+        "mfa": false
+      }
+    },
+    {
+      "name": "principals",
+      "operation": "principal",
+      "principal_type": "User",
+      "action": {
+        "type": "Action",
+        "id": "edit"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "private"
+      },
+      "context": {
+        "mfa": true
+      }
+    },
+    {
+      "name": "actions-unknown-context",
+      "operation": "action",
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "public"
+      },
+      "context": null
+    },
+    {
+      "name": "actions-known-true",
+      "operation": "action",
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "public"
+      },
+      "context": {
+        "mfa": true
+      },
+      "replay": true
+    },
+    {
+      "name": "actions-known-false",
+      "operation": "action",
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "public"
+      },
+      "context": {
+        "mfa": false
+      }
+    },
+    {
+      "name": "unknown-identities",
+      "operation": "action",
+      "principal": {
+        "type": "User",
+        "id": null
+      },
+      "resource": {
+        "type": "Photo",
+        "id": null
+      },
+      "context": null
+    },
+    {
+      "name": "unsatisfiable-undecided",
+      "operation": "action",
+      "policies": "permit(principal, action == Action::\"view\", resource) when {context.mfa && !context.mfa};",
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "public"
+      },
+      "context": null
+    },
+    {
+      "name": "resources-denied",
+      "operation": "resource",
+      "policies": "forbid(principal, action, resource);",
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource_type": "Photo",
+      "context": {
+        "mfa": false
+      }
+    },
+    {
+      "name": "principals-empty",
+      "operation": "principal",
+      "entities": [],
+      "principal_type": "User",
+      "action": {
+        "type": "Action",
+        "id": "edit"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "private"
+      },
+      "context": {
+        "mfa": true
+      }
+    },
+    {
+      "name": "invalid-context-excluded",
+      "operation": "action",
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "public"
+      },
+      "context": {}
+    },
+    {
+      "name": "resource-added-entity",
+      "operation": "resource",
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource_type": "Photo",
+      "context": {
+        "mfa": false
+      },
+      "additions": [
+        {
+          "uid": {
+            "type": "Photo",
+            "id": "added/雪"
+          },
+          "attrs": {
+            "public": true
+          },
+          "parents": [],
+          "tags": {}
+        }
+      ]
+    },
+    {
+      "name": "resource-conflicts-loaded",
+      "operation": "resource",
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource_type": "Photo",
+      "context": {
+        "mfa": false
+      },
+      "additions": [
+        {
+          "uid": {
+            "type": "Photo",
+            "id": "public"
+          },
+          "attrs": {
+            "public": false
+          },
+          "parents": [],
+          "tags": {}
+        }
+      ]
+    },
+    {
+      "name": "resource-conflicts-additions",
+      "operation": "resource",
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "view"
+      },
+      "resource_type": "Photo",
+      "context": {
+        "mfa": false
+      },
+      "additions": [
+        {
+          "uid": {
+            "type": "Photo",
+            "id": "added/雪"
+          },
+          "attrs": {
+            "public": true
+          },
+          "parents": [],
+          "tags": {}
+        },
+        {
+          "uid": {
+            "type": "Photo",
+            "id": "added/雪"
+          },
+          "attrs": {
+            "public": false
+          },
+          "parents": [],
+          "tags": {}
+        }
+      ]
+    },
+    {
+      "name": "principal-added-entity",
+      "operation": "principal",
+      "principal_type": "User",
+      "action": {
+        "type": "Action",
+        "id": "edit"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "private"
+      },
+      "context": {
+        "mfa": true
+      },
+      "additions": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "added/雪"
+          },
+          "attrs": {
+            "admin": true
+          },
+          "parents": [],
+          "tags": {}
+        }
+      ]
+    },
+    {
+      "name": "principal-conflicts-loaded",
+      "operation": "principal",
+      "principal_type": "User",
+      "action": {
+        "type": "Action",
+        "id": "edit"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "private"
+      },
+      "context": {
+        "mfa": true
+      },
+      "additions": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "alice"
+          },
+          "attrs": {
+            "admin": false
+          },
+          "parents": [],
+          "tags": {}
+        }
+      ]
+    },
+    {
+      "name": "principal-conflicts-additions",
+      "operation": "principal",
+      "principal_type": "User",
+      "action": {
+        "type": "Action",
+        "id": "edit"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "private"
+      },
+      "context": {
+        "mfa": true
+      },
+      "additions": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "added/雪"
+          },
+          "attrs": {
+            "admin": true
+          },
+          "parents": [],
+          "tags": {}
+        },
+        {
+          "uid": {
+            "type": "User",
+            "id": "added/雪"
+          },
+          "attrs": {
+            "admin": false
+          },
+          "parents": [],
+          "tags": {}
+        }
+      ]
+    },
+    {
+      "name": "action-added-entity",
+      "operation": "action",
+      "principal": {
+        "type": "User",
+        "id": "added/雪"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "public"
+      },
+      "context": {
+        "mfa": true
+      },
+      "replay": true,
+      "additions": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "added/雪"
+          },
+          "attrs": {
+            "admin": true
+          },
+          "parents": [],
+          "tags": {}
+        }
+      ]
+    },
+    {
+      "name": "action-conflicts-loaded",
+      "operation": "action",
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "public"
+      },
+      "context": {
+        "mfa": true
+      },
+      "replay": true,
+      "additions": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "alice"
+          },
+          "attrs": {
+            "admin": false
+          },
+          "parents": [],
+          "tags": {}
+        }
+      ]
+    },
+    {
+      "name": "action-conflicts-additions",
+      "operation": "action",
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "public"
+      },
+      "context": {
+        "mfa": true
+      },
+      "replay": true,
+      "additions": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "added/雪"
+          },
+          "attrs": {
+            "admin": true
+          },
+          "parents": [],
+          "tags": {}
+        },
+        {
+          "uid": {
+            "type": "User",
+            "id": "added/雪"
+          },
+          "attrs": {
+            "admin": false
+          },
+          "parents": [],
+          "tags": {}
+        }
+      ]
+    },
+    {
+      "name": "action-added-unknown-attributes",
+      "operation": "action",
+      "principal": {
+        "type": "User",
+        "id": "added/雪"
+      },
+      "resource": {
+        "type": "Photo",
+        "id": "public"
+      },
+      "context": {
+        "mfa": true
+      },
+      "replay": false,
+      "additions": [
+        {
+          "uid": {
+            "type": "User",
+            "id": "added/雪"
+          },
+          "attrs": null,
+          "parents": [],
+          "tags": {}
+        }
+      ]
+    }
+  ]
+}

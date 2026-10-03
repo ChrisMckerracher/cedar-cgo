@@ -1,0 +1,277 @@
+[
+  {
+    "allowed": [
+      {
+        "type": "Photo",
+        "id": "public"
+      }
+    ],
+    "name": "resources"
+  },
+  {
+    "allowed": [
+      {
+        "type": "User",
+        "id": "alice"
+      }
+    ],
+    "name": "principals"
+  },
+  {
+    "allowed": [
+      {
+        "type": "Action",
+        "id": "view"
+      }
+    ],
+    "undecided": [
+      {
+        "type": "Action",
+        "id": "edit"
+      }
+    ],
+    "name": "actions-unknown-context"
+  },
+  {
+    "allowed": [
+      {
+        "type": "Action",
+        "id": "edit"
+      },
+      {
+        "type": "Action",
+        "id": "view"
+      }
+    ],
+    "undecided": [],
+    "name": "actions-known-true"
+  },
+  {
+    "allowed": [
+      {
+        "type": "Action",
+        "id": "view"
+      }
+    ],
+    "undecided": [],
+    "name": "actions-known-false"
+  },
+  {
+    "allowed": [],
+    "undecided": [
+      {
+        "type": "Action",
+        "id": "edit"
+      },
+      {
+        "type": "Action",
+        "id": "view"
+      }
+    ],
+    "name": "unknown-identities"
+  },
+  {
+    "allowed": [],
+    "undecided": [
+      {
+        "type": "Action",
+        "id": "view"
+      }
+    ],
+    "name": "unsatisfiable-undecided"
+  },
+  {
+    "allowed": [],
+    "name": "resources-denied"
+  },
+  {
+    "allowed": [],
+    "name": "principals-empty"
+  },
+  {
+    "allowed": [],
+    "undecided": [],
+    "name": "invalid-context-excluded"
+  },
+  {
+    "allowed": [
+      {
+        "type": "Photo",
+        "id": "added/雪"
+      },
+      {
+        "type": "Photo",
+        "id": "public"
+      }
+    ],
+    "name": "resource-added-entity",
+    "without_additions": {
+      "allowed": [
+        {
+          "type": "Photo",
+          "id": "public"
+        }
+      ]
+    }
+  },
+  {
+    "error_kind": "entities",
+    "name": "resource-conflicts-loaded",
+    "without_additions": {
+      "allowed": [
+        {
+          "type": "Photo",
+          "id": "public"
+        }
+      ]
+    }
+  },
+  {
+    "error_kind": "entities",
+    "name": "resource-conflicts-additions",
+    "without_additions": {
+      "allowed": [
+        {
+          "type": "Photo",
+          "id": "public"
+        }
+      ]
+    }
+  },
+  {
+    "allowed": [
+      {
+        "type": "User",
+        "id": "added/雪"
+      },
+      {
+        "type": "User",
+        "id": "alice"
+      }
+    ],
+    "name": "principal-added-entity",
+    "without_additions": {
+      "allowed": [
+        {
+          "type": "User",
+          "id": "alice"
+        }
+      ]
+    }
+  },
+  {
+    "error_kind": "entities",
+    "name": "principal-conflicts-loaded",
+    "without_additions": {
+      "allowed": [
+        {
+          "type": "User",
+          "id": "alice"
+        }
+      ]
+    }
+  },
+  {
+    "error_kind": "entities",
+    "name": "principal-conflicts-additions",
+    "without_additions": {
+      "allowed": [
+        {
+          "type": "User",
+          "id": "alice"
+        }
+      ]
+    }
+  },
+  {
+    "allowed": [
+      {
+        "type": "Action",
+        "id": "edit"
+      },
+      {
+        "type": "Action",
+        "id": "view"
+      }
+    ],
+    "undecided": [],
+    "name": "action-added-entity",
+    "without_additions": {
+      "allowed": [
+        {
+          "type": "Action",
+          "id": "view"
+        }
+      ],
+      "undecided": [
+        {
+          "type": "Action",
+          "id": "edit"
+        }
+      ]
+    }
+  },
+  {
+    "error_kind": "entities",
+    "name": "action-conflicts-loaded",
+    "without_additions": {
+      "allowed": [
+        {
+          "type": "Action",
+          "id": "edit"
+        },
+        {
+          "type": "Action",
+          "id": "view"
+        }
+      ],
+      "undecided": []
+    }
+  },
+  {
+    "error_kind": "entities",
+    "name": "action-conflicts-additions",
+    "without_additions": {
+      "allowed": [
+        {
+          "type": "Action",
+          "id": "edit"
+        },
+        {
+          "type": "Action",
+          "id": "view"
+        }
+      ],
+      "undecided": []
+    }
+  },
+  {
+    "allowed": [
+      {
+        "type": "Action",
+        "id": "view"
+      }
+    ],
+    "undecided": [
+      {
+        "type": "Action",
+        "id": "edit"
+      }
+    ],
+    "name": "action-added-unknown-attributes",
+    "without_additions": {
+      "allowed": [
+        {
+          "type": "Action",
+          "id": "view"
+        }
+      ],
+      "undecided": [
+        {
+          "type": "Action",
+          "id": "edit"
+        }
+      ]
+    }
+  }
+]

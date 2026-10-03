@@ -806,3 +806,25 @@ Diagnostic policy IDs retain their original bytes. Rendered messages can escape 
 
 `PolicyMessage` now contains a span slice. Compare messages with `reflect.DeepEqual` instead of Go equality.
 Authorization evaluation messages retain their existing policy ID and text fields.
+
+### Permission queries
+
+Permission queries use Cedar's experimental type-aware partial evaluation API.
+Create an authorizer with a schema before you call these methods.
+The authorizer's request, memory, response, and time limits apply.
+
+`Authorizer.QueryResources` selects allowed resources of one type from the native entity store.
+Supply a concrete principal, action, and context.
+`Authorizer.QueryPrincipals` selects allowed principals of one type from the native entity store.
+Supply a concrete action, resource, and context.
+Per-query `Entities` augments the loaded store through Cedar's existing conflict checks.
+Both methods return only candidates that native Cedar permits.
+
+`Authorizer.QueryActions` enumerates applicable actions through the schema in Rust.
+Principal and resource types must be known. Their IDs can be unknown.
+A nil context is wholly unknown. A pointer to `Context{}` is known empty.
+The method returns separate `Allowed` and `Undecided` lists.
+`ActionQueryResult` JSON uses flat UID objects and preserves both lists during decoding.
+It excludes definite denial and requests that fail per-action schema validation.
+An undecided action does not prove that a satisfying completion exists.
+Use ordinary authorization for a concrete request before granting access.

@@ -19,6 +19,7 @@ mod expressions;
 mod format;
 mod literals;
 mod policies;
+mod queries;
 mod schemas;
 mod slicing;
 mod templates;
@@ -329,4 +330,14 @@ pub unsafe extern "C" fn cgw_schemas(ptr: u32, len: u32) -> u64 {
 pub unsafe extern "C" fn cgw_utilities(ptr: u32, len: u32) -> u64 {
     // SAFETY: the host passes a buffer from `cgw_alloc(len)`.
     run(unsafe { take_input(ptr, len) }, utilities::execute)
+}
+
+/// Runs a native TPE permission query against loaded state.
+///
+/// # Safety
+/// `ptr` and `len` must come from one `cgw_alloc(len)` call.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn cgw_queries(ptr: u32, len: u32) -> u64 {
+    // SAFETY: the host passes a buffer from `cgw_alloc(len)`.
+    run(unsafe { take_input(ptr, len) }, queries::execute)
 }

@@ -394,3 +394,17 @@ The comparison preserves JSON integer text instead of converting integers to flo
 `TestUtilityReadbackExactIntegers` checks readback and merge with integers beyond floating-point precision and both signed 64-bit bounds.
 `TestUtilityContextInputProtocol` checks missing fields, unexpected fields, and explicit null context values.
 `TestUtilityPreflight` checks UTF-8 rejection and source limits before guest execution.
+
+`TestPermissionQueryNativeFixtures` compares all three query operations with direct native TPE calls.
+Twenty cases cover schema-driven action enumeration, known and unknown context, unknown IDs, empty results, and unsatisfiable residual conditions.
+The additional cases distinguish loaded entities from per-query concrete or partial additions.
+The oracle converts loaded entities with native `PartialEntities::from_concrete` before it adds partial query entities.
+They check UID conflicts, unknown attributes, and unchanged loaded entities after successful or failed queries.
+Concrete resource, principal, and action query results are replayed through ordinary authorization.
+`TestActionQueryResultJSONRoundTrip` checks flat UID fields, exact Unicode values, empty lists, and invalid UTF-8.
+Native ABI decoding tests check all query operations before direct native execution.
+They preserve raw context and entity JSON, including exact signed 64-bit integers and escaped Unicode.
+They reject missing fields, duplicate operations, and fields from other query operations.
+`TestPermissionQueryBoundaries` covers unknown types, missing schemas, and cancellation.
+`TestPermissionQueryLimitsBeforeGuest` checks input limits and invalid UTF-8 before guest execution.
+Regenerate native fixtures with `scripts/queries-parity.sh --write`.
