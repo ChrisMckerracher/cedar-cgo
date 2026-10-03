@@ -296,8 +296,11 @@ func sourceTokenCommentSummaries(text string) []string {
 }
 
 func sourceTokenKind(kind string) bool {
+	if sourceTokenKeyword(kind) {
+		return true
+	}
 	switch kind {
-	case "identifier", "number", "string", "true", "false", "if", "permit", "forbid", "when", "unless", "in", "has", "like", "is", "then", "else", "principal", "action", "resource", "context", "?principal", "?resource", "@", ".", ",", ";", ":", "::", "(", ")", "{", "}", "[", "]", "==", "!=", "<", "<=", ">", ">=", "||", "&&", "+", "-", "*", "/", "%", "!":
+	case "identifier", "number", "string", "?principal", "?resource", "@", ".", ",", ";", ":", "::", "(", ")", "{", "}", "[", "]", "==", "!=", "<", "<=", ">", ">=", "||", "&&", "+", "-", "*", "/", "%", "!":
 		return true
 	}
 	return false
