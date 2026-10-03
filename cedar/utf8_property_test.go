@@ -101,7 +101,7 @@ func TestPropertyUnicodeValuesPreserveIdentity(t *testing.T) {
 func TestPropertyMalformedUTF8ValuesRejected(t *testing.T) {
 	rapid.Check(t, func(pt *rapid.T) {
 		bad := propGenMalformed(pt, propGenUnicode.Draw(pt, "text"))
-		uid := cedar.NewEntityUID(bad, "a")
+		uid := cedar.NewEntityUID("User", bad)
 		cases := map[string]any{
 			"UID ID":         uid,
 			"UID type":       cedar.NewEntityUID(bad, "a"),
