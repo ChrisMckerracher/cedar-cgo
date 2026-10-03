@@ -87,6 +87,10 @@ jobs:
           echo "$CVC5_SHA256  cvc5.zip" | sha256sum --check
           unzip -q cvc5.zip
       - run: CVC5="$PWD/cvc5-Linux-x86_64-static/bin/cvc5" go test -count=1 -v ./analysis/
+      - name: Native SymCC query parity
+        run: |
+          set -euo pipefail
+          CVC5="$PWD/cvc5-Linux-x86_64-static/bin/cvc5" scripts/analysis-queries-parity.sh --check
       - name: Prove the ABI arithmetic
         run: CVC5="$PWD/cvc5-Linux-x86_64-static/bin/cvc5" go test -count=1 -v ./internal/verification
 
@@ -136,6 +140,8 @@ jobs:
           cargo clippy --locked --release --target wasm32-wasip1 -p cgw-abi -p cgw-authorizer -p cgw-analysis -- -D warnings
           cargo clippy --locked --release -p cgw-native-bench -- -D warnings
           cargo clippy --locked --release -p cgw-authorizer --example template_fixtures -- -D warnings
+      - name: Native SymCC query oracle lint
+        run: cargo clippy --manifest-path rust/Cargo.toml --locked --release -p cgw-analysis --example analysis_queries -- -D warnings
       - name: Verify native slicing fixtures
         run: scripts/slicing-fixtures.sh --check
       - name: Policy construction native parity

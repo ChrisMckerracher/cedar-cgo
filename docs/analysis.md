@@ -51,8 +51,50 @@ for _, result := range report.Results {
 `Equivalent(ctx, schema, first, second)` checks whether two policy sets
 make the same decision for every request described by the schema.
 
-Both operations require a schema and strictly valid static policies.
+All operations require a schema and strictly valid static policies.
 See the [complete example](../analysis/example_test.go).
+
+## Check errors and matching
+
+Use matching queries when permit and forbid conditions matter independently of the final decision.
+Pass a policy set with exactly one policy to each singleton argument.
+Templates are rejected.
+
+| Method | Property |
+| --- | --- |
+| `NeverErrors(ctx, schema, policy)` | The policy never produces an evaluation error |
+| `AlwaysMatches(ctx, schema, policy)` | The policy matches every schema-valid request |
+| `NeverMatches(ctx, schema, policy)` | The policy matches no schema-valid requests |
+| `MatchesEquivalent(ctx, schema, first, second)` | Both policies match the same requests |
+| `MatchesImplies(ctx, schema, first, second)` | A match for the first policy implies a match for the second |
+| `MatchesDisjoint(ctx, schema, first, second)` | No request matches both policies |
+| `Disjoint(ctx, schema, first, second)` | No request is allowed by both policy sets |
+
+`Disjoint` accepts complete policy sets.
+Matching queries use the original permit or forbid effects.
+For example, two forbid policies can deny every request and still match different requests.
+An evaluation error also differs from an ordinary nonmatch.
+`NeverErrors` checks native symbolic error behavior directly.
+
+Every method returns the same `Report` structure.
+Matching and error counterexamples also contain `FirstEvaluation` and, for pairwise queries, `SecondEvaluation`.
+Each `PolicyEvaluation` contains a `Matched` flag and native policy evaluation errors.
+The concrete authorizer confirms these observations before the result crosses the Go boundary.
+
+```go
+report, err := analyzer.NeverErrors(ctx, schema, policy)
+if err != nil {
+    return err
+}
+for _, result := range report.Results {
+    if result.Counterexample != nil {
+        fmt.Println(result.Counterexample.FirstEvaluation.Errors)
+    }
+}
+```
+
+To check always-allow behavior, compare a policy set with an unconditional permit using `Equivalent`.
+To check always-deny behavior, compare it with an empty policy set.
 
 ## Interpret results
 
@@ -67,10 +109,12 @@ action, and resource type allowed by the schema.
 | `Counterexample.Request` | Request, context, and entities for reproduction |
 | `Counterexample.Text` | Human-readable Cedar description |
 | `Counterexample.First`, `Second` | Decisions in the caller's policy-set argument order |
+| `Counterexample.FirstEvaluation`, `SecondEvaluation` | Concrete singleton matching and errors for matching or error queries |
 
 For `NewlyPermitted`, **holds means the change permits nothing new**.
 A counterexample has `First == cedar.Deny` and `Second == cedar.Allow`.
 For `Equivalent`, a counterexample has different decisions.
+For `Disjoint`, both policy sets allow the counterexample.
 
 Check the Go error before using the report. A zero-value report has no
 results, so its `Holds()` method returns true vacuously.

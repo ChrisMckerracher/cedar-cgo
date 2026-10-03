@@ -1,0 +1,393 @@
+[
+  {
+    "name": "never-errors-overflow",
+    "results": [
+      {
+        "principal_type": "User",
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource_type": "Document",
+        "holds": false,
+        "counterexample_confirmed": true,
+        "a_evaluation": {
+          "matched": false,
+          "errors": [
+            {
+              "policy_id": "policy0",
+              "message": "integer overflow while attempting to add the values `9223372036854775807` and `1`"
+            }
+          ]
+        },
+        "b_evaluation": null
+      }
+    ]
+  },
+  {
+    "name": "never-errors-safe",
+    "results": [
+      {
+        "principal_type": "User",
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource_type": "Document",
+        "holds": true,
+        "counterexample_confirmed": null,
+        "a_evaluation": null,
+        "b_evaluation": null
+      }
+    ]
+  },
+  {
+    "name": "always-matches",
+    "results": [
+      {
+        "principal_type": "User",
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource_type": "Document",
+        "holds": true,
+        "counterexample_confirmed": null,
+        "a_evaluation": null,
+        "b_evaluation": null
+      }
+    ]
+  },
+  {
+    "name": "not-always-matches",
+    "results": [
+      {
+        "principal_type": "User",
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource_type": "Document",
+        "holds": false,
+        "counterexample_confirmed": true,
+        "a_evaluation": {
+          "matched": false,
+          "errors": []
+        },
+        "b_evaluation": null
+      }
+    ]
+  },
+  {
+    "name": "never-matches",
+    "results": [
+      {
+        "principal_type": "User",
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource_type": "Document",
+        "holds": true,
+        "counterexample_confirmed": null,
+        "a_evaluation": null,
+        "b_evaluation": null
+      }
+    ]
+  },
+  {
+    "name": "does-match",
+    "results": [
+      {
+        "principal_type": "User",
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource_type": "Document",
+        "holds": false,
+        "counterexample_confirmed": true,
+        "a_evaluation": {
+          "matched": true,
+          "errors": []
+        },
+        "b_evaluation": null
+      }
+    ]
+  },
+  {
+    "name": "equivalent-match-mixed-effects",
+    "results": [
+      {
+        "principal_type": "User",
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource_type": "Document",
+        "holds": true,
+        "counterexample_confirmed": null,
+        "a_evaluation": null,
+        "b_evaluation": null
+      }
+    ]
+  },
+  {
+    "name": "different-match-both-forbid",
+    "results": [
+      {
+        "principal_type": "User",
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource_type": "Document",
+        "holds": false,
+        "counterexample_confirmed": true,
+        "a_evaluation": {
+          "matched": false,
+          "errors": []
+        },
+        "b_evaluation": {
+          "matched": true,
+          "errors": []
+        }
+      }
+    ]
+  },
+  {
+    "name": "matching-implication",
+    "results": [
+      {
+        "principal_type": "User",
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource_type": "Document",
+        "holds": true,
+        "counterexample_confirmed": null,
+        "a_evaluation": null,
+        "b_evaluation": null
+      }
+    ]
+  },
+  {
+    "name": "matching-implication-fails",
+    "results": [
+      {
+        "principal_type": "User",
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource_type": "Document",
+        "holds": false,
+        "counterexample_confirmed": true,
+        "a_evaluation": {
+          "matched": true,
+          "errors": []
+        },
+        "b_evaluation": {
+          "matched": false,
+          "errors": []
+        }
+      }
+    ]
+  },
+  {
+    "name": "matching-disjoint",
+    "results": [
+      {
+        "principal_type": "User",
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource_type": "Document",
+        "holds": true,
+        "counterexample_confirmed": null,
+        "a_evaluation": null,
+        "b_evaluation": null
+      }
+    ]
+  },
+  {
+    "name": "matching-overlap-both-forbid",
+    "results": [
+      {
+        "principal_type": "User",
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource_type": "Document",
+        "holds": false,
+        "counterexample_confirmed": true,
+        "a_evaluation": {
+          "matched": true,
+          "errors": []
+        },
+        "b_evaluation": {
+          "matched": true,
+          "errors": []
+        }
+      }
+    ]
+  },
+  {
+    "name": "allow-disjoint",
+    "results": [
+      {
+        "principal_type": "User",
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource_type": "Document",
+        "holds": true,
+        "counterexample_confirmed": null,
+        "a_evaluation": null,
+        "b_evaluation": null
+      }
+    ]
+  },
+  {
+    "name": "allow-overlap",
+    "results": [
+      {
+        "principal_type": "User",
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource_type": "Document",
+        "holds": false,
+        "counterexample_confirmed": true,
+        "a_evaluation": null,
+        "b_evaluation": null
+      }
+    ]
+  },
+  {
+    "name": "forbid-sets-disjoint",
+    "results": [
+      {
+        "principal_type": "User",
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource_type": "Document",
+        "holds": true,
+        "counterexample_confirmed": null,
+        "a_evaluation": null,
+        "b_evaluation": null
+      }
+    ]
+  },
+  {
+    "name": "never-errors-empty-policy-id",
+    "results": [
+      {
+        "principal_type": "User",
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource_type": "Document",
+        "holds": false,
+        "counterexample_confirmed": true,
+        "a_evaluation": {
+          "matched": false,
+          "errors": [
+            {
+              "policy_id": "",
+              "message": "integer overflow while attempting to add the values `9223372036854775807` and `1`"
+            }
+          ]
+        },
+        "b_evaluation": null
+      }
+    ]
+  },
+  {
+    "name": "never-errors-escaped-policy-id",
+    "results": [
+      {
+        "principal_type": "User",
+        "action": {
+          "type": "Action",
+          "id": "view"
+        },
+        "resource_type": "Document",
+        "holds": false,
+        "counterexample_confirmed": true,
+        "a_evaluation": {
+          "matched": false,
+          "errors": [
+            {
+              "policy_id": "quoted\"\n\\\u0000",
+              "message": "integer overflow while attempting to add the values `9223372036854775807` and `1`"
+            }
+          ]
+        },
+        "b_evaluation": null
+      }
+    ]
+  },
+  {
+    "name": "disjoint-empty-schema-template-a",
+    "error": {
+      "kind": "compile_a",
+      "message": "symbolic queries require static policies and no templates"
+    }
+  },
+  {
+    "name": "disjoint-empty-schema-template-b",
+    "error": {
+      "kind": "compile_b",
+      "message": "symbolic queries require static policies and no templates"
+    }
+  },
+  {
+    "name": "disjoint-empty-schema-static-vacuity",
+    "results": []
+  },
+  {
+    "name": "equivalent-empty-schema-template-a",
+    "error": {
+      "kind": "compile_a",
+      "message": "symbolic queries require static policies and no templates"
+    }
+  },
+  {
+    "name": "equivalent-empty-schema-template-b",
+    "error": {
+      "kind": "compile_b",
+      "message": "symbolic queries require static policies and no templates"
+    }
+  },
+  {
+    "name": "equivalent-empty-schema-static-vacuity",
+    "results": []
+  },
+  {
+    "name": "implies-empty-schema-template-a",
+    "error": {
+      "kind": "compile_a",
+      "message": "symbolic queries require static policies and no templates"
+    }
+  },
+  {
+    "name": "implies-empty-schema-template-b",
+    "error": {
+      "kind": "compile_b",
+      "message": "symbolic queries require static policies and no templates"
+    }
+  },
+  {
+    "name": "implies-empty-schema-static-vacuity",
+    "results": []
+  }
+]

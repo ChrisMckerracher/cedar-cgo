@@ -74,6 +74,41 @@ func (a *Analyzer) Equivalent(ctx context.Context, schema cedar.Schema, x, y ced
 	return a.run(ctx, "equivalent", schema, x, y, false)
 }
 
+// NeverErrors checks one policy for evaluation errors on schema-valid requests.
+func (a *Analyzer) NeverErrors(ctx context.Context, schema cedar.Schema, policy cedar.PolicySet) (Report, error) {
+	return a.run(ctx, "never_errors", schema, policy, cedar.PolicySet{}, false)
+}
+
+// AlwaysMatches checks whether one policy matches every schema-valid request.
+func (a *Analyzer) AlwaysMatches(ctx context.Context, schema cedar.Schema, policy cedar.PolicySet) (Report, error) {
+	return a.run(ctx, "always_matches", schema, policy, cedar.PolicySet{}, false)
+}
+
+// NeverMatches checks whether one policy matches no schema-valid requests.
+func (a *Analyzer) NeverMatches(ctx context.Context, schema cedar.Schema, policy cedar.PolicySet) (Report, error) {
+	return a.run(ctx, "never_matches", schema, policy, cedar.PolicySet{}, false)
+}
+
+// MatchesEquivalent compares native matching behavior for permit and forbid policies.
+func (a *Analyzer) MatchesEquivalent(ctx context.Context, schema cedar.Schema, x, y cedar.PolicySet) (Report, error) {
+	return a.run(ctx, "matches_equivalent", schema, x, y, false)
+}
+
+// MatchesImplies checks whether matching x always implies matching y.
+func (a *Analyzer) MatchesImplies(ctx context.Context, schema cedar.Schema, x, y cedar.PolicySet) (Report, error) {
+	return a.run(ctx, "matches_implies", schema, x, y, false)
+}
+
+// MatchesDisjoint checks whether two policies can never both match one request.
+func (a *Analyzer) MatchesDisjoint(ctx context.Context, schema cedar.Schema, x, y cedar.PolicySet) (Report, error) {
+	return a.run(ctx, "matches_disjoint", schema, x, y, false)
+}
+
+// Disjoint checks whether two policy sets can never both allow one request.
+func (a *Analyzer) Disjoint(ctx context.Context, schema cedar.Schema, x, y cedar.PolicySet) (Report, error) {
+	return a.run(ctx, "disjoint", schema, x, y, false)
+}
+
 type analyzeInput struct {
 	Schema wire.Source `json:"schema"`
 	A      wire.Source `json:"a"`
@@ -134,7 +169,7 @@ func (a *Analyzer) run(ctx context.Context, query string, schema cedar.Schema, p
 	if w.Error != nil {
 		return Report{}, a.withSolverDetail(&Error{Kind: w.Error.Kind, Message: w.Error.Message}, state, session)
 	}
-	return decodeReport(w, swap)
+	return decodePropertyReport(w, swap, query)
 }
 
 func (a *Analyzer) withSolverDetail(err error, state *sessionState, session Session) error {

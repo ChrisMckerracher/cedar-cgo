@@ -457,3 +457,42 @@ Comment-field tests reject missing or null strings and null array entries.
 Lexical response tests reject omitted tokens, incorrect token kinds, and truncated native tokens.
 Native spelling tests preserve Unicode whitespace, lone-CR comments, raw string line breaks, and unsupported semantic escapes.
 `TestSourceTokenPreflight` checks input encoding and source limits before guest execution.
+
+### Entity store mutation checks
+
+The entity-store oracle invokes native Cedar APIs directly.
+Its ten fixtures retain one native store across mutation sequences.
+The Go API compares normalized exports, direct parents, ancestry, membership, and deep equality at each step.
+Fixtures cover replacement, deletion, redundant direct edges, missing parents, duplicate upserts, cycles, and schema validation.
+They also check schema action deletion and exact integer, extension, Unicode, and tag values.
+
+The opaque snapshot records direct parents from the native AST.
+A chain deletion fixture detects accidental reconstruction from transitive normalized JSON.
+The mutation fuzz target changes an isolated graph component.
+It then checks that an unrelated authorization decision stays unchanged.
+
+### Symbolic error and matching checks
+
+`scripts/analysis-queries-parity.sh --check` requires the pinned cvc5 executable.
+Its native oracle runs optimized boolean queries and their counterexample variants.
+The oracle confirms each failed property with the concrete authorizer.
+`TestAnalysisQueriesNativeParity` compares the Wasm results with these native fixtures.
+
+The cvc5-gated tests cover safe policies, integer overflow, unconditional matches, and nonmatches.
+They also cover pairwise matching and policy-set disjointness.
+Empty-schema cases reject templates in either set and retain vacuous results for valid static sets.
+Response decoding requires property flags and action ID fields.
+Explicit false flags and empty action IDs remain valid.
+Counterexample requests require complete UIDs that match their reported request environment.
+Context objects and entity arrays retain their original JSON bytes and exact integer values.
+Entity records require complete flat UIDs, attribute objects, parent UID arrays, and optional tag objects.
+The decoder checks these containers without interpreting Cedar values or graph semantics.
+Forbid fixtures preserve distinct matching conditions while both final decisions deny.
+Generated tests compare matching thresholds and replay each returned counterexample.
+The response decoder rejects missing evaluations and evidence that does not violate the queried property.
+It requires Deny for singleton nonmatches and errors, and permits at most one error per singleton policy.
+Unary queries require Deny and no evaluation for the unused second policy set.
+It also rejects missing results, incomplete environment types, and incomplete error messages.
+An explicit empty result list remains valid for a schema with no request environments.
+Native fixtures check real error evidence with empty policy IDs and IDs containing quotes, newlines, backslashes, and NUL.
+The Go comparison preserves those raw IDs and compares native error messages.
