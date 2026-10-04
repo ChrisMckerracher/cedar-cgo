@@ -12,8 +12,8 @@ export CARGO_TARGET_DIR=$(cd "${CARGO_TARGET_DIR:-$repo/rust/target}" && pwd)
 output=$(cd "${WASM_OUTPUT_DIR:-$repo/internal/modules}" && pwd)
 
 # An 8 MiB stack matches native Linux's default; placing it below data makes overflow trap.
-# Path remapping keeps checkout and toolchain locations out of reproducible artifacts.
-export RUSTFLAGS="-C link-arg=-zstack-size=8388608 --remap-path-prefix=$repo=/cedar-go-wasm --remap-path-prefix=$cargo_home=/cargo --remap-path-prefix=$rustup_home=/rustup"
+# Generated Cedar parsers embed their source paths, so remap the target directory too.
+export RUSTFLAGS="-C link-arg=-zstack-size=8388608 --remap-path-prefix=$repo=/cedar-go-wasm --remap-path-prefix=$cargo_home=/cargo --remap-path-prefix=$rustup_home=/rustup --remap-path-prefix=$CARGO_TARGET_DIR=/cedar-target"
 export CARGO_INCREMENTAL=0
 unset CARGO_BUILD_RUSTFLAGS CARGO_ENCODED_RUSTFLAGS RUSTC RUSTC_WRAPPER RUSTC_WORKSPACE_WRAPPER
 

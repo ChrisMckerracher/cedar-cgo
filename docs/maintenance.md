@@ -102,7 +102,8 @@ The verifier rejects missing files, checksum failures, hash mismatches, and a di
 CI runs this comparison and passes verified artifacts to every Go compilation job.
 
 The build uses Cargo's `--locked` mode, LTO, one codegen unit, disabled incremental compilation, and an 8 MiB Wasm stack.
-Path remapping removes checkout, `CARGO_HOME`, and `RUSTUP_HOME` locations from generated modules.
+Path remapping removes checkout, Cargo target, `CARGO_HOME`, and `RUSTUP_HOME` locations from generated modules.
+Generated Cedar parsers contain source paths, so Cargo target remapping is required for independent builds.
 The build verifies vendored SymCC against the pinned source archive and patch.
 Runtime hash checks compare embedded bytes with their generated expected values.
 Checksums establish integrity against expected values; they do not establish source provenance or reproducibility.
