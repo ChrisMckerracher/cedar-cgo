@@ -2,8 +2,9 @@
 
 Cedar's Rust authorization engine, strict validator, and policy-change
 analysis for Go. The reference implementation runs as embedded WebAssembly
-under [wazero](https://wazero.io/), so authorization ships in a Go binary
-and builds with the Go toolchain alone.
+under [wazero](https://wazero.io/), so authorization ships in a Go binary.
+Release source bundles include the tested modules and need Go without Rust.
+Source checkouts require the pinned Rust build before Go compilation.
 
 We wanted all of Cedar in Go.
 [cedar-go](https://github.com/cedar-policy/cedar-go#comparison-to-the-rust-implementation)
@@ -21,10 +22,39 @@ See [verification](docs/verification.md) for the checks and their scope.
 ## Install
 
 Requires **Go 1.26 or later**.
+Go module downloads do not include the generated modules.
+Use the release source bundle to build without Rust.
+
+### Lesson 1: Use a release bundle in a Go project
+
+Objective: Install the package with CI-tested modules and no local Rust build.
+
+1. From a [release](https://github.com/ChrisMckerracher/cedar-go-wasm/releases), download `cedar-go-wasm-source.zip` and `SHA256SUMS`.
+2. From the download directory, verify the bundle checksum and build attestation:
+
+   ```bash
+   sha256sum --check --ignore-missing SHA256SUMS
+   gh attestation verify cedar-go-wasm-source.zip --repo ChrisMckerracher/cedar-go-wasm
+   ```
+
+   The checksum command checks downloaded assets and skips absent release files.
+   See [release verification](docs/maintenance.md#releases) to verify all assets.
+3. Extract the bundle to a permanent directory.
+4. From your Go project, set the local module replacement and add the package:
 
 ```bash
+go mod edit -replace=github.com/ChrisMckerracher/cedar-go-wasm=/absolute/path/cedar-go-wasm
 go get github.com/ChrisMckerracher/cedar-go-wasm/cedar
 ```
+
+Worked example: If you extracted `/opt/cedar-go-wasm`, use that path as the replacement directory.
+Keep this directory available for later builds.
+For shared builds, distribute the same verified bundle and configure its local path.
+
+Knowledge check: Does ordinary `go get` download release attachments? No; the local replacement supplies the generated modules.
+
+For a source checkout, follow [contributor setup](CONTRIBUTING.md#tests).
+Source builds require the pinned Rust toolchain.
 
 ```go
 import "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
@@ -133,10 +163,11 @@ for methodology, memory costs, and reproduction commands.
 ## Maintenance
 
 Each release pins one Cedar version, the Rust toolchain, and its dependencies.
-Cedar upgrades rebuild both embedded modules and must pass conformance and
+Cedar upgrades build both embedded modules and must pass conformance and
 analysis tests. CI checks reproducible builds, licenses, and vulnerabilities;
 Dependabot proposes updates, and weekly audits check for new advisories.
-Release builds publish module checksums and signed provenance.
+CI generates modules and hash files; Git does not track these outputs.
+Release builds publish tested modules, source bundles, checksums, and signed provenance.
 
 The [maintenance guide](docs/maintenance.md) documents upgrades, dependency
 review, versioning, and release steps.

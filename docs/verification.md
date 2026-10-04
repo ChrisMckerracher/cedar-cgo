@@ -243,13 +243,18 @@ successful universal analysis results depend on the solver's `unsat` answer.
 
 - Runtime startup checks module hashes and import allowlists, and each
   instance checks the ABI version.
-- CI rebuilds the embedded modules from pinned source and requires
-  byte-identical output.
+- CI builds both embedded modules from the checked source commit with pinned Rust inputs.
+- Every Go compilation job verifies complete artifacts, checksums, and the matching source commit.
+- CI compares two independent builds byte for byte, including their generated hashes.
+- Release packages contain the tested modules, checksums, source metadata, and build provenance.
 - Tests compare `CedarVersion` and `SymCCVersion` with `rust/Cargo.lock`.
 - CI checks vendored SymCC against its release archive plus the local patch,
   and regenerates third-party license notices from the lockfile.
 
 See [Maintenance](maintenance.md) for the upgrade and release checks.
+
+Checksums detect artifact corruption. They do not prove source provenance or reproducibility.
+Generated modules and hash files remain untracked; source checkouts require a build before Go compilation.
 
 ### Batched loading parity and bounded arithmetic
 
