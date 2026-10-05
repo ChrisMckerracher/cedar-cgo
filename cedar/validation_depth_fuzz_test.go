@@ -32,7 +32,7 @@ func FuzzValidationDepth(f *testing.F) {
 		checkNoFault(t, err)
 		second, errAgain := rt.ValidateWithLevel(ctx, d.schema, policies, uint32(level))
 		checkNoFault(t, errAgain)
-		if !reflect.DeepEqual(first, second) || !reflect.DeepEqual(err, errAgain) {
+		if !reflect.DeepEqual(propStableValidation(first), propStableValidation(second)) || !reflect.DeepEqual(err, errAgain) {
 			t.Fatalf("level %d validation is not deterministic: (%v, %v) vs (%v, %v)",
 				level, first, err, second, errAgain)
 		}

@@ -39,11 +39,17 @@ func propSortedMessages(messages []cedar.PolicyMessage) []cedar.PolicyMessage {
 	return out
 }
 
+// Native validation collects errors and warnings in HashSets and renders
+// hash-chosen spelling hints, so normalize both before comparing results.
+func propStableValidation(result cedar.ValidationResult) cedar.ValidationResult {
+	result.Errors = propSortedMessages(propStripHints(result.Errors))
+	result.Warnings = propSortedMessages(propStripHints(result.Warnings))
+	return result
+}
+
 func propSameValidation(t *rapid.T, a, b cedar.ValidationResult) {
 	t.Helper()
-	if a.Passed != b.Passed ||
-		!reflect.DeepEqual(propSortedMessages(propStripHints(a.Errors)), propSortedMessages(propStripHints(b.Errors))) ||
-		!reflect.DeepEqual(propSortedMessages(propStripHints(a.Warnings)), propSortedMessages(propStripHints(b.Warnings))) {
+	if !reflect.DeepEqual(propStableValidation(a), propStableValidation(b)) {
 		t.Fatalf("validation is not deterministic: %+v vs %+v", a, b)
 	}
 }
