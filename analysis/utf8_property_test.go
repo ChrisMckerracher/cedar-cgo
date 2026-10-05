@@ -7,7 +7,9 @@ import (
 	"unicode/utf8"
 
 	"github.com/ChrisMckerracher/cedar-go-wasm/analysis"
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
+	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
+	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
+	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 	"pgregory.net/rapid"
 )
 
@@ -37,22 +39,22 @@ func TestPropertyMalformedUTF8AnalysisInputRejected(t *testing.T) {
 	rapid.Check(t, func(pt *rapid.T) {
 		bad := propGenMalformedSource(pt, propGenSource.Draw(pt, "text"))
 		inputs := []struct {
-			schema        cedar.Schema
-			first, second cedar.PolicySet
+			schema        schemas.Schema
+			first, second policy.PolicySet
 		}{
-			{schema: cedar.SchemaFromCedar(bad)},
-			{schema: cedar.SchemaFromJSON([]byte(bad))},
-			{first: cedar.PoliciesFromCedar(bad)},
-			{second: cedar.PoliciesFromJSON([]byte(bad))},
+			{schema: schemas.SchemaFromCedar(bad)},
+			{schema: schemas.SchemaFromJSON([]byte(bad))},
+			{first: policy.PoliciesFromCedar(bad)},
+			{second: policy.PoliciesFromJSON([]byte(bad))},
 		}
 		for _, in := range inputs {
 			_, err := a.Equivalent(ctx, in.schema, in.first, in.second)
 			var e *analysis.Error
-			if !errors.As(err, &e) || e.Kind != string(cedar.KindInput) {
+			if !errors.As(err, &e) || e.Kind != string(diagnostic.KindInput) {
 				pt.Fatalf("Equivalent: got %v; want input error", err)
 			}
 			_, err = a.NewlyPermitted(ctx, in.schema, in.first, in.second)
-			if !errors.As(err, &e) || e.Kind != string(cedar.KindInput) {
+			if !errors.As(err, &e) || e.Kind != string(diagnostic.KindInput) {
 				pt.Fatalf("NewlyPermitted: got %v; want input error", err)
 			}
 		}

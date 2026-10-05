@@ -275,11 +275,27 @@ dependencies = [
 ]
 
 [[package]]
-name = "cgw-native-bench"
+name = "cgw-native"
+version = "0.1.0"
+dependencies = [
+ "cgw-abi",
+ "cgw-analysis",
+ "cgw-authorizer",
+ "serde_json",
+]
+
+[[package]]
+name = "cgw-verification"
 version = "0.1.0"
 dependencies = [
  "cedar-policy",
+ "cedar-policy-core",
+ "cedar-policy-formatter",
+ "cedar-policy-symcc",
+ "cgw-abi",
+ "serde",
  "serde_json",
+ "tokio",
 ]
 
 [[package]]

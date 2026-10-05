@@ -1,9 +1,10 @@
 use cedar_policy::PolicySet;
 use cedar_policy_formatter::{Config, policies_str_to_pretty};
-use cgw_abi::{OpError, diagnostics::Diagnostic, parse_input, run, take_input};
+use cgw_abi::{OpError, diagnostics::Diagnostic, parse_input};
 use serde::{Deserialize, Serialize};
 use std::fmt::Write;
 use std::str::FromStr;
+mod bounds;
 
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -15,15 +16,16 @@ struct FormatInput {
 }
 
 #[derive(Serialize)]
-struct FormatOutput {
+pub(crate) struct FormatOutput {
     formatted: String,
 }
 
-fn format(bytes: &[u8]) -> Result<FormatOutput, OpError> {
+pub(crate) fn format(bytes: &[u8]) -> Result<FormatOutput, OpError> {
     let input: FormatInput = parse_input(bytes)?;
     if input.max_output_bytes == 0 || input.max_output_bytes > 16 << 20 {
         return Err(OpError::msg("input", "invalid format output limit"));
     }
+    bounds::check(&input.text, input.indent_width, input.max_output_bytes)?;
     let config = Config {
         line_width: input.line_width as usize,
         indent_width: input.indent_width as isize,
@@ -69,14 +71,4 @@ fn format(bytes: &[u8]) -> Result<FormatOutput, OpError> {
         ));
     }
     Ok(FormatOutput { formatted })
-}
-
-/// Formats policy and template text without loading authorization state.
-///
-/// # Safety
-/// `ptr` and `len` must come from one `cgw_alloc(len)` call.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn cgw_format(ptr: u32, len: u32) -> u64 {
-    // SAFETY: the host passes a buffer from `cgw_alloc(len)`.
-    run(unsafe { take_input(ptr, len) }, format)
 }

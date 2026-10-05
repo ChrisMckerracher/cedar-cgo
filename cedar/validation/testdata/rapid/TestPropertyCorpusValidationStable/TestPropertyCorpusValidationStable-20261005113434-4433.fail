@@ -1,0 +1,6 @@
+# 2026/10/05 11:34:34.855127 [TestPropertyCorpusValidationStable] [rapid] draw file: "/tmp/cedar-migration/corpus/corpus-tests/000cea5e18eb0cd6b9568510a11452373e268190.entities.json"
+# 2026/10/05 11:34:34.855150 [TestPropertyCorpusValidationStable] decode: json: cannot unmarshal array into Go value of type testsupport.CorpusTest
+# 
+v0.4.8#4259457162729718733
+0x0
+0x0

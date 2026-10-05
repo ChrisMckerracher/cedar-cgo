@@ -4,9 +4,11 @@ import (
 	"bufio"
 	"context"
 	"errors"
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 	"os"
 	"testing"
+
+	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/solver"
+	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 )
 
 func TestCompiledCloseInterruptsActiveCall(t *testing.T) {
@@ -41,7 +43,7 @@ func TestCompiledRealCVC5LifetimeClose(t *testing.T) {
 		s, instance, _ := testCompiledSession(t, func(context.Context, []byte) ([]byte, error) {
 			return []byte(`{"report":{"results":[]}}`), nil
 		})
-		transport, err := CVC5(path).Start(s.lifetime)
+		transport, err := solver.CVC5(path).Start(s.lifetime)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -56,13 +58,13 @@ func TestCompiledRealCVC5LifetimeClose(t *testing.T) {
 		if err := s.Close(); err != nil {
 			t.Fatalf("iteration %d: canceled solver cleanup failed: %v", iteration, err)
 		}
-		if state := transport.(*process).cmd.ProcessState; state == nil {
+		if !transport.(interface{ Reaped() bool }).Reaped() {
 			t.Fatal("solver process was not reaped")
 		}
 		if instance.closes.Load() != 1 {
-			t.Fatal("lifetime cancellation retained the guest")
+			t.Fatal("lifetime cancellation retained native state")
 		}
-		if _, err := s.Compile(context.Background(), cedar.PolicySet{}); !errors.Is(err, ErrCompiledClosed) {
+		if _, err := s.Compile(context.Background(), policy.PolicySet{}); !errors.Is(err, ErrCompiledClosed) {
 			t.Fatalf("canceled lifetime retained session: %v", err)
 		}
 	}

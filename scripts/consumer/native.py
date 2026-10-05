@@ -1,0 +1,113 @@
+"""Check native source identity, target objects, ABI, and linker records."""
+import hashlib
+import json
+import re
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from native_linker import link_source
+
+TARGETS = {
+    "x86_64-unknown-linux-gnu": "linux_amd64",
+    "aarch64-unknown-linux-gnu": "linux_arm64",
+    "aarch64-apple-darwin": "darwin_arm64",
+}
+ARTIFACT_FILES = ("SOURCE_COMMIT", "cedar.h", "libcgw_native.a", "link_flags.go", "manifest.json", "SHA256SUMS")
+
+
+def generated_names(platform):
+    return tuple(f"internal/native/lib/{platform}/{name}" for name in ARTIFACT_FILES if name != "link_flags.go") + ("internal/native/link_flags.go",)
+
+
+def sha(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+def unique_object(pairs):
+    value = {}
+    for key, entry in pairs:
+        if key in value:
+            raise ValueError("duplicate native manifest key")
+        value[key] = entry
+    return value
+
+
+def verify_archive(data, target):
+    if not data.startswith(b"!<arch>\n"):
+        raise ValueError("native library is not an archive")
+    offset, objects = 8, 0
+    while offset < len(data):
+        header = data[offset:offset + 60]
+        if len(header) != 60 or header[58:] != b"`\n":
+            raise ValueError("invalid native archive header")
+        size = int(header[48:58].strip())
+        offset += 60
+        body = data[offset:offset + size]
+        if size < 0 or len(body) != size:
+            raise ValueError("invalid native archive length")
+        name = header[:16].strip()
+        if name.startswith(b"#1/"):
+            count = int(name[3:])
+            if count < 0 or count > len(body):
+                raise ValueError("invalid archive member name")
+            body = body[count:]
+        if body.startswith(b"\x7fELF") and len(body) >= 20:
+            machine = int.from_bytes(body[18:20], "little")
+            expected = 183 if target == "aarch64-unknown-linux-gnu" else 62
+            correct = target.endswith("linux-gnu") and body[4:6] == b"\x02\x01" and machine == expected
+        elif body.startswith(b"\xcf\xfa\xed\xfe") and len(body) >= 8:
+            correct = target == "aarch64-apple-darwin" and int.from_bytes(body[4:8], "little") == 0x0100000C
+        elif len(body) >= 20 and int.from_bytes(body[:2], "little") in (0x8664, 0xAA64):
+            correct = False
+        else:
+            offset += size + (size & 1)
+            continue
+        objects += 1
+        if not correct:
+            raise ValueError("native archive object target does not match")
+        offset += size + (size & 1)
+    if objects == 0:
+        raise ValueError("native archive has no target objects")
+
+
+def verify_native(files, commit, expected_target=None):
+    manifests = [name for name in files if re.fullmatch(r"internal/native/lib/[^/]+/manifest.json", name)]
+    if len(manifests) != 1:
+        raise ValueError("bundle requires exactly one native platform artifact")
+    prefix = manifests[0].removesuffix("manifest.json")
+    platform = prefix.split("/")[-2]
+    if platform not in TARGETS.values():
+        raise ValueError("unsupported native platform")
+    names = generated_names(platform)
+    for name in names:
+        if name not in files:
+            raise ValueError(f"missing bundle file: {name}")
+    if any(name.startswith("internal/native/lib/") and name not in names for name in files):
+        raise ValueError("unexpected native artifact file")
+    artifact = {name: files["internal/native/link_flags.go" if name == "link_flags.go" else prefix + name] for name in ARTIFACT_FILES}
+    manifest = json.loads(artifact["manifest.json"], object_pairs_hook=unique_object)
+    expected_fields = {"abi", "source_commit", "target", "platform", "cedar", "symcc", "toolchain", "profile", "panic", "native_static_libs", "files"}
+    if not isinstance(manifest, dict) or set(manifest) != expected_fields:
+        raise ValueError("native manifest fields do not match")
+    target = manifest["target"]
+    if target not in TARGETS or TARGETS[target] != platform or (expected_target and target != expected_target):
+        raise ValueError("native manifest target does not match")
+    if artifact["SOURCE_COMMIT"] != (commit + "\n").encode() or manifest["source_commit"] != commit:
+        raise ValueError("native artifact source commit does not match")
+    if manifest["abi"] != 2 or (manifest["cedar"], manifest["symcc"], manifest["toolchain"], manifest["profile"], manifest["panic"]) != ("4.13.0", "0.7.0", "1.99.0", "native", "unwind"):
+        raise ValueError("native ABI or build inputs do not match")
+    if artifact["cedar.h"] != files.get("internal/native/include/cedar.h"):
+        raise ValueError("native artifact header does not match source header")
+    hashes = {name: sha(artifact[name]) for name in ("cedar.h", "libcgw_native.a", "link_flags.go")}
+    if manifest["files"] != hashes:
+        raise ValueError("native artifact file hashes do not match")
+    flags = manifest["native_static_libs"]
+    expected = link_source(platform, flags, hashes["libcgw_native.a"])
+    if artifact["link_flags.go"] != expected or files["internal/native/link_flags.go"] != expected:
+        raise ValueError("generated native linker source does not match")
+    checksums = "".join(f"{sha(artifact[name])}  {name}\n" for name in sorted(set(ARTIFACT_FILES) - {"SHA256SUMS"})).encode()
+    if artifact["SHA256SUMS"] != checksums:
+        raise ValueError("native artifact checksum manifest does not match")
+    verify_archive(artifact["libcgw_native.a"], target)
+    return names

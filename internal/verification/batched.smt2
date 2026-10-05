@@ -1,13 +1,12 @@
-; Models charge, calls++, int(n), and int32(len(body)) in cedar/batched.go.
-; Native int may be 32 or 64 bits; sizes are nonnegative and capped by their source guards.
-; Excludes JSON correctness, guest memory, callbacks, Cedar semantics, and control-flow verification.
+; Models charge, calls++, and native callback lengths in cedar/authorization/batched.
+; Supported native targets use 64-bit int; sizes are nonnegative and capped by their source guards.
+; Excludes JSON correctness, pointers, ownership, Cedar semantics, and control-flow verification.
 ; UTF-8 guards only reject input; accepted lengths and their bounds remain unchanged.
 (set-logic QF_BV)
 (set-option :incremental true)
 
 (declare-const host_max (_ BitVec 64))
-(assert (or (= host_max (_ bv2147483647 64))
-            (= host_max (_ bv9223372036854775807 64))))
+(assert (= host_max (_ bv9223372036854775807 64)))
 (declare-const max_batch (_ BitVec 64))
 (assert (and (bvugt max_batch (_ bv0 64))
              (bvule max_batch (_ bv67108864 64))))
@@ -49,30 +48,30 @@
 (pop 1)
 (pop 1)
 
-; The unsigned batch check precedes converting the guest's request size to int.
-(declare-const request_length (_ BitVec 32))
+; The batch check bounds a borrowed native request length.
+(declare-const request_length (_ BitVec 64))
 (push 1)
-(assert (bvule ((_ zero_extend 32) request_length) max_batch))
+(assert (bvule request_length max_batch))
 (check-sat)
 (push 1)
 (assert (not (and
-  (= ((_ sign_extend 32) request_length) ((_ zero_extend 32) request_length))
-  (bvule ((_ zero_extend 32) request_length) host_max))))
+  (= request_length request_length)
+  (bvule request_length host_max))))
 (check-sat)
 (pop 1)
 (pop 1)
 
 ; A successful JSON object is nonempty; JSON serialization itself is outside this model.
 (declare-const result_length (_ BitVec 64))
-(define-fun returned_length () (_ BitVec 32) ((_ extract 31 0) result_length))
+(define-fun returned_length () (_ BitVec 64) result_length)
 (push 1)
 (assert (and (bvugt result_length (_ bv0 64)) (bvule result_length max_batch)))
 (check-sat)
 (push 1)
 (assert (not (and
-  (= ((_ sign_extend 32) returned_length) result_length)
-  (bvsgt returned_length (_ bv0 32))
-  (distinct returned_length #xffffffff))))
+  (= returned_length result_length)
+  (bvsgt returned_length (_ bv0 64))
+  (distinct returned_length #xffffffffffffffff))))
 (check-sat)
 (pop 1)
 (pop 1)

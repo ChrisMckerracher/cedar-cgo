@@ -1,166 +1,77 @@
-# Security model
+# Native security model for Cedar Go consumers
 
-[Documentation](README.md) · [Verification](verification.md) · [Report a vulnerability](../SECURITY.md)
+Cedar runs in the consumer process through cgo.
+The native library provides Cedar semantics and explicit ownership checks.
+It does not provide a Wasm sandbox or a separate process.
 
-## Contents
+## Inputs and decisions
 
-- [Execution model](#execution-model)
-- [Guest capabilities](#guest-capabilities)
-- [Resource limits](#resource-limits)
-- [Failure behavior](#failure-behavior)
-- [Solver process](#solver-process)
-- [Build integrity](#build-integrity)
+Source, request, response, callback, and solver output sizes have explicit limits.
+Input validation rejects invalid UTF-8 before JSON encoding can change an identity.
+Integer values retain their exact signed 64-bit representation.
 
-## Execution model
+Concrete authorization returns Deny on every operation error.
+Partial evaluation returns Undecided on operation error.
+Policy evaluation diagnostics remain separate from transport errors and can accompany an Allow decision.
 
-Cedar's Rust engine runs inside wazero's WebAssembly sandbox. The Go host
-encodes inputs, calls the guest, and decodes results. Cedar makes the policy
-decision. Each authorization instance owns its parsed configuration and
-serves one call at a time; the pool provides concurrency through separate
-instances.
+Configuration loading parses policies, schemas, and entities.
+Strict policy validation remains a separate operation.
+Batched authorization requires a schema and strictly valid policies.
 
-Runtime startup verifies the embedded module's SHA-256, enforces an import
-allowlist, rejects imported memories, and checks required exports. Each
-instance must report the expected ABI version before use.
+## Lifetime and concurrency
 
-The ABI transfers JSON through guest linear memory. The guest owns input
-buffers once a call starts. The host checks response addresses and sizes,
-copies the response into Go memory, then frees the guest buffer. A failed
-call marks the instance as faulted, and its resources are released when the
-instance is discarded.
+Runtime closure rejects new calls and invalidates dependent clients.
+Session closure waits for active native execution before releasing state.
+Opaque handle identities reject stale and foreign ownership.
+Go callback identifiers remain live until their synchronous native call returns.
 
-## Guest capabilities
+Loaded authorizers share one session implementation for ordinary, batched, and partial operations.
+Explicit runtime and pool limits bound native concurrency.
+Compiled analysis serializes solver interaction and retains immutable policy snapshots.
 
-The guest reaches host services through these imports:
+## Cancellation and faults
 
-| Import | Host behavior | Purpose |
-|---|---|---|
-| `random_get` | Reads `crypto/rand` | Seeds Rust's randomized hash maps |
-| `environ_get`, `environ_sizes_get` | Empty environment | Rust standard-library startup |
-| `fd_write` | Discards stdout; retains the first 4 KiB of stderr | Panic diagnostics |
-| `proc_exit` | Ends the instance and produces a fault | Rust abort path |
-| `clock_time_get` (analysis) | wazero's synthetic clock | tokio runtime |
-| `poll_oneoff` (analysis) | wazero's no-op sleep | tokio runtime |
-| `cgw_host.solver_write`, `cgw_host.solver_read` (analysis) | Solver stdin and stdout | SMT-LIB queries and replies |
+Context cancellation prevents acquisition and native entry when already observed.
+Callbacks observe the call context. Solver cancellation closes its transport to unblock input and output.
+After Rust returns, Go rejects a result if it observes cancellation.
 
-Files, network access, arguments, stdin, and the real clock are not granted
-to the guest. An added import requires an explicit allowlist change and
-security review.
+A Go deadline cannot forcibly interrupt native CPU work.
+A loader that ignores cancellation can delay both cancellation and closure.
+Active-call resources remain owned until Rust returns.
 
-## Resource limits
+The native profile catches recoverable Rust panics at the C interface.
+A caught panic invalidates affected mutable state.
+Go callback panics become operation errors.
 
-| Resource | Authorization default | Analysis default |
-|---|---|---|
-| Linear memory per instance | 256 MiB | 1 GiB |
-| Guest execution deadline | 1 s per `Authorize` call | 60 s per analysis call, including solver time |
-| Instance creation and load deadline | 30 s | Included in the analysis deadline |
-| Encoded request, including context and extra entities | 1 MiB | Included in source input |
-| Encoded source input | 64 MiB per load, validation or format | 64 MiB per comparison |
-| Response size | 16 MiB | 256 MiB |
-| Retained linear memory before recycling | 64 MiB | Instance closed after each call |
-| Instances | Up to `GOMAXPROCS` per authorizer | One per concurrent call |
-| Solver output | — | 256 MiB per call |
+Allocation aborts, stack overflow, and fatal process faults can terminate the process.
+Deep-input fault tests use disposable child processes.
+Use a separate worker process if your application requires fault containment or a hard process memory limit.
 
-Runtime options and per-authorizer `Limits` configure the budgets, except
-for the fixed response-size caps. The caller's context bounds waiting for
-an authorization instance and bounds validation, which uses a fresh
-instance. Formatting also uses a fresh instance per call, with the runtime's
-source, response, and memory caps; only the caller's context bounds time.
-`WithFormatMaxOutputBytes` can reduce the raw result limit below the fixed
-16 MiB encoded-response cap. Intermediate allocations remain subject to the
-memory cap. The application controls formatting and analysis concurrency.
+## Memory and formatting
 
-The guest's 8 MiB stack sits below its data. Stack overflow traps instead
-of overwriting data. Actual nesting limits depend on the workload and
-embedded version; the fault tests exercise deep policy input.
+Native memory has no per-session hard heap limit.
+Go heap statistics do not measure Rust allocation.
+Process memory measurements include shared runtime costs and allocator retention.
 
-## Failure behavior
-
-All input strings must contain valid UTF-8. This includes source text, entity
-types and IDs, values, record keys, and raw JSON bytes. The Go boundary checks
-these inputs before JSON encoding can replace malformed bytes with `U+FFFD`.
-Valid Unicode, including `U+FFFD`, retains its identity without normalization.
-
-Malformed UTF-8 returns `KindInput` before instance acquisition in every request
-mode. Ordinary authorization and reauthorization return `Deny`; partial
-authorization returns `Undecided`. Analysis returns an input error before starting
-the solver. Loader results are checked before transfer to the guest; malformed
-UTF-8 returns `KindInput` and discards the interrupted instance.
-
-The table describes ordinary authorization and residual reauthorization.
-Experimental `PartialAuthorize` returns `Undecided` on these failures with the
-same error and instance handling; see [partial evaluation](partial-evaluation.md).
-
-| Condition | Decision | Go error | Instance |
-|---|---|---|---|
-| Cedar rejects the request, entities, context, or a UID | Deny | `*cedar.Error` with the matching kind | Reused |
-| Encoded input exceeds a size limit | Deny | `KindLimit` | Not acquired |
-| Guest execution exceeds its deadline | Deny | Matches `ErrFault` and `context.DeadlineExceeded` | Discarded |
-| Caller cancels or its deadline expires | Deny | Wraps the context error | Discarded when cancellation interrupts guest execution |
-| Guest traps or aborts, including memory exhaustion and stack overflow | Deny | Matches `ErrFault`, with bounded guest stderr | Discarded |
-| Guest response violates the protocol | Deny | Matches `ErrFault` | Discarded |
-
-`Deny` is the zero value of `Decision`. `Authorizer.Stats` counts created
-and discarded instances, and the pool creates replacements when needed.
-Cedar input errors permit reuse because authorization reads the configured
-state without mutating it.
-
-Policy evaluation diagnostics in `Response.Errors` follow Cedar semantics:
-Cedar skips those policies and decides using the remaining ones. They are
-distinct from a returned Go error and can accompany an `Allow` decision.
-
-Formatting returns no text on error and always closes its temporary instance.
-Its input and raw output size failures use `KindLimit`; guest faults and an
-oversized encoded response use `KindFault`. Loaded authorizers are unaffected.
+Positive formatter indentation cannot exceed its output byte limit.
+The formatter rejects tokenized delimiter depth above 256 before recursive formatting.
+Strings and comments do not contribute delimiters to this depth limit.
+These checks do not establish a general bound for every Cedar parser.
 
 ## Solver process
 
-The provided `analysis.Command` starts a solver with an empty environment,
-uses pipes for SMT-LIB, captures bounded stderr, and kills the process on
-context cancellation or session closure.
+The solver is a separate executable selected by the consumer.
+The supplied process adapter uses an empty environment and explicit arguments.
+It bounds solver output and stderr, closes pipes, and waits for process exit.
+The adapter does not install or own the solver executable.
 
-The solver is a native host process with the permissions of the application
-user. The guest sandbox and linear-memory limit do not constrain that
-process's filesystem access or memory. Deployments that need those limits
-should apply OS-level process isolation or provide a `Solver` adapter with
-the required controls.
+## Supply chain
 
-Counterexamples are checked with Cedar's concrete authorizer. A property
-that holds depends on the solver's `unsat` answer and SymCC's encoding.
-The [verification guide](verification.md) separates these trust assumptions
-from the tests and proofs.
+The native artifact verifier checks exact files, checksums, source, target, header, ABI, and pinned build inputs.
+Consumer extraction rejects unsafe paths, duplicate members, symbolic links, and altered source or artifact records.
+Release gates require every expected CI job to succeed for the exact main commit.
+Release files have checksums and build provenance.
 
-## Build integrity
-
-The repository tracks Rust sources, dependency pins, Cargo's lockfile, and the pinned Rust toolchain.
-CI generates the modules and their expected SHA-256 values together.
-Every Go compilation job verifies artifact checksums and its source commit before using those files.
-Two independent builds must produce identical modules and generated hashes.
-Generated modules and hash files remain untracked.
-
-Runtime hash checks detect corruption against the generated expected values.
-A checksum does not establish source provenance or reproducibility.
-Reviewed sources, build tools, generated expected hashes, and the host runtime remain trusted inputs.
-
-Release builds test the generated bytes, attest their provenance, and publish checksums. See
-[Maintenance](maintenance.md#reproducible-builds) for reproduction and
-verification commands, and [SECURITY.md](../SECURITY.md) for private reporting.
-
-### Experimental entity-loader callbacks
-
-Batched authorization adds exactly two allowlisted imports,
-`cgw_entity_loader.load` and `cgw_entity_loader.read`. Their state belongs to one
-call context, with serial load/read ownership and no global callback registry.
-The host checks guest memory bounds and byte/call budgets before deserializing
-UIDs or invoking the application loader. The result is sized before a guest
-allocation, then copied once into the exact destination. A failed host callback
-closes and discards that instance; returned errors cannot become an allow or a
-known-missing entity. Guest-side entity parsing errors are latched across the
-remaining bounded upstream iterations and returned as errors.
-
-Application loaders are trusted host code: they can allocate memory or block
-outside Wasm's limits and must honor the supplied context. The bridge uses no
-background callback goroutines. Complete ancestor data and consistency across
-rounds remain the loader's responsibility, matching upstream's experimental
-contract. This API does not imply a proof of convergence or correctness for
-malicious/inconsistent entity stores.
+The release environment defines tested compiler and system runtime requirements.
+See [platform requirements](migration/platforms.md) and the [native contract](migration/native-contract.md).
+Report vulnerabilities through [SECURITY.md](../SECURITY.md).

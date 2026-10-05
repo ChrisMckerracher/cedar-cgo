@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+
+	reports "github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/report"
 )
 
 func (s *CompiledSession) check(ctx context.Context, query string, first, second CompiledPolicySet) (Report, error) {
@@ -27,12 +29,8 @@ func (s *CompiledSession) check(ctx context.Context, query string, first, second
 		if err := json.Unmarshal(data, &result); err != nil {
 			return err
 		}
-		var output analyzeOutput
 		if len(result.Report) == 0 {
 			return errors.New("compiled response has no report")
-		}
-		if err := json.Unmarshal(result.Report, &output); err != nil {
-			return err
 		}
 		var envelope map[string]json.RawMessage
 		if err := json.Unmarshal(result.Report, &envelope); err != nil {
@@ -41,18 +39,21 @@ func (s *CompiledSession) check(ctx context.Context, query string, first, second
 		if _, present := envelope["results"]; !present || len(envelope) != 1 {
 			return errors.New("compiled report has an invalid envelope")
 		}
-		if output.Results == nil || len(output.Results) != len(s.environments) {
+		var err error
+		report, err = reports.Decode(result.Report, false, query)
+		if err != nil {
+			return err
+		}
+		if len(report.Results) != len(s.environments) {
 			return errors.New("compiled response has the wrong environment count")
 		}
-		for i, result := range output.Results {
+		for i, result := range report.Results {
 			env := s.environments[i]
-			if result.PrincipalType != env.PrincipalType || result.Action.Type != env.Action.Type || result.Action.ID == nil || *result.Action.ID != env.Action.ID || result.ResourceType != env.ResourceType {
+			if result.PrincipalType != env.PrincipalType || result.Action.Type != env.Action.Type || result.Action.ID != env.Action.ID || result.ResourceType != env.ResourceType {
 				return errors.New("compiled response has the wrong environment")
 			}
 		}
-		var err error
-		report, err = decodePropertyReport(output, false, query)
-		return err
+		return nil
 	})
 	if err != nil {
 		return Report{}, err

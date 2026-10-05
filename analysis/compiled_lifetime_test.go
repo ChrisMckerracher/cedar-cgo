@@ -3,16 +3,19 @@ package analysis_test
 import (
 	"context"
 	"errors"
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis"
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 	"testing"
+
+	"github.com/ChrisMckerracher/cedar-go-wasm/analysis"
+	uids "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
+	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
+	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 )
 
 func TestCompiledEnvironmentSelectionAndLifetime(t *testing.T) {
 	a, solver := compiledAnalyzer(t)
 	ctx := context.Background()
-	schema := cedar.SchemaFromCedar(`entity User; entity Document; action view appliesTo {principal: User, resource: Document, context: {n: Long}}; action edit appliesTo {principal: User, resource: Document, context: {n: Long}};`)
-	selection := []analysis.RequestEnvironment{{PrincipalType: "User", Action: cedar.NewEntityUID("Action", "view"), ResourceType: "Document"}}
+	schema := schemas.SchemaFromCedar(`entity User; entity Document; action view appliesTo {principal: User, resource: Document, context: {n: Long}}; action edit appliesTo {principal: User, resource: Document, context: {n: Long}};`)
+	selection := []analysis.RequestEnvironment{{PrincipalType: "User", Action: uids.NewEntityUID("Action", "view"), ResourceType: "Document"}}
 	life, cancel := context.WithCancel(ctx)
 	s, err := a.OpenCompiled(life, schema, selection)
 	if err != nil {
@@ -40,7 +43,7 @@ func TestCompiledEnvironmentSelectionAndLifetime(t *testing.T) {
 		t.Fatal("duplicate selection accepted")
 	}
 	invalid := valid
-	invalid.Action = cedar.NewEntityUID("Action", "missing")
+	invalid.Action = uids.NewEntityUID("Action", "missing")
 	if _, err := a.OpenCompiled(ctx, schema, []analysis.RequestEnvironment{invalid}); err == nil {
 		t.Fatal("unknown selection accepted")
 	}
@@ -56,7 +59,7 @@ func TestCompiledEnvironmentSelectionAndLifetime(t *testing.T) {
 	if err != nil || len(report.Results) != 0 || !report.Holds() {
 		t.Fatalf("empty selection %+v %v", report, err)
 	}
-	if _, err := empty.Compile(ctx, cedar.PoliciesFromCedar(`permit(principal == ?principal,action,resource);`)); err == nil {
+	if _, err := empty.Compile(ctx, policy.PoliciesFromCedar(`permit(principal == ?principal,action,resource);`)); err == nil {
 		t.Fatal("empty selection accepted template")
 	}
 	cancel()

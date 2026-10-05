@@ -1,0 +1,17 @@
+[package]
+name = "cgw-native"
+description = "Maintained C interface for Cedar authorization and analysis"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[lib]
+crate-type = ["staticlib", "rlib"]
+
+[dependencies]
+cgw-abi.workspace = true
+cgw-authorizer = { path = "../authorizer" }
+cgw-analysis = { path = "../analysis" }
+serde_json.workspace = true

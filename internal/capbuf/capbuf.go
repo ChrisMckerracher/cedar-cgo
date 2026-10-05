@@ -1,4 +1,4 @@
-// Package capbuf bounds diagnostic capture so guest output cannot exhaust host memory.
+// Package capbuf bounds diagnostic capture so diagnostic output cannot exhaust host memory.
 package capbuf
 
 import (

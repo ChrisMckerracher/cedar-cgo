@@ -22,8 +22,7 @@ In scope:
 A vulnerability in Cedar itself belongs to the Cedar project. Report it
 through Cedar's process in
 [cedar-policy/cedar SECURITY.md](https://github.com/cedar-policy/cedar/blob/main/SECURITY.md).
-A vulnerability in wazero belongs to
-[wazero](https://github.com/wazero/wazero/security). If you are not sure
+If you are not sure
 where a problem lies, report it here and we will forward it.
 
 ## Supported Versions

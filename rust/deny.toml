@@ -1,8 +1,8 @@
 # Embedded dependencies must have permissive licenses compatible with Apache-2.0.
 
 [graph]
-# Check both shipped guests and the native Linux benchmark.
-targets = ["wasm32-wasip1", "x86_64-unknown-linux-gnu"]
+# Check every supported native target.
+targets = ["x86_64-unknown-linux-gnu", "aarch64-unknown-linux-gnu", "aarch64-apple-darwin"]
 all-features = true
 
 [advisories]

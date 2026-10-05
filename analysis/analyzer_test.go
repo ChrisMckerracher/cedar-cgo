@@ -8,7 +8,12 @@ import (
 	"time"
 
 	"github.com/ChrisMckerracher/cedar-go-wasm/analysis"
+	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/solver"
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
+	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
+	requests "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
+	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
+	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 )
 
 func readFile(t *testing.T, name string) string {
@@ -26,7 +31,7 @@ func newAnalyzer(t *testing.T) *analysis.Analyzer {
 	if path == "" {
 		t.Skip("CVC5 is not set to a cvc5 executable; see CONTRIBUTING.md")
 	}
-	a, err := analysis.New(context.Background(), analysis.CVC5(path))
+	a, err := analysis.New(context.Background(), solver.CVC5(path))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -37,10 +42,10 @@ func newAnalyzer(t *testing.T) *analysis.Analyzer {
 func TestNewlyPermittedJoy(t *testing.T) {
 	a := newAnalyzer(t)
 	ctx := context.Background()
-	schema := cedar.SchemaFromCedar(readFile(t, "../testdata/joy/joy.cedarschema"))
-	before := cedar.PoliciesFromCedar(readFile(t, "../testdata/joy/old.cedar"))
-	added := cedar.PoliciesFromCedar(readFile(t, "../testdata/joy/new.cedar"))
-	tight := cedar.PoliciesFromCedar(readFile(t, "../testdata/joy/tight.cedar"))
+	schema := schemas.SchemaFromCedar(readFile(t, "../testdata/joy/joy.cedarschema"))
+	before := policy.PoliciesFromCedar(readFile(t, "../testdata/joy/old.cedar"))
+	added := policy.PoliciesFromCedar(readFile(t, "../testdata/joy/new.cedar"))
+	tight := policy.PoliciesFromCedar(readFile(t, "../testdata/joy/tight.cedar"))
 
 	rt, err := cedar.NewRuntime(ctx)
 	if err != nil {
@@ -61,7 +66,7 @@ func TestNewlyPermittedJoy(t *testing.T) {
 		}
 		widened++
 		c := r.Counterexample
-		if c.First != cedar.Deny || c.Second != cedar.Allow {
+		if c.First != requests.Deny || c.Second != requests.Allow {
 			t.Fatalf("%s: counterexample decisions before=%v after=%v", r.Action, c.First, c.Second)
 		}
 		checkWithAuthorizer(t, rt, schema, before, added, c)
@@ -96,15 +101,15 @@ func TestNewlyPermittedJoy(t *testing.T) {
 	}
 }
 
-// Replay through Go to verify that counterexample decoding preserves the guest's result.
-func checkWithAuthorizer(t *testing.T, rt *cedar.Runtime, schema cedar.Schema, before, after cedar.PolicySet, c *analysis.Counterexample) {
+// Replay through Go to verify that counterexample decoding preserves the native result.
+func checkWithAuthorizer(t *testing.T, rt *cedar.Runtime, schema schemas.Schema, before, after policy.PolicySet, c *analysis.Counterexample) {
 	t.Helper()
 	ctx := context.Background()
 	for _, tc := range []struct {
-		policies cedar.PolicySet
-		want     cedar.Decision
-	}{{before, cedar.Deny}, {after, cedar.Allow}} {
-		az, err := rt.NewAuthorizer(ctx, cedar.Config{Schema: &schema, Policies: tc.policies})
+		policies policy.PolicySet
+		want     requests.Decision
+	}{{before, requests.Deny}, {after, requests.Allow}} {
+		az, err := rt.NewAuthorizer(ctx, authorization.Config{Schema: &schema, Policies: tc.policies})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -121,8 +126,8 @@ func checkWithAuthorizer(t *testing.T, rt *cedar.Runtime, schema cedar.Schema, b
 
 func TestAnalysisRejectsInvalidPolicies(t *testing.T) {
 	a := newAnalyzer(t)
-	schema := cedar.SchemaFromCedar(readFile(t, "../testdata/joy/joy.cedarschema"))
-	bad := cedar.PoliciesFromCedar(`permit(principal, action, resource) when { context.deviceLevel == "high" };`)
+	schema := schemas.SchemaFromCedar(readFile(t, "../testdata/joy/joy.cedarschema"))
+	bad := policy.PoliciesFromCedar(`permit(principal, action, resource) when { context.deviceLevel == "high" };`)
 	_, err := a.NewlyPermitted(context.Background(), schema, bad, bad)
 	if err == nil || !strings.Contains(err.Error(), "compile") {
 		t.Fatalf("got %v, want a compile error", err)
@@ -130,13 +135,13 @@ func TestAnalysisRejectsInvalidPolicies(t *testing.T) {
 }
 
 func TestAnalysisSolverMissing(t *testing.T) {
-	a, err := analysis.New(context.Background(), analysis.CVC5("/nonexistent/cvc5"))
+	a, err := analysis.New(context.Background(), solver.CVC5("/nonexistent/cvc5"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer a.Close(context.Background())
-	schema := cedar.SchemaFromCedar(readFile(t, "../testdata/joy/joy.cedarschema"))
-	p := cedar.PoliciesFromCedar(readFile(t, "../testdata/joy/old.cedar"))
+	schema := schemas.SchemaFromCedar(readFile(t, "../testdata/joy/joy.cedarschema"))
+	p := policy.PoliciesFromCedar(readFile(t, "../testdata/joy/old.cedar"))
 	if _, err := a.Equivalent(context.Background(), schema, p, p); err == nil {
 		t.Fatal("analysis without a solver succeeded")
 	}

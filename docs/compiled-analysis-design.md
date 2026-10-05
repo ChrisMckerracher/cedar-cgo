@@ -13,12 +13,12 @@ A later API can define typed assertions after it defines their validation and co
 
 ## Ownership
 
-`Analyzer.OpenCompiled` creates one Go-owned solver session and one Wasm instance.
+`Analyzer.OpenCompiled` creates one Go-owned solver session and one native state.
 The constructor context controls the session lifetime.
 The native instance owns one schema, selected request environments, compiled policy sets, and a symbolic compiler.
 The Go session owns the instance, solver transport, lifetime cancellation, and call gate.
 A handle contains its originating Go session and a native integer ID.
-A handle has no pointer into Wasm memory.
+A handle has no pointer into native memory.
 The native session retains the original policy sets for concrete counterexample replay.
 
 ```text
@@ -26,7 +26,7 @@ Analyzer
   CompiledSession
     Go solver transport
     exclusive call gate
-    Wasm instance
+    native state
       Schema + RequestEnv values
       CedarSymCompiler<HostSolver>
       handle -> original PolicySet + compiled sets per environment
@@ -42,7 +42,7 @@ Reject templates through the native compilation contract.
 Check implication, equivalence, or disjointness with existing native optimized methods.
 Reuse compiled sets and the solver transport across checks.
 Release a handle to remove its native policy data.
-Limit each session to 128 active handles. The configured Wasm memory limit also applies.
+Limit each session to 128 active handles. Native memory has no per-session hard heap limit.
 Close the session to release all handles, its instance, and solver.
 Closing the analyzer also closes its compiled sessions.
 
@@ -53,9 +53,9 @@ A canceled caller that still waits for the gate does not affect an active call.
 Each active call uses the analyzer timeout and a new solver-output byte counter.
 If an active call times out or is canceled, close the solver and invalidate the whole session.
 A solver read must unblock when its transport closes.
-A guest trap, malformed response, solver failure, or unconfirmed counterexample also invalidates the session.
+A recovered native panic, malformed response, solver failure, or unconfirmed counterexample also invalidates the session.
 Ordinary input and compilation errors leave the session usable.
-Reject handles from another session before guest execution.
+Reject handles from another session before native execution.
 Never reuse native handle IDs within one session.
 
 ## Results and compatibility
@@ -80,8 +80,8 @@ Record benchmark input, tool versions, iterations, timings, and allocations.
 
 The Go call gate covers resource construction as well as regular calls.
 Register a session before construction so analyzer closure can cancel pending solver startup.
-Cancel the session lifetime and close its solver before waiting for the guest call gate.
-This order unblocks an active host read before guest cleanup.
+Cancel the session lifetime and close its solver before waiting for the native library call gate.
+This order unblocks an active host read before native library cleanup.
 Each native check retains the original policies and uses the existing concrete replay helper.
 Native solver failures also discard the native session state.
 Go rejects non-monotonic returned handle IDs, including IDs of released handles.

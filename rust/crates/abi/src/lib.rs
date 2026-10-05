@@ -1,110 +1,13 @@
-//! Operations consume host-allocated JSON input and transfer JSON response ownership
-//! back to the host, which copies the bytes before calling `cgw_free`.
-
+//! Shared native transport records, Cedar parsing, and diagnostic conversion.
+mod callback;
 pub mod structured;
+pub use callback::{Callback, CallbackFn};
 
 use cedar_policy::{PolicySet, Schema};
-use serde::{Deserialize, Serialize};
-use std::alloc::Layout;
+use serde::Deserialize;
 use std::str::FromStr;
 
-/// The host rejects a version mismatch before exchanging memory.
-pub const ABI_VERSION: u32 = 1;
-
-/// Allocates `len` bytes for the host. Returns 0 if the allocation fails.
-pub fn alloc(len: u32) -> u32 {
-    let Ok(layout) = Layout::array::<u8>(len.max(1) as usize) else {
-        return 0;
-    };
-    // SAFETY: the layout has a non-zero size.
-    unsafe { std::alloc::alloc(layout) as u32 }
-}
-
-/// Releases a buffer that `alloc` or `respond` returned.
-///
-/// # Safety
-/// `ptr` and `len` must come from one `alloc` call or one response, and the
-/// buffer must not be used after this call.
-pub unsafe fn free(ptr: u32, len: u32) {
-    if ptr == 0 {
-        return;
-    }
-    if let Ok(layout) = Layout::array::<u8>(len.max(1) as usize) {
-        // SAFETY: the caller guarantees that `ptr` came from `alloc` with this layout.
-        unsafe { std::alloc::dealloc(ptr as *mut u8, layout) }
-    }
-}
-
-/// Takes ownership of an input buffer that the host filled.
-///
-/// # Safety
-/// `ptr` and `len` must come from one `alloc(len)` call, and the host must not
-/// use the buffer after this call.
-pub unsafe fn take_input(ptr: u32, len: u32) -> Input {
-    Input { ptr, len }
-}
-
-/// An input buffer owned by the module. Dropping it releases the memory.
-pub struct Input {
-    ptr: u32,
-    len: u32,
-}
-
-impl Input {
-    pub fn bytes(&self) -> &[u8] {
-        if self.len == 0 {
-            return &[];
-        }
-        // SAFETY: `take_input` guarantees that the buffer holds `len` bytes.
-        unsafe { std::slice::from_raw_parts(self.ptr as *const u8, self.len as usize) }
-    }
-}
-
-impl Drop for Input {
-    fn drop(&mut self) {
-        // SAFETY: `take_input` guarantees that the buffer came from `alloc(len)`.
-        unsafe { free(self.ptr, self.len) }
-    }
-}
-
-/// Transfers ownership to the host: pointer in the high 32 bits, length in the low 32.
-pub fn respond(body: Vec<u8>) -> u64 {
-    let len = body.len() as u32;
-    let ptr = alloc(len);
-    if ptr == 0 {
-        // The host treats a zero response as a fault and discards the instance.
-        return 0;
-    }
-    // SAFETY: `ptr` points to `len` freshly allocated bytes.
-    unsafe { std::ptr::copy_nonoverlapping(body.as_ptr(), ptr as *mut u8, body.len()) };
-    (u64::from(ptr) << 32) | u64::from(len)
-}
-
-pub fn respond_json<T: Serialize>(value: &T) -> u64 {
-    match serde_json::to_vec(value) {
-        Ok(body) => respond(body),
-        Err(e) => respond_error("internal", e.to_string()),
-    }
-}
-
-#[derive(Serialize)]
-struct ErrorBody<'a> {
-    kind: &'a str,
-    message: String,
-}
-
-#[derive(Serialize)]
-struct ErrorResponse<'a> {
-    error: ErrorBody<'a>,
-}
-
-pub fn respond_error(kind: &str, message: String) -> u64 {
-    let body = ErrorResponse {
-        error: ErrorBody { kind, message },
-    };
-    // Serializing two strings cannot fail.
-    respond(serde_json::to_vec(&body).unwrap_or_default())
-}
+pub const ABI_VERSION: u32 = 2;
 
 #[derive(Debug)]
 pub struct OpError {
@@ -127,15 +30,6 @@ impl OpError {
             kind,
             message: message.into(),
         }
-    }
-}
-
-pub fn run<T: Serialize>(input: Input, op: impl FnOnce(&[u8]) -> Result<T, OpError>) -> u64 {
-    let result = op(input.bytes());
-    drop(input);
-    match result {
-        Ok(value) => respond_json(&value),
-        Err(e) => respond_error(e.kind, e.message),
     }
 }
 
@@ -210,29 +104,4 @@ pub mod diagnostics {
         }
         out
     }
-}
-
-#[macro_export]
-macro_rules! export_memory_functions {
-    () => {
-        #[unsafe(no_mangle)]
-        pub extern "C" fn cgw_abi_version() -> u32 {
-            $crate::ABI_VERSION
-        }
-
-        #[unsafe(no_mangle)]
-        pub extern "C" fn cgw_alloc(len: u32) -> u32 {
-            $crate::alloc(len)
-        }
-
-        /// Releases a response buffer.
-        ///
-        /// # Safety
-        /// The host passes a pointer and length from one response.
-        #[unsafe(no_mangle)]
-        pub unsafe extern "C" fn cgw_free(ptr: u32, len: u32) {
-            // SAFETY: the host passes a pointer and length from one response.
-            unsafe { $crate::free(ptr, len) }
-        }
-    };
 }

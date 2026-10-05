@@ -1,0 +1,1120 @@
+{
+  "baseline_count": 219,
+  "new_count": 223,
+  "missing": [],
+  "equivalents": [
+    {
+      "old": "BenchmarkAuthorizeJoy",
+      "new": "BenchmarkAuthorizeJoy",
+      "path": "cedar/integration/bench_test.go"
+    },
+    {
+      "old": "BenchmarkAuthorizeJoyParallel",
+      "new": "BenchmarkAuthorizeJoyParallel",
+      "path": "cedar/integration/bench_test.go"
+    },
+    {
+      "old": "BenchmarkInstanceMemory",
+      "new": "BenchmarkInstanceMemory",
+      "path": "cedar/authorization/memory_native_internal_test.go"
+    },
+    {
+      "old": "BenchmarkNewAuthorizerJoy",
+      "new": "BenchmarkNewAuthorizerJoy",
+      "path": "cedar/integration/bench_test.go"
+    },
+    {
+      "old": "BenchmarkNewRuntime",
+      "new": "BenchmarkNewRuntime",
+      "path": "cedar/integration/bench_test.go"
+    },
+    {
+      "old": "BenchmarkNewRuntimeCached",
+      "new": "BenchmarkNewRuntimeParallel",
+      "path": "cedar/integration/bench_test.go"
+    },
+    {
+      "old": "BenchmarkValidateJoy",
+      "new": "BenchmarkValidateJoy",
+      "path": "cedar/integration/bench_test.go"
+    },
+    {
+      "old": "Example",
+      "new": "Example",
+      "path": "cedar/integration/example_test.go"
+    },
+    {
+      "old": "ExampleAuthorizer_AuthorizeBatched",
+      "new": "Example_authorizeBatched",
+      "path": "cedar/authorization/batched/batched_cached_entities_and_ownership_test.go"
+    },
+    {
+      "old": "ExamplePartialResponse_Reauthorize",
+      "new": "ExamplePartialResponse_Reauthorize",
+      "path": "cedar/authorization/partial/partial_example_test.go"
+    },
+    {
+      "old": "ExampleRuntime_FormatPolicies",
+      "new": "Example_formatPolicies",
+      "path": "cedar/policy/format/format_output_limit_test.go"
+    },
+    {
+      "old": "ExampleRuntime_LinkTemplate",
+      "new": "Example_linkTemplate",
+      "path": "cedar/policy/template/templates_example_test.go"
+    },
+    {
+      "old": "ExampleRuntime_ParsePolicy",
+      "new": "Example_parsePolicy",
+      "path": "cedar/policy/policies_example_test.go"
+    },
+    {
+      "old": "ExampleRuntime_PolicyFromSyntax",
+      "new": "Example_policyFromSyntax",
+      "path": "cedar/policy/policies_example_test.go"
+    },
+    {
+      "old": "ExampleRuntime_SliceEntities",
+      "new": "Example_sliceEntities",
+      "path": "cedar/entity/slicing/slice_entities_cancellation_test.go"
+    },
+    {
+      "old": "ExampleRuntime_Validate",
+      "new": "Example_validate",
+      "path": "cedar/integration/example_test.go"
+    },
+    {
+      "old": "FuzzAuthorize",
+      "new": "FuzzAuthorize",
+      "path": "cedar/integration/fuzz_test.go"
+    },
+    {
+      "old": "FuzzBatchedDifferential",
+      "new": "FuzzBatchedDifferential",
+      "path": "cedar/authorization/batched/batched_differential_test.go"
+    },
+    {
+      "old": "FuzzBatchedEntities",
+      "new": "FuzzBatchedEntities",
+      "path": "cedar/authorization/batched/batched_fuzz_test.go"
+    },
+    {
+      "old": "FuzzConfusableStrings",
+      "new": "FuzzConfusableStrings",
+      "path": "cedar/utility/utilities_fuzz_test.go"
+    },
+    {
+      "old": "FuzzContextMerge",
+      "new": "FuzzContextMerge",
+      "path": "cedar/utility/utilities_fuzz_test.go"
+    },
+    {
+      "old": "FuzzDiagnostics",
+      "new": "FuzzDiagnostics",
+      "path": "cedar/diagnostic/diagnostics_protocol_test.go"
+    },
+    {
+      "old": "FuzzEntities",
+      "new": "FuzzEntities",
+      "path": "cedar/integration/entities_test.go"
+    },
+    {
+      "old": "FuzzEntityLiteralSubstitution",
+      "new": "FuzzEntityLiteralSubstitution",
+      "path": "cedar/policy/entity_literal_native_fixtures_test.go"
+    },
+    {
+      "old": "FuzzEntityStoreUnrelatedDecisions",
+      "new": "FuzzEntityStoreUnrelatedDecisions",
+      "path": "cedar/entity/entity_store_native_values_and_equality_test.go"
+    },
+    {
+      "old": "FuzzEvalResult",
+      "new": "FuzzEvalResult",
+      "path": "cedar/expression/expressions_internal_test.go"
+    },
+    {
+      "old": "FuzzFormatPolicies",
+      "new": "FuzzFormatPolicies",
+      "path": "cedar/policy/format/format_fuzz_test.go"
+    },
+    {
+      "old": "FuzzNativeUIDRoundTrip",
+      "new": "FuzzNativeUIDRoundTrip",
+      "path": "cedar/utility/nativeuid_round_trip_test.go"
+    },
+    {
+      "old": "FuzzPartialEntities",
+      "new": "FuzzPartialEntities",
+      "path": "cedar/authorization/partial/partial_fuzz_test.go"
+    },
+    {
+      "old": "FuzzPartialReauthorize",
+      "new": "FuzzPartialReauthorize",
+      "path": "cedar/authorization/partial/partial_fuzz_test.go"
+    },
+    {
+      "old": "FuzzPolicies",
+      "new": "FuzzPolicies",
+      "path": "cedar/integration/policies_test.go"
+    },
+    {
+      "old": "FuzzPolicyEdits",
+      "new": "FuzzPolicyEdits",
+      "path": "cedar/policy/policy_edits_test.go"
+    },
+    {
+      "old": "FuzzPolicySyntax",
+      "new": "FuzzPolicySyntax",
+      "path": "cedar/policy/policies_fuzz_test.go"
+    },
+    {
+      "old": "FuzzResidualImport",
+      "new": "FuzzResidualImport",
+      "path": "cedar/authorization/partial/residual_fuzz_test.go"
+    },
+    {
+      "old": "FuzzSchemaFragments",
+      "new": "FuzzSchemaFragments",
+      "path": "cedar/schema/schemas_fuzz_test.go"
+    },
+    {
+      "old": "FuzzScopeValidation",
+      "new": "FuzzScopeValidation",
+      "path": "cedar/utility/scope_validation_test.go"
+    },
+    {
+      "old": "FuzzSliceEntities",
+      "new": "FuzzSliceEntities",
+      "path": "cedar/entity/slicing/slicing_fuzz_test.go"
+    },
+    {
+      "old": "FuzzSourceTokenSpans",
+      "new": "FuzzSourceTokenSpans",
+      "path": "cedar/policy/source/source_tokens_test.go"
+    },
+    {
+      "old": "FuzzTemplates",
+      "new": "FuzzTemplates",
+      "path": "cedar/policy/template/templates_fuzz_test.go"
+    },
+    {
+      "old": "FuzzUTF8Values",
+      "new": "FuzzUTF8Values",
+      "path": "cedar/integration/utf8_fuzz_test.go"
+    },
+    {
+      "old": "FuzzValidationDepth",
+      "new": "FuzzValidationDepth",
+      "path": "cedar/validation/validation_depth_fuzz_test.go"
+    },
+    {
+      "old": "TestActionQueryResultJSONRoundTrip",
+      "new": "TestActionQueryResultJSONRoundTrip",
+      "path": "cedar/authorization/partial/queries_protocol_test.go"
+    },
+    {
+      "old": "TestApplicabilityBoundaries",
+      "new": "TestApplicabilityBoundaries",
+      "path": "cedar/policy/applicability/request_environmentjson_round_trip_test.go"
+    },
+    {
+      "old": "TestApplicabilityDoesNotAuthorize",
+      "new": "TestApplicabilityDoesNotAuthorize",
+      "path": "cedar/policy/applicability/request_environmentjson_round_trip_test.go"
+    },
+    {
+      "old": "TestApplicabilityNativeFixtures",
+      "new": "TestApplicabilityNativeFixtures",
+      "path": "cedar/policy/applicability/applicability_test.go"
+    },
+    {
+      "old": "TestApplicabilityRawIDFixtures",
+      "new": "TestApplicabilityRawIDFixtures",
+      "path": "cedar/policy/applicability/applicability_test.go"
+    },
+    {
+      "old": "TestAuthorizeErrorsDeny",
+      "new": "TestAuthorizeErrorsDeny",
+      "path": "cedar/authorization/authorizer_test.go"
+    },
+    {
+      "old": "TestAuthorizeJoy",
+      "new": "TestAuthorizeJoy",
+      "path": "cedar/authorization/authorizer_test.go"
+    },
+    {
+      "old": "TestAuthorizeRejectsInvalidUTF8Identity",
+      "new": "TestAuthorizeRejectsInvalidUTF8Identity",
+      "path": "cedar/integration/utf8_test.go"
+    },
+    {
+      "old": "TestAuthorizeRequestEntities",
+      "new": "TestAuthorizeRequestEntities",
+      "path": "cedar/authorization/authorizer_test.go"
+    },
+    {
+      "old": "TestBatchedCachedEntitiesAndOwnership",
+      "new": "TestBatchedCachedEntitiesAndOwnership",
+      "path": "cedar/authorization/batched/batched_cached_entities_and_ownership_test.go"
+    },
+    {
+      "old": "TestBatchedCallbackFailures",
+      "new": "TestBatchedCallbackFailures",
+      "path": "cedar/authorization/batched/batched_test.go"
+    },
+    {
+      "old": "TestBatchedCancellationAndPoolWait",
+      "new": "TestBatchedCancellationAndPoolWait",
+      "path": "cedar/authorization/batched/batched_limits_test.go"
+    },
+    {
+      "old": "TestBatchedLimits",
+      "new": "TestBatchedLimits",
+      "path": "cedar/authorization/batched/batched_limits_test.go"
+    },
+    {
+      "old": "TestBatchedLoaderCannotRedefineCachedEntities",
+      "new": "TestBatchedLoaderCannotRedefineCachedEntities",
+      "path": "cedar/authorization/batched/batched_cached_entities_and_ownership_test.go"
+    },
+    {
+      "old": "TestBatchedNativeParity",
+      "new": "TestBatchedNativeParity",
+      "path": "cedar/authorization/batched/batched_test.go"
+    },
+    {
+      "old": "TestBatchedSchemaAndRequestErrors",
+      "new": "TestBatchedSchemaAndRequestErrors",
+      "path": "cedar/authorization/batched/batched_schema_and_request_errors_test.go"
+    },
+    {
+      "old": "TestBatchedTimeoutAndConcurrency",
+      "new": "TestBatchedTimeoutAndConcurrency",
+      "path": "cedar/authorization/batched/batched_limits_test.go"
+    },
+    {
+      "old": "TestCombinedPolicyEvaluationPaths",
+      "new": "TestCombinedPolicyEvaluationPaths",
+      "path": "cedar/integration/combined_parity_test.go"
+    },
+    {
+      "old": "TestConfusableMetadataAndRawPolicyIDs",
+      "new": "TestConfusableMetadataAndRawPolicyIDs",
+      "path": "cedar/utility/standalone_validation_and_confusables_test.go"
+    },
+    {
+      "old": "TestConfusableStringsDoNotDuplicateLinkedTemplates",
+      "new": "TestConfusableStringsDoNotDuplicateLinkedTemplates",
+      "path": "cedar/utility/standalone_validation_and_confusables_test.go"
+    },
+    {
+      "old": "TestContextMergeContract",
+      "new": "TestContextMergeContract",
+      "path": "cedar/utility/utilities_test.go"
+    },
+    {
+      "old": "TestContextMergeDisjointProperty",
+      "new": "TestContextMergeDisjointProperty",
+      "path": "cedar/utility/utilities_test.go"
+    },
+    {
+      "old": "TestCorpus",
+      "new": "TestCorpus",
+      "path": "cedar/integration/conformance_test.go"
+    },
+    {
+      "old": "TestDecodeSliceFailClosed",
+      "new": "TestDecodeSliceFailClosed",
+      "path": "cedar/entity/slicing/slicing_internal_test.go"
+    },
+    {
+      "old": "TestDiagnosticJSONPolicySpans",
+      "new": "TestDiagnosticJSONPolicySpans",
+      "path": "cedar/diagnostic/diagnostics_test.go"
+    },
+    {
+      "old": "TestDiagnosticMetadataIgnoresNativeOrder",
+      "new": "TestDiagnosticMetadataIgnoresNativeOrder",
+      "path": "cedar/diagnostic/diagnostic_metadata_ignores_spelling_hints_test.go"
+    },
+    {
+      "old": "TestDiagnosticMetadataIgnoresSpellingHints",
+      "new": "TestDiagnosticMetadataIgnoresSpellingHints",
+      "path": "cedar/diagnostic/diagnostic_metadata_ignores_spelling_hints_test.go"
+    },
+    {
+      "old": "TestDiagnosticProtocol",
+      "new": "TestDiagnosticProtocol",
+      "path": "cedar/diagnostic/diagnostics_protocol_test.go"
+    },
+    {
+      "old": "TestDiagnosticRawPolicyIDs",
+      "new": "TestDiagnosticRawPolicyIDs",
+      "path": "cedar/diagnostic/diagnostic_metadata_ignores_spelling_hints_test.go"
+    },
+    {
+      "old": "TestEncodeEntityLoadResultExactBudget",
+      "new": "TestEncodeEntityLoadResultExactBudget",
+      "path": "cedar/authorization/batched/entity_loader_import_protocol_test.go"
+    },
+    {
+      "old": "TestEntityLiteralBoundaries",
+      "new": "TestEntityLiteralBoundaries",
+      "path": "cedar/policy/entity_literal_boundaries_test.go"
+    },
+    {
+      "old": "TestEntityLiteralInventoryJSONRoundTrip",
+      "new": "TestEntityLiteralInventoryJSONRoundTrip",
+      "path": "cedar/policy/entity_literal_inventoryjson_round_trip_test.go"
+    },
+    {
+      "old": "TestEntityLiteralNativeFixtures",
+      "new": "TestEntityLiteralNativeFixtures",
+      "path": "cedar/policy/entity_literal_native_fixtures_test.go"
+    },
+    {
+      "old": "TestEntityLoaderImportProtocol",
+      "new": "TestEntityLoaderImportProtocol",
+      "path": "cedar/authorization/batched/entity_loader_import_protocol_test.go"
+    },
+    {
+      "old": "TestEntityLoaderRejectsInvalidUTF8",
+      "new": "TestEntityLoaderRejectsInvalidUTF8",
+      "path": "cedar/authorization/batched/batched_internal_test.go"
+    },
+    {
+      "old": "TestEntityStoreEmptySnapshot",
+      "new": "TestEntityStoreEmptySnapshot",
+      "path": "cedar/entity/entity_store_internal_test.go"
+    },
+    {
+      "old": "TestEntityStoreInputLimitsBeforeGuest",
+      "new": "TestEntityStoreInputLimitsBeforeGuest",
+      "path": "cedar/entity/entity_store_internal_test.go"
+    },
+    {
+      "old": "TestEntityStoreJSONComparisonPreservesIntegers",
+      "new": "TestEntityStoreJSONComparisonPreservesIntegers",
+      "path": "cedar/entity/entity_store_test.go"
+    },
+    {
+      "old": "TestEntityStoreMalformedSnapshot",
+      "new": "TestEntityStoreMalformedSnapshot",
+      "path": "cedar/entity/entity_store_internal_test.go"
+    },
+    {
+      "old": "TestEntityStoreNativeParity",
+      "new": "TestEntityStoreNativeParity",
+      "path": "cedar/entity/entity_store_native_parity_test.go"
+    },
+    {
+      "old": "TestEntityStoreNativeValuesAndEquality",
+      "new": "TestEntityStoreNativeValuesAndEquality",
+      "path": "cedar/entity/entity_store_native_values_and_equality_test.go"
+    },
+    {
+      "old": "TestEntityStoreZeroAndInvalidInputs",
+      "new": "TestEntityStoreZeroAndInvalidInputs",
+      "path": "cedar/entity/entity_store_native_values_and_equality_test.go"
+    },
+    {
+      "old": "TestExpressionErrors",
+      "new": "TestExpressionErrors",
+      "path": "cedar/expression/expressions_test.go"
+    },
+    {
+      "old": "TestExpressionEvaluationVariants",
+      "new": "TestExpressionEvaluationVariants",
+      "path": "cedar/expression/expressions_test.go"
+    },
+    {
+      "old": "TestExpressionLimits",
+      "new": "TestExpressionLimits",
+      "path": "cedar/expression/expressions_internal_test.go"
+    },
+    {
+      "old": "TestExpressionNativeFixtures",
+      "new": "TestExpressionNativeFixtures",
+      "path": "cedar/expression/expressions_internal_test.go"
+    },
+    {
+      "old": "TestExpressionRejectsInvalidUTF8BeforeGuest",
+      "new": "TestExpressionRejectsInvalidUTF8BeforeGuest",
+      "path": "cedar/expression/expression_rejects_invalidutf8_before_guest_test.go"
+    },
+    {
+      "old": "TestFailClosedOnCallerCancel",
+      "new": "TestFailClosedOnCallerCancel",
+      "path": "cedar/integration/failclosed_test.go"
+    },
+    {
+      "old": "TestFailClosedOnCorruptInstance",
+      "new": "TestFailClosedOnCorruptInstance",
+      "path": "cedar/authorization/failclosed_native_internal_test.go"
+    },
+    {
+      "old": "TestFailClosedOnMemoryLimit",
+      "new": "TestFailClosedOnMemoryLimit",
+      "path": "cedar/integration/failclosed_test.go"
+    },
+    {
+      "old": "TestFailClosedOnStackOverflow",
+      "new": "TestFailClosedOnStackOverflow",
+      "path": "cedar/integration/failclosed_stack_test.go"
+    },
+    {
+      "old": "TestFailClosedOnTimeout",
+      "new": "TestFailClosedOnTimeout",
+      "path": "cedar/integration/failclosed_test.go"
+    },
+    {
+      "old": "TestFormatCancellationAndIsolation",
+      "new": "TestFormatCancellationAndIsolation",
+      "path": "cedar/policy/format/format_output_limit_test.go"
+    },
+    {
+      "old": "TestFormatConcurrent",
+      "new": "TestFormatConcurrent",
+      "path": "cedar/policy/format/format_output_limit_test.go"
+    },
+    {
+      "old": "TestFormatDiagnosticsAndInput",
+      "new": "TestFormatDiagnosticsAndInput",
+      "path": "cedar/policy/format/format_test.go"
+    },
+    {
+      "old": "TestFormatEncodedLimits",
+      "new": "TestFormatEncodedLimits",
+      "path": "cedar/policy/format/format_internal_test.go"
+    },
+    {
+      "old": "TestFormatGuestCancellationAndEnvelope",
+      "new": "TestFormatGuestCancellationAndEnvelope",
+      "path": "cedar/policy/format/format_internal_test.go"
+    },
+    {
+      "old": "TestFormatMemoryAndStackLimits",
+      "new": "TestFormatMemoryAndStackLimits",
+      "path": "cedar/policy/format/format_output_limit_test.go"
+    },
+    {
+      "old": "TestFormatNativeParity",
+      "new": "TestFormatNativeParity",
+      "path": "cedar/policy/format/format_test.go"
+    },
+    {
+      "old": "TestFormatOutputLimit",
+      "new": "TestFormatOutputLimit",
+      "path": "cedar/policy/format/format_output_limit_test.go"
+    },
+    {
+      "old": "TestFormatRejectsBrokenResponses",
+      "new": "TestFormatRejectsBrokenResponses",
+      "path": "cedar/policy/format/format_internal_test.go"
+    },
+    {
+      "old": "TestMalformedEvaluationResults",
+      "new": "TestMalformedEvaluationResults",
+      "path": "cedar/expression/expressions_internal_test.go"
+    },
+    {
+      "old": "TestMalformedSourceTokenResponses",
+      "new": "TestMalformedSourceTokenResponses",
+      "path": "cedar/policy/source/source_tokens_internal_test.go"
+    },
+    {
+      "old": "TestModuleChecks",
+      "new": "TestModuleChecks",
+      "path": "cedar/integration/failclosed_internal_test.go"
+    },
+    {
+      "old": "TestNativeUIDRoundTripProperty",
+      "new": "TestNativeUIDRoundTripProperty",
+      "path": "cedar/utility/utilities_test.go"
+    },
+    {
+      "old": "TestNativeUtilityErrors",
+      "new": "TestNativeUtilityErrors",
+      "path": "cedar/utility/standalone_validation_and_confusables_test.go"
+    },
+    {
+      "old": "TestNewAuthorizerRejectsBadPolicies",
+      "new": "TestNewAuthorizerRejectsBadPolicies",
+      "path": "cedar/authorization/authorizer_test.go"
+    },
+    {
+      "old": "TestPSTMappingNativeFixtures",
+      "new": "TestPSTMappingNativeFixtures",
+      "path": "cedar/policy/pst_mapping_test.go"
+    },
+    {
+      "old": "TestPartialCancellationAndClose",
+      "new": "TestPartialCancellationAndClose",
+      "path": "cedar/authorization/partial/partial_input_errors_test.go"
+    },
+    {
+      "old": "TestPartialDecodeFaults",
+      "new": "TestPartialDecodeFaults",
+      "path": "cedar/authorization/partial/partial_internal_test.go"
+    },
+    {
+      "old": "TestPartialExecutionTimeout",
+      "new": "TestPartialExecutionTimeout",
+      "path": "cedar/authorization/partial/partial_execution_timeout_test.go"
+    },
+    {
+      "old": "TestPartialFaultRecovery",
+      "new": "TestPartialFaultRecovery",
+      "path": "cedar/authorization/partial/partial_fault_recovery_test.go"
+    },
+    {
+      "old": "TestPartialInputErrors",
+      "new": "TestPartialInputErrors",
+      "path": "cedar/authorization/partial/partial_input_errors_test.go"
+    },
+    {
+      "old": "TestPartialNativeFixtures",
+      "new": "TestPartialNativeFixtures",
+      "path": "cedar/authorization/partial/partial_test.go"
+    },
+    {
+      "old": "TestPartialRawPolicyIDs",
+      "new": "TestPartialRawPolicyIDs",
+      "path": "cedar/authorization/partial/partial_ids_test.go"
+    },
+    {
+      "old": "TestPartialTypedEntitiesAndSnapshot",
+      "new": "TestPartialTypedEntitiesAndSnapshot",
+      "path": "cedar/authorization/partial/snapshot_internal_test.go"
+    },
+    {
+      "old": "TestPermissionQueryBoundaries",
+      "new": "TestPermissionQueryBoundaries",
+      "path": "cedar/authorization/partial/permission_query_boundaries_test.go"
+    },
+    {
+      "old": "TestPermissionQueryLimitsBeforeGuest",
+      "new": "TestPermissionQueryLimitsBeforeGuest",
+      "path": "cedar/authorization/partial/queries_protocol_test.go"
+    },
+    {
+      "old": "TestPermissionQueryNativeFixtures",
+      "new": "TestPermissionQueryNativeFixtures",
+      "path": "cedar/authorization/partial/queries_test.go"
+    },
+    {
+      "old": "TestPermissionQueryProtocol",
+      "new": "TestPermissionQueryProtocol",
+      "path": "cedar/authorization/partial/queries_protocol_test.go"
+    },
+    {
+      "old": "TestPoliciesNativeParity",
+      "new": "TestPoliciesNativeParity",
+      "path": "cedar/policy/policies_test.go"
+    },
+    {
+      "old": "TestPolicyAdversarialSyntax",
+      "new": "TestPolicyAdversarialSyntax",
+      "path": "cedar/policy/policy_adversarial_syntax_test.go"
+    },
+    {
+      "old": "TestPolicyCancellation",
+      "new": "TestPolicyCancellation",
+      "path": "cedar/policy/policy_adversarial_syntax_test.go"
+    },
+    {
+      "old": "TestPolicyConcurrentSnapshots",
+      "new": "TestPolicyConcurrentSnapshots",
+      "path": "cedar/policy/policy_concurrent_snapshots_test.go"
+    },
+    {
+      "old": "TestPolicyInspectionAndIsolation",
+      "new": "TestPolicyInspectionAndIsolation",
+      "path": "cedar/policy/policy_inspection_and_isolation_test.go"
+    },
+    {
+      "old": "TestPolicyInvalidUTF8",
+      "new": "TestPolicyInvalidUTF8",
+      "path": "cedar/policy/policy_invalidutf8_test.go"
+    },
+    {
+      "old": "TestPolicyOperationLimits",
+      "new": "TestPolicyOperationLimits",
+      "path": "cedar/policy/policies_internal_test.go"
+    },
+    {
+      "old": "TestPolicyOperationMemoryLimit",
+      "new": "TestPolicyOperationMemoryLimit",
+      "path": "cedar/policy/policies_internal_test.go"
+    },
+    {
+      "old": "TestPolicyProtocolRejectsUnknownFields",
+      "new": "TestPolicyProtocolRejectsUnknownFields",
+      "path": "cedar/policy/policies_internal_test.go"
+    },
+    {
+      "old": "TestPolicyRawIDs",
+      "new": "TestPolicyRawIDs",
+      "path": "cedar/policy/policy_rawi_ds_test.go"
+    },
+    {
+      "old": "TestPropertyAuthorizeDeterministic",
+      "new": "TestPropertyAuthorizeDeterministic",
+      "path": "cedar/authorization/authorizer_property_test.go"
+    },
+    {
+      "old": "TestPropertyAuthorizeStateless",
+      "new": "TestPropertyAuthorizeStateless",
+      "path": "cedar/authorization/authorizer_property_test.go"
+    },
+    {
+      "old": "TestPropertyBatchedMatchesSequential",
+      "new": "TestPropertyBatchedMatchesSequential",
+      "path": "cedar/authorization/batched/batched_property_test.go"
+    },
+    {
+      "old": "TestPropertyConfusableDetection",
+      "new": "TestPropertyConfusableDetection",
+      "path": "cedar/utility/utilities_property_test.go"
+    },
+    {
+      "old": "TestPropertyContextMergeDisjointKeys",
+      "new": "TestPropertyContextMergeDisjointKeys",
+      "path": "cedar/utility/property_context_merge_disjoint_keys_test.go"
+    },
+    {
+      "old": "TestPropertyCorpusValidationStable",
+      "new": "TestPropertyCorpusValidationStable",
+      "path": "cedar/validation/validation_property_test.go"
+    },
+    {
+      "old": "TestPropertyEditsIsolateUnrelatedPolicies",
+      "new": "TestPropertyEditsIsolateUnrelatedPolicies",
+      "path": "cedar/policy/property_edits_isolate_unrelated_policies_test.go"
+    },
+    {
+      "old": "TestPropertyEntitiesJSONPassthrough",
+      "new": "TestPropertyEntitiesJSONPassthrough",
+      "path": "cedar/value/values_property_test.go"
+    },
+    {
+      "old": "TestPropertyFormatIdempotent",
+      "new": "TestPropertyFormatIdempotent",
+      "path": "cedar/policy/format/format_property_test.go"
+    },
+    {
+      "old": "TestPropertyFormatPreservesAuthorization",
+      "new": "TestPropertyFormatPreservesAuthorization",
+      "path": "cedar/policy/format/format_property_test.go"
+    },
+    {
+      "old": "TestPropertyMalformedEntitiesFailClosed",
+      "new": "TestPropertyMalformedEntitiesFailClosed",
+      "path": "cedar/value/values_property_test.go"
+    },
+    {
+      "old": "TestPropertyMalformedUTF8RequestsFailClosed",
+      "new": "TestPropertyMalformedUTF8RequestsFailClosed",
+      "path": "cedar/integration/property_malformedutf8_requests_fail_closed_test.go"
+    },
+    {
+      "old": "TestPropertyMalformedUTF8ValuesRejected",
+      "new": "TestPropertyMalformedUTF8ValuesRejected",
+      "path": "cedar/integration/utf8_property_test.go"
+    },
+    {
+      "old": "TestPropertyPSTMappedSetPreservesAuthorization",
+      "new": "TestPropertyPSTMappedSetPreservesAuthorization",
+      "path": "cedar/policy/propertypst_mapped_set_preserves_authorization_test.go"
+    },
+    {
+      "old": "TestPropertyPartialFullyKnownMatchesDirect",
+      "new": "TestPropertyPartialFullyKnownMatchesDirect",
+      "path": "cedar/authorization/partial/partial_property_test.go"
+    },
+    {
+      "old": "TestPropertyPartialReauthorizeMatchesDirect",
+      "new": "TestPropertyPartialReauthorizeMatchesDirect",
+      "path": "cedar/authorization/partial/partial_property_test.go"
+    },
+    {
+      "old": "TestPropertyPolicyEditSequences",
+      "new": "TestPropertyPolicyEditSequences",
+      "path": "cedar/policy/policies_property_test.go"
+    },
+    {
+      "old": "TestPropertyPolicyViewsRoundtrip",
+      "new": "TestPropertyPolicyViewsRoundtrip",
+      "path": "cedar/policy/policies_property_test.go"
+    },
+    {
+      "old": "TestPropertyScopeValidation",
+      "new": "TestPropertyScopeValidation",
+      "path": "cedar/utility/utilities_property_test.go"
+    },
+    {
+      "old": "TestPropertySimultaneousEntityLiteralSubstitution",
+      "new": "TestPropertySimultaneousEntityLiteralSubstitution",
+      "path": "cedar/policy/entity_literal_boundaries_test.go"
+    },
+    {
+      "old": "TestPropertySliceDecisionPreserved",
+      "new": "TestPropertySliceDecisionPreserved",
+      "path": "cedar/entity/slicing/slicing_property_test.go"
+    },
+    {
+      "old": "TestPropertyTemplateInspectionRoundtrip",
+      "new": "TestPropertyTemplateInspectionRoundtrip",
+      "path": "cedar/policy/template/templates_property_test.go"
+    },
+    {
+      "old": "TestPropertyTemplateLinkMatchesSubstitution",
+      "new": "TestPropertyTemplateLinkMatchesSubstitution",
+      "path": "cedar/policy/template/templates_property_test.go"
+    },
+    {
+      "old": "TestPropertyUnicodeValuesPreserveIdentity",
+      "new": "TestPropertyUnicodeValuesPreserveIdentity",
+      "path": "cedar/integration/utf8_property_test.go"
+    },
+    {
+      "old": "TestPropertyValidationDepthMonotonic",
+      "new": "TestPropertyValidationDepthMonotonic",
+      "path": "cedar/validation/validation_depth_property_test.go"
+    },
+    {
+      "old": "TestPropertyValidationDepthZeroForbidsDereferences",
+      "new": "TestPropertyValidationDepthZeroForbidsDereferences",
+      "path": "cedar/validation/validation_depth_property_test.go"
+    },
+    {
+      "old": "TestPropertyValidationDeterministic",
+      "new": "TestPropertyValidationDeterministic",
+      "path": "cedar/validation/validation_property_test.go"
+    },
+    {
+      "old": "TestPropertyValueJSONFixpoint",
+      "new": "TestPropertyValueJSONFixpoint",
+      "path": "cedar/value/values_property_test.go"
+    },
+    {
+      "old": "TestRejectInvalidUTF8RequestModes",
+      "new": "TestRejectInvalidUTF8RequestModes",
+      "path": "cedar/integration/reject_invalidutf8_request_modes_test.go"
+    },
+    {
+      "old": "TestRejectInvalidUTF8Sources",
+      "new": "TestRejectInvalidUTF8Sources",
+      "path": "cedar/integration/reject_invalidutf8_request_modes_test.go"
+    },
+    {
+      "old": "TestRejectInvalidUTF8Values",
+      "new": "TestRejectInvalidUTF8Values",
+      "path": "cedar/integration/utf8_test.go"
+    },
+    {
+      "old": "TestRequestEnvironmentJSONRejectsInvalidUTF8",
+      "new": "TestRequestEnvironmentJSONRejectsInvalidUTF8",
+      "path": "cedar/policy/applicability/request_environmentjson_round_trip_test.go"
+    },
+    {
+      "old": "TestRequestEnvironmentJSONRoundTrip",
+      "new": "TestRequestEnvironmentJSONRoundTrip",
+      "path": "cedar/policy/applicability/request_environmentjson_round_trip_test.go"
+    },
+    {
+      "old": "TestRequestSizeLimit",
+      "new": "TestRequestSizeLimit",
+      "path": "cedar/integration/failclosed_test.go"
+    },
+    {
+      "old": "TestResidualImportGuardsBeforeGuest",
+      "new": "TestResidualImportGuardsBeforeGuest",
+      "path": "cedar/authorization/partial/partial_internal_test.go"
+    },
+    {
+      "old": "TestResidualImportRejectsEditedExports",
+      "new": "TestResidualImportRejectsEditedExports",
+      "path": "cedar/authorization/partial/residual_import_rejects_edited_exports_test.go"
+    },
+    {
+      "old": "TestResidualPolicyIDPresence",
+      "new": "TestResidualPolicyIDPresence",
+      "path": "cedar/authorization/partial/partial_internal_test.go"
+    },
+    {
+      "old": "TestResidualProjectionDecodeFaults",
+      "new": "TestResidualProjectionDecodeFaults",
+      "path": "cedar/authorization/partial/partial_internal_test.go"
+    },
+    {
+      "old": "TestResidualProjectionPreservesNestedErrors",
+      "new": "TestResidualProjectionPreservesNestedErrors",
+      "path": "cedar/authorization/partial/residual_export_test.go"
+    },
+    {
+      "old": "TestResidualRawPolicyIDs",
+      "new": "TestResidualRawPolicyIDs",
+      "path": "cedar/authorization/partial/residual_import_rejects_edited_exports_test.go"
+    },
+    {
+      "old": "TestSchemaCompositionNamespaceAnnotations",
+      "new": "TestSchemaCompositionNamespaceAnnotations",
+      "path": "cedar/schema/schema_errors_test.go"
+    },
+    {
+      "old": "TestSchemaCompositionResolvesAfterCombining",
+      "new": "TestSchemaCompositionResolvesAfterCombining",
+      "path": "cedar/schema/schema_inspectionjson_round_trip_test.go"
+    },
+    {
+      "old": "TestSchemaErrors",
+      "new": "TestSchemaErrors",
+      "path": "cedar/schema/schema_errors_test.go"
+    },
+    {
+      "old": "TestSchemaFragmentAnnotations",
+      "new": "TestSchemaFragmentAnnotations",
+      "path": "cedar/schema/schema_inspectionjson_round_trip_test.go"
+    },
+    {
+      "old": "TestSchemaInspectionJSONRoundTrip",
+      "new": "TestSchemaInspectionJSONRoundTrip",
+      "path": "cedar/schema/schema_inspectionjson_round_trip_test.go"
+    },
+    {
+      "old": "TestSchemaLimitsBeforeGuest",
+      "new": "TestSchemaLimitsBeforeGuest",
+      "path": "cedar/schema/schemas_internal_test.go"
+    },
+    {
+      "old": "TestSchemaNativeFixtures",
+      "new": "TestSchemaNativeFixtures",
+      "path": "cedar/schema/schemas_test.go"
+    },
+    {
+      "old": "TestSimultaneousEntityLiteralSubstitution",
+      "new": "TestSimultaneousEntityLiteralSubstitution",
+      "path": "cedar/policy/literals_test.go"
+    },
+    {
+      "old": "TestSliceEntitiesBoundaries",
+      "new": "TestSliceEntitiesBoundaries",
+      "path": "cedar/entity/slicing/slicing_test.go"
+    },
+    {
+      "old": "TestSliceEntitiesCancellation",
+      "new": "TestSliceEntitiesCancellation",
+      "path": "cedar/entity/slicing/slice_entities_cancellation_test.go"
+    },
+    {
+      "old": "TestSliceEntitiesConcurrent",
+      "new": "TestSliceEntitiesConcurrent",
+      "path": "cedar/entity/slicing/slice_entities_cancellation_test.go"
+    },
+    {
+      "old": "TestSliceEntitiesLastIteration",
+      "new": "TestSliceEntitiesLastIteration",
+      "path": "cedar/entity/slicing/slice_entities_cancellation_test.go"
+    },
+    {
+      "old": "TestSliceEntitiesNativeParity",
+      "new": "TestSliceEntitiesNativeParity",
+      "path": "cedar/entity/slicing/slicing_test.go"
+    },
+    {
+      "old": "TestSliceEntitiesRequestData",
+      "new": "TestSliceEntitiesRequestData",
+      "path": "cedar/entity/slicing/slice_entities_cancellation_test.go"
+    },
+    {
+      "old": "TestSliceResourceLimits",
+      "new": "TestSliceResourceLimits",
+      "path": "cedar/entity/slicing/slicing_internal_test.go"
+    },
+    {
+      "old": "TestSourceTokenCommentAttachment",
+      "new": "TestSourceTokenCommentAttachment",
+      "path": "cedar/policy/source/source_token_native_spelling_and_trivia_test.go"
+    },
+    {
+      "old": "TestSourceTokenCommentFieldPresence",
+      "new": "TestSourceTokenCommentFieldPresence",
+      "path": "cedar/policy/source/source_token_comment_field_presence_test.go"
+    },
+    {
+      "old": "TestSourceTokenNativeFixtures",
+      "new": "TestSourceTokenNativeFixtures",
+      "path": "cedar/policy/source/source_tokens_internal_test.go"
+    },
+    {
+      "old": "TestSourceTokenNativeSpellingAndTrivia",
+      "new": "TestSourceTokenNativeSpellingAndTrivia",
+      "path": "cedar/policy/source/source_token_native_spelling_and_trivia_test.go"
+    },
+    {
+      "old": "TestSourceTokenPreflight",
+      "new": "TestSourceTokenPreflight",
+      "path": "cedar/policy/source/source_token_native_spelling_and_trivia_test.go"
+    },
+    {
+      "old": "TestSourceTokenResponseLexicalContract",
+      "new": "TestSourceTokenResponseLexicalContract",
+      "path": "cedar/policy/source/source_token_comment_field_presence_test.go"
+    },
+    {
+      "old": "TestSourceTokenZeroStartResponse",
+      "new": "TestSourceTokenZeroStartResponse",
+      "path": "cedar/policy/source/source_tokens_internal_test.go"
+    },
+    {
+      "old": "TestSourceTokensPreserveCommentsAndSpacing",
+      "new": "TestSourceTokensPreserveCommentsAndSpacing",
+      "path": "cedar/policy/source/source_tokens_test.go"
+    },
+    {
+      "old": "TestSourceTokensSeparateLexingFromValidation",
+      "new": "TestSourceTokensSeparateLexingFromValidation",
+      "path": "cedar/policy/source/source_tokens_test.go"
+    },
+    {
+      "old": "TestStandaloneValidationAndConfusables",
+      "new": "TestStandaloneValidationAndConfusables",
+      "path": "cedar/utility/standalone_validation_and_confusables_test.go"
+    },
+    {
+      "old": "TestStructuredDiagnosticsNativeFixtures",
+      "new": "TestStructuredDiagnosticsNativeFixtures",
+      "path": "cedar/diagnostic/diagnostics_test.go"
+    },
+    {
+      "old": "TestTemplateConcurrentSnapshots",
+      "new": "TestTemplateConcurrentSnapshots",
+      "path": "cedar/policy/template/template_concurrent_snapshots_test.go"
+    },
+    {
+      "old": "TestTemplateDiagnosticIDs",
+      "new": "TestTemplateDiagnosticIDs",
+      "path": "cedar/policy/template/template_concurrent_snapshots_test.go"
+    },
+    {
+      "old": "TestTemplateEntityLiteralSubstitution",
+      "new": "TestTemplateEntityLiteralSubstitution",
+      "path": "cedar/policy/literals_test.go"
+    },
+    {
+      "old": "TestTemplateExactIntegerPreservation",
+      "new": "TestTemplateExactIntegerPreservation",
+      "path": "cedar/policy/template/template_exact_integer_preservation_test.go"
+    },
+    {
+      "old": "TestTemplateInspectionAndSnapshots",
+      "new": "TestTemplateInspectionAndSnapshots",
+      "path": "cedar/policy/template/template_inspection_and_snapshots_test.go"
+    },
+    {
+      "old": "TestTemplateMalformedInputs",
+      "new": "TestTemplateMalformedInputs",
+      "path": "cedar/policy/template/template_inspection_and_snapshots_test.go"
+    },
+    {
+      "old": "TestTemplateMemoryLimit",
+      "new": "TestTemplateMemoryLimit",
+      "path": "cedar/policy/template/templates_internal_test.go"
+    },
+    {
+      "old": "TestTemplateNativeParity",
+      "new": "TestTemplateNativeParity",
+      "path": "cedar/policy/template/templates_test.go"
+    },
+    {
+      "old": "TestTemplateRejectsInvalidUTF8",
+      "new": "TestTemplateRejectsInvalidUTF8",
+      "path": "cedar/policy/template/template_concurrent_snapshots_test.go"
+    },
+    {
+      "old": "TestTemplateResourceAndLifecycle",
+      "new": "TestTemplateResourceAndLifecycle",
+      "path": "cedar/policy/template/templates_internal_test.go"
+    },
+    {
+      "old": "TestTemplateWireRejectsMalformedEnvelope",
+      "new": "TestTemplateWireRejectsMalformedEnvelope",
+      "path": "cedar/policy/template/templates_internal_test.go"
+    },
+    {
+      "old": "TestUtilityContextInputProtocol",
+      "new": "TestUtilityContextInputProtocol",
+      "path": "cedar/utility/utility_readback_exact_integers_test.go"
+    },
+    {
+      "old": "TestUtilityNativeFixtures",
+      "new": "TestUtilityNativeFixtures",
+      "path": "cedar/utility/utilities_internal_test.go"
+    },
+    {
+      "old": "TestUtilityPreflight",
+      "new": "TestUtilityPreflight",
+      "path": "cedar/utility/utilities_internal_test.go"
+    },
+    {
+      "old": "TestUtilityReadbackExactIntegers",
+      "new": "TestUtilityReadbackExactIntegers",
+      "path": "cedar/utility/utility_readback_exact_integers_test.go"
+    },
+    {
+      "old": "TestUtilityWarningResponses",
+      "new": "TestUtilityWarningResponses",
+      "path": "cedar/utility/utility_readback_exact_integers_test.go"
+    },
+    {
+      "old": "TestValidate",
+      "new": "TestValidate",
+      "path": "cedar/authorization/authorizer_test.go"
+    },
+    {
+      "old": "TestValidationComparisonDiagnostics",
+      "new": "TestValidationComparisonDiagnostics",
+      "path": "cedar/validation/validation_comparison_test.go"
+    },
+    {
+      "old": "TestValidationDepthNativeFixtures",
+      "new": "TestValidationDepthNativeFixtures",
+      "path": "cedar/validation/validation_depth_test.go"
+    },
+    {
+      "old": "TestValidationDiagnosticPreservesEmptyPolicyID",
+      "new": "TestValidationDiagnosticPreservesEmptyPolicyID",
+      "path": "cedar/diagnostic/diagnostics_identity_test.go"
+    },
+    {
+      "old": "TestValidationDiagnosticRequiresPolicyID",
+      "new": "TestValidationDiagnosticRequiresPolicyID",
+      "path": "cedar/diagnostic/diagnostics_identity_test.go"
+    },
+    {
+      "old": "TestVersionsMatchCargoLock",
+      "new": "TestVersionsMatchCargoLock",
+      "path": "cedar/syntax/version_test.go"
+    }
+  ],
+  "added": [
+    {
+      "name": "TestAuthorizationResponseRequiredFields",
+      "path": "cedar/authorization/request/protocol_test.go"
+    },
+    {
+      "name": "TestNativeConcurrencyCapIncludesCallbacks",
+      "path": "cedar/authorization/concurrency_native_internal_test.go"
+    },
+    {
+      "name": "TestNativeRuntimeCloseWaitsForActiveCallback",
+      "path": "cedar/authorization/concurrency_native_internal_test.go"
+    },
+    {
+      "name": "TestNativeStackOverflowHelper",
+      "path": "cedar/integration/failclosed_stack_test.go"
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Package the checked source commit with its validated embedded modules."""
+"""Package the checked source commit with its validated native library."""
 
 import copy
 import io
@@ -9,31 +9,38 @@ import sys
 import zipfile
 from pathlib import Path
 
-from consumer.bundle import METADATA, MODULES, ROOT, checksums, read_bundle
+from consumer.bundle import METADATA, ROOT, checksums, read_bundle
+from consumer.native import ARTIFACT_FILES, generated_names
+from native.source import committed_source
+import json
 
 
 def package(artifact, commit, output):
     repo = Path(__file__).resolve().parent.parent
     artifact = Path(artifact).resolve()
     output = Path(output).resolve()
-    head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=repo, text=True).strip()
-    if head != commit:
-        raise ValueError("package source commit does not match HEAD")
-    subprocess.run(["git", "diff", "--quiet", "HEAD", "--"], cwd=repo, check=True)
+    commit = committed_source(repo, commit)
+    manifest = json.loads((artifact / "manifest.json").read_text())
+    platform, target = manifest["platform"], manifest["target"]
+    native = generated_names(platform)
     subprocess.run(
-        ["go", "run", "./cmd/verify-wasm-artifact", str(artifact), commit],
+        ["go", "run", "./cmd/verify-native-artifact", str(artifact), commit, target, "internal/native/include/cedar.h"],
         cwd=repo, check=True,
     )
-    archive = subprocess.check_output(["git", "archive", "--format=zip", "HEAD"], cwd=repo)
+    archive = subprocess.check_output(["git", "archive", "--format=zip", commit], cwd=repo)
     with zipfile.ZipFile(io.BytesIO(archive)) as source:
         entries = {entry.filename: copy.copy(entry) for entry in source.infolist()}
         files = {entry.filename: source.read(entry) for entry in source.infolist() if not entry.is_dir()}
-    if (METADATA | set(MODULES)) & set(files):
-        raise ValueError("generated modules and bundle metadata must be absent from the source commit")
+    if (METADATA | set(native)) & set(files):
+        raise ValueError("generated native files and bundle metadata must be absent from the source commit")
     files["SOURCE_SHA256SUMS"] = checksums(files)
-    for name in MODULES:
-        files[name] = (artifact / name.removeprefix("internal/modules/")).read_bytes()
-    files["SHA256SUMS"] = checksums({name: files[name] for name in MODULES})
+    prefix = f"internal/native/lib/{platform}/"
+    for name in ARTIFACT_FILES:
+        if name == "link_flags.go":
+            continue
+        files[prefix + name] = (artifact / name).read_bytes()
+    files["internal/native/link_flags.go"] = (artifact / "link_flags.go").read_bytes()
+    files["SHA256SUMS"] = checksums({name: files[name] for name in native})
     files["SOURCE_COMMIT"] = (commit + "\n").encode()
     output.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED) as bundle:
@@ -46,7 +53,7 @@ def package(artifact, commit, output):
                 entry.compress_type = zipfile.ZIP_DEFLATED
             entry.filename = ROOT + name
             bundle.writestr(entry, files.get(name, b""))
-    read_bundle(output, commit)
+    read_bundle(output, commit, target)
     print(f"Consumer source bundle: {output}")
 
 
@@ -55,5 +62,5 @@ if __name__ == "__main__":
         sys.exit("usage: package-consumer.py ARTIFACT_DIR SOURCE_COMMIT OUTPUT_ZIP")
     try:
         package(*sys.argv[1:])
-    except (OSError, ValueError, subprocess.CalledProcessError, zipfile.BadZipFile) as error:
+    except (OSError, ValueError, KeyError, TypeError, subprocess.CalledProcessError, zipfile.BadZipFile) as error:
         sys.exit(f"consumer package failed: {error}")
