@@ -3,3 +3,8 @@
 *.prof
 /corpus/
 /cvc5*/
+/internal/modules/*/*.wasm
+/internal/modules/*/sha256.go
+/internal/modules/SHA256SUMS
+/internal/modules/SOURCE_COMMIT
+__pycache__/

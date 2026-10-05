@@ -1,4 +1,4 @@
-# Rust lockfile updates also require scripts/build-wasm.sh because CI compares artifacts.
+# Rust lockfile updates require pinned-source CI builds and regenerated license notices; do not commit build outputs.
 version: 2
 updates:
   - package-ecosystem: gomod

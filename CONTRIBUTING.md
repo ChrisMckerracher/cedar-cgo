@@ -1,4 +1,4 @@
-# Contributing
+# Contributing to cedar-go-wasm
 
 Report bugs and propose changes through GitHub issues and pull requests.
 Report vulnerabilities privately as described in [SECURITY.md](SECURITY.md).
@@ -20,7 +20,7 @@ internal/
   wasmhost/            Shared module compilation, instances, and faults
   wire/                Shared JSON source, UID, and error envelopes
   capbuf/              Bounded diagnostic output
-  modules/             Embedded Wasm artifacts and generated hashes
+  modules/             Embedding code and untracked generated Wasm outputs
   verification/        Source-linked SMT proof of ABI arithmetic
 rust/
   crates/
@@ -56,16 +56,27 @@ pooling, or resource handling belong at the corresponding Go seam.
 
 ## Tests
 
-Use Go 1.26 or later. The committed guest modules let Go tests run without
-rebuilding Rust:
+### Lesson 1: Build and test a source checkout
+
+Objective: Generate the embedded modules from pinned Rust sources before Go compilation.
+
+1. Use Go 1.26 or later and the Rust toolchain in `rust-toolchain.toml`.
+2. If the pinned Rust toolchain is missing, install it with `rustup toolchain install`.
+3. From the repository root, build both modules, then run the Go checks:
 
 ```bash
+scripts/build-wasm.sh
 go vet ./...
 go test ./...
 ```
 
-The conformance test requires `CEDAR_CORPUS_DIR`. The corpus commit and
-checksum must match the pins in both workflows:
+The build generates both `.wasm` files and their `sha256.go` files under `internal/modules/`.
+Git ignores these outputs. Repeat the build after changing Rust sources, dependencies, or build settings.
+
+Knowledge check: Can a clean checkout run Go tests before generating the embedded files? No; Go embedding requires those files.
+
+4. To run conformance tests, set `CEDAR_CORPUS_DIR`.
+   Use the corpus commit and checksum from both workflows:
 
 ```bash
 commit=1999ea249229e26cabb398a279fea721854a471d
@@ -76,21 +87,21 @@ tar xzf corpus.tar.gz -C corpus
 CEDAR_CORPUS_DIR="$PWD/corpus" go test -run '^TestCorpus$' -v ./cedar
 ```
 
-Analysis integration tests require a cvc5 1.3.1 executable from the
+5. To run analysis integration tests, use a cvc5 1.3.1 executable from the
 [official release](https://github.com/cvc5/cvc5/releases/tag/cvc5-1.3.1):
 
 ```bash
 CVC5=/path/to/cvc5 go test -v ./analysis
 ```
 
-Unset variables cause the corresponding integration tests to skip. Set
-both when running a complete verification pass:
+Unset variables cause the corresponding integration tests to skip.
+6. For a complete verification pass, set both variables:
 
 ```bash
 CEDAR_CORPUS_DIR="$PWD/corpus" CVC5=/path/to/cvc5 go test -count=1 ./...
 ```
 
-Fuzz seeds run in ordinary tests. To fuzz a target for longer:
+7. Run fuzz targets for longer when needed. Ordinary tests run their seed inputs:
 
 ```bash
 go test -run '^$' -fuzz '^FuzzAuthorize$' -fuzztime 5m ./cedar
@@ -117,18 +128,23 @@ CI checks regenerated fixtures against the committed results.
 
 ## Guest changes
 
-Use the pinned Rust toolchain and Wasm target from `rust-toolchain.toml`.
-After editing guest code or its dependencies:
+### Lesson 2: Validate a guest source change
+
+Objective: Review Rust sources and verify their generated modules without committing build outputs.
+
+1. Use the pinned Rust toolchain and Wasm target from `rust-toolchain.toml`.
+2. After editing guest code or its dependencies, generate modules and license notices:
 
 ```bash
 scripts/build-wasm.sh
 scripts/third-party-licenses.sh
 ```
 
-Include the regenerated modules, hashes, and license notices with the
-source changes. CI compares rebuilt bytes with the committed artifacts.
+3. Include source changes, dependency pins, lockfile changes, and updated license notices in the review.
+   Leave generated modules and hashes untracked. CI builds them from the reviewed commit.
+   CI compares two independent builds and tests the generated modules.
 
-Run the Rust checks from `rust/`:
+4. From `rust/`, run the Rust checks:
 
 ```bash
 cargo fmt --all -- --check
@@ -138,9 +154,11 @@ cargo deny --all-features check
 cargo audit --deny warnings
 ```
 
-Run `scripts/vendor-symcc.sh` from the repository root to verify the
-vendored source. The [maintenance guide](docs/maintenance.md) describes
-tool versions, rebuilds, and Cedar upgrades.
+5. From the repository root, run `scripts/vendor-symcc.sh` to verify the vendored source.
+
+Knowledge check: Which generated files belong in the commit? License notices belong in the commit; modules and hash files do not.
+
+The [maintenance guide](docs/maintenance.md) describes tool versions, builds, and Cedar upgrades.
 
 ## Documentation changes
 
