@@ -26,6 +26,7 @@ The build uses the target's baseline CPU settings. It does not use `target-cpu=n
 Musl and fully static consumer executables are outside this support matrix.
 A Rust static library does not make the final Go executable fully static.
 Linker requirements come from Rust's `--print=native-static-libs` output.
+macOS requires the CoreFoundation framework. Verified linker source preserves its ordered framework and library flags.
 
 A source build requires the pinned Rust toolchain and the supported C compiler.
 A prebuilt source bundle requires cgo, Go, and the supported C compiler. It does not require Rust.

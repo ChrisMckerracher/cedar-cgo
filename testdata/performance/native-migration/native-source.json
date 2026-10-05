@@ -1,5 +1,5 @@
 {
-  "digest": "a13a839f9dcbf4efb87e3a4a27163eeb0b8f4e7f4c407a46e3b8658c94c7ca06",
+  "digest": "4b38c390a52f06e3ce32821635700ee772cd7f9688ce3d97cfabf49a7abe26ec",
   "files": {
     "analysis/analyzer.go": "77f82d5c46b8cb719c72f0b1d7ecd576e5ef42d9f6fafe36eadbc85eb880690a",
     "analysis/calls.go": "77ada0ff5189179fbe95b7a383a0e6c7d1bfe7cb5092e708200343b701501da9",
@@ -99,7 +99,7 @@
     "go.mod": "56fe8146d49c4064c130abcb676f7185c5cb869244ab07725e6a1cdc873e48bf",
     "go.sum": "326751a5a34442f2e6fe56f4741639dcfb76406339b8ec0bb9deb3ab985551bf",
     "internal/artifact/archive.go": "9fc4993e72b971e67629e9a3f4c9044a8dde0203b24a3d9ed09d3c62639a7277",
-    "internal/artifact/link_source.go": "02d31bccb6ef69b57fd32d9ac26df31fa2da92f2986eaeae61dcc7add7722dee",
+    "internal/artifact/link_source.go": "3ce66c7ed9cfc89ac44e3df249891161a15f6552b8d0f381533139c866a1ed7d",
     "internal/artifact/manifest.go": "4500e90e01eba2402887208da311b72e1a415be1175c882f07daf3563fe190ab",
     "internal/artifact/verify.go": "e6a028183ef738084f2d73ddea0ab2a7f93bfccb4c258d21c612182a437c9f21",
     "internal/capbuf/capbuf.go": "b0463db5a0e0ff29306ecc1245e3de2bc801590bb4d6b9ceb8836db1a6ebb0c7",

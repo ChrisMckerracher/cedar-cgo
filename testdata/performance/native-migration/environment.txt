@@ -1,4 +1,4 @@
-2026-10-05T16:48:32Z
+2026-10-05T17:27:21Z
 Linux agent-01 6.19.10-300.fc44.x86_64 #1 SMP PREEMPT_DYNAMIC Wed Mar 25 18:23:49 UTC 2026 x86_64 GNU/Linux
 go version go1.27.1 linux/amd64
 rustc 1.99.0 (b940084d7 2026-09-28)
@@ -46,49 +46,27 @@ See the file COPYING (distributed with the source code, and with
 all binaries) for the full cvc5 copyright, licensing, and (lack of)
 warranty information.
 
-93eba69c9a8ddd01cb2290c7c51f80e07f31f15d
- M cedar/authorization/authorizer.go
- M cedar/entity/edits.go
- M cedar/entity/readback.go
- M cedar/entity/slicing/slicing.go
- M cedar/entity/snapshot.go
- M cedar/expression/expressions.go
- M cedar/policy/applicability/applicability.go
- M cedar/policy/format/format.go
- M cedar/policy/literals.go
- M cedar/policy/parse.go
- M cedar/policy/source/tokens.go
- M cedar/policy/template/links.go
- M cedar/policy/template/templates.go
- M cedar/schema/diagnostics.go
- M cedar/schema/fragments.go
- M cedar/schema/operations.go
- M cedar/utility/context.go
- M cedar/utility/utilities.go
- M cedar/validation/validation.go
- M docs/migration/native-contract.md
- M docs/migration/verification.md
- M internal/execution/session.go
- M internal/execution/utilities.go
- M scripts/measure-native-performance.sh
- M scripts/performance/source-hash.py
-?? cedar/authorization/cancellation_internal_test.go
-?? cedar/schema/cancellation_internal_test.go
-?? internal/execution/response.go
-?? internal/execution/response_test.go
-?? internal/execution/session_load.go
-?? internal/execution/session_load_test.go
+a6d98bdf7e655f7b84dd17384cea1f23e6d776e3
+ M internal/artifact/fixture_test.go
+ M internal/artifact/link_source.go
+ M scripts/consumer/fixture.py
+ M scripts/consumer/native.py
+ M scripts/native/manifest.py
+?? internal/artifact/framework_test.go
+?? scripts/consumer/test_frameworks.py
+?? scripts/consumer/test_native_generation.py
+?? scripts/native_linker.py
 d367d0ea505b1de1e17da548f247f81ab922f577d10a0763c42c2620bcc409b1  /tmp/cedar-migration/worktree/rust/Cargo.lock
 8f144f5e6076378e926d44cbbbed21ab9c2b5187a3f02fe2b1addb57defc11f5  /tmp/cedar-migration/worktree/internal/native/include/cedar.h
 0ad4a70385a653914894bc5cb923e9cea6a6451521b3d2b78be38a9f86ac88ea  /tmp/cedar-migration/worktree/internal/native/lib/linux_amd64/libcgw_native.a
-4cfa32cb931f6f6ccfce7eaa134cbafb8f0585a5c0cbea9f18d9701c4c53a6fc  /tmp/cedar-migration/performance-final/native.test
-4cecb9a3cbb0dd439c73a090b6a099aeeb8a24086cb3723b90b57fc481144b03  /tmp/cedar-migration/performance-final/wasm.test
+4cfa32cb931f6f6ccfce7eaa134cbafb8f0585a5c0cbea9f18d9701c4c53a6fc  /tmp/cedar-migration/performance-platform-final/native.test
+6ba438f53f5812152da7ddb3292c81fe183c1d2238d06149441e8748413d88ba  /tmp/cedar-migration/performance-platform-final/wasm.test
 529281f207b3260804fb9511654499137f29d83979b484893e433ff791b1bf43  /tmp/cedar-issue-47-main/internal/modules/analysis/analysis.wasm
 f28edbcdf645a6ed34a7ff0401f87a93376207f9f3b44a17d8b8113f8489887d  /tmp/cedar-issue-47-main/internal/modules/authorizer/authorizer.wasm
 GOMAXPROCS=2; pool cap=2; native concurrency cap=2; Wasm concurrency follows two benchmark workers.
 No compilation cache. Authorization reuses loaded state. Compiled analysis has one warm query.
 Each sample starts a fresh benchmark process. Native static linking is outside timed Runtime construction.
 Order alternates native/Wasm per sample. RSS measures the parent process after closed solver sessions.
-Native source: a13a839f9dcbf4efb87e3a4a27163eeb0b8f4e7f4c407a46e3b8658c94c7ca06
+Native source: 4b38c390a52f06e3ce32821635700ee772cd7f9688ce3d97cfabf49a7abe26ec
 Wasm source: fc7905a6de3f162b325123c8d19d153ba70cae37028042fcd5ee1d9a85b3dc22
 Source and backend hashes remained unchanged throughout the measurements.

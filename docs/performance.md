@@ -16,8 +16,8 @@ The comparison checkout was pinned to `a7083b5cb27dae4ec8be5f84d8f7b88b4a1fbcc6`
 The native implementation used a migration worktree based on that commit.
 [Environment records](../testdata/performance/native-migration/environment.txt) identify source, libraries, toolchains, and executable hashes.
 [Source manifests](../testdata/performance/native-migration/native-source.json) identify production Go, Rust, headers, and vendored SymCC files.
-The native source digest is `a13a839f9dcbf4efb87e3a4a27163eeb0b8f4e7f4c407a46e3b8658c94c7ca06`.
-The recorded source includes cancellation checks after Go decoding.
+The native source digest is `4b38c390a52f06e3ce32821635700ee772cd7f9688ce3d97cfabf49a7abe26ec`.
+The recorded source includes cancellation checks after Go decoding and the macOS linker-flag validation correction.
 
 Authorization uses the [Joy fixture](../testdata/joy) and a permitted `session.write` request.
 The callback workload loads one missing entity through the Go loader.
@@ -37,15 +37,17 @@ The table reports medians.
 The ratio divides the Wasm median by the native median.
 Parallel time is wall time per completed decision, rather than individual request latency.
 Ratios describe these inputs and this machine.
+All five samples remain in the summary, including slower samples.
+These measurements do not control CPU frequency or all host scheduling.
 
 | Workload | Native median | Wasm median | Ratio |
 |---|---:|---:|---:|
-| Serial authorization | 135.027 µs | 885.308 µs | 6.56 |
-| Parallel authorization | 73.869 µs | 493.184 µs | 6.68 |
-| Load an authorizer | 2.083 ms | 21.736 ms | 10.44 |
-| Batched authorization with a loader callback | 55.528 µs | 260.195 µs | 4.69 |
-| Reuse compiled analysis | 1.878 ms | 2.095 ms | 1.12 |
-| Stateless analysis with a new solver process | 4.947 ms | 18.114 ms | 3.66 |
+| Serial authorization | 139.602 µs | 928.937 µs | 6.65 |
+| Parallel authorization | 75.867 µs | 500.851 µs | 6.60 |
+| Load an authorizer | 2.050 ms | 21.667 ms | 10.57 |
+| Batched authorization with a loader callback | 57.160 µs | 262.174 µs | 4.59 |
+| Reuse compiled analysis | 1.895 ms | 2.073 ms | 1.09 |
+| Stateless analysis with a new solver process | 5.059 ms | 18.267 ms | 3.61 |
 
 [Raw samples](../testdata/performance/native-migration/) preserve every timing, Go allocation count, and workload counter.
 [The summary](../testdata/performance/native-migration/summary.json) preserves the five values and median for each workload.
@@ -67,7 +69,7 @@ Compiled timings exclude initial compilation; stateless timings include it.
 
 | Workload | Native median | Wasm median |
 |---|---:|---:|
-| Construct and close a Runtime | 1.944 µs | 3.817 s |
+| Construct and close a Runtime | 1.800 µs | 4.135 s |
 
 Each Runtime sample contains five operations.
 Wasm Runtime construction includes cold, uncached module compilation.
@@ -87,17 +89,17 @@ Benchmark `B/op` and `allocs/op` counters exclude Rust allocations and solver su
 
 | Completed cycles | Process RSS | Live Go heap |
 |---:|---:|---:|
-| 0 | 8.01 MB | 115,176 bytes |
-| 20 | 21.82 MB | 213,240 bytes |
-| 40 | 22.97 MB | 219,584 bytes |
-| 60 | 23.49 MB | 213,760 bytes |
-| 80 | 23.49 MB | 220,568 bytes |
-| 100 | 23.98 MB | 214,968 bytes |
+| 0 | 8.02 MB | 115,064 bytes |
+| 20 | 21.78 MB | 207,680 bytes |
+| 40 | 23.24 MB | 214,128 bytes |
+| 60 | 23.54 MB | 220,496 bytes |
+| 80 | 23.64 MB | 214,176 bytes |
+| 100 | 23.66 MB | 220,720 bytes |
 
 [The first resource record](../testdata/performance/native-migration/resources.txt) contains exact checkpoint values.
 [Three further runs in one process](../testdata/performance/native-migration/resources-followup.txt) cover 300 additional cycles.
 After the first 100 cycles, RSS remained near 24 MB during the next 200 cycles.
-The final checkpoint was 24.59 MB, with a live Go heap of 230,424 bytes.
+The final checkpoint was 24.60 MB, with a live Go heap of 230,312 bytes.
 These short runs show stable later checkpoints, but they do not establish a zero-leak guarantee.
 RSS includes allocator retention and excludes memory from the already closed solver processes.
 All resource runs used the same verified executable while competing builds, tests, and fuzzing remained paused.

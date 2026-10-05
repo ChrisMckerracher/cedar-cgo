@@ -43,7 +43,7 @@ The gate compares exact statement fractions with the pinned reference, without a
 |---|---:|---:|
 | Cedar and shared execution | 1,423/1,579; 90.12% | 1,499/1,645; 91.12% |
 | Analysis | 474/544; 87.13% | 533/595; 89.58% |
-| Artifact verification | 48/55; 87.27% | 135/136; 99.26% |
+| Artifact verification | 48/55; 87.27% | 148/149; 99.33% |
 
 All 25 fuzz targets remain present.
 Each target passed a complete local run of at least 60 seconds.
@@ -74,8 +74,8 @@ Deadlines reject canceled results after native execution returns and cannot forc
 
 The [performance report](../performance.md) contains five samples for each of seven workloads on both backends.
 It records complete Go encoding and decoding, native computation, concurrency, ordering, source hashes, and actual resource counts.
-Serial authorization measured 135.027 microseconds natively and 885.308 microseconds with Wasm on the recorded machine.
-The ratio is 6.56 for this workload.
+Serial authorization measured 139.602 microseconds natively and 928.937 microseconds with Wasm on the recorded machine.
+The ratio is 6.65 for this workload.
 Compiled analysis measured a smaller difference because real solver interaction remains in the timed path.
 
 Resource checks cover 400 create, call, release, and close cycles.
