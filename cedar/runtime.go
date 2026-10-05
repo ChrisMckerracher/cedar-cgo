@@ -2,89 +2,42 @@ package cedar
 
 import (
 	"context"
-	"fmt"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/modules/authorizer"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/wasmhost"
-	"github.com/tetratelabs/wazero"
+	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
+	entity "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
+	slicing "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/slicing"
+	expression "github.com/ChrisMckerracher/cedar-go-wasm/cedar/expression"
+	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
+	applicability "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/applicability"
+	policyformat "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/format"
+	policysource "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/source"
+	template "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/template"
+	schema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
+	utility "github.com/ChrisMckerracher/cedar-go-wasm/cedar/utility"
+	validation "github.com/ChrisMckerracher/cedar-go-wasm/cedar/validation"
+	"github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
 )
 
-const (
-	DefaultMemoryLimitBytes = 256 << 20
-	DefaultMaxSourceBytes   = 64 << 20
-	DefaultMaxResponseBytes = 16 << 20
-)
+type Runtime struct{ runtime *execution.Runtime }
 
-// Reject unlisted imports so guest upgrades cannot silently gain host capabilities.
-var authorizerImports = []string{
-	"cgw_entity_loader.load",
-	"cgw_entity_loader.read",
-	"wasi_snapshot_preview1.random_get",
-	"wasi_snapshot_preview1.environ_get",
-	"wasi_snapshot_preview1.environ_sizes_get",
-	"wasi_snapshot_preview1.fd_write",
-	"wasi_snapshot_preview1.proc_exit",
-}
-
-// Runtime is safe to share across goroutines to amortize module compilation.
-type Runtime struct {
-	module         *wasmhost.Module
-	maxSourceBytes int
-	maxResponse    uint32
-}
-
-type runtimeConfig struct {
-	memoryLimit    uint64
-	cache          wazero.CompilationCache
-	maxSourceBytes int
-}
-
-type RuntimeOption func(*runtimeConfig)
-
-// WithMemoryLimit caps per-instance linear memory; exceeding it faults and discards
-// the instance. The default is [DefaultMemoryLimitBytes].
-func WithMemoryLimit(bytes uint64) RuntimeOption {
-	return func(c *runtimeConfig) { c.memoryLimit = bytes }
-}
-
-// WithCompilationCache avoids recompilation across runtimes and, with a disk cache, restarts.
-func WithCompilationCache(cache wazero.CompilationCache) RuntimeOption {
-	return func(c *runtimeConfig) { c.cache = cache }
-}
-
-// WithMaxSourceBytes bounds each encoded runtime operation, including its input envelope.
-// The default is [DefaultMaxSourceBytes].
-func WithMaxSourceBytes(n int) RuntimeOption {
-	return func(c *runtimeConfig) { c.maxSourceBytes = n }
-}
-
-// NewRuntime enforces integrity and capability checks before any guest execution.
 func NewRuntime(ctx context.Context, opts ...RuntimeOption) (*Runtime, error) {
-	cfg := runtimeConfig{memoryLimit: DefaultMemoryLimitBytes, maxSourceBytes: DefaultMaxSourceBytes}
-	for _, o := range opts {
-		o(&cfg)
+	rt, e := execution.New(ctx, opts...)
+	if e != nil {
+		return nil, e
 	}
-	if cfg.maxSourceBytes <= 0 {
-		return nil, fmt.Errorf("cedar: max source bytes must be positive, got %d", cfg.maxSourceBytes)
-	}
-	m, err := wasmhost.Compile(ctx, wasmhost.Config{
-		Name:             "authorizer",
-		Wasm:             authorizer.Wasm,
-		SHA256:           authorizer.SHA256,
-		MemoryLimitBytes: cfg.memoryLimit,
-		Cache:            cfg.cache,
-		AllowedImports:   authorizerImports,
-		HostModules:      defineEntityLoaderModule,
-		Exports:          []string{"cgw_load", "cgw_authorize", "cgw_validate", "cgw_authorize_batched", "cgw_slice_entities", "cgw_policies", "cgw_templates", "cgw_partial_authorize", "cgw_reauthorize", "cgw_format", "cgw_expressions", "cgw_literals", "cgw_applicability", "cgw_schema_warnings", "cgw_schemas", "cgw_entity_store", "cgw_utilities", "cgw_queries", "cgw_import_partial", "cgw_source_tokens"},
-	})
-	if err != nil {
-		return nil, fmt.Errorf("cedar: %w", err)
-	}
-	return &Runtime{module: m, maxSourceBytes: cfg.maxSourceBytes, maxResponse: DefaultMaxResponseBytes}, nil
+	return &Runtime{runtime: rt}, nil
 }
-
-// Close also invalidates every authorizer created from this runtime.
-func (rt *Runtime) Close(ctx context.Context) error {
-	return rt.module.Close(ctx)
+func (rt *Runtime) Close(ctx context.Context) error { return rt.runtime.Close(ctx) }
+func (rt *Runtime) NewAuthorizer(ctx context.Context, cfg authorization.Config) (*authorization.Authorizer, error) {
+	return authorization.NewAuthorizer(ctx, rt.runtime, cfg)
 }
-
-func ModuleSHA256() string { return authorizer.SHA256 }
+func (rt *Runtime) Applicability() *applicability.Client { return applicability.New(rt.runtime) }
+func (rt *Runtime) Schemas() *schema.Client              { return schema.New(rt.runtime) }
+func (rt *Runtime) Entities() *entity.Client             { return entity.New(rt.runtime) }
+func (rt *Runtime) Expressions() *expression.Client      { return expression.New(rt.runtime) }
+func (rt *Runtime) Formatter() *policyformat.Client      { return policyformat.New(rt.runtime) }
+func (rt *Runtime) Policies() *policy.Client             { return policy.New(rt.runtime) }
+func (rt *Runtime) Slicing() *slicing.Client             { return slicing.New(rt.runtime) }
+func (rt *Runtime) Source() *policysource.Client         { return policysource.New(rt.runtime) }
+func (rt *Runtime) Templates() *template.Client          { return template.New(rt.runtime) }
+func (rt *Runtime) Utilities() *utility.Client           { return utility.New(rt.runtime) }
+func (rt *Runtime) Validation() *validation.Client       { return validation.New(rt.runtime) }

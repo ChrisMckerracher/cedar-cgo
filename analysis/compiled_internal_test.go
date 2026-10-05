@@ -6,6 +6,8 @@ import (
 	"sync"
 	"sync/atomic"
 	"testing"
+
+	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/solver"
 )
 
 type compiledTestTransport struct {
@@ -14,9 +16,9 @@ type compiledTestTransport struct {
 	closes atomic.Int32
 }
 
-type compiledTestSolver func(context.Context) (Session, error)
+type compiledTestSolver func(context.Context) (solver.Session, error)
 
-func (start compiledTestSolver) Start(ctx context.Context) (Session, error) { return start(ctx) }
+func (start compiledTestSolver) Start(ctx context.Context) (solver.Session, error) { return start(ctx) }
 
 func (s *compiledTestTransport) Read([]byte) (int, error) { <-s.closed; return 0, io.EOF }
 

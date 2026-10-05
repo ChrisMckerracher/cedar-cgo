@@ -3,17 +3,18 @@ package analysis
 import (
 	"context"
 	"errors"
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 	"strings"
 	"sync/atomic"
 	"testing"
+
+	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 )
 
 func TestCompiledProtocolFaultsAndOrdinaryErrors(t *testing.T) {
 	for _, response := range []string{`not JSON`, `{"report":{}}`, `{"error":{"kind":"solver","message":"closed"}}`, `{"error":{"kind":"unconfirmed_counterexample","message":"false model"}}`, `{"error":{"kind":"input"}}`, `{"error":{"kind":"input","message":null}}`, `{"error":{"kind":"input","message":""}}`, `{"handle":1}`} {
 		t.Run(response, func(t *testing.T) {
 			s, _, transport := testCompiledSession(t, func(context.Context, []byte) ([]byte, error) { return []byte(response), nil })
-			if _, err := s.Compile(context.Background(), cedar.PolicySet{}); err == nil {
+			if _, err := s.Compile(context.Background(), policy.PolicySet{}); err == nil {
 				t.Fatal("invalid response accepted")
 			}
 			if transport.closes.Load() != 1 {
@@ -24,7 +25,7 @@ func TestCompiledProtocolFaultsAndOrdinaryErrors(t *testing.T) {
 	s, _, transport := testCompiledSession(t, func(context.Context, []byte) ([]byte, error) {
 		return []byte(`{"error":{"kind":"compile_a","message":"ill-typed"}}`), nil
 	})
-	if _, err := s.Compile(context.Background(), cedar.PolicySet{}); err == nil {
+	if _, err := s.Compile(context.Background(), policy.PolicySet{}); err == nil {
 		t.Fatal("compile failure omitted")
 	}
 	if transport.closes.Load() != 0 {
@@ -43,13 +44,13 @@ func TestCompiledRejectsMixedResponseEnvelopes(t *testing.T) {
 			s, instance, transport := testCompiledSession(t, func(context.Context, []byte) ([]byte, error) {
 				return []byte(response), nil
 			})
-			if _, err := s.Compile(context.Background(), cedar.PolicySet{}); err == nil || !strings.Contains(err.Error(), "invalid envelope") {
+			if _, err := s.Compile(context.Background(), policy.PolicySet{}); err == nil || !strings.Contains(err.Error(), "invalid envelope") {
 				t.Fatalf("mixed response error: %v", err)
 			}
 			if transport.closes.Load() != 1 || instance.closes.Load() != 1 {
 				t.Fatal("mixed response retained resources")
 			}
-			if _, err := s.Compile(context.Background(), cedar.PolicySet{}); !errors.Is(err, ErrCompiledClosed) {
+			if _, err := s.Compile(context.Background(), policy.PolicySet{}); !errors.Is(err, ErrCompiledClosed) {
 				t.Fatalf("mixed response retained session: %v", err)
 			}
 		})
@@ -81,13 +82,13 @@ func TestCompiledRejectsInvalidUTF8Response(t *testing.T) {
 		response := append([]byte(`{"error":{"kind":"input","message":"`), byte(0xff))
 		return append(response, []byte(`"}}`)...), nil
 	})
-	if _, err := s.Compile(context.Background(), cedar.PolicySet{}); err == nil || !strings.Contains(err.Error(), "not valid UTF-8") {
+	if _, err := s.Compile(context.Background(), policy.PolicySet{}); err == nil || !strings.Contains(err.Error(), "not valid UTF-8") {
 		t.Fatalf("invalid UTF-8 response error: %v", err)
 	}
 	if transport.closes.Load() != 1 || instance.closes.Load() != 1 {
 		t.Fatal("invalid UTF-8 response retained resources")
 	}
-	if _, err := s.Compile(context.Background(), cedar.PolicySet{}); !errors.Is(err, ErrCompiledClosed) {
+	if _, err := s.Compile(context.Background(), policy.PolicySet{}); !errors.Is(err, ErrCompiledClosed) {
 		t.Fatalf("invalid UTF-8 response retained session: %v", err)
 	}
 }
@@ -103,10 +104,10 @@ func TestCompiledValidOrdinaryErrorsPreserveSession(t *testing.T) {
 				return []byte(`{"handle":2}`), nil
 			})
 			var input *Error
-			if _, err := s.Compile(context.Background(), cedar.PolicySet{}); !errors.As(err, &input) || input.Kind != kind {
+			if _, err := s.Compile(context.Background(), policy.PolicySet{}); !errors.As(err, &input) || input.Kind != kind {
 				t.Fatalf("ordinary error changed: %v", err)
 			}
-			if _, err := s.Compile(context.Background(), cedar.PolicySet{}); err != nil {
+			if _, err := s.Compile(context.Background(), policy.PolicySet{}); err != nil {
 				t.Fatalf("ordinary error prevented later compilation: %v", err)
 			}
 			if transport.closes.Load() != 0 || instance.closes.Load() != 0 {

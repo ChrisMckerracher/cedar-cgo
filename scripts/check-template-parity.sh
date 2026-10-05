@@ -5,7 +5,7 @@ repo=$(cd "$(dirname "$0")/.." && pwd)
 actual=$(mktemp)
 trap 'rm -f "$actual"' EXIT
 cd "$repo/rust"
-cargo run --locked --release -p cgw-authorizer --example template_fixtures > "$actual"
+cargo run --locked --release -p cgw-verification --bin template_fixtures > "$actual"
 diff -u "$repo/testdata/parity/templates/native.json" "$actual"
 cd "$repo"
-go test -count=1 -run '^TestTemplateNativeParity$' ./cedar
+go test -count=1 -run '^TestTemplateNativeParity$' ./cedar/policy/template

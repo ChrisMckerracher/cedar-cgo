@@ -8,7 +8,7 @@ import (
 )
 
 func TestVerifyArtifact(t *testing.T) {
-	if err := Verify(fixture(t), testCommit); err != nil {
+	if err := Verify(fixture(t), testCommit, testTarget, testHeader); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -19,12 +19,12 @@ func TestRejectArtifactChanges(t *testing.T) {
 		change        func(*testing.T, string)
 	}{
 		{"missing module", "missing artifact file", func(t *testing.T, dir string) {
-			if err := os.Remove(filepath.Join(dir, "analysis", "analysis.wasm")); err != nil {
+			if err := os.Remove(filepath.Join(dir, "libcgw_native.a")); err != nil {
 				t.Fatal(err)
 			}
 		}},
 		{"extra file", "unexpected artifact entry", func(t *testing.T, dir string) {
-			write(t, filepath.Join(dir, "analysis", "other.wasm"), nil)
+			write(t, filepath.Join(dir, "other.a"), nil)
 		}},
 		{"extra directory", "unexpected artifact entry", func(t *testing.T, dir string) {
 			if err := os.Mkdir(filepath.Join(dir, "other"), 0o700); err != nil {
@@ -34,16 +34,16 @@ func TestRejectArtifactChanges(t *testing.T) {
 		{"wrong commit", "source commit does not match", func(t *testing.T, dir string) {
 			write(t, filepath.Join(dir, "SOURCE_COMMIT"), []byte(strings.Repeat("0", 40)+"\n"))
 		}},
-		{"changed hash file", "generated source does not match", func(t *testing.T, dir string) {
-			path := filepath.Join(dir, "analysis", "sha256.go")
+		{"changed hash file", "hash does not match", func(t *testing.T, dir string) {
+			path := filepath.Join(dir, "link_flags.go")
 			data, err := os.ReadFile(path)
 			if err != nil {
 				t.Fatal(err)
 			}
 			write(t, path, append(data, []byte("// changed\n")...))
 		}},
-		{"changed module with matching manifest", "generated source does not match", func(t *testing.T, dir string) {
-			write(t, filepath.Join(dir, "analysis", "analysis.wasm"), []byte("changed module"))
+		{"changed module with matching manifest", "hash does not match", func(t *testing.T, dir string) {
+			write(t, filepath.Join(dir, "libcgw_native.a"), []byte("changed module"))
 			rewriteManifest(t, dir)
 		}},
 		{"wrong checksum", "checksums or manifest paths", func(t *testing.T, dir string) {
@@ -55,10 +55,10 @@ func TestRejectArtifactChanges(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			write(t, path, []byte(strings.ReplaceAll(string(data), "analysis/analysis.wasm", "../analysis.wasm")))
+			write(t, path, []byte(strings.ReplaceAll(string(data), "libcgw_native.a", "../libcgw_native.a")))
 		}},
-		{"injected Go declaration with matching manifest", "generated source does not match", func(t *testing.T, dir string) {
-			path := filepath.Join(dir, "analysis", "sha256.go")
+		{"injected Go declaration with matching manifest", "hash does not match", func(t *testing.T, dir string) {
+			path := filepath.Join(dir, "link_flags.go")
 			data, err := os.ReadFile(path)
 			if err != nil {
 				t.Fatal(err)
@@ -71,7 +71,7 @@ func TestRejectArtifactChanges(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			dir := fixture(t)
 			test.change(t, dir)
-			if err := Verify(dir, testCommit); err == nil || !strings.Contains(err.Error(), test.message) {
+			if err := Verify(dir, testCommit, testTarget, testHeader); err == nil || !strings.Contains(err.Error(), test.message) {
 				t.Fatalf("got %v, want %q", err, test.message)
 			}
 		})
@@ -80,7 +80,7 @@ func TestRejectArtifactChanges(t *testing.T) {
 
 func TestRejectInvalidCommit(t *testing.T) {
 	for _, commit := range []string{"HEAD", testCommit[:39], strings.ToUpper(testCommit), strings.Repeat("z", 40)} {
-		if err := Verify(fixture(t), commit); err == nil {
+		if err := Verify(fixture(t), commit, testTarget, testHeader); err == nil {
 			t.Fatalf("accepted invalid commit %q", commit)
 		}
 	}

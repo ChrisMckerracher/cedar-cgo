@@ -7,11 +7,11 @@ import zipfile
 from pathlib import Path, PurePosixPath
 
 ROOT = "cedar-go-wasm/"
-MODULES = tuple(
-    f"internal/modules/{name}/{file}"
-    for name in ("analysis", "authorizer")
-    for file in (f"{name}.wasm", "sha256.go")
-)
+if __package__:
+    from .native import verify_native
+else:
+    from native import verify_native
+
 METADATA = {"SOURCE_COMMIT", "SHA256SUMS", "SOURCE_SHA256SUMS"}
 
 
@@ -30,7 +30,7 @@ def verify_manifest(data, files, required):
         raise ValueError("bundle checksums or manifest paths do not match")
 
 
-def read_bundle(path, expected_commit):
+def read_bundle(path, expected_commit, expected_target=None):
     if not re.fullmatch(r"[0-9a-f]{40}", expected_commit):
         raise ValueError("source commit must contain 40 lowercase hexadecimal characters")
     files = {}
@@ -52,19 +52,20 @@ def read_bundle(path, expected_commit):
             seen.add(name)
             if not entry.is_dir():
                 files[name[len(ROOT):]] = archive.read(entry)
-    for name in METADATA | set(MODULES) | {"go.mod", "go.sum"}:
+    for name in METADATA | {"go.mod", "go.sum"}:
         if name not in files:
             raise ValueError(f"missing bundle file: {name}")
     if files["SOURCE_COMMIT"] != (expected_commit + "\n").encode():
         raise ValueError("bundle source commit does not match")
-    verify_manifest(files["SHA256SUMS"], files, set(MODULES))
-    source = set(files) - METADATA - set(MODULES)
+    native = set(verify_native(files, expected_commit, expected_target))
+    verify_manifest(files["SHA256SUMS"], files, native)
+    source = set(files) - METADATA - native
     verify_manifest(files["SOURCE_SHA256SUMS"], files, source)
     return files
 
 
-def extract_bundle(path, expected_commit, destination):
-    files = read_bundle(path, expected_commit)
+def extract_bundle(path, expected_commit, destination, expected_target=None):
+    files = read_bundle(path, expected_commit, expected_target)
     with zipfile.ZipFile(path) as archive:
         modes = {entry.filename[len(ROOT):]: (entry.external_attr >> 16) & 0o777 for entry in archive.infolist()}
     root = Path(destination) / ROOT

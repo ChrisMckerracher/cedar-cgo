@@ -1,180 +1,137 @@
-# Contributing to cedar-go-wasm
+# Contributor lessons for cedar-go-wasm
 
-Report bugs and propose changes through GitHub issues and pull requests.
-Report vulnerabilities privately as described in [SECURITY.md](SECURITY.md).
+Report bugs through GitHub issues. Report vulnerabilities through [SECURITY.md](SECURITY.md).
+Use existing tools and dependencies. Obtain approval before installing a new tool or dependency.
 
-## Contents
-
-- [Repository layout](#repository-layout)
-- [Tests](#tests)
-- [Guest changes](#guest-changes)
-- [Documentation changes](#documentation-changes)
-- [Dependencies and releases](#dependencies-and-releases)
-
-## Repository layout
+## Package responsibilities
 
 ```text
-cedar/                 Public authorization and validation package
-analysis/              Public policy-comparison package and solver adapter
+cedar/                          Runtime composition and feature factories
+  syntax/                       Cedar and JSON formats
+  diagnostic/                   Errors, policy diagnostics, and source spans
+  value/                        Values, expression results, and entity references
+  entity/                       Entity records, collections, and stores
+    uid/                        Entity identity
+    slicing/                    Request-specific entity slicing
+  schema/                       Schema sources, composition, and inspection
+  policy/                       Policy sources, immutable snapshots, edits, and persistence
+    template/                   Template sources, slots, and links
+    format/                     Formatting and output limits
+    source/                     Tokens and source spans
+    applicability/              Potential request environments
+  authorization/                Configuration and concrete authorization
+    request/                    Requests, contexts, decisions, and responses
+    batched/                    Call-local entity loading
+    partial/                    Unknown inputs, residuals, persistence, and queries
+  validation/                   Explicit strict validation and depth limits
+  expression/                   Expression parsing and evaluation
+  utility/                      Language and request utilities
+  integration/                  Corpus and cross-feature verification
+analysis/                       Stateless and compiled policy analysis
+  solver/                       External solver processes and transport
+  internal/report/              Checked counterexample and diagnostic decoding
 internal/
-  wasmhost/            Shared module compilation, instances, and faults
-  wire/                Shared JSON source, UID, and error envelopes
-  capbuf/              Bounded diagnostic output
-  modules/             Embedding code and untracked generated Wasm outputs
-  verification/        Source-linked SMT proof of ABI arithmetic
-rust/
-  crates/
-    abi/               Guest memory exchange and source parsing
-    authorizer/        Guest load, authorize, and validate operations
-    analysis/          SymCC guest and solver protocol
-    native-bench/      Native authorization benchmark
-  patches/             Wasm target patch for SymCC
-  vendor/              Pinned SymCC source
-testdata/joy/          Shared policy, schema, and entity fixtures
-docs/                  API, analysis, security, verification, performance, maintenance
-scripts/               Rebuild, vendoring, and license-generation scripts
-.github/               CI, releases, and dependency-update configuration
+  execution/                    Scheduling, limits, and loaded session ownership
+  native/                       Cgo interface, callbacks, and native lifetimes
+  artifact/                     Native file and identity verification
+  testsupport/                  Shared test fixtures and generators
+  verification/                 Source-linked native arithmetic checks
+rust/crates/
+  abi/                          Shared parsing, conversion, callbacks, and diagnostics
+  authorizer/                   Explicit native Cedar state and domain operations
+  analysis/                     Explicit native SymCC state and solver protocol
+  native/                       Versioned C interface and ownership registries
+  verification/                 Independent direct Cedar and SymCC fixture programs
 ```
 
-Tests and benchmarks live beside the package they exercise. The repository
-root contains project metadata; Go users import `/cedar` or `/analysis`.
+Feature packages own their records, operations, and tests. They do not import the composition package.
+Authorization child packages share internal session ownership. They do not import their parent implementation.
+Entity collections depend on values. Values depend on entity identity through `entity/uid`.
+Policy sets own persistence. The template package uses policy sets without an inverse dependency.
 
-Within `cedar`, `runtime.go` manages module compilation, `config.go` defines
-authorizer settings, `pool.go` handles instance lifetime, `authorizer.go`
-coordinates calls, `protocol.go` decodes authorization results, and
-`validation.go` runs strict validation. Sources, entities, values, contexts,
-and errors each have a focused file.
+```mermaid
+flowchart TD
+    composition[cedar composition] --> domains[domain clients]
+    domains --> execution[shared execution]
+    execution --> native[cgo ownership]
+    native --> rust[Rust C interface]
+    rust --> cedar[Cedar operations]
+    rust --> symcc[SymCC operations]
+    symcc --> solver[call-local solver callbacks]
+```
 
-Within `analysis`, `analyzer.go` coordinates comparisons, `options.go`
-defines budgets, `host.go` implements the guest's solver imports,
-`solver.go` manages native processes, and `report.go` decodes results.
-The shared `wasmhost` package separates module setup, instance calls, and
-fault reporting.
+Closing a runtime invalidates its clients. Closing a session waits for active native calls.
+Private inputs and snapshots remain immutable. Display records cannot change a partial continuation.
+Read the [native contract](docs/migration/native-contract.md) before changing resource ownership.
 
-Keep Cedar decisions inside the Rust engine. Changes to transport,
-pooling, or resource handling belong at the corresponding Go seam.
+## Lesson 1: Build and check a source change
 
-## Tests
+Objective: Verify native execution with pinned inputs.
 
-### Lesson 1: Build and test a source checkout
-
-Objective: Generate the embedded modules from pinned Rust sources before Go compilation.
-
-1. Use Go 1.26 or later and the Rust toolchain in `rust-toolchain.toml`.
-2. If the pinned Rust toolchain is missing, install it with `rustup toolchain install`.
-3. From the repository root, build both modules, then run the Go checks:
+1. Use Go 1.26 or 1.27, the pinned Rust toolchain, and a supported C compiler.
+2. Commit source changes before building verified native artifacts.
+3. Build the native archive and generated linker requirements.
+4. Run formatting, static analysis, and Go tests.
 
 ```bash
-scripts/build-wasm.sh
+CGO_ENABLED=1 scripts/build-native.sh
+test -z "$(gofmt -l .)" || { gofmt -l .; exit 1; }
 go vet ./...
-go test ./...
+go test -count=1 ./...
 ```
 
-The build generates both `.wasm` files and their `sha256.go` files under `internal/modules/`.
-Git ignores these outputs. Repeat the build after changing Rust sources, dependencies, or build settings.
+Worked example: The default command writes artifacts under `internal/native/_artifacts/` and installs only linker files for Go.
 
-Knowledge check: Can a clean checkout run Go tests before generating the embedded files? No; Go embedding requires those files.
+Knowledge check: Does a deadline stop active native CPU work? No. Read the cancellation contract before interpreting timeout tests.
 
-4. To run conformance tests, set `CEDAR_CORPUS_DIR`.
-   Use the corpus commit and checksum from both workflows:
+## Lesson 2: Run complete verification
+
+Objective: Preserve semantic and lifetime coverage before publication.
+
+1. Set `CVC5` to the approved cvc5 1.3.1 executable.
+2. Set `CEDAR_CORPUS_DIR` to the verified pinned corpus directory.
+3. Run the exact local checks from CI against the final candidate.
 
 ```bash
-commit=1999ea249229e26cabb398a279fea721854a471d
-curl -sSfL -o corpus.tar.gz "https://raw.githubusercontent.com/cedar-policy/cedar-integration-tests/$commit/corpus-tests.tar.gz"
-echo "65476adf952c0574d6bf9b317d67d30c9ac462eb1dbf5e4c7b2a35856baf5205  corpus.tar.gz" | sha256sum --check
-mkdir -p corpus
-tar xzf corpus.tar.gz -C corpus
-CEDAR_CORPUS_DIR="$PWD/corpus" go test -run '^TestCorpus$' -v ./cedar
+set -euo pipefail
+go test -count=1 -coverpkg=./... -coverprofile=coverage.out ./...
+python3 scripts/check-coverage.py coverage.out
+go test -race -count=1 ./...
+GOEXPERIMENT=cgocheck2 go test -count=1 ./...
+scripts/fuzz-native.sh
+scripts/check-rust.sh
+python3 -m unittest discover -s scripts/consumer -p 'test_*.py'
+python3 -m unittest discover -s scripts/release -p 'test_*.py'
 ```
 
-5. To run analysis integration tests, use a cvc5 1.3.1 executable from the
-[official release](https://github.com/cvc5/cvc5/releases/tag/cvc5-1.3.1):
+The fuzz script discovers all 25 preserved targets and runs each for 60 seconds.
+The Rust script checks native tests, Clippy, independent fixtures, dependency policy, advisories, and license output.
+Expected fixture files remain read-only. Use the relevant explicit update command only for an approved expectation change.
 
-```bash
-CVC5=/path/to/cvc5 go test -v ./analysis
-```
+Worked example: `scripts/check-native-reproducibility.sh /tmp/native-artifact` compares two independent native builds.
 
-Unset variables cause the corresponding integration tests to skip.
-6. For a complete verification pass, set both variables:
+Knowledge check: Can a missing tool or skipped check count as a pass? No. Resolve the missing check before pushing.
 
-```bash
-CEDAR_CORPUS_DIR="$PWD/corpus" CVC5=/path/to/cvc5 go test -count=1 ./...
-```
+## Shared contracts and file size
 
-7. Run fuzz targets for longer when needed. Ordinary tests run their seed inputs:
+Keep one implementation for each shared behavior.
+Shared execution owns acquisition, cancellation checks, invalidation, and close ordering.
+Shared wire checks reject invalid UTF-8. Domain decoders enforce their required fields and result variants.
+Schema and policy sources share format vocabulary. Their snapshots retain distinct domain ownership.
+Shared test support resolves fixture paths after package moves.
 
-```bash
-go test -run '^$' -fuzz '^FuzzAuthorize$' -fuzztime 5m ./cedar
-```
+Analysis selection records remain distinct from schema applicability records because their accepted fields differ.
+Analysis policy-evaluation reports require consistency checks beyond ordinary policy diagnostic decoding.
+These distinctions preserve domain input and output contracts.
 
-Property tests (`TestProperty*`) run in ordinary tests too; rapid prints the
-seed on failure, so reproduce with `go test ./cedar -run TestPropertyX -rapid.seed=N`.
+Target 150 lines per maintained code file. Rust inline tests can exceed the production-line target.
+Before splitting a file, identify its separate responsibilities. Name each resulting file for its responsibility.
+Document each necessary exception in the change report.
+The [migration report](docs/migration/verification.md) records before-and-after counts and remaining exceptions.
 
-Repeat for every target listed in the CI workflow and verification guide. See
-[Verification](docs/verification.md) for coverage and
-[Performance](docs/performance.md#reproduce) for benchmarks.
+## Publication and releases
 
-Formatting has a direct native upstream oracle, independent of the guest wrapper:
-
-```bash
-scripts/format-parity.sh --check
-cargo clippy --manifest-path rust/Cargo.toml --locked --release -p cgw-authorizer --example format_parity -- -D warnings
-```
-
-After changing the formatter pin or fixture inputs, run
-`scripts/format-parity.sh --write`, review `testdata/parity/format/expected.json`,
-and run `go test -run 'TestFormat|ExampleRuntime_FormatPolicies' ./cedar`.
-CI checks regenerated fixtures against the committed results.
-
-## Guest changes
-
-### Lesson 2: Validate a guest source change
-
-Objective: Review Rust sources and verify their generated modules without committing build outputs.
-
-1. Use the pinned Rust toolchain and Wasm target from `rust-toolchain.toml`.
-2. After editing guest code or its dependencies, generate modules and license notices:
-
-```bash
-scripts/build-wasm.sh
-scripts/third-party-licenses.sh
-```
-
-3. Include source changes, dependency pins, lockfile changes, and updated license notices in the review.
-   Leave generated modules and hashes untracked. CI builds them from the reviewed commit.
-   CI compares two independent builds and tests the generated modules.
-
-4. From `rust/`, run the Rust checks:
-
-```bash
-cargo fmt --all -- --check
-cargo clippy --locked --release --target wasm32-wasip1 -p cgw-abi -p cgw-authorizer -p cgw-analysis -- -D warnings
-cargo clippy --locked --release -p cgw-native-bench -- -D warnings
-cargo deny --all-features check
-cargo audit --deny warnings
-```
-
-5. From the repository root, run `scripts/vendor-symcc.sh` to verify the vendored source.
-
-Knowledge check: Which generated files belong in the commit? License notices belong in the commit; modules and hash files do not.
-
-The [maintenance guide](docs/maintenance.md) describes tool versions, builds, and Cedar upgrades.
-
-## Documentation changes
-
-Keep the README focused on the purpose, example, measured tradeoffs, and
-links to the guides. Put detailed contracts in [API](docs/api.md), execution
-assumptions in [Security](docs/security.md), and development procedures in
-this file or [Maintenance](docs/maintenance.md).
-
-Keep examples aligned with the executable Go examples. Identify the
-workload, versions, and environment for benchmark claims, and state the
-scope of verification evidence. Update links and commands when moving files.
-
-## Dependencies and releases
-
-See [dependency review](docs/maintenance.md#dependency-review),
-[Cedar upgrades](docs/maintenance.md#upgrading-cedar), and
-[releases](docs/maintenance.md#releases). Dependency changes require
-maintainer review and must satisfy the repository's license and provenance
-policies.
+Run every applicable local CI check before pushing. Keep the exact repository-wide `gofmt` check.
+Verify remote CI for the exact published main commit before tagging a release.
+Release assets must contain the exact tested native files and consumer source bundle.
+Follow [release maintenance](docs/maintenance.md) and the [consumer migration lessons](docs/migration/consumer.md).

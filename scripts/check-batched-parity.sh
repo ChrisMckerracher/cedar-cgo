@@ -5,7 +5,7 @@ repo=$(cd "$(dirname "$0")/.." && pwd)
 output=$(mktemp)
 trap 'rm -f "$output"' EXIT
 cd "$repo/rust"
-cargo run --offline --locked --release -p cgw-authorizer --example batched-oracle < "$repo/testdata/parity/batched/input.json" > "$output"
+cargo run --offline --locked --release -p cgw-verification --bin batched-oracle < "$repo/testdata/parity/batched/input.json" > "$output"
 diff -u "$repo/testdata/parity/batched/expected.json" "$output"
 cd "$repo"
-go test -count=1 -run '^TestBatchedNativeParity$' ./cedar
+go test -count=1 -run '^TestBatchedNativeParity$' ./cedar/authorization/batched

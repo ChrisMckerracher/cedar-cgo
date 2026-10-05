@@ -19,16 +19,18 @@ import (
 // Full declaration fingerprints preserve the premises, casts, and guard order reviewed for the model.
 func TestBatchedProofSource(t *testing.T) {
 	checks := map[string]map[string]string{
-		"../../cedar/batched.go": {
-			"AuthorizeBatched":       "b3bb0932f52ec5a8ec771c645efe20012aa3dfdb4160806715c91a933fd097ba",
-			"entityLoaderState":      "329f1433c14a880785396a433c40f17ffd1dcb0ff6a9fd1992cc8f520036e5c4",
-			"charge":                 "c5ca032a105efe396ee4745fb0b36561faad5f68900d577c7809ca1cb17d7a83",
-			"loadEntityBatch":        "6a8e0f705af595bea6bdeeb519e02caf10a68cd3ac0b8d07a5d89a93b95a2130",
-			"encodeEntityLoadResult": "7c9f83fd575004c1c257b8d87e7b058343d58dad90e04c9d89b9e7008ca4a21e",
-			"DefaultMaxBatchBytes":   "6cdd837b8a317898f0d862fa1357be0ff89d16521839b8c22fa8073b724f457c",
-			"DefaultMaxLoaderBytes":  "e470d69e046e1be25c080a6f112920f5a61d0c97b4e085e1668b4c4b3bc07bf7",
+		"../../cedar/authorization/batched/batched.go": {
+			"AuthorizeBatched":      "73a8833b8f2592e49d98c39b24aadbb2454707530ad62d89a6b60ed538f6973b",
+			"EntityLoaderState":     "2bd5d64c0e198178676dc673ebf9678391eaca2eb1cf94a88cd0533a7c9048da",
+			"DefaultMaxBatchBytes":  "6cdd837b8a317898f0d862fa1357be0ff89d16521839b8c22fa8073b724f457c",
+			"DefaultMaxLoaderBytes": "e470d69e046e1be25c080a6f112920f5a61d0c97b4e085e1668b4c4b3bc07bf7",
 		},
-		"../../cedar/runtime.go": {
+		"../../cedar/authorization/batched/callback.go": {
+			"charge":                 "bcdc4920f823a1b13a76abc3de6e23270e7f35c7066616ad903856e12c63a148",
+			"LoadEntityBatch":        "56dd39db215beea321944e547dae1651c6d1c5386fd509de68be6c9883e9f6d3",
+			"EncodeEntityLoadResult": "1b8c7a044f944545ad29744a3dbb638e111b6fe47373d439ba38123025ca3e15",
+		},
+		"../../internal/execution/runtime.go": {
 			"DefaultMaxSourceBytes": "3e3dd176f77d783ffd18525efa54c9e6bdc8f46317be81336484cd6a20c1696d",
 		},
 	}
@@ -96,5 +98,5 @@ func TestBatchedProof(t *testing.T) {
 	if got := strings.Join(strings.Fields(string(output)), " "); got != want {
 		t.Fatalf("expected four satisfiable premise sets and five proved properties (%s), got:\n%s", want, output)
 	}
-	t.Log("proved: charge range and conservation, bounded call increment, request int conversion, positive result int32 conversion")
+	t.Log("proved: charge range and conservation, bounded call increment, request length bound, positive native callback result")
 }

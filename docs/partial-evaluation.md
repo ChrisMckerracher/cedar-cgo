@@ -1,6 +1,6 @@
 # Partial evaluation (experimental)
 
-`Authorizer.PartialAuthorize` exposes Cedar 4.13.0's type-aware partial
+`partial.Client.PartialAuthorize` exposes Cedar 4.13.0's type-aware partial
 evaluation (TPE). Cedar labels this API experimental and recommends `tpe`
 instead of the older `partial-eval` feature. This package uses `tpe` only;
 it does not implement legacy unknown-expression substitution. The Go API,
@@ -68,7 +68,7 @@ entities, so supply complete replacements for per-call partial entities there.
 
 The response privately retains its original input snapshot and authorizer.
 Reauthorization recomputes TPE in a pooled instance and then invokes native
-`TpeResponse::reauthorize` on those residuals. This avoids retained guest handles
+`TpeResponse::reauthorize` on those residuals. This avoids retained native library handles
 and works after an instance is recycled. It repeats the TPE cost on each call.
 The authorizer and runtime must remain open. Reauthorization is safe to call
 concurrently; callers must not concurrently mutate input records or slices.
@@ -81,7 +81,7 @@ An unresolved condition can contain this node without always producing an error.
 Short-circuit evaluation can skip it.
 
 `PartialResponse.Export()` serializes the frozen partial input and projection.
-`Authorizer.ImportPartialResponse()` recomputes partial evaluation and requires the complete versioned projection to match.
+`partial.Client.ImportPartialResponse()` recomputes partial evaluation and requires the complete versioned projection to match.
 It then reconstructs the matching native PST through `PolicySet::from_pst`.
 Ordinary Cedar JSON parsing cannot accept internal residual error expressions.
 Unknown representation versions, different Cedar versions, and changed residual policies return `KindInput`.
@@ -95,7 +95,7 @@ Direct authorization has the same decisions, reasons, and error policy IDs.
 Its error messages can differ because residual errors discard the original error details.
 The original authorizer must stay open for its continuation.
 An imported continuation uses the authorizer that accepted the import.
-Request, response, memory, and cancellation limits also apply to import and replay.
+Request, response, and cancellation limits also apply to import and replay.
 
 Residual display text does not serialize the full residual state.
 Cedar can emit internal residual-error expressions that ordinary source parsing
@@ -107,26 +107,26 @@ that information and receive ordinary `Response.Errors` diagnostics.
 Run the complete example with:
 
 ```bash
-go test ./cedar -run '^ExamplePartialResponse_Reauthorize$' -v
+go test ./cedar/authorization/partial -run '^ExamplePartialResponse_Reauthorize$' -v
 ```
 
 It leaves the principal, resource IDs, and MFA context unknown, inspects an
 undecided residual, then resolves the same response to Allow with MFA and Deny
-without it. Source: [executable example](../cedar/partial_example_test.go).
+without it. Source: [executable example](../cedar/authorization/partial/partial_example_test.go).
 
 ## Bounds and verification
 
-Both operations share the existing authorizer pool, memory limit, per-call
+Both operations share the existing authorizer pool, per-call
 timeout, caller cancellation, response-byte limit, and fault recycling.
 `MaxRequestBytes` bounds the full JSON envelope. For reauthorization that
 includes the original partial input **and** the concrete completion; reserve
 space for both when configuring this limit. Each response retains at most one
-bounded partial-input snapshot and residual projection on the Go heap, with no guest handle cache.
+bounded partial-input snapshot and residual projection on the Go heap, with no native library handle cache.
 As with ordinary authorization, callers control how many responses they retain.
 Errors from partial evaluation return `Undecided`; reauthorization errors return
 `Deny`. No error or undecided result becomes Allow implicitly.
 
-`testdata/parity/partial` compares the public Go/Wasm API with a separate native
+`testdata/parity/partial` compares the public Go/native API with a separate native
 program calling the pinned Cedar APIs directly. Successful native completions
 are also checked against ordinary native authorization. Fixtures cover concrete
 and unknown requests/entity data, forbid precedence, integer overflow, invalid
@@ -135,12 +135,12 @@ inputs, and inconsistent completions. Regenerate or verify them with:
 ```bash
 scripts/partial-fixtures.sh
 scripts/partial-fixtures.sh --check
-go test ./cedar -run 'TestPartial|ExamplePartial|FuzzPartial' -count=1
+go test ./cedar/authorization/partial -run 'TestPartial|ExamplePartial|FuzzPartial' -count=1
 ```
 
 CI regenerates and compares the fixtures and fuzzes the partial-entity input
 boundary. Tests also exercise cancellation during execution and pool waits,
-memory exhaustion, malformed output, response limits, corrupted guest state,
+recovered panics, malformed output, response limits, corrupted native state,
 and recovery. These are differential and boundary tests, not a proof of Cedar
-semantics. The existing ABI arithmetic proof remains applicable; this feature
-adds no pointer arithmetic or guest handle protocol.
+semantics. Native arithmetic proofs cover checked lengths and handle identity.
+They do not prove partial-evaluation semantics or pointer ownership.

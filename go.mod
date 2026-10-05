@@ -4,7 +4,6 @@ go 1.26.0
 
 require (
 	github.com/jackc/puddle/v2 v2.2.2
-	github.com/tetratelabs/wazero v1.12.0
 	pgregory.net/rapid v1.3.0
 )
 

@@ -1,24 +1,21 @@
-// This independent consumer exercises both embedded modules without Rust or cvc5.
+// This independent consumer runs native authorization and real solver analysis.
 package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"io"
 	"log"
+	"os"
 
 	"github.com/ChrisMckerracher/cedar-go-wasm/analysis"
+	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/solver"
 	"github.com/ChrisMckerracher/cedar-go-wasm/cedar"
+	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
+	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
+	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
+	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
+	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 )
-
-type unusedSolver struct{}
-type unusedSession struct{}
-
-func (unusedSolver) Start(context.Context) (analysis.Session, error) { return unusedSession{}, nil }
-func (unusedSession) Read([]byte) (int, error)                       { return 0, io.EOF }
-func (unusedSession) Write([]byte) (int, error)                      { return 0, errors.New("unexpected solver input") }
-func (unusedSession) Close() error                                   { return nil }
 
 func main() {
 	ctx := context.Background()
@@ -27,31 +24,37 @@ func main() {
 		log.Fatal(err)
 	}
 	defer runtime.Close(ctx)
-	authorizer, err := runtime.NewAuthorizer(ctx, cedar.Config{
-		Policies: cedar.PoliciesFromCedar(`permit(principal, action, resource);`),
+	s := schema.SchemaFromCedar(`entity User; entity Doc; action read appliesTo {principal: User, resource: Doc, context: {n: Long}};`)
+	authorizer, err := runtime.NewAuthorizer(ctx, authorization.Config{
+		Schema: &s, Policies: policy.PoliciesFromCedar(`permit(principal, action, resource);`),
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer authorizer.Close()
-	response, err := authorizer.Authorize(ctx, cedar.Request{
-		Principal: cedar.NewEntityUID("User", "alice"),
-		Action:    cedar.NewEntityUID("Action", "read"),
-		Resource:  cedar.NewEntityUID("Doc", "example"),
+	response, err := authorizer.Authorize(ctx, request.Request{
+		Principal: uid.NewEntityUID("User", "alice"),
+		Action:    uid.NewEntityUID("Action", "read"),
+		Resource:  uid.NewEntityUID("Doc", "example"), Context: request.ContextFromJSON([]byte(`{"n":0}`)),
 	})
-	if err != nil || response.Decision != cedar.Allow {
+	if err != nil || response.Decision != request.Allow {
 		log.Fatalf("authorization result: %v, error: %v", response.Decision, err)
 	}
-	analyzer, err := analysis.New(ctx, unusedSolver{})
+	analyzer, err := analysis.New(ctx, solver.CVC5(os.Getenv("CVC5")))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer analyzer.Close(ctx)
-	// Invalid syntax exercises the analysis guest before it needs a solver reply.
-	_, err = analyzer.Equivalent(ctx, cedar.SchemaFromCedar("invalid schema"), cedar.PolicySet{}, cedar.PolicySet{})
-	var analysisError *analysis.Error
-	if !errors.As(err, &analysisError) || analysisError.Kind != "schema" {
-		log.Fatalf("analysis schema result: %v", err)
+	a := policy.PoliciesFromCedar(`permit(principal, action, resource) when {context.n < 0};`)
+	b := policy.PoliciesFromCedar(`permit(principal, action, resource) when {context.n <= -1};`)
+	report, err := analyzer.Equivalent(ctx, s, a, b)
+	if err != nil || len(report.Results) != 1 || !report.Holds() {
+		log.Fatalf("solver equivalence result: %+v, error: %v", report, err)
 	}
-	fmt.Println("The source bundle runs both embedded modules without Rust.")
+	b = policy.PoliciesFromCedar(`permit(principal, action, resource) when {context.n <= 0};`)
+	report, err = analyzer.Equivalent(ctx, s, a, b)
+	if err != nil || len(report.Results) != 1 || report.Holds() || report.Results[0].Counterexample == nil {
+		log.Fatalf("solver counterexample result: %+v, error: %v", report, err)
+	}
+	fmt.Println("The source bundle runs native authorization and cvc5 analysis without Rust.")
 }

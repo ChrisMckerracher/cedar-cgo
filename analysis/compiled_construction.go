@@ -4,13 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
+
+	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 	"github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
 )
 
 // OpenCompiled creates a reusable session tied to the constructor context.
 // A nil selection includes all environments. An empty selection includes none.
-func (a *Analyzer) OpenCompiled(ctx context.Context, schema cedar.Schema, selection []RequestEnvironment) (*CompiledSession, error) {
+func (a *Analyzer) OpenCompiled(ctx context.Context, schema schemas.Schema, selection []RequestEnvironment) (*CompiledSession, error) {
 	source := source(schema.Format(), schema.Text())
 	input := compiledInput{Operation: "open", Schema: &source}
 	if selection != nil {

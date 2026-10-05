@@ -1,0 +1,14 @@
+[
+  {
+    "target": "FuzzBatchedDifferential",
+    "input": "41dcd8a1a27bbe3c",
+    "sha256": "41dcd8a1a27bbe3ce1c8500c70aa22272c99c3a939a816efe52b4c67a0527b5e",
+    "new_path": "cedar/authorization/batched/testdata/fuzz/FuzzBatchedDifferential/41dcd8a1a27bbe3c"
+  },
+  {
+    "target": "FuzzValidationDepth",
+    "input": "unsafe-context-attribute",
+    "sha256": "10b00fdc4bfdb7d9866a614ef0c4c8fcfa06fc443dae8a28807be5f3b2eea13b",
+    "new_path": "cedar/validation/testdata/fuzz/FuzzValidationDepth/unsafe-context-attribute"
+  }
+]

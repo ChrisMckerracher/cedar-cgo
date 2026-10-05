@@ -1,191 +1,115 @@
 # cedar-go-wasm
 
-Cedar's Rust authorization engine, strict validator, and policy-change
-analysis for Go. The reference implementation runs as embedded WebAssembly
-under [wazero](https://wazero.io/), so authorization ships in a Go binary.
-Release source bundles include the tested modules and need Go without Rust.
-Source checkouts require the pinned Rust build before Go compilation.
+Cedar's pinned Rust implementation runs through cgo for Go consumers.
+The package provides authorization, strict validation, policy tools, partial evaluation, and solver-backed analysis.
+It uses Cedar 4.13.0, the Cedar formatter 4.13.0, and SymCC 0.7.0.
+The module and repository names remain unchanged.
 
-We wanted all of Cedar in Go.
-[cedar-go](https://github.com/cedar-policy/cedar-go#comparison-to-the-rust-implementation)
-lacks feature parity with the Rust reference implementation and
-[doesn't appear actively maintained](https://github.com/cedar-policy/cedar-go/commits/main/).
-So we run the Rust implementation directly.
+The native migration changes public imports and constructors.
+Read the [migration lessons](docs/migration/consumer.md) before updating an existing consumer.
+Read the [execution contract](docs/migration/native-contract.md) for cancellation, memory, panic, and ownership rules.
 
-The embedded versions are **cedar-policy 4.13.0**,
-**cedar-policy-formatter 4.13.0**, and **cedar-policy-symcc 0.7.0**. Authorization and strict validation match the
-pinned upstream corpus: **7,523 tests, 60,184 requests, zero mismatches**.
-See [verification](docs/verification.md) for the checks and their scope.
+## Supported platforms
 
-[Example](#example) · [Testing](#testing-and-security) · [Performance](#performance) · [Maintenance](#maintenance) · [Documentation](#documentation)
+Linux amd64 GNU, Linux arm64 GNU, and macOS arm64 are the selected targets.
+CI tests Go 1.26 and 1.27 on each target.
+See the [platform requirements and verification status](docs/migration/platforms.md).
 
-## Install
+A source build requires Go, cgo, a supported C compiler, and the pinned Rust toolchain.
+A prebuilt consumer bundle requires Go, cgo, and a supported C compiler. It does not require Rust.
+Analysis also requires an external solver. Verification uses cvc5 1.3.1.
 
-Requires **Go 1.26 or later**.
-Go module downloads do not include the generated modules.
-Use the release source bundle to build without Rust.
+## Lesson 1: Build a source checkout
 
-### Lesson 1: Use a release bundle in a Go project
+Objective: Build the native library and authorize a request.
 
-Objective: Install the package with CI-tested modules and no local Rust build.
-
-1. From a [release](https://github.com/ChrisMckerracher/cedar-go-wasm/releases), download `cedar-go-wasm-source.zip` and `SHA256SUMS`.
-2. From the download directory, verify the bundle checksum and build attestation:
-
-   ```bash
-   sha256sum --check --ignore-missing SHA256SUMS
-   gh attestation verify cedar-go-wasm-source.zip --repo ChrisMckerracher/cedar-go-wasm
-   ```
-
-   The checksum command checks downloaded assets and skips absent release files.
-   See [release verification](docs/maintenance.md#releases) to verify all assets.
-3. Extract the bundle to a permanent directory.
-4. From your Go project, set the local module replacement and add the package:
+1. Use Go 1.26 or later and the Rust toolchain in `rust-toolchain.toml`.
+2. Enable cgo and use the supported platform's C compiler.
+3. Commit source changes before building verified artifacts.
+4. Build the library from the repository root.
 
 ```bash
+CGO_ENABLED=1 scripts/build-native.sh
+go test ./...
+```
+
+The command installs an untracked native archive and its generated linker requirements.
+It does not install a new toolchain or dependency.
+If a required tool is missing, install it through your approved setup process.
+
+Worked example: [The independent consumer](scripts/consumer/smoke/main.go) runs authorization and real solver analysis.
+
+Knowledge check: Does ordinary `go get` include native release attachments? No. Build the source or use a verified bundle.
+
+## Lesson 2: Install a prebuilt consumer bundle
+
+Objective: Link the exact native files that passed the release checks.
+
+1. Download your platform's source ZIP and checksum file from a [release](https://github.com/ChrisMckerracher/cedar-go-wasm/releases).
+2. Verify the ZIP checksum and its build attestation.
+3. Extract the verified source bundle to a permanent directory.
+4. Set a local module replacement in your consumer project.
+
+```bash
+gh attestation verify cedar-go-wasm-linux_amd64-source.zip --repo ChrisMckerracher/cedar-go-wasm
 go mod edit -replace=github.com/ChrisMckerracher/cedar-go-wasm=/absolute/path/cedar-go-wasm
-go get github.com/ChrisMckerracher/cedar-go-wasm/cedar
+CGO_ENABLED=1 go get github.com/ChrisMckerracher/cedar-go-wasm/cedar
 ```
 
-Worked example: If you extracted `/opt/cedar-go-wasm`, use that path as the replacement directory.
-Keep this directory available for later builds.
-For shared builds, distribute the same verified bundle and configure its local path.
+Use `linux_arm64` or `darwin_arm64` for the other selected platforms.
+Verify the complete checksum file as described in [release maintenance](docs/maintenance.md).
+Keep the replacement directory available for later builds.
 
-Knowledge check: Does ordinary `go get` download release attachments? No; the local replacement supplies the generated modules.
+Worked example: CI builds a separate consumer with isolated caches and blocks every Rust command.
 
-For a source checkout, follow [contributor setup](CONTRIBUTING.md#tests).
-Source builds require the pinned Rust toolchain.
-
-```go
-import "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
-```
-
-The project is pre-v1; the Go API may evolve before a stable release.
-The [API guide](docs/api.md) covers parsed policy edits, template management,
-on-demand entity loading, request-specific slicing, and policy formatting through
-the pinned Rust implementation. Experimental APIs are marked individually.
+Knowledge check: Does a Rust static archive make the Go executable fully static? No. System linker requirements still apply.
 
 ## Example
 
-Alice can view a photo she owns, and every request must use MFA:
+Use the composition package to create domain clients.
 
 ```go
 ctx := context.Background()
 rt, err := cedar.NewRuntime(ctx)
 if err != nil {
-	return err
+    return err
 }
 defer rt.Close(ctx)
 
-schema := cedar.SchemaFromCedar(`
-entity User;
-entity Photo { owner: User, private: Bool };
-action view appliesTo { principal: User, resource: Photo, context: { mfa: Bool } };
-`)
-alice := cedar.NewEntityUID("User", "alice")
-authorizer, err := rt.NewAuthorizer(ctx, cedar.Config{
-	Schema: &schema,
-	Policies: cedar.PoliciesFromCedar(`
-permit(principal, action == Action::"view", resource)
-when { resource.owner == principal || !resource.private };
-forbid(principal, action, resource) unless { context.mfa };`),
-	Entities: cedar.NewEntities(
-		cedar.Entity{UID: alice},
-		cedar.Entity{
-			UID:   cedar.NewEntityUID("Photo", "beach"),
-			Attrs: cedar.Record{"owner": alice, "private": cedar.Bool(true)},
-		},
-	),
-})
+policies := policy.PoliciesFromCedar(`permit(principal, action, resource);`)
+authorizer, err := rt.NewAuthorizer(ctx, authorization.Config{Policies: policies})
 if err != nil {
-	return err
+    return err
 }
 defer authorizer.Close()
 
-response, err := authorizer.Authorize(ctx, cedar.Request{
-	Principal: alice,
-	Action:    cedar.NewEntityUID("Action", "view"),
-	Resource:  cedar.NewEntityUID("Photo", "beach"),
-	Context:   cedar.NewContext(cedar.Record{"mfa": cedar.Bool(true)}),
+response, err := authorizer.Authorize(ctx, request.Request{
+    Principal: uid.NewEntityUID("User", "alice"),
+    Action: uid.NewEntityUID("Action", "view"),
+    Resource: uid.NewEntityUID("Photo", "beach"),
 })
 if err != nil {
-	return err
+    return err
 }
-fmt.Println(response.Decision, response.Reasons)
-// allow [policy0]
+fmt.Println(response.Decision)
+// allow
 ```
 
-Set `mfa` to false and the result is `deny [policy1]`. The
-[runnable example](cedar/example_test.go) exercises both outcomes and strict
-validation. The [API guide](docs/api.md) covers values, lifecycle, and errors.
+The imports use `/cedar`, `/cedar/authorization`, `/cedar/authorization/request`, `/cedar/entity/uid`, and `/cedar/policy`.
+[Runnable examples](cedar/integration/example_test.go) show schema validation and Deny behavior.
 
-Experimental [partial evaluation](docs/partial-evaluation.md) accepts unknown
-request and entity data, returns inspectable residual policies, and resumes
-authorization when the missing data is available.
+## Verification
 
-Package [`analysis`](docs/analysis.md) also answers whether a change permits
-anything new, or whether two policy sets are equivalent. It uses SymCC with
-cvc5 and returns concrete counterexamples for changed decisions.
+The pinned corpus contains 7,523 tests and 60,184 requests.
+Verification compares decisions, reason IDs, evaluation error IDs, and strict validation results.
+Independent fixture programs call pinned Cedar and SymCC directly.
+The migration preserves all 25 fuzz targets, saved inputs, property tests, examples, and domain benchmarks.
 
-## Testing and security
-
-- **Conformance:** CI compares decisions, deciding policy IDs, evaluation
-  error policy IDs, and strict-validation results against Cedar's corpus.
-- **Fuzzing:** Go fuzz targets exercise requests, policies, and entities
-  across the Go/Wasm interface; CI runs each target for 60 seconds.
-- **Fault handling:** tests exercise timeouts, cancellation, memory
-  exhaustion, stack overflow, and corrupted instances.
-  Concrete authorization errors return `Deny`; partial evaluation errors return
-  `Undecided`. Faulted instances are discarded.
-- **Sandbox and build checks:** import allowlists, memory and time limits,
-  module hashes, and byte-for-byte rebuild checks are part of the design.
-
-Read the [security model](docs/security.md) and
-[verification guide](docs/verification.md) for details, including a scoped
-SMT proofs of response-word and callback-budget arithmetic.
-
-## Performance
-
-Measured on the same 45-policy workload, with the same Cedar version:
-
-| Operation | Native Rust | Go/Wasm | Go/Wasm cost |
-|---|---|---|---|
-| Authorization, including request construction/parsing | 127 µs | 1.22–1.24 ms | **9.6–9.8×** |
-| Analyze an added binding | 0.79 s | 1.19 s | **1.5×** |
-| Analyze a raised device level | 0.19 s | 0.58 s | **3.1×** |
-
-Authorization throughput with 12 callers and 12 instances was about
-**5,000 decisions/second**. A warm compilation cache reduced runtime startup
-from **3.7 s to 130 ms**. These are workload-specific measurements from
-October 1, 2026, on a Ryzen 5 5600X; see [Performance](docs/performance.md)
-for methodology, memory costs, and reproduction commands.
-
-## Maintenance
-
-Each release pins one Cedar version, the Rust toolchain, and its dependencies.
-Cedar upgrades build both embedded modules and must pass conformance and
-analysis tests. CI checks reproducible builds, licenses, and vulnerabilities;
-Dependabot proposes updates, and weekly audits check for new advisories.
-CI generates modules and hash files; Git does not track these outputs.
-Release builds publish tested modules, source bundles, checksums, and signed provenance.
-
-The [maintenance guide](docs/maintenance.md) documents upgrades, dependency
-review, versioning, and release steps.
+The [verification guide](docs/verification.md) records evidence and its limits.
+The [performance guide](docs/performance.md) separates production measurements from the historical prototype.
 
 ## Documentation
 
-| Guide | Contents |
-|---|---|
-| [API](docs/api.md) | Runtime, policies, templates, entity loading/slicing, formatting, and errors |
-| [Partial evaluation](docs/partial-evaluation.md) | Experimental TPE, unknown inputs, and residual reauthorization |
-| [Change analysis](docs/analysis.md) | Setup, policy comparisons, and counterexamples |
-| [Security](docs/security.md) | Sandbox, limits, and failure behavior |
-| [Verification](docs/verification.md) | Conformance, fuzzing, and assurance scope |
-| [Performance](docs/performance.md) | Benchmarks, ratios, memory, and startup |
-| [Maintenance](docs/maintenance.md) | Upgrades, reproducible builds, and releases |
-| [Contributing](CONTRIBUTING.md) | Repository layout and development workflow |
-
-## License
-
-Apache License 2.0. See [LICENSE](LICENSE), [NOTICE](NOTICE), and
-[third-party licenses](THIRD_PARTY_LICENSES.txt).
+Read the [feature guide](docs/api.md), [partial evaluation guide](docs/partial-evaluation.md), and [analysis guide](docs/analysis.md).
+Read [contributor setup](CONTRIBUTING.md) for package responsibilities and checks.
+Read the [security model](docs/security.md) before selecting process isolation and resource controls.

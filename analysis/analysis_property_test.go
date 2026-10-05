@@ -7,6 +7,10 @@ import (
 	"testing"
 
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
+	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
+	requests "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
+	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
+	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 	"pgregory.net/rapid"
 )
 
@@ -57,15 +61,15 @@ func propAnalysisPolicy(t *rapid.T, id string) string {
 // A policy set is equivalent to itself.
 func TestPropertyAnalysisMatchesGroundTruth(t *testing.T) {
 	a := newAnalyzer(t)
-	schema := cedar.SchemaFromCedar(readFile(t, "../testdata/joy/joy.cedarschema"))
+	schema := schemas.SchemaFromCedar(readFile(t, "../testdata/joy/joy.cedarschema"))
 	ctx := context.Background()
 	rt, err := cedar.NewRuntime(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer rt.Close(ctx)
-	decide := func(policies string, req cedar.Request) cedar.Decision {
-		az, err := rt.NewAuthorizer(ctx, cedar.Config{Schema: &schema, Policies: cedar.PoliciesFromCedar(policies)})
+	decide := func(policies string, req requests.Request) requests.Decision {
+		az, err := rt.NewAuthorizer(ctx, authorization.Config{Schema: &schema, Policies: policy.PoliciesFromCedar(policies)})
 		if err != nil {
 			t.Fatalf("replay load: %v\n%s", err, policies)
 		}
@@ -87,7 +91,7 @@ func TestPropertyAnalysisMatchesGroundTruth(t *testing.T) {
 		before := strings.Join(parts, "\n")
 		parts = append(parts, propAnalysisPolicy(pt, "delta"))
 		after := strings.Join(parts, "\n")
-		report, err := a.NewlyPermitted(ctx, schema, cedar.PoliciesFromCedar(before), cedar.PoliciesFromCedar(after))
+		report, err := a.NewlyPermitted(ctx, schema, policy.PoliciesFromCedar(before), policy.PoliciesFromCedar(after))
 		if err != nil {
 			pt.Fatalf("analysis: %v\nbefore:\n%s\nafter:\n%s", err, before, after)
 		}
@@ -97,22 +101,22 @@ func TestPropertyAnalysisMatchesGroundTruth(t *testing.T) {
 				continue
 			}
 			c := res.Counterexample
-			if c == nil || c.First != cedar.Deny || c.Second != cedar.Allow {
+			if c == nil || c.First != requests.Deny || c.Second != requests.Allow {
 				pt.Fatalf("counterexample is not newly allowed: %+v", c)
 			}
 			if replayed < 3 {
 				replayed++
 				replayedTotal++
-				if got := decide(before, c.Request); got != cedar.Deny {
+				if got := decide(before, c.Request); got != requests.Deny {
 					pt.Fatalf("counterexample %s: before decided %v, want deny\nbefore:\n%s", c.Text, got, before)
 				}
-				if got := decide(after, c.Request); got != cedar.Allow {
+				if got := decide(after, c.Request); got != requests.Allow {
 					pt.Fatalf("counterexample %s: after decided %v, want allow\nafter:\n%s", c.Text, got, after)
 				}
 			}
 		}
 		if rapid.Bool().Draw(pt, "selfEquivalent") {
-			report, err := a.Equivalent(ctx, schema, cedar.PoliciesFromCedar(before), cedar.PoliciesFromCedar(before))
+			report, err := a.Equivalent(ctx, schema, policy.PoliciesFromCedar(before), policy.PoliciesFromCedar(before))
 			if err != nil {
 				pt.Fatalf("self-equivalence: %v\n%s", err, before)
 			}

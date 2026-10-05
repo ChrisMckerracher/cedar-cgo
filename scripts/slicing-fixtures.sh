@@ -5,7 +5,7 @@ repo=$(cd "$(dirname "$0")/.." && pwd)
 generated=$(mktemp)
 trap 'rm -f "$generated"' EXIT
 cd "$repo/rust"
-cargo run --offline --locked --release -p cgw-native-bench --bin slicing-fixtures -- \
+cargo run --offline --locked --release -p cgw-verification --bin slicing-fixtures -- \
   "$repo/testdata/parity/slicing/cases.json" > "$generated"
 if [[ ${1:-} == --check ]]; then
   diff -u "$repo/testdata/parity/slicing/expected.json" "$generated"

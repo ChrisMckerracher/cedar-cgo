@@ -3,15 +3,17 @@ package analysis_test
 import (
 	"context"
 	"errors"
+	"testing"
+
 	"github.com/ChrisMckerracher/cedar-go-wasm/analysis"
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
-	"testing"
+	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 )
 
 func TestCompiledReuseMatchesStatelessAndReplays(t *testing.T) {
 	a, solver := compiledAnalyzer(t)
 	ctx := context.Background()
-	schema := cedar.SchemaFromCedar(querySchema)
+	schema := schemas.SchemaFromCedar(querySchema)
 	x, y := queryPolicy("permit", "context.n < 0"), queryPolicy("permit", "context.n < 1")
 	s, err := a.OpenCompiled(ctx, schema, nil)
 	if err != nil {

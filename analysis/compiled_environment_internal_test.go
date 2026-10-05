@@ -3,12 +3,14 @@ package analysis
 import (
 	"context"
 	"encoding/json"
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 	"testing"
+
+	uids "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
+	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 )
 
 func TestCompiledEnvironmentJSONRoundTrip(t *testing.T) {
-	want := RequestEnvironment{PrincipalType: "User", Action: cedar.NewEntityUID("Action", "view"), ResourceType: "Document"}
+	want := RequestEnvironment{PrincipalType: "User", Action: uids.NewEntityUID("Action", "view"), ResourceType: "Document"}
 	data, err := json.Marshal([]RequestEnvironment{want})
 	if err != nil {
 		t.Fatal(err)
@@ -25,7 +27,7 @@ func TestCompiledEnvironmentJSONRoundTrip(t *testing.T) {
 	}
 	for _, env := range []RequestEnvironment{
 		{PrincipalType: string([]byte{255}), Action: want.Action, ResourceType: want.ResourceType},
-		{PrincipalType: want.PrincipalType, Action: cedar.NewEntityUID("Action", string([]byte{255})), ResourceType: want.ResourceType},
+		{PrincipalType: want.PrincipalType, Action: uids.NewEntityUID("Action", string([]byte{255})), ResourceType: want.ResourceType},
 		{PrincipalType: want.PrincipalType, Action: want.Action, ResourceType: string([]byte{255})},
 	} {
 		if _, err := json.Marshal(env); err == nil {
@@ -72,7 +74,7 @@ func TestCompiledOpenRequiresEnvironmentFields(t *testing.T) {
 			if s.environments == nil || transport.closes.Load() != 0 {
 				t.Fatal("valid environment response invalidated session")
 			}
-			if len(s.environments) == 1 && s.environments[0].Action != cedar.NewEntityUID("Action", "") {
+			if len(s.environments) == 1 && s.environments[0].Action != uids.NewEntityUID("Action", "") {
 				t.Fatalf("empty action ID changed: %+v", s.environments)
 			}
 		})
@@ -82,12 +84,12 @@ func TestCompiledOpenRequiresEnvironmentFields(t *testing.T) {
 func TestCompiledEnvironmentUTF8BeforeGuest(t *testing.T) {
 	a := &Analyzer{maxSourceBytes: 1 << 20}
 	for _, env := range []RequestEnvironment{
-		{PrincipalType: string([]byte{255}), Action: cedar.NewEntityUID("Action", "view"), ResourceType: "Doc"},
-		{PrincipalType: "User", Action: cedar.NewEntityUID("Action", string([]byte{255})), ResourceType: "Doc"},
-		{PrincipalType: "User", Action: cedar.NewEntityUID("Action", "view"), ResourceType: string([]byte{255})},
+		{PrincipalType: string([]byte{255}), Action: uids.NewEntityUID("Action", "view"), ResourceType: "Doc"},
+		{PrincipalType: "User", Action: uids.NewEntityUID("Action", string([]byte{255})), ResourceType: "Doc"},
+		{PrincipalType: "User", Action: uids.NewEntityUID("Action", "view"), ResourceType: string([]byte{255})},
 	} {
-		if _, err := a.OpenCompiled(context.Background(), cedar.SchemaFromCedar(querySchemaForUTF8), []RequestEnvironment{env}); err == nil {
-			t.Fatal("invalid UTF-8 reached guest")
+		if _, err := a.OpenCompiled(context.Background(), schemas.SchemaFromCedar(querySchemaForUTF8), []RequestEnvironment{env}); err == nil {
+			t.Fatal("invalid UTF-8 reached native execution")
 		}
 	}
 }

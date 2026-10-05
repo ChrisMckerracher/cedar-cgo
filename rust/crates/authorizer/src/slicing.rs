@@ -2,7 +2,7 @@
 
 use crate::{AuthorizeInput, entity_uid, parse_entities};
 use cedar_policy::{Context, Decision, Entities, Entity, EntityLoader, EntityUid, Request};
-use cgw_abi::{OpError, Source, parse_input, parse_policies, parse_schema, run, take_input};
+use cgw_abi::{OpError, Source, parse_input, parse_policies, parse_schema};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, value::RawValue};
 use std::collections::{HashMap, HashSet};
@@ -18,7 +18,7 @@ struct SliceInput {
 }
 
 #[derive(Serialize)]
-struct SliceOutput {
+pub(crate) struct SliceOutput {
     decision: &'static str,
     entities: Vec<Value>,
     batches: Vec<Vec<Value>>,
@@ -43,7 +43,7 @@ impl EntityLoader for RecordingLoader<'_> {
     }
 }
 
-fn slice(bytes: &[u8]) -> Result<SliceOutput, OpError> {
+pub(crate) fn slice(bytes: &[u8]) -> Result<SliceOutput, OpError> {
     let input: SliceInput = parse_input(bytes)?;
     let schema = parse_schema(&input.schema)?;
     let policies = parse_policies(&input.policies)?;
@@ -101,14 +101,4 @@ fn slice(bytes: &[u8]) -> Result<SliceOutput, OpError> {
             })
             .collect::<Result<_, _>>()?,
     })
-}
-
-/// Selects whole entities for one concrete request using the upstream loader.
-///
-/// # Safety
-/// `ptr` and `len` must come from one `cgw_alloc(len)` call.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn cgw_slice_entities(ptr: u32, len: u32) -> u64 {
-    // SAFETY: the host passes a buffer from `cgw_alloc(len)`.
-    run(unsafe { take_input(ptr, len) }, slice)
 }

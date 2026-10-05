@@ -1,0 +1,95 @@
+[package]
+name = "cgw-verification"
+description = "Independent pinned Cedar and SymCC fixture oracles and benchmarks"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+autobins = false
+
+[dependencies]
+cedar-policy = { workspace = true, features = ["tpe"] }
+cedar-policy-core.workspace = true
+cedar-policy-formatter.workspace = true
+cedar-policy-symcc.workspace = true
+cgw-abi.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+
+[[bin]]
+name = "applicability_fixtures"
+path = "src/authorizer/applicability/main.rs"
+
+[[bin]]
+name = "batched-oracle"
+path = "src/authorizer/batched/main.rs"
+
+[[bin]]
+name = "diagnostic_fixtures"
+path = "src/authorizer/diagnostic/main.rs"
+
+[[bin]]
+name = "entity_store_fixtures"
+path = "src/authorizer/entity_store/main.rs"
+
+[[bin]]
+name = "expression_fixtures"
+path = "src/authorizer/expression/main.rs"
+
+[[bin]]
+name = "format_parity"
+path = "src/authorizer/format/main.rs"
+
+[[bin]]
+name = "literal_fixtures"
+path = "src/authorizer/literal/main.rs"
+
+[[bin]]
+name = "policies_oracle"
+path = "src/authorizer/policies/main.rs"
+
+[[bin]]
+name = "pst_fixtures"
+path = "src/authorizer/pst/main.rs"
+
+[[bin]]
+name = "query_fixtures"
+path = "src/authorizer/query/main.rs"
+
+[[bin]]
+name = "schema_fixtures"
+path = "src/authorizer/schema/main.rs"
+
+[[bin]]
+name = "source_token_fixtures"
+path = "src/authorizer/source_token/main.rs"
+
+[[bin]]
+name = "template_fixtures"
+path = "src/authorizer/template/main.rs"
+
+[[bin]]
+name = "utility_fixtures"
+path = "src/authorizer/utility/main.rs"
+
+[[bin]]
+name = "validation_depth"
+path = "src/authorizer/validation_depth/main.rs"
+
+[[bin]]
+name = "analysis_queries"
+path = "src/analysis/queries/main.rs"
+
+[[bin]]
+name = "partial_fixture"
+path = "src/authorizer/partial/main.rs"
+
+[[bin]]
+name = "slicing-fixtures"
+path = "src/authorizer/slicing/main.rs"
+
+[[bin]]
+name = "native-bench"
+path = "src/benchmark/main.rs"

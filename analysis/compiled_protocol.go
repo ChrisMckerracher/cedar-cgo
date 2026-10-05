@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
+
+	uids "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
 	"github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
 )
 
@@ -65,7 +66,7 @@ func (s *CompiledSession) decodeOpen(data []byte) error {
 		if env.PrincipalType == "" || env.Action.Type == nil || *env.Action.Type == "" || env.Action.ID == nil || env.ResourceType == "" {
 			return errors.New("compiled session response has an incomplete environment")
 		}
-		environments[i] = RequestEnvironment{env.PrincipalType, cedar.NewEntityUID(*env.Action.Type, *env.Action.ID), env.ResourceType}
+		environments[i] = RequestEnvironment{env.PrincipalType, uids.NewEntityUID(*env.Action.Type, *env.Action.ID), env.ResourceType}
 	}
 	s.environments = environments
 	return nil

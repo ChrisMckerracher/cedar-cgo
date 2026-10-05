@@ -4,18 +4,20 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
 	"sync"
+
+	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/solver"
+	uids "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
+	"github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
 )
 
 var ErrCompiledClosed = errors.New("analysis: compiled session is closed")
 
 // RequestEnvironment identifies one schema-defined principal/action/resource combination.
 type RequestEnvironment struct {
-	PrincipalType string          `json:"principal_type"`
-	Action        cedar.EntityUID `json:"action"`
-	ResourceType  string          `json:"resource_type"`
+	PrincipalType string         `json:"principal_type"`
+	Action        uids.EntityUID `json:"action"`
+	ResourceType  string         `json:"resource_type"`
 }
 
 // MarshalJSON preserves flat action UIDs and rejects invalid UTF-8 before encoding.
@@ -43,7 +45,7 @@ type compiledInstance interface {
 }
 
 // CompiledSession reuses native compilation and one solver transport.
-// Calls are serialized. Close releases all handles, the guest, and the solver.
+// Calls are serialized. Close releases all handles, native state, and the solver.
 type CompiledSession struct {
 	analyzer  *Analyzer
 	lifetime  context.Context
@@ -54,9 +56,9 @@ type CompiledSession struct {
 	mu        sync.Mutex
 	closed    bool
 	reason    error
-	transport Session
+	transport solver.Session
 	closeErr  error
-	// The gate protects guest access and the active handle map.
+	// The gate protects native access and the active handle map.
 	instance     compiledInstance
 	handles      map[uint64]struct{}
 	environments []RequestEnvironment

@@ -3,23 +3,25 @@ package analysis
 import (
 	"context"
 	"errors"
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 	"testing"
 	"time"
+
+	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/solver"
+	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 )
 
 func TestCompiledAnalyzerCloseCancelsPendingConstruction(t *testing.T) {
 	started := make(chan struct{})
 	transport := &compiledTestTransport{closed: make(chan struct{})}
 	a := &Analyzer{maxSourceBytes: 1 << 20, maxSolverOutput: 1 << 20}
-	a.solver = compiledTestSolver(func(ctx context.Context) (Session, error) {
+	a.solver = compiledTestSolver(func(ctx context.Context) (solver.Session, error) {
 		close(started)
 		<-ctx.Done()
 		return transport, nil
 	})
 	result := make(chan error, 1)
 	go func() {
-		_, err := a.OpenCompiled(context.Background(), cedar.SchemaFromCedar(querySchemaForUTF8), nil)
+		_, err := a.OpenCompiled(context.Background(), schemas.SchemaFromCedar(querySchemaForUTF8), nil)
 		result <- err
 	}()
 	<-started
@@ -65,7 +67,7 @@ func TestCompiledPendingConstructionReportsCloseErrors(t *testing.T) {
 			transport := &compiledCloseErrorTransport{compiledTestTransport: &compiledTestTransport{closed: make(chan struct{})}, failure: failure}
 			started := make(chan struct{})
 			a := &Analyzer{maxSourceBytes: 1 << 20, maxSolverOutput: 1 << 20}
-			a.solver = compiledTestSolver(func(ctx context.Context) (Session, error) {
+			a.solver = compiledTestSolver(func(ctx context.Context) (solver.Session, error) {
 				a.mu.Lock()
 				var pending *CompiledSession
 				for session := range a.sessions {
@@ -82,7 +84,7 @@ func TestCompiledPendingConstructionReportsCloseErrors(t *testing.T) {
 			defer cancel()
 			opened := make(chan error, 1)
 			go func() {
-				_, err := a.OpenCompiled(ctx, cedar.SchemaFromCedar(querySchemaForUTF8), nil)
+				_, err := a.OpenCompiled(ctx, schemas.SchemaFromCedar(querySchemaForUTF8), nil)
 				opened <- err
 			}()
 			<-started

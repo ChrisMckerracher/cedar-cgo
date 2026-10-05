@@ -2,13 +2,14 @@ package analysis_test
 
 import (
 	"context"
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 	"testing"
+
+	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 )
 
 func BenchmarkRepeatedEquivalent(b *testing.B) {
 	ctx := context.Background()
-	schema := cedar.SchemaFromCedar(querySchema)
+	schema := schemas.SchemaFromCedar(querySchema)
 	firstPolicies := queryPolicy("permit", "context.n < 0")
 	secondPolicies := queryPolicy("permit", "context.n <= -1")
 	b.Run("stateless", func(b *testing.B) {

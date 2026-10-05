@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
+
+	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 )
 
 // Compile creates one native compiled set per selected request environment.
-func (s *CompiledSession) Compile(ctx context.Context, policies cedar.PolicySet) (CompiledPolicySet, error) {
+func (s *CompiledSession) Compile(ctx context.Context, policies policy.PolicySet) (CompiledPolicySet, error) {
 	if s == nil || s.analyzer == nil {
 		return CompiledPolicySet{}, ErrCompiledClosed
 	}

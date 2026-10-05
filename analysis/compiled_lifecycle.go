@@ -29,7 +29,7 @@ func (s *CompiledSession) abort(reason error) {
 	close(s.abortDone)
 }
 
-func (s *CompiledSession) closeGuest() {
+func (s *CompiledSession) closeNative() {
 	if s.instance != nil {
 		err := s.instance.Close(context.WithoutCancel(s.lifetime))
 		s.instance = nil
@@ -47,14 +47,14 @@ func (s *CompiledSession) closeGuest() {
 func (s *CompiledSession) closeWithReason(reason error) error {
 	s.abort(reason)
 	s.gate <- struct{}{}
-	s.closeGuest()
+	s.closeNative()
 	<-s.gate
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return s.closeErr
 }
 
-// Close interrupts an active call and waits for its guest resources to close.
+// Close interrupts an active call and waits for its native resources to close.
 func (s *CompiledSession) Close() error {
 	if s == nil || s.analyzer == nil {
 		return nil

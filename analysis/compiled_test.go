@@ -2,20 +2,22 @@ package analysis_test
 
 import (
 	"context"
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis"
 	"os"
 	"sync"
 	"sync/atomic"
 	"testing"
+
+	"github.com/ChrisMckerracher/cedar-go-wasm/analysis"
+	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/solver"
 )
 
 type countingSolver struct {
-	base   analysis.Solver
+	base   solver.Solver
 	starts atomic.Int32
 	closes atomic.Int32
 }
 
-func (s *countingSolver) Start(ctx context.Context) (analysis.Session, error) {
+func (s *countingSolver) Start(ctx context.Context) (solver.Session, error) {
 	transport, err := s.base.Start(ctx)
 	if err != nil {
 		return nil, err
@@ -25,7 +27,7 @@ func (s *countingSolver) Start(ctx context.Context) (analysis.Session, error) {
 }
 
 type countingTransport struct {
-	analysis.Session
+	solver.Session
 	owner *countingSolver
 	once  sync.Once
 	err   error
@@ -42,7 +44,7 @@ func compiledAnalyzer(t testing.TB, options ...analysis.Option) (*analysis.Analy
 	if path == "" {
 		t.Skip("CVC5 is not set to the pinned solver executable")
 	}
-	solver := &countingSolver{base: analysis.CVC5(path)}
+	solver := &countingSolver{base: solver.CVC5(path)}
 	a, err := analysis.New(context.Background(), solver, options...)
 	if err != nil {
 		t.Fatal(err)

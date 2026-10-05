@@ -18,11 +18,11 @@ an external solver.
 
 Use the **cvc5 1.3.1** executable from the
 [official release](https://github.com/cvc5/cvc5/releases/tag/cvc5-1.3.1),
-the version used by this repository's CI. Pass its path to `analysis.CVC5`.
-The analyzer and the authorization runtime each embed their own module.
+the version used by this repository's CI. Pass its path to `solver.CVC5`.
+Analysis and authorization use the same linked native library with separate state handles.
 
 ```go
-analyzer, err := analysis.New(ctx, analysis.CVC5("/path/to/cvc5"))
+analyzer, err := analysis.New(ctx, solver.CVC5("/path/to/cvc5"))
 if err != nil {
 	return err
 }
@@ -52,7 +52,7 @@ for _, result := range report.Results {
 make the same decision for every request described by the schema.
 
 All operations require a schema and strictly valid static policies.
-Call `Runtime.Validate` to establish full-schema validity before analysis.
+Call `validation.Client.Validate` to establish full-schema validity before analysis.
 Native compilation checks strict types only in the analyzed request environments.
 See the [complete example](../analysis/example_test.go).
 
@@ -114,7 +114,7 @@ action, and resource type allowed by the schema.
 | `Counterexample.FirstEvaluation`, `SecondEvaluation` | Concrete singleton matching and errors for matching or error queries |
 
 For `NewlyPermitted`, **holds means the change permits nothing new**.
-A counterexample has `First == cedar.Deny` and `Second == cedar.Allow`.
+A counterexample has `First == request.Deny` and `Second == request.Allow`.
 For `Equivalent`, a counterexample has different decisions.
 For `Disjoint`, both policy sets allow the counterexample.
 
@@ -125,7 +125,7 @@ Every counterexample is re-evaluated with Cedar's concrete authorizer inside
 the module before being returned. Solver-generated values may be extreme,
 such as a `Long` of 2^63−1 or a datetime before 1970. A successful property
 result depends on SymCC's encoding and the solver's `unsat` answer; see
-[Verification](verification.md#upstream-assurance).
+[Verification](verification.md#independent-fixtures).
 
 ## Reuse compiled policy sets
 
@@ -168,20 +168,20 @@ Their `Report` and `Counterexample` types match the stateless API.
 
 Handles belong to one session.
 `Release(ctx, handle)` removes a handle's native data.
-Foreign, zero, and released handles fail before guest execution.
+Foreign, zero, and released handles fail before native execution.
 Native handle IDs increase and are never reused within a session.
 Each session supports 128 active handles.
-The analyzer's source, response, memory, and solver-output limits still apply.
+The analyzer's source, response, and solver-output limits still apply.
 
 Calls use an exclusive gate.
 A canceled caller that waits for the gate leaves the active call and solver unchanged.
 The analyzer timeout starts after the caller acquires the gate.
 An active cancellation or timeout closes the solver and invalidates the entire session.
-A solver failure, guest fault, or malformed response also invalidates it.
+A solver failure, native library fault, or malformed response also invalidates it.
 Create a new session after these failures.
 Ordinary input or compilation errors preserve the session.
 
-`Close` interrupts an active call and releases all session resources.
+`Close` closes solver transport, waits for native execution, and releases session resources.
 `Analyzer.Close` also closes its compiled sessions.
 Custom solver transports must unblock active reads and writes when `Close` runs.
 Stateless calls continue to create their own instances and solver transports.
@@ -199,8 +199,6 @@ resources until the session closes.
 | Option | Default |
 |---|---|
 | `WithTimeout` | 60 s, including solver time |
-| `WithMemoryLimit` | 1 GiB linear memory per instance |
-| `WithCompilationCache` | No shared cache |
 | `WithMaxSourceBytes` | 64 MiB encoded schema and policies |
 | `WithMaxSolverOutput` | 256 MiB read from the solver per call |
 
@@ -211,12 +209,10 @@ a host process; see [Security model](security.md#solver-process).
 
 ## Implementation
 
-SymCC 0.7.0 is vendored with a small target-specific patch that excludes
-its native process-based `LocalSolver` and solver pool from WebAssembly
-builds. Its symbolic compiler runs in the guest; the Go host provides
-`solver_write` and `solver_read` imports.
+SymCC 0.7.0 runs in the native Rust library. Explicit state owns compiled sessions.
+Go callbacks provide each session's solver transport. No callback persists after its active call.
+The vendored pin and existing patch remain checked against the pinned upstream archive.
 
-[`scripts/vendor-symcc.sh`](../scripts/vendor-symcc.sh) checks the vendored
-source against the pinned crates.io archive plus
-[`rust/patches`](../rust/patches). The
-[maintenance guide](maintenance.md#upgrading-cedar) describes upgrades.
+The native analyzer removes Wasm memory limits and compilation caches.
+A deadline closes external solver transport but cannot forcibly stop native CPU work.
+Read the [native contract](migration/native-contract.md) and [security model](security.md).

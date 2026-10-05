@@ -1,0 +1,373 @@
+2026-10-05T15:45:59Z
+Linux agent-01 6.19.10-300.fc44.x86_64 #1 SMP PREEMPT_DYNAMIC Wed Mar 25 18:23:49 UTC 2026 x86_64 GNU/Linux
+go version go1.27.1 linux/amd64
+rustc 1.99.0 (b940084d7 2026-09-28)
+This is cvc5 version 1.3.1 [git ea1b484 on branch HEAD]
+compiled with GCC version 11.4.0
+on Sep 24 2025 18:42:09
+
+Copyright (c) 2009-2025 by the authors and their institutional
+affiliations listed at https://cvc5.github.io/people.html
+
+cvc5 is open-source and is covered by the BSD license (modified).
+
+THIS SOFTWARE IS PROVIDED AS-IS, WITHOUT ANY WARRANTIES.
+USE AT YOUR OWN RISK.
+
+This version of cvc5 is linked against the following non-(L)GPL'ed
+third party libraries.
+
+  CaDiCaL - Simplified Satisfiability Solver
+  See https://github.com/arminbiere/cadical for copyright information.
+
+  Editline Library
+  See https://thrysoee.dk/editline
+  for copyright information.
+
+  SymFPU - The Symbolic Floating Point Unit
+  See https://github.com/martin-cs/symfpu/tree/CVC4 for copyright information.
+
+This version of cvc5 is linked against the following third party
+libraries covered by the LGPLv3 license.
+See licenses/lgpl-3.0.txt for more information.
+
+  GMP - Gnu Multi Precision Arithmetic Library
+  See http://gmplib.org for copyright information.
+
+  LibPoly polynomial library
+  See https://github.com/SRI-CSL/libpoly for copyright and
+  licensing information.
+
+cvc5 is statically linked against these libraries. To recompile
+this version of cvc5 with different versions of these libraries
+follow the instructions on https://github.com/cvc5/cvc5/blob/main/INSTALL.md
+
+See the file COPYING (distributed with the source code, and with
+all binaries) for the full cvc5 copyright, licensing, and (lack of)
+warranty information.
+
+a7083b5cb27dae4ec8be5f84d8f7b88b4a1fbcc6
+ D .github/actions/install-wasm/action.yml
+ M .github/workflows/ci.yml
+ M .github/workflows/release.yml
+ M .gitignore
+ M CONTRIBUTING.md
+ M README.md
+ M SECURITY.md
+ M analysis/analysis_property_test.go
+ M analysis/analyzer.go
+ M analysis/analyzer_test.go
+ M analysis/bench_test.go
+ M analysis/compiled.go
+ M analysis/compiled_benchmark_test.go
+ M analysis/compiled_construction.go
+ M analysis/compiled_construction_internal_test.go
+ M analysis/compiled_environment_internal_test.go
+ M analysis/compiled_execute.go
+ M analysis/compiled_faults_internal_test.go
+ M analysis/compiled_handles.go
+ M analysis/compiled_handles_internal_test.go
+ M analysis/compiled_internal_test.go
+ M analysis/compiled_lifecycle.go
+ M analysis/compiled_lifecycle_internal_test.go
+ M analysis/compiled_lifetime_test.go
+ M analysis/compiled_limits_test.go
+ M analysis/compiled_protocol.go
+ M analysis/compiled_protocol_internal_test.go
+ M analysis/compiled_queries.go
+ M analysis/compiled_replay_test.go
+ M analysis/compiled_scope_test.go
+ M analysis/compiled_test.go
+ M analysis/doc.go
+ M analysis/example_test.go
+ M analysis/host.go
+ M analysis/options.go
+ D analysis/queries_internal_test.go
+ M analysis/queries_test.go
+ M analysis/report.go
+ D analysis/solver.go
+ D analysis/solver_internal_test.go
+ M analysis/utf8_property_test.go
+ M analysis/utf8_test.go
+ D cedar/applicability.go
+ D cedar/applicability_test.go
+ D cedar/authorizer.go
+ D cedar/authorizer_property_test.go
+ D cedar/authorizer_test.go
+ D cedar/batched.go
+ D cedar/batched_fuzz_test.go
+ D cedar/batched_internal_test.go
+ D cedar/batched_property_test.go
+ D cedar/batched_test.go
+ D cedar/bench_internal_test.go
+ D cedar/bench_test.go
+ D cedar/combined_parity_test.go
+ D cedar/config.go
+ D cedar/conformance_test.go
+ D cedar/context.go
+ D cedar/diagnostics.go
+ D cedar/diagnostics_identity_test.go
+ D cedar/diagnostics_protocol_test.go
+ D cedar/diagnostics_test.go
+ D cedar/doc.go
+ D cedar/entities.go
+ D cedar/entity_store.go
+ D cedar/entity_store_internal_test.go
+ D cedar/entity_store_test.go
+ D cedar/errors.go
+ D cedar/example_test.go
+ D cedar/expressions.go
+ D cedar/expressions_internal_test.go
+ D cedar/expressions_test.go
+ D cedar/failclosed_internal_test.go
+ D cedar/failclosed_test.go
+ D cedar/format.go
+ D cedar/format_fuzz_test.go
+ D cedar/format_internal_test.go
+ D cedar/format_property_test.go
+ D cedar/format_test.go
+ D cedar/fuzz_test.go
+ D cedar/literals.go
+ D cedar/literals_test.go
+ D cedar/partial.go
+ D cedar/partial_example_test.go
+ D cedar/partial_fuzz_test.go
+ D cedar/partial_ids_test.go
+ D cedar/partial_internal_test.go
+ D cedar/partial_property_test.go
+ D cedar/partial_test.go
+ D cedar/policies.go
+ D cedar/policies_example_test.go
+ D cedar/policies_fuzz_test.go
+ D cedar/policies_internal_test.go
+ D cedar/policies_property_test.go
+ D cedar/policies_test.go
+ D cedar/pool.go
+ D cedar/property_gen_test.go
+ D cedar/protocol.go
+ D cedar/pst_mapping_test.go
+ D cedar/queries.go
+ D cedar/queries_protocol_test.go
+ D cedar/queries_test.go
+ D cedar/request.go
+ D cedar/residual_export_test.go
+ D cedar/residual_fuzz_test.go
+ M cedar/runtime.go
+ D cedar/schemas.go
+ D cedar/schemas_fuzz_test.go
+ D cedar/schemas_internal_test.go
+ D cedar/schemas_test.go
+ D cedar/slicing.go
+ D cedar/slicing_fuzz_test.go
+ D cedar/slicing_internal_test.go
+ D cedar/slicing_property_test.go
+ D cedar/slicing_test.go
+ D cedar/source.go
+ D cedar/source_tokens.go
+ D cedar/source_tokens_internal_test.go
+ D cedar/source_tokens_test.go
+ D cedar/templates.go
+ D cedar/templates_example_test.go
+ D cedar/templates_fuzz_test.go
+ D cedar/templates_internal_test.go
+ D cedar/templates_property_test.go
+ D cedar/templates_test.go
+ D cedar/testdata/fuzz/FuzzBatchedDifferential/41dcd8a1a27bbe3c
+ D cedar/testdata/fuzz/FuzzValidationDepth/unsafe-context-attribute
+ D cedar/utf8_fuzz_test.go
+ D cedar/utf8_property_test.go
+ D cedar/utf8_test.go
+ D cedar/utilities.go
+ D cedar/utilities_fuzz_test.go
+ D cedar/utilities_internal_test.go
+ D cedar/utilities_property_test.go
+ D cedar/utilities_test.go
+ D cedar/validation.go
+ D cedar/validation_comparison_test.go
+ D cedar/validation_depth_fuzz_test.go
+ D cedar/validation_depth_property_test.go
+ D cedar/validation_depth_test.go
+ D cedar/validation_property_test.go
+ D cedar/value.go
+ D cedar/values_property_test.go
+ D cedar/version.go
+ D cedar/version_test.go
+ D cmd/verify-wasm-artifact/main.go
+ M docs/README.md
+ M docs/analysis.md
+ M docs/api.md
+ M docs/compiled-analysis-design.md
+ M docs/maintenance.md
+ M docs/partial-evaluation.md
+ M docs/security.md
+ M docs/verification.md
+ M go.mod
+ M go.sum
+ M internal/artifact/fixture_test.go
+ D internal/artifact/hash.go
+ M internal/artifact/symlink_test.go
+ M internal/artifact/verify.go
+ M internal/artifact/verify_test.go
+ D internal/modules/analysis/analysis.go
+ D internal/modules/authorizer/authorizer.go
+ D internal/verification/abi.smt2
+ D internal/verification/abi_test.go
+ M internal/verification/batched.smt2
+ M internal/verification/batched_test.go
+ D internal/wasmhost/doc.go
+ D internal/wasmhost/fault.go
+ D internal/wasmhost/instance.go
+ D internal/wasmhost/module.go
+ M rust-toolchain.toml
+ M rust/Cargo.lock
+ M rust/Cargo.toml
+ M rust/crates/abi/src/lib.rs
+ M rust/crates/analysis/Cargo.toml
+ D rust/crates/analysis/examples/analysis_queries.rs
+ M rust/crates/analysis/src/lib.rs
+ D rust/crates/analysis/src/sessions.rs
+ M rust/crates/authorizer/Cargo.toml
+ D rust/crates/authorizer/examples/applicability_fixtures.rs
+ D rust/crates/authorizer/examples/batched-oracle.rs
+ D rust/crates/authorizer/examples/diagnostic_fixtures.rs
+ D rust/crates/authorizer/examples/entity_store_fixtures.rs
+ D rust/crates/authorizer/examples/expression_fixtures.rs
+ D rust/crates/authorizer/examples/format_parity.rs
+ D rust/crates/authorizer/examples/literal_fixtures.rs
+ D rust/crates/authorizer/examples/policies_oracle.rs
+ D rust/crates/authorizer/examples/pst_fixtures.rs
+ D rust/crates/authorizer/examples/query_fixtures.rs
+ D rust/crates/authorizer/examples/schema_fixtures.rs
+ D rust/crates/authorizer/examples/source_token_fixtures.rs
+ D rust/crates/authorizer/examples/template_fixtures.rs
+ D rust/crates/authorizer/examples/utility_fixtures.rs
+ D rust/crates/authorizer/examples/validation_depth.rs
+ D rust/crates/authorizer/src/batched.rs
+ D rust/crates/authorizer/src/entity_store.rs
+ M rust/crates/authorizer/src/format.rs
+ M rust/crates/authorizer/src/lib.rs
+ D rust/crates/authorizer/src/partial.rs
+ D rust/crates/authorizer/src/policies.rs
+ D rust/crates/authorizer/src/queries.rs
+ D rust/crates/authorizer/src/schemas.rs
+ M rust/crates/authorizer/src/slicing.rs
+ D rust/crates/authorizer/src/templates.rs
+ D rust/crates/authorizer/src/utilities.rs
+ D rust/crates/native-bench/Cargo.toml
+ D rust/crates/native-bench/examples/partial_fixture.rs
+ D rust/crates/native-bench/src/bin/slicing-fixtures.rs
+ D rust/crates/native-bench/src/main.rs
+ M rust/deny.toml
+ M scripts/analysis-queries-parity.sh
+ M scripts/applicability-parity.sh
+ D scripts/build-wasm.sh
+ M scripts/check-batched-parity.sh
+ M scripts/check-consumer.sh
+ M scripts/check-template-parity.sh
+ D scripts/check-wasm-reproducibility.sh
+ M scripts/consumer/bundle.py
+ M scripts/consumer/extract.py
+ M scripts/consumer/smoke/main.go
+ M scripts/consumer/test_bundle.py
+ M scripts/diagnostics-parity.sh
+ M scripts/entity-store-parity.sh
+ M scripts/expression-parity.sh
+ M scripts/format-parity.sh
+ M scripts/literal-parity.sh
+ M scripts/package-consumer.py
+ M scripts/partial-fixtures.sh
+ M scripts/policies-parity.sh
+ M scripts/pst-parity.sh
+ M scripts/queries-parity.sh
+ M scripts/schema-parity.sh
+ M scripts/slicing-fixtures.sh
+ M scripts/source-token-parity.sh
+ M scripts/utility-parity.sh
+ M scripts/validation-depth-parity.sh
+?? .github/actions/install-native/
+?? analysis/calls.go
+?? analysis/host_internal_test.go
+?? analysis/internal/
+?? analysis/queries.go
+?? analysis/queries_input_test.go
+?? analysis/queries_parity_test.go
+?? analysis/queries_property_test.go
+?? analysis/solver/
+?? analysis/stateless.go
+?? analysis/stateless_lifecycle_internal_test.go
+?? cedar/authorization/
+?? cedar/diagnostic/
+?? cedar/entity/
+?? cedar/expression/
+?? cedar/integration/
+?? cedar/options.go
+?? cedar/policy/
+?? cedar/schema/
+?? cedar/syntax/
+?? cedar/utility/
+?? cedar/validation/
+?? cedar/value/
+?? cmd/verify-native-artifact/
+?? docs/history/
+?? docs/migration/
+?? internal/artifact/archive.go
+?? internal/artifact/archive_test.go
+?? internal/artifact/identity_test.go
+?? internal/artifact/invalid_manifest_test.go
+?? internal/artifact/manifest.go
+?? internal/execution/
+?? internal/native/
+?? internal/testsupport/
+?? internal/verification/native.smt2
+?? internal/verification/native_test.go
+?? internal/verification/performance/
+?? rust/crates/abi/src/callback.rs
+?? rust/crates/analysis/src/confirm.rs
+?? rust/crates/analysis/src/counterexample.rs
+?? rust/crates/analysis/src/queries.rs
+?? rust/crates/analysis/src/sessions/
+?? rust/crates/analysis/src/solver.rs
+?? rust/crates/analysis/src/solver/
+?? rust/crates/analysis/src/stateless.rs
+?? rust/crates/authorizer/src/authorize.rs
+?? rust/crates/authorizer/src/batched/
+?? rust/crates/authorizer/src/entity_store/
+?? rust/crates/authorizer/src/format/
+?? rust/crates/authorizer/src/partial/
+?? rust/crates/authorizer/src/policies/
+?? rust/crates/authorizer/src/queries/
+?? rust/crates/authorizer/src/schemas/
+?? rust/crates/authorizer/src/state.rs
+?? rust/crates/authorizer/src/templates/
+?? rust/crates/authorizer/src/utilities/
+?? rust/crates/authorizer/src/validation.rs
+?? rust/crates/native/
+?? rust/crates/verification/
+?? scripts/build-native.sh
+?? scripts/check-coverage.py
+?? scripts/check-native-reproducibility.sh
+?? scripts/check-rust.sh
+?? scripts/consumer/fixture.py
+?? scripts/consumer/native.py
+?? scripts/consumer/test_native.py
+?? scripts/fuzz-native.sh
+?? scripts/install-native.sh
+?? scripts/measure-native-performance.sh
+?? scripts/native/
+?? scripts/performance/
+?? scripts/release/
+?? scripts/test-inputs.sh
+d367d0ea505b1de1e17da548f247f81ab922f577d10a0763c42c2620bcc409b1  /tmp/cedar-migration/worktree/rust/Cargo.lock
+e75b47d6530d05e7e20e3aad904118253986eceea35103cb589488516999849f  /tmp/cedar-migration/worktree/internal/native/include/cedar.h
+0ad4a70385a653914894bc5cb923e9cea6a6451521b3d2b78be38a9f86ac88ea  /tmp/cedar-migration/worktree/internal/native/lib/linux_amd64/libcgw_native.a
+4ba4a45729de866b688dd9c1489039e62138c409a06b6a4a664c05048a6cc8bc  /tmp/cedar-migration/performance-clean/native.test
+8d2f456dbcc3a43cde6880bd2ff0878064f8827de72cc606b798085c061cb6c9  /tmp/cedar-migration/performance-clean/wasm.test
+529281f207b3260804fb9511654499137f29d83979b484893e433ff791b1bf43  /tmp/cedar-issue-47-main/internal/modules/analysis/analysis.wasm
+f28edbcdf645a6ed34a7ff0401f87a93376207f9f3b44a17d8b8113f8489887d  /tmp/cedar-issue-47-main/internal/modules/authorizer/authorizer.wasm
+GOMAXPROCS=2; pool cap=2; native concurrency cap=2; Wasm concurrency follows two benchmark workers.
+No compilation cache. Authorization reuses loaded state. Compiled analysis has one warm query.
+Each sample starts a fresh benchmark process. Native static linking is outside timed Runtime construction.
+Order alternates native/Wasm per sample. RSS measures the parent process after closed solver sessions.
+Native source: e65f80b3fc2644c42a6b65ab7ee36dd4c41180ed120cc28a4e078442cc168d68
+Wasm source: f38e65e3dc21bf932e7af73c0e39b307dce4991532d447ef030e30bafded8507
+Source and backend hashes remained unchanged throughout the measurements.

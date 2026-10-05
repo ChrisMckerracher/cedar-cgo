@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
 	"unicode/utf8"
+
+	"github.com/ChrisMckerracher/cedar-go-wasm/internal/native"
+	"github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
 )
 
 func ordinaryCompiledError(kind string) bool {
@@ -28,7 +30,7 @@ func (s *CompiledSession) execute(ctx context.Context, input []byte, validate fu
 		select {
 		case <-s.done:
 			<-s.abortDone
-			s.closeGuest()
+			s.closeNative()
 		default:
 		}
 		<-s.gate
@@ -55,7 +57,7 @@ func (s *CompiledSession) execute(ctx context.Context, input []byte, validate fu
 	transport := s.transport
 	s.mu.Unlock()
 	state := &sessionState{session: transport, limit: s.analyzer.maxSolverOutput}
-	out, err := s.instance.Call(context.WithValue(callCtx, sessionKey{}, state), "cgw_compiled", input, defaultMaxResponseBytes)
+	out, err := s.instance.Call(native.WithCallback(context.WithValue(callCtx, sessionKey{}, state), state), "cgw_compiled", input, defaultMaxResponseBytes)
 	if callCtx.Err() != nil {
 		err = callCtx.Err()
 	}

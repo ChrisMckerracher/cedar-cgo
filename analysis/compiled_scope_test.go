@@ -6,18 +6,19 @@ import (
 
 	"github.com/ChrisMckerracher/cedar-go-wasm/analysis"
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
+	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 )
 
 func TestCompiledEmptySelectionDoesNotEstablishPolicyValidity(t *testing.T) {
 	ctx := context.Background()
-	schema := cedar.SchemaFromCedar(querySchema)
+	schema := schemas.SchemaFromCedar(querySchema)
 	policies := queryPolicy("permit", "context.n == true")
 	rt, err := cedar.NewRuntime(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer rt.Close(ctx)
-	validation, err := rt.Validate(ctx, schema, policies)
+	validation, err := rt.Validation().Validate(ctx, schema, policies)
 	if err != nil || len(validation.Errors) == 0 {
 		t.Fatalf("full-schema validation must reject the invalid operand type: %+v %v", validation, err)
 	}

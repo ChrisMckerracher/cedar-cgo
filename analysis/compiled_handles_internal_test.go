@@ -3,9 +3,10 @@ package analysis
 import (
 	"context"
 	"errors"
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 	"sync/atomic"
 	"testing"
+
+	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 )
 
 func TestCompiledForeignAndReleasedHandlesBeforeGuest(t *testing.T) {
@@ -18,7 +19,7 @@ func TestCompiledForeignAndReleasedHandlesBeforeGuest(t *testing.T) {
 		t.Fatal("zero handle accepted")
 	}
 	if instance.calls.Load() != 0 {
-		t.Fatal("foreign handle reached guest")
+		t.Fatal("foreign handle reached native execution")
 	}
 	handle := CompiledPolicySet{session: s, id: 1}
 	if err := s.Release(context.Background(), handle); err != nil {
@@ -28,7 +29,7 @@ func TestCompiledForeignAndReleasedHandlesBeforeGuest(t *testing.T) {
 		t.Fatal("released handle accepted")
 	}
 	if instance.calls.Load() != 1 {
-		t.Fatal("released handle reached guest")
+		t.Fatal("released handle reached native execution")
 	}
 }
 
@@ -43,7 +44,7 @@ func TestCompiledReleasedIDCannotReturnAgain(t *testing.T) {
 	if err := s.Release(context.Background(), CompiledPolicySet{session: s, id: 1}); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := s.Compile(context.Background(), cedar.PolicySet{}); err == nil {
+	if _, err := s.Compile(context.Background(), policy.PolicySet{}); err == nil {
 		t.Fatal("released native ID was reused")
 	}
 	if transport.closes.Load() != 1 {
@@ -56,7 +57,7 @@ func TestZeroCompiledSession(t *testing.T) {
 	if err := s.Close(); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := s.Compile(context.Background(), cedar.PolicySet{}); !errors.Is(err, ErrCompiledClosed) {
+	if _, err := s.Compile(context.Background(), policy.PolicySet{}); !errors.Is(err, ErrCompiledClosed) {
 		t.Fatalf("zero session compile %v", err)
 	}
 }

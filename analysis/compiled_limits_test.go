@@ -3,15 +3,16 @@ package analysis_test
 import (
 	"context"
 	"errors"
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis"
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 	"testing"
+
+	"github.com/ChrisMckerracher/cedar-go-wasm/analysis"
+	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 )
 
 func TestCompiledSolverOutputLimitInvalidates(t *testing.T) {
 	a, solver := compiledAnalyzer(t, analysis.WithMaxSolverOutput(1))
 	ctx := context.Background()
-	s, err := a.OpenCompiled(ctx, cedar.SchemaFromCedar(querySchema), nil)
+	s, err := a.OpenCompiled(ctx, schemas.SchemaFromCedar(querySchema), nil)
 	if err != nil {
 		t.Fatal(err)
 	}

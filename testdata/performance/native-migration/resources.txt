@@ -1,0 +1,4 @@
+=== RUN   TestNativeResourceTrend
+    resource_test.go:148: {"Cycles":100,"CompiledReleases":200,"AuthorizationCreated":100,"AuthorizationDiscarded":0,"LoaderCalls":100,"SolverStarts":100,"SolverCloses":100,"SolverReads":100,"SolverWrites":100,"Checkpoints":[{"Completed":0,"RSSBytes":7999488,"GoHeap":114904},{"Completed":20,"RSSBytes":22335488,"GoHeap":218632},{"Completed":40,"RSSBytes":23330816,"GoHeap":219616},{"Completed":60,"RSSBytes":23773184,"GoHeap":219904},{"Completed":80,"RSSBytes":24236032,"GoHeap":220352},{"Completed":100,"RSSBytes":24289280,"GoHeap":220808}]}
+--- PASS: TestNativeResourceTrend (0.55s)
+PASS

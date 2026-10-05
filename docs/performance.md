@@ -1,116 +1,117 @@
-# Performance
+# Native performance
 
 [Documentation](README.md) · [API](api.md) · [Change analysis](analysis.md)
 
-## Contents
+## Measurement scope
 
-- [Workload and environment](#workload-and-environment)
-- [Authorization](#authorization)
-- [Change analysis](#change-analysis)
-- [Startup and memory](#startup-and-memory)
-- [Reproduce](#reproduce)
+These measurements were recorded on 2026-10-05 with the production Go interfaces.
+Both backends include Go encoding, Cedar parsing and evaluation, result serialization, and Go decoding.
+The [historical Wasm record](history/wasm-performance.md) preserves the earlier prototype measurements.
 
-## Workload and environment
+The machine used an AMD Ryzen 5 5600X, Linux 6.19.10, Go 1.27.1, and Rust 1.99.0.
+Dependencies were Cedar 4.13.0, SymCC 0.7.0, wazero 1.12.0, and cvc5 1.3.1.
+The native library used the optimized Cargo `native` profile with panic unwinding.
 
-The measurements below were recorded on **2026-10-01**, using an AMD Ryzen
-5 5600X (6 cores, 12 threads), Linux 6.19, Go 1.27.1, Rust 1.99.0,
-wazero 1.12.0, Cedar 4.13.0, SymCC 0.7.0, and cvc5 1.3.1.
+The comparison checkout was pinned to `a7083b5cb27dae4ec8be5f84d8f7b88b4a1fbcc6`.
+The native implementation used a migration worktree based on that commit.
+[Environment records](../testdata/performance/native-migration/environment.txt) identify source, libraries, toolchains, and executable hashes.
+[Source manifests](../testdata/performance/native-migration/native-source.json) identify the measured native files.
 
-The shared fixture is [`testdata/joy`](../testdata/joy): 45 policies and a
-schema with 10 request environments. Authorization uses a `session.write`
-request whose context contains datetime, IP address, and record values.
-Ratios compare measurements from this workload on this machine; they are
-not a general bound for other policy sets.
+Authorization uses the [Joy fixture](../testdata/joy) and a permitted `session.write` request.
+The callback workload loads one missing entity through the Go loader.
+Analysis compares equivalent integer bounds through the real cvc5 process.
+These measurements exclude partial evaluation and partial reauthorization.
 
-## Authorization
+## Controls and results
 
-| Measurement | Time | Relative to native with JSON |
-|---|---|---|
-| Native Cedar, prebuilt request | 49 µs | Different scope |
-| Native Cedar, building the request from JSON and serializing reason IDs | 127 µs | 1× |
-| Go `Authorize`, one instance, Go request to Go response | 1.22–1.24 ms | **9.6–9.8×** |
+Each workload has five raw samples.
+Each sample starts a new process, and backend order alternates between samples.
+`GOMAXPROCS`, the authorizer pool limit, and native call concurrency are two.
+The Wasm parallel workload also uses two workers and two pooled instances.
+No compilation cache is enabled.
+Other builds, tests, and fuzzing were paused during the comparison.
 
-The native baseline includes context parsing, request construction, and
-reason-ID serialization. The Go measurement additionally includes Go JSON
-encoding, the pool, Wasm calls, and response decoding. Comparing to the
-prebuilt native request instead gives 24.9–25.3×; that omits request handling
-from the native side.
+The table reports medians.
+The ratio divides the Wasm median by the native median.
+Parallel time is wall time per completed decision, rather than individual request latency.
+Ratios describe these inputs and this machine.
 
-With 12 concurrent callers and 12 instances, the measured throughput was
-**184–203 µs of wall time per completed decision**, or approximately
-**4,900–5,400 decisions/second**. This is aggregate throughput, not the
-latency experienced by an individual caller.
+| Workload | Native median | Wasm median | Ratio |
+|---|---:|---:|---:|
+| Serial authorization | 139.481 µs | 907.008 µs | 6.50 |
+| Parallel authorization | 74.802 µs | 497.459 µs | 6.65 |
+| Load an authorizer | 2.091 ms | 21.003 ms | 10.04 |
+| Batched authorization with a loader callback | 58.627 µs | 269.416 µs | 4.60 |
+| Reuse compiled analysis | 1.898 ms | 1.989 ms | 1.05 |
+| Stateless analysis with a new solver process | 5.069 ms | 17.744 ms | 3.50 |
 
-The main costs were measured separately:
+[Raw samples](../testdata/performance/native-migration/) preserve every timing, Go allocation count, and workload counter.
+[The summary](../testdata/performance/native-migration/summary.json) preserves the five values and median for each workload.
+Serial, parallel, and callback samples contain 1,000 operations.
+Load and compiled samples contain 100 operations; stateless analysis samples contain 20.
 
-| Same Rust workload under the wazero CLI | Prebuilt request | With JSON parsing |
-|---|---|---|
-| Standard execution | 210 µs | 497 µs |
-| With execution deadline checks | 456 µs | 1,121 µs |
+Authorization reuses loaded state.
+Every serial sample created one instance; every parallel sample created two.
+Each load sample created and closed 100 authorizers.
+All authorization samples reported zero discarded instances.
+Each callback sample made 1,000 loader calls and retained one idle instance.
 
-Wazero execution accounts for roughly 4–5× the native cost. Interruptible
-execution roughly doubles that cost in this workload: wazero inserts loop
-checks so a context can stop guest execution. The Go encoding and pool
-added about 70 µs in the original measurements. These experiments explain
-the tradeoff; the shipped runtime enables deadline checks.
+Compiled analysis creates two handles and performs one untimed warm query.
+Each sample starts and closes one solver session, with 101 solver reads and writes.
+Each stateless sample starts and closes 20 solver sessions, with 20 reads and writes.
+Compiled timings exclude initial compilation; stateless timings include it.
 
-## Change analysis
+## Runtime construction
 
-Both paths use cvc5 1.3.1 and the same schema and policy sets.
+| Workload | Native median | Wasm median |
+|---|---:|---:|
+| Construct and close a Runtime | 2.000 µs | 3.841 s |
 
-| Question | Result | Native SymCC | Go/Wasm | Ratio |
-|---|---|---|---|---|
-| Does adding a binding permit anything new? | Yes, in 8 of 10 environments, with counterexamples | 0.79 s | 1.19 s | **1.5×** |
-| Does raising a device level permit anything new? | No, in all 10 environments | 0.19 s | 0.58 s | **3.1×** |
+Each Runtime sample contains five operations.
+Wasm Runtime construction includes cold, uncached module compilation.
+Native static linking occurs before process execution and lies outside the timed operation.
+This comparison measures API construction cost, rather than total application startup or build cost.
 
-These are complete comparison timings, including solver work. Solver cost
-varies with the property, so the ratio differs substantially between the
-two questions. The native analysis and CLI breakdowns above are recorded
-experiments; the checked-in native benchmark reproduces authorization.
+## Resource observations
 
-## Startup and memory
+The release workload creates and closes 100 runtimes, authorizers, analyzers, and compiled sessions.
+It performs 100 loader callbacks and explicitly releases 200 compiled handles.
+It records 100 created authorizer instances, zero discarded instances, and 100 solver starts and closes.
+Every solver process was closed before the memory checkpoint.
 
-| Measurement | Result |
-|---|---|
-| `cedar.NewRuntime`, cold compilation | 3.7 s |
-| `cedar.NewRuntime`, warm disk compilation cache | 130 ms, about **28× faster** |
-| `analysis.New`, cold compilation | 4.4 s |
-| Load one authorization instance | 32 ms |
-| Strict validation, including a fresh instance | 67 ms |
-| Go heap per loaded authorization instance | 11.4 MB, including 9.6 MB of linear memory |
-| `authorizer.wasm` | 5.47 MB; 1.51 MB gzip |
-| `analysis.wasm` | 6.33 MB; 1.75 MB gzip |
-| Stripped binary: hello world / with `cedar` / with `analysis` too | 1.5 MB / 10.8 MB / 17.1 MB |
+Process resident memory, or RSS, includes resident Go and native allocations.
+The Go heap counter measures live Go allocations after garbage collection.
+Benchmark `B/op` and `allocs/op` counters exclude Rust allocations and solver subprocess memory.
 
-Sizes use decimal MB. Instance heap measurements are per loaded instance,
-rather than total process memory. Binary sizes depend on application code,
-linker options, and toolchain.
+| Completed cycles | Process RSS | Live Go heap |
+|---:|---:|---:|
+| 0 | 8.00 MB | 114,904 bytes |
+| 20 | 22.34 MB | 218,632 bytes |
+| 40 | 23.33 MB | 219,616 bytes |
+| 60 | 23.77 MB | 219,904 bytes |
+| 80 | 24.24 MB | 220,352 bytes |
+| 100 | 24.29 MB | 220,808 bytes |
 
-Compile once per process, reuse authorizers, and use a
-[disk compilation cache](api.md#runtime-lifecycle) for faster restarts.
-Choose the pool size to balance throughput and memory. Load and validation
-costs are paid when creating instances or checking policy changes.
+[The first resource record](../testdata/performance/native-migration/resources.txt) contains exact checkpoint values.
+[Three further runs in one process](../testdata/performance/native-migration/resources-followup.txt) cover 300 additional cycles.
+After the first 100 cycles, RSS remained near 24 MB during the next 200 cycles.
+The final checkpoint was 24.41 MB, with a live Go heap of 230,648 bytes.
+These short runs show stable later checkpoints, but they do not establish a zero-leak guarantee.
+RSS includes allocator retention and excludes memory from the already closed solver processes.
+The follow-up run measured resource counts and memory; its durations are outside the controlled timing comparison.
 
 ## Reproduce
 
-From the repository root, with the pinned tools available:
+Use existing pinned tools and a checkout at the comparison commit.
+Build the native artifact before the measurements.
+Pause competing builds, tests, and fuzzing before running the comparison.
 
 ```bash
-go test -run '^$' -bench . -benchmem -count 3 ./cedar
-go test -run '^$' -bench . -count 3 ./analysis
-CVC5=/path/to/cvc5 go test -run '^TestNewlyPermittedJoy$' -count 1 -v ./analysis
+CVC5=/path/to/cvc5 scripts/measure-native-performance.sh /path/to/pinned-wasm-checkout /tmp/cedar-performance
+CVC5=/path/to/cvc5 GOMAXPROCS=2 go test -count=3 -cpu=2 -run '^TestNativeResourceTrend$' -v ./internal/verification/performance
 ```
 
-The analysis benchmark measures compilation; `TestNewlyPermittedJoy` logs
-the two policy-comparison timings. Run the native authorization baseline
-from `rust/`:
-
-```bash
-cd rust
-cargo run --locked --release -p cgw-native-bench -- ../testdata/joy
-```
-
-Use `-cpu 12` on the Go benchmark to reproduce the caller count in the
-parallel measurement. Keep version pins and fixtures identical between
-comparisons, and record CPU, OS, toolchains, cache state, and concurrency
-alongside new results.
+The script creates a temporary consumer for the pinned Wasm interfaces.
+It uses the same benchmark inputs without editing the comparison checkout.
+It rejects source or native archive changes during the comparison.
+Re-measure affected workloads when their implementation or inputs change.

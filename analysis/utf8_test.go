@@ -6,7 +6,9 @@ import (
 	"testing"
 
 	"github.com/ChrisMckerracher/cedar-go-wasm/analysis"
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
+	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
+	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
+	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 )
 
 func TestRejectInvalidUTF8SourcesBeforeSolver(t *testing.T) {
@@ -14,21 +16,21 @@ func TestRejectInvalidUTF8SourcesBeforeSolver(t *testing.T) {
 	a := &analysis.Analyzer{}
 	bad := string([]byte{0xff})
 	for _, inputs := range []struct {
-		schema        cedar.Schema
-		first, second cedar.PolicySet
+		schema        schemas.Schema
+		first, second policy.PolicySet
 	}{
-		{schema: cedar.SchemaFromCedar(bad)},
-		{schema: cedar.SchemaFromJSON([]byte(bad))},
-		{first: cedar.PoliciesFromCedar(bad)},
-		{second: cedar.PoliciesFromJSON([]byte(bad))},
+		{schema: schemas.SchemaFromCedar(bad)},
+		{schema: schemas.SchemaFromJSON([]byte(bad))},
+		{first: policy.PoliciesFromCedar(bad)},
+		{second: policy.PoliciesFromJSON([]byte(bad))},
 	} {
 		_, err := a.Equivalent(context.Background(), inputs.schema, inputs.first, inputs.second)
 		var e *analysis.Error
-		if !errors.As(err, &e) || e.Kind != string(cedar.KindInput) {
+		if !errors.As(err, &e) || e.Kind != string(diagnostic.KindInput) {
 			t.Fatalf("got %v; want input error", err)
 		}
 		_, err = a.NewlyPermitted(context.Background(), inputs.schema, inputs.first, inputs.second)
-		if !errors.As(err, &e) || e.Kind != string(cedar.KindInput) {
+		if !errors.As(err, &e) || e.Kind != string(diagnostic.KindInput) {
 			t.Fatalf("got %v; want input error", err)
 		}
 	}
