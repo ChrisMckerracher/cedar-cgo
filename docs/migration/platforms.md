@@ -19,6 +19,9 @@ The amd64 release environment provides glibc 2.35. The arm64 release environment
 The release gate requires passing consumer checks in both environments.
 The local VM uses a newer runtime. Local checks cannot establish either release minimum.
 
+The macOS consumer checks passed on macOS 15.7.9, build 24G830.
+These checks do not establish compatibility with earlier macOS releases.
+
 Executable inspection records system dependencies and symbol version requirements.
 The native manifest records source, target, ABI, header, Cedar versions, Rust toolchain, and linker requirements.
 The build uses the target's baseline CPU settings. It does not use `target-cpu=native`.
