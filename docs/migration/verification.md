@@ -41,7 +41,7 @@ The gate compares exact statement fractions with the pinned reference, without a
 
 | Coverage group | Reference | Native candidate |
 |---|---:|---:|
-| Cedar and shared execution | 1,423/1,579; 90.12% | 1,499/1,645; 91.12% |
+| Cedar and shared execution | 1,423/1,579; 90.12% | 1,501/1,645; 91.25% |
 | Analysis | 474/544; 87.13% | 533/595; 89.58% |
 | Artifact verification | 48/55; 87.27% | 148/149; 99.33% |
 
@@ -56,6 +56,8 @@ The [independent ownership review](ownership-review.md) records handle, buffer, 
 Go race checks and `GOEXPERIMENT=cgocheck2` pass.
 Native lifetime tests cover queued calls during close, parent closure, fault invalidation, callback panics, and response caps.
 Deterministic tests cancel during result decoding and reject authorization, stateless output, and session construction.
+The timeout regression confirms native entry through a loader callback before testing discard and recovery.
+A deadline before entry retains the untouched native handle for reuse.
 Partial continuations retain private frozen inputs after export, import, display edits, and pool replacement.
 Solver lifetime tests verify cancellation, blocked input and output, process cleanup, and compiled-handle invalidation.
 

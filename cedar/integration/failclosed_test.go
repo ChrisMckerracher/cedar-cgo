@@ -5,9 +5,12 @@ import (
 	errors "errors"
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
+	batched "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/batched"
 	request "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
 	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
+	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
+	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
 	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
 	strconv "strconv"
@@ -38,15 +41,17 @@ func TestFailClosedOnMemoryLimit(t *testing.T) {
 }
 
 func TestFailClosedOnTimeout(t *testing.T) {
+	schema := cedarschema.SchemaFromCedar(`entity User { active: Bool }; entity Photo; action "view" appliesTo { principal: User, resource: Photo, context: { a?: Set<Long> } };`)
 	a, err := testsupport.TestRuntime(t).NewAuthorizer(context.Background(), authorization.Config{
-		Policies: cedarpolicy.PoliciesFromCedar("permit(principal, action, resource) unless { context has a && context.a.contains(-1) };"),
-		Limits:   authorization.Limits{MaxInstances: 1, MaxRequestBytes: 64 << 20, CallTimeout: time.Millisecond},
+		Schema:   &schema,
+		Policies: cedarpolicy.PoliciesFromCedar("permit(principal, action, resource) when { !(context has a) || principal.active } unless { context has a && context.a.contains(-1) };"),
+		Limits:   authorization.Limits{MaxInstances: 1, MaxRequestBytes: 64 << 20, CallTimeout: time.Second},
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer a.Close()
-	// Native CPU work must return before the canceled result can be rejected.
+	// The loader proves native entry before the deadline expires; retain the large context input.
 	var sb strings.Builder
 	sb.WriteString(`{"a":[`)
 	for i := range 100000 {
@@ -56,7 +61,16 @@ func TestFailClosedOnTimeout(t *testing.T) {
 		sb.WriteString(strconv.Itoa(i))
 	}
 	sb.WriteString(`]}`)
-	resp, err := a.Authorize(context.Background(), testsupport.SimpleRequest(request.ContextFromJSON([]byte(sb.String()))))
+	entered := false
+	decision, err := a.Batched().AuthorizeBatched(context.Background(), testsupport.SimpleRequest(request.ContextFromJSON([]byte(sb.String()))), batched.EntityLoaderFunc(func(ctx context.Context, uids []entityuid.EntityUID) (batched.EntityLoadResult, error) {
+		entered = true
+		<-ctx.Done()
+		return batched.EntityLoadResult{Missing: uids}, nil
+	}), batched.BatchedOptions{MaxIterations: 2})
+	if !entered {
+		t.Fatal("deadline expired before the native loader callback")
+	}
+	resp := request.Response{Decision: decision}
 	if !errors.Is(err, context.DeadlineExceeded) {
 		t.Fatalf("got error %v, want a deadline", err)
 	}
