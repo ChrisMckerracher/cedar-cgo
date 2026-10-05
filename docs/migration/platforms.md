@@ -3,11 +3,11 @@
 Chris selected these targets on 2026-10-05.
 The migration replaces the previous Windows and macOS amd64 support matrix with this explicit scope.
 
-| Go platform | Rust target | CI build environment | Required compiler | Status |
+| Go platform | Rust target | CI build environment | Required compiler | Release gate |
 |---|---|---|---|---|
-| Linux amd64 | `x86_64-unknown-linux-gnu` | Ubuntu 22.04 | System GCC | Local native verification; remote verification required |
-| Linux arm64 | `aarch64-unknown-linux-gnu` | Ubuntu 24.04 ARM | System GCC | Remote native verification required |
-| macOS arm64 | `aarch64-apple-darwin` | macOS 15 ARM | Apple Clang | Remote native verification required |
+| Linux amd64 | `x86_64-unknown-linux-gnu` | Ubuntu 22.04 | System GCC | Native reproduction and independent consumer |
+| Linux arm64 | `aarch64-unknown-linux-gnu` | Ubuntu 24.04 ARM | System GCC | Native reproduction and independent consumer |
+| macOS arm64 | `aarch64-apple-darwin` | macOS 15 ARM | Apple Clang | Native reproduction and independent consumer |
 
 CI tests Go 1.26 and 1.27 on each target.
 Each runner builds two independent archives and compares them byte for byte.
@@ -16,7 +16,7 @@ Each consumer executes concrete authorization and solver-backed analysis.
 
 The Linux archives use the GNU C runtime.
 The amd64 release environment provides glibc 2.35. The arm64 release environment provides glibc 2.39.
-These environments become supported minimum environments only after their consumer checks pass.
+The release gate requires passing consumer checks in both environments.
 The local VM uses a newer runtime. Local checks cannot establish either release minimum.
 
 Executable inspection records system dependencies and symbol version requirements.

@@ -11,9 +11,9 @@ def native_fixture(commit, header):
     artifact = {
         "libcgw_native.a": b"!<arch>\n" + member + body,
         "cedar.h": header,
-        "link_flags.go": link_source("linux_amd64", ["-lc"]),
         "SOURCE_COMMIT": (commit + "\n").encode(),
     }
+    artifact["link_flags.go"] = link_source("linux_amd64", ["-lc"], sha(artifact["libcgw_native.a"]))
     manifest = {
         "abi": 2, "source_commit": commit, "target": "x86_64-unknown-linux-gnu", "platform": "linux_amd64",
         "cedar": "4.13.0", "symcc": "0.7.0", "toolchain": "1.99.0", "profile": "native", "panic": "unwind",
@@ -68,4 +68,3 @@ class BundleCase(unittest.TestCase):
             command,
             capture_output=True, text=True,
         )
-

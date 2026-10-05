@@ -1,7 +1,9 @@
 package artifact
 
 import (
+	"crypto/sha256"
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -67,9 +69,14 @@ func TestRejectHeaderAndObjectMismatch(t *testing.T) {
 		if err := json.Unmarshal(data, &m); err != nil {
 			t.Fatal(err)
 		}
+		link, err := LinkSource(m.Platform, m.NativeStaticLibs, fmt.Sprintf("%x", sha256.Sum256(library)))
+		if err != nil {
+			t.Fatal(err)
+		}
+		write(t, filepath.Join(dir, "link_flags.go"), link)
 		updateMetadata(t, dir, m)
-		if err := Verify(dir, testCommit, testTarget, testHeader); err == nil {
-			t.Fatal("accepted wrong object target")
+		if err := Verify(dir, testCommit, testTarget, testHeader); err == nil || !strings.Contains(err.Error(), "object target does not match") {
+			t.Fatalf("got %v, want an object target mismatch", err)
 		}
 	})
 }

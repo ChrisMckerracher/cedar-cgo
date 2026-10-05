@@ -73,7 +73,7 @@ func TestRejectMissingAndCorruptedNativeFiles(t *testing.T) {
 	if err := Verify(dir, testCommit, testTarget, testHeader); err == nil {
 		t.Fatal("accepted missing linker requirements")
 	}
-	if _, err := LinkSource("bad", []string{"-lc"}); err == nil {
+	if _, err := LinkSource("bad", []string{"-lc"}, ""); err == nil {
 		t.Fatal("accepted invalid platform")
 	}
 }

@@ -26,7 +26,7 @@ func fixture(t *testing.T) string {
 	library = append(library, object...)
 	write(t, filepath.Join(dir, "libcgw_native.a"), library)
 	write(t, filepath.Join(dir, "cedar.h"), testHeader)
-	link, _ := LinkSource("linux_amd64", []string{"-lc"})
+	link, _ := LinkSource("linux_amd64", []string{"-lc"}, fmt.Sprintf("%x", sha256.Sum256(library)))
 	write(t, filepath.Join(dir, "link_flags.go"), link)
 	write(t, filepath.Join(dir, "SOURCE_COMMIT"), []byte(testCommit+"\n"))
 	m := Manifest{ABI: 2, SourceCommit: testCommit, Target: testTarget, Platform: "linux_amd64", Cedar: "4.13.0", SymCC: "0.7.0", Toolchain: "1.99.0", Profile: "native", Panic: "unwind", NativeStaticLibs: []string{"-lc"}}

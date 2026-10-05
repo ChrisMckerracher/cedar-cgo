@@ -43,9 +43,10 @@ The gate compares exact statement fractions with the pinned reference, without a
 |---|---:|---:|
 | Cedar and shared execution | 1,423/1,579; 90.12% | 1,452/1,598; 90.86% |
 | Analysis | 474/544; 87.13% | 533/595; 89.58% |
-| Artifact verification | 48/55; 87.27% | 133/134; 99.25% |
+| Artifact verification | 48/55; 87.27% | 135/136; 99.26% |
 
 All 25 fuzz targets remain present.
+Each target passed a complete local run of at least 60 seconds.
 The publication gate runs every target for at least 60 seconds.
 A missing target, failed target, or incomplete run blocks publication.
 
@@ -88,6 +89,9 @@ Verified native builds require committed source and reject untracked source file
 They compile an archive snapshot of the recorded commit.
 Independent builds use separate Cargo output directories and compare their exact artifact files.
 Artifact checks bind source, target, header, ABI, build pins, object architecture, linker requirements, and checksums.
+Generated Go linker source includes the library checksum to invalidate cached builds when the archive changes.
+Go does not detect changes to external C libraries in its [build cache](https://pkg.go.dev/cmd/go#hdr-Build_and_test_caching).
+A disposable consumer test replaces an archive at the same path and verifies the second executable uses the replacement.
 Consumer extraction rejects path escapes, duplicate entries, symbolic links, corrupted records, and mixed target objects.
 
 Each supported target must pass native reproduction and an independent consumer in CI.
