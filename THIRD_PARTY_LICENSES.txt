@@ -1,6 +1,6 @@
 Third-party licenses
 
-The WebAssembly modules in internal/modules contain the Rust crates below.
+The native static library libcgw_native.a contains the Rust crates below.
 scripts/third-party-licenses.sh generates this file with cargo-about from
 rust/Cargo.lock. Do not edit it by hand.
 

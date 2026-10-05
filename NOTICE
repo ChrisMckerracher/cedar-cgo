@@ -3,14 +3,13 @@ Copyright 2026 The cedar-go-wasm Authors
 
 This product is licensed under the Apache License, Version 2.0. See LICENSE.
 
-The WebAssembly modules in internal/modules/authorizer and
-internal/modules/analysis are compiled from rust/ and contain third-party
-code:
+The native static library libcgw_native.a is compiled from rust/ and
+contains third-party code:
 
 Cedar (https://github.com/cedar-policy/cedar)
 Copyright Cedar Contributors
 Licensed under the Apache License, Version 2.0.
-The modules contain the crates cedar-policy 4.13.0, cedar-policy-core 4.13.0,
+The library contains the crates cedar-policy 4.13.0, cedar-policy-core 4.13.0,
 cedar-policy-formatter 4.13.0 and cedar-policy-symcc 0.7.0.
 
 cedar-policy-symcc 0.7.0 is modified. rust/vendor/cedar-policy-symcc-0.7.0
@@ -19,7 +18,7 @@ process feature does not build there. The change is in
 rust/patches/cedar-policy-symcc-0.7.0-wasm.patch, and each changed file
 carries a notice.
 
-The modules also contain other Rust crates under the Apache-2.0, MIT and
+The library also contains other Rust crates under the Apache-2.0, MIT and
 Unicode-3.0 licenses. THIRD_PARTY_LICENSES.txt lists each crate with the
 full text of its license.
 
