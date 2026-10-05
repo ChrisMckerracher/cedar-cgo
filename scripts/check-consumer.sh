@@ -9,7 +9,11 @@ fi
 repo=$(cd "$(dirname "$0")/.." && pwd)
 bundle=$(realpath "$1")
 consumer_tmp=$(mktemp -d)
-trap 'rm -rf "$consumer_tmp"' EXIT
+cleanup() {
+	chmod -R u+w "$consumer_tmp"
+	rm -rf "$consumer_tmp"
+}
+trap cleanup EXIT
 
 python3 "$repo/scripts/consumer/extract.py" "$bundle" "$2" "$consumer_tmp"
 mkdir "$consumer_tmp/consumer" "$consumer_tmp/bin"
