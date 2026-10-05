@@ -21,7 +21,7 @@ type PolicyApplicability struct {
 
 // ApplicableEnvironments invokes Cedar's native get_valid_request_envs operation.
 // Results describe potential applicability, not decisions or satisfying requests.
-func (rt *Client) ApplicableEnvironments(ctx context.Context, schema cedarschema.Schema, policies policy.PolicySet) (PolicyApplicability, error) {
+func (rt *Client) ApplicableEnvironments(ctx context.Context, schema cedarschema.Schema, policies policy.PolicySet) (decoded PolicyApplicability, decodeErr error) {
 	in, err := execution.Encode(struct {
 		Schema   wire.Source `json:"schema"`
 		Policies wire.Source `json:"policies"`
@@ -29,6 +29,7 @@ func (rt *Client) ApplicableEnvironments(ctx context.Context, schema cedarschema
 	if err != nil {
 		return PolicyApplicability{}, err
 	}
+	defer execution.FinishDecode(ctx, &decoded, &decodeErr)
 	out, err := rt.runtime.CallOnce(ctx, "cgw_applicability", in)
 	if err != nil {
 		return PolicyApplicability{}, err

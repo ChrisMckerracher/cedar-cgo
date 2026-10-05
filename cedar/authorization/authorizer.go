@@ -31,6 +31,10 @@ func NewAuthorizer(ctx context.Context, rt *execution.Runtime, cfg Config) (*Aut
 
 // Authorize returns Deny on every error so callers fail closed.
 func (a *Authorizer) Authorize(ctx context.Context, req request.Request) (request.Response, error) {
+	return a.authorize(ctx, req, request.DecodeAuthorize)
+}
+
+func (a *Authorizer) authorize(ctx context.Context, req request.Request, decode func([]byte) (request.Response, error)) (resp request.Response, err error) {
 	in, err := execution.Encode(request.AuthorizeInput{
 		Principal: req.Principal.Wire(),
 		Action:    req.Action.Wire(),
@@ -41,8 +45,8 @@ func (a *Authorizer) Authorize(ctx context.Context, req request.Request) (reques
 	if err != nil {
 		return request.Response{}, err
 	}
-	var resp request.Response
-	err = a.session.Call(ctx, "cgw_authorize", in, func(out []byte) error { var err error; resp, err = request.DecodeAuthorize(out); return err })
+	defer execution.FinishDecode(ctx, &resp, &err)
+	err = a.session.Call(ctx, "cgw_authorize", in, func(out []byte) error { var err error; resp, err = decode(out); return err })
 	return resp, err
 }
 

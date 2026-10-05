@@ -41,7 +41,7 @@ The gate compares exact statement fractions with the pinned reference, without a
 
 | Coverage group | Reference | Native candidate |
 |---|---:|---:|
-| Cedar and shared execution | 1,423/1,579; 90.12% | 1,452/1,598; 90.86% |
+| Cedar and shared execution | 1,423/1,579; 90.12% | 1,499/1,645; 91.12% |
 | Analysis | 474/544; 87.13% | 533/595; 89.58% |
 | Artifact verification | 48/55; 87.27% | 135/136; 99.26% |
 
@@ -55,6 +55,7 @@ A missing target, failed target, or incomplete run blocks publication.
 The [independent ownership review](ownership-review.md) records handle, buffer, callback, and shutdown contracts.
 Go race checks and `GOEXPERIMENT=cgocheck2` pass.
 Native lifetime tests cover queued calls during close, parent closure, fault invalidation, callback panics, and response caps.
+Deterministic tests cancel during result decoding and reject authorization, stateless output, and session construction.
 Partial continuations retain private frozen inputs after export, import, display edits, and pool replacement.
 Solver lifetime tests verify cancellation, blocked input and output, process cleanup, and compiled-handle invalidation.
 
@@ -73,8 +74,8 @@ Deadlines reject canceled results after native execution returns and cannot forc
 
 The [performance report](../performance.md) contains five samples for each of seven workloads on both backends.
 It records complete Go encoding and decoding, native computation, concurrency, ordering, source hashes, and actual resource counts.
-Serial authorization measured 139.481 microseconds natively and 907.008 microseconds with Wasm on the recorded machine.
-The ratio is 6.50 for this workload.
+Serial authorization measured 135.027 microseconds natively and 885.308 microseconds with Wasm on the recorded machine.
+The ratio is 6.56 for this workload.
 Compiled analysis measured a smaller difference because real solver interaction remains in the timed path.
 
 Resource checks cover 400 create, call, release, and close cycles.

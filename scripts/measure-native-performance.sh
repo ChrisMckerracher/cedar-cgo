@@ -56,6 +56,7 @@ for sample in 1 2 3 4 5; do
     done
  done
 "$output/native.test" -test.run '^TestNativeResourceTrend$' -test.v > "$output/resources.txt"
+"$output/native.test" -test.run '^TestNativeResourceTrend$' -test.count 3 -test.cpu 2 -test.v > "$output/resources-followup.txt"
 test "$native_source" = "$(python3 "$repo/scripts/performance/source-hash.py" "$repo")"
 test "$wasm_source" = "$(python3 "$repo/scripts/performance/source-hash.py" "$baseline")"
 test "$native_archive" = "$(sha256sum "$archive" | cut -d ' ' -f 1)"

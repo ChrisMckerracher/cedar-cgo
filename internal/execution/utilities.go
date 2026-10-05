@@ -24,11 +24,12 @@ type UtilityOutput struct {
 	Error    *wire.Error                 `json:"error"`
 }
 
-func UtilityCall(ctx context.Context, rt Caller, input map[string]any) (UtilityOutput, error) {
+func UtilityCall(ctx context.Context, rt Caller, input map[string]any) (decoded UtilityOutput, decodeErr error) {
 	in, err := Encode(input, "utility input", rt.SourceLimit())
 	if err != nil {
 		return UtilityOutput{}, err
 	}
+	defer FinishDecode(ctx, &decoded, &decodeErr)
 	out, err := rt.CallOnce(ctx, "cgw_utilities", in)
 	if err != nil {
 		return UtilityOutput{}, err

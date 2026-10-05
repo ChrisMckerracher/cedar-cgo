@@ -30,6 +30,7 @@ An expired context prevents handle acquisition and native entry.
 A callback observes its call context. An entity loader must observe cancellation itself.
 A solver transport closes on cancellation to unblock solver input and output.
 After native execution returns, Go rejects the result if it observes cancellation.
+Go checks cancellation again after response decoding and clears canceled results.
 An active-call cancellation invalidates mutable session state.
 
 A Go deadline cannot forcibly stop Rust CPU execution.

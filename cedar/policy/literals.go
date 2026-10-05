@@ -67,7 +67,7 @@ type LiteralOutput struct {
 	Error     *wire.Error             `json:"error"`
 }
 
-func (rt *Client) literalCall(ctx context.Context, operation string, policies PolicySet, replacements map[entityuid.EntityUID]entityuid.EntityUID) (LiteralOutput, error) {
+func (rt *Client) literalCall(ctx context.Context, operation string, policies PolicySet, replacements map[entityuid.EntityUID]entityuid.EntityUID) (decoded LiteralOutput, decodeErr error) {
 	entries := make([]LiteralReplacement, 0, len(replacements))
 	for from, to := range replacements {
 		entries = append(entries, LiteralReplacement{from.Wire(), to.Wire()})
@@ -86,6 +86,7 @@ func (rt *Client) literalCall(ctx context.Context, operation string, policies Po
 	if err != nil {
 		return LiteralOutput{}, err
 	}
+	defer execution.FinishDecode(ctx, &decoded, &decodeErr)
 	out, err := rt.runtime.CallOnce(ctx, "cgw_literals", in)
 	if err != nil {
 		return LiteralOutput{}, err
@@ -114,11 +115,12 @@ func (rt *Client) EntityLiterals(ctx context.Context, policies PolicySet) (Entit
 
 // SubstituteEntityLiterals applies all replacements simultaneously through native Cedar.
 // Policy IDs, template IDs, annotations, slots, and links retain their identities.
-func (rt *Client) SubstituteEntityLiterals(ctx context.Context, policies PolicySet, replacements map[entityuid.EntityUID]entityuid.EntityUID) (PolicySet, error) {
+func (rt *Client) SubstituteEntityLiterals(ctx context.Context, policies PolicySet, replacements map[entityuid.EntityUID]entityuid.EntityUID) (decoded PolicySet, decodeErr error) {
 	result, err := rt.literalCall(ctx, "substitute", policies, replacements)
 	if err != nil {
 		return PolicySet{}, err
 	}
+	defer execution.FinishDecode(ctx, &decoded, &decodeErr)
 	if len(result.Policies) == 0 || string(result.Policies) == "null" {
 		return PolicySet{}, diagnostic.FaultError(fmt.Errorf("entity literal response has no policies"))
 	}

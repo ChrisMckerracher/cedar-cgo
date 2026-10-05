@@ -13,11 +13,12 @@ import (
 )
 
 // Values returns native evaluated values, including exact integers and extension values.
-func (rt *Client) ContextValues(ctx context.Context, c request.Context) (cedarvalue.EvalRecord, error) {
+func (rt *Client) ContextValues(ctx context.Context, c request.Context) (decoded cedarvalue.EvalRecord, decodeErr error) {
 	result, err := execution.UtilityCall(ctx, rt.runtime, map[string]any{"operation": "context_values", "context": c})
 	if err != nil {
 		return nil, err
 	}
+	defer execution.FinishDecode(ctx, &decoded, &decodeErr)
 	if result.Values == nil {
 		return nil, diagnostic.FaultError(fmt.Errorf("context response has no values"))
 	}
@@ -33,7 +34,7 @@ func (rt *Client) ContextValues(ctx context.Context, c request.Context) (cedarva
 }
 
 // Get distinguishes a missing attribute from context parsing or evaluation failure.
-func (rt *Client) ContextGet(ctx context.Context, c request.Context, key string) (cedarvalue.EvalResult, bool, error) {
+func (rt *Client) ContextGet(ctx context.Context, c request.Context, key string) (decoded cedarvalue.EvalResult, found bool, decodeErr error) {
 	if err := wire.CheckUTF8(key); err != nil {
 		return nil, false, &diagnostic.Error{Kind: diagnostic.KindInput, Message: err.Error()}
 	}
@@ -41,6 +42,7 @@ func (rt *Client) ContextGet(ctx context.Context, c request.Context, key string)
 	if err != nil {
 		return nil, false, err
 	}
+	defer execution.FinishLookup(ctx, &decoded, &found, &decodeErr)
 	if result.Found == nil {
 		return nil, false, diagnostic.FaultError(fmt.Errorf("context response has no lookup result"))
 	}
@@ -59,11 +61,12 @@ func (rt *Client) ContextGet(ctx context.Context, c request.Context, key string)
 
 // Merge rejects every overlapping top-level key, including keys with equal values.
 // It preserves both inputs and performs no recursive merge.
-func (rt *Client) ContextMerge(ctx context.Context, c request.Context, other request.Context) (request.Context, error) {
+func (rt *Client) ContextMerge(ctx context.Context, c request.Context, other request.Context) (decoded request.Context, decodeErr error) {
 	result, err := execution.UtilityCall(ctx, rt.runtime, map[string]any{"operation": "context_merge", "context": c, "other": other})
 	if err != nil {
 		return request.Context{}, err
 	}
+	defer execution.FinishDecode(ctx, &decoded, &decodeErr)
 	if len(result.Context) == 0 || result.Context[0] != '{' {
 		return request.Context{}, diagnostic.FaultError(fmt.Errorf("context response has no merged record"))
 	}

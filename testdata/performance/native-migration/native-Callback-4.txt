@@ -2,5 +2,5 @@ goos: linux
 goarch: amd64
 pkg: github.com/ChrisMckerracher/cedar-go-wasm/internal/verification/performance
 cpu: AMD Ryzen 5 5600X 6-Core Processor             
-BenchmarkControlledCallback-2   	    1000	     56812 ns/op	         1.000 created	         0 discarded	         1.000 idle	      1000 loader-calls	    2148 B/op	      35 allocs/op
+BenchmarkControlledCallback-2   	    1000	     55209 ns/op	         1.000 created	         0 discarded	         1.000 idle	      1000 loader-calls	    2148 B/op	      35 allocs/op
 PASS

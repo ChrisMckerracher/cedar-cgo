@@ -93,7 +93,7 @@ type SourceTokensOutput struct {
 
 // TokenizePolicies uses Cedar's formatter lexer without performing semantic policy validation.
 // Token spans apply only to the supplied source; lex again after changing it.
-func (rt *Client) TokenizePolicies(ctx context.Context, TextValue string) (SourceTokens, error) {
+func (rt *Client) TokenizePolicies(ctx context.Context, TextValue string) (decoded SourceTokens, decodeErr error) {
 	if err := wire.CheckUTF8(TextValue); err != nil {
 		return SourceTokens{}, &diagnostic.Error{Kind: diagnostic.KindInput, Message: err.Error()}
 	}
@@ -103,6 +103,7 @@ func (rt *Client) TokenizePolicies(ctx context.Context, TextValue string) (Sourc
 	if err != nil {
 		return SourceTokens{}, err
 	}
+	defer execution.FinishDecode(ctx, &decoded, &decodeErr)
 	out, err := rt.runtime.CallOnce(ctx, "cgw_source_tokens", in)
 	if err != nil {
 		return SourceTokens{}, err

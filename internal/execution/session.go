@@ -4,12 +4,10 @@ import (
 	puddle "github.com/jackc/puddle/v2"
 
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	"github.com/ChrisMckerracher/cedar-go-wasm/internal/native"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
 
 	"sync/atomic"
 	"time"
@@ -75,42 +73,6 @@ func NewSession(ctx context.Context, rt *Runtime, load []byte, limits Limits) (*
 	r.Release()
 	return a, nil
 }
-func (a *Session) NewInstance(ctx context.Context) (*native.Instance, error) {
-	ctx, cancel := context.WithTimeout(ctx, a.Limits.LoadTimeout)
-	defer cancel()
-	release, e := a.Runtime.Acquire(ctx)
-	if e != nil {
-		return nil, diagnostic.FaultError(e)
-	}
-	defer release()
-	i, e := a.Runtime.Module.Instantiate(ctx)
-	if e != nil {
-		return nil, diagnostic.FaultError(e)
-	}
-	out, e := i.Call(ctx, "cgw_load", a.Load, a.Runtime.MaxResponse)
-	if e == nil {
-		var r struct {
-			Policies *int        `json:"policies"`
-			Error    *wire.Error `json:"error"`
-		}
-		switch e = json.Unmarshal(out, &r); {
-		case e != nil:
-			e = diagnostic.FaultError(e)
-		case r.Error != nil:
-			e = diagnostic.ModuleError(r.Error)
-		case r.Policies == nil:
-			e = diagnostic.FaultError(errors.New("load response has no result"))
-		}
-	} else {
-		e = diagnostic.FaultError(e)
-	}
-	if e != nil {
-		_ = i.Close(context.WithoutCancel(ctx))
-		return nil, e
-	}
-	a.created.Add(1)
-	return i, nil
-}
 func (a *Session) Call(ctx context.Context, op string, in []byte, decode func([]byte) error) error {
 	if len(in) > a.Limits.MaxRequestBytes {
 		return diagnostic.LimitError("request", len(in), a.Limits.MaxRequestBytes)
@@ -135,7 +97,7 @@ func (a *Session) Call(ctx context.Context, op string, in []byte, decode func([]
 	if e != nil {
 		return diagnostic.FaultError(e)
 	}
-	e = decode(out)
+	e = CompletionError(ctx, decode(out))
 	if errors.Is(e, diagnostic.ErrFault) {
 		i.MarkFaulted()
 	}

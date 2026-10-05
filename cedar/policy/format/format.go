@@ -49,7 +49,7 @@ type FormatOutput struct {
 
 // FormatPolicies formats Cedar policy/template text with the pinned Rust formatter.
 // Experimental: the Go API may change before v1. The caller's context bounds execution.
-func (rt *Client) FormatPolicies(ctx context.Context, TextValue string, opts ...FormatOption) (string, error) {
+func (rt *Client) FormatPolicies(ctx context.Context, TextValue string, opts ...FormatOption) (decoded string, decodeErr error) {
 	if err := ctx.Err(); err != nil {
 		return "", diagnostic.FaultError(err)
 	}
@@ -77,6 +77,7 @@ func (rt *Client) FormatPolicies(ctx context.Context, TextValue string, opts ...
 	if err := ctx.Err(); err != nil {
 		return "", diagnostic.FaultError(err)
 	}
+	defer execution.FinishDecode(ctx, &decoded, &decodeErr)
 	out, err := rt.runtime.CallOnce(ctx, "cgw_format", in)
 	if err != nil {
 		return "", err

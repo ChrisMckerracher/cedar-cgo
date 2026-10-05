@@ -34,8 +34,12 @@ func (rt *Client) ValidateScopeVariables(ctx context.Context, schema schema.Sche
 }
 
 // ConfusableStrings checks static policies and templates without requiring a schema.
-func (rt *Client) ConfusableStrings(ctx context.Context, policies policy.PolicySet) ([]diagnostic.PolicyMessage, error) {
+func (rt *Client) ConfusableStrings(ctx context.Context, policies policy.PolicySet) (decoded []diagnostic.PolicyMessage, decodeErr error) {
 	result, err := execution.UtilityCall(ctx, rt.runtime, map[string]any{"operation": "confusables", "policies": policies.Wire()})
+	if err != nil {
+		return nil, err
+	}
+	defer execution.FinishDecode(ctx, &decoded, &decodeErr)
 	return UtilityWarningsResult(result, err, policies)
 }
 

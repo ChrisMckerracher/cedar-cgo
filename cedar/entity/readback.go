@@ -8,6 +8,7 @@ import (
 	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
 	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
+	execution "github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
 	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
 )
 
@@ -38,12 +39,13 @@ func DecodeEntityRecord(values map[string]json.RawMessage) (cedarvalue.EvalRecor
 }
 
 // Get returns the native entity and reports whether the UID exists.
-func (s ParsedEntityStore) Get(ctx context.Context, uid entityuid.EntityUID) (ParsedEntity, bool, error) {
+func (s ParsedEntityStore) Get(ctx context.Context, uid entityuid.EntityUID) (decoded ParsedEntity, found bool, decodeErr error) {
 	u := uid.Wire()
 	result, err := s.call(ctx, EntityStoreInput{Operation: "get", UID: &u})
 	if err != nil {
 		return ParsedEntity{}, false, err
 	}
+	defer execution.FinishLookup(ctx, &decoded, &found, &decodeErr)
 	if bytes.Equal(result.Entity, []byte("null")) {
 		return ParsedEntity{}, false, nil
 	}
@@ -78,12 +80,13 @@ func (s ParsedEntityStore) Get(ctx context.Context, uid entityuid.EntityUID) (Pa
 }
 
 // Ancestors returns transitive ancestors and reports whether the UID exists.
-func (s ParsedEntityStore) Ancestors(ctx context.Context, uid entityuid.EntityUID) ([]entityuid.EntityUID, bool, error) {
+func (s ParsedEntityStore) Ancestors(ctx context.Context, uid entityuid.EntityUID) (decoded []entityuid.EntityUID, found bool, decodeErr error) {
 	u := uid.Wire()
 	result, err := s.call(ctx, EntityStoreInput{Operation: "ancestors", UID: &u})
 	if err != nil {
 		return nil, false, err
 	}
+	defer execution.FinishLookup(ctx, &decoded, &found, &decodeErr)
 	if bytes.Equal(result.Ancestors, []byte("null")) {
 		return nil, false, nil
 	}

@@ -37,13 +37,14 @@ func DecodeSchemaWarnings(data []byte, sourceBytes int) ([]diagnostic.SchemaWarn
 }
 
 // SchemaWarnings parses a complete schema and returns its native syntax warnings.
-func (rt *Client) SchemaWarnings(ctx context.Context, schema Schema) ([]diagnostic.SchemaWarning, error) {
+func (rt *Client) SchemaWarnings(ctx context.Context, schema Schema) (decoded []diagnostic.SchemaWarning, decodeErr error) {
 	in, err := execution.Encode(struct {
 		Schema wire.Source `json:"schema"`
 	}{schema.Wire()}, "schema warning input", rt.runtime.MaxSourceBytes)
 	if err != nil {
 		return nil, err
 	}
+	defer execution.FinishDecode(ctx, &decoded, &decodeErr)
 	out, err := rt.runtime.CallOnce(ctx, "cgw_schema_warnings", in)
 	if err != nil {
 		return nil, err

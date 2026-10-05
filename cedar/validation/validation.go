@@ -47,11 +47,12 @@ func (rt *Client) ValidateWithLevel(ctx context.Context, schema schema.Schema, p
 	return rt.validate(ctx, schema, policies, &maxDereferenceLevel)
 }
 
-func (rt *Client) validate(ctx context.Context, schema schema.Schema, policies policy.PolicySet, level *uint32) (ValidationResult, error) {
+func (rt *Client) validate(ctx context.Context, schema schema.Schema, policies policy.PolicySet, level *uint32) (decoded ValidationResult, decodeErr error) {
 	in, err := execution.Encode(ValidateInput{Schema: schema.Wire(), Policies: policies.Wire(), MaxDereferenceLevel: level}, "validation input", rt.runtime.MaxSourceBytes)
 	if err != nil {
 		return ValidationResult{}, err
 	}
+	defer execution.FinishDecode(ctx, &decoded, &decodeErr)
 	out, err := rt.runtime.CallOnce(ctx, "cgw_validate", in)
 	if err != nil {
 		return ValidationResult{}, err

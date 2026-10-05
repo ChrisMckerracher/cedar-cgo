@@ -41,7 +41,7 @@ func (s ParsedEntityStore) Export() Entities { return EntitiesFromJSON(s.normali
 
 // ParseEntityStore parses and validates entities with native Cedar.
 // If schema is non-nil, Cedar validates entities and inserts schema action entities.
-func (rt *Client) ParseEntityStore(ctx context.Context, entities Entities, schema SchemaSource) (ParsedEntityStore, error) {
+func (rt *Client) ParseEntityStore(ctx context.Context, entities Entities, schema SchemaSource) (decoded ParsedEntityStore, decodeErr error) {
 	var source *wire.Source
 	if hasSchema(schema) {
 		value := schema.Wire()
@@ -51,6 +51,7 @@ func (rt *Client) ParseEntityStore(ctx context.Context, entities Entities, schem
 	if err != nil {
 		return ParsedEntityStore{}, err
 	}
+	defer execution.FinishDecode(ctx, &decoded, &decodeErr)
 	return rt.decodeEntitySnapshot(result)
 }
 
@@ -74,11 +75,12 @@ type EntityStoreOutput struct {
 	Error      *wire.Error     `json:"error"`
 }
 
-func (rt *Client) entityStoreCall(ctx context.Context, input EntityStoreInput) (EntityStoreOutput, error) {
+func (rt *Client) entityStoreCall(ctx context.Context, input EntityStoreInput) (decoded EntityStoreOutput, decodeErr error) {
 	in, err := execution.Encode(input, "entity store input", rt.runtime.MaxSourceBytes)
 	if err != nil {
 		return EntityStoreOutput{}, err
 	}
+	defer execution.FinishDecode(ctx, &decoded, &decodeErr)
 	out, err := rt.runtime.CallOnce(ctx, "cgw_entity_store", in)
 	if err != nil {
 		return EntityStoreOutput{}, err

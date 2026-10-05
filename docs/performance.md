@@ -15,7 +15,9 @@ The native library used the optimized Cargo `native` profile with panic unwindin
 The comparison checkout was pinned to `a7083b5cb27dae4ec8be5f84d8f7b88b4a1fbcc6`.
 The native implementation used a migration worktree based on that commit.
 [Environment records](../testdata/performance/native-migration/environment.txt) identify source, libraries, toolchains, and executable hashes.
-[Source manifests](../testdata/performance/native-migration/native-source.json) identify the measured native files.
+[Source manifests](../testdata/performance/native-migration/native-source.json) identify production Go, Rust, headers, and vendored SymCC files.
+The native source digest is `a13a839f9dcbf4efb87e3a4a27163eeb0b8f4e7f4c407a46e3b8658c94c7ca06`.
+The recorded source includes cancellation checks after Go decoding.
 
 Authorization uses the [Joy fixture](../testdata/joy) and a permitted `session.write` request.
 The callback workload loads one missing entity through the Go loader.
@@ -38,12 +40,12 @@ Ratios describe these inputs and this machine.
 
 | Workload | Native median | Wasm median | Ratio |
 |---|---:|---:|---:|
-| Serial authorization | 139.481 µs | 907.008 µs | 6.50 |
-| Parallel authorization | 74.802 µs | 497.459 µs | 6.65 |
-| Load an authorizer | 2.091 ms | 21.003 ms | 10.04 |
-| Batched authorization with a loader callback | 58.627 µs | 269.416 µs | 4.60 |
-| Reuse compiled analysis | 1.898 ms | 1.989 ms | 1.05 |
-| Stateless analysis with a new solver process | 5.069 ms | 17.744 ms | 3.50 |
+| Serial authorization | 135.027 µs | 885.308 µs | 6.56 |
+| Parallel authorization | 73.869 µs | 493.184 µs | 6.68 |
+| Load an authorizer | 2.083 ms | 21.736 ms | 10.44 |
+| Batched authorization with a loader callback | 55.528 µs | 260.195 µs | 4.69 |
+| Reuse compiled analysis | 1.878 ms | 2.095 ms | 1.12 |
+| Stateless analysis with a new solver process | 4.947 ms | 18.114 ms | 3.66 |
 
 [Raw samples](../testdata/performance/native-migration/) preserve every timing, Go allocation count, and workload counter.
 [The summary](../testdata/performance/native-migration/summary.json) preserves the five values and median for each workload.
@@ -65,7 +67,7 @@ Compiled timings exclude initial compilation; stateless timings include it.
 
 | Workload | Native median | Wasm median |
 |---|---:|---:|
-| Construct and close a Runtime | 2.000 µs | 3.841 s |
+| Construct and close a Runtime | 1.944 µs | 3.817 s |
 
 Each Runtime sample contains five operations.
 Wasm Runtime construction includes cold, uncached module compilation.
@@ -85,20 +87,21 @@ Benchmark `B/op` and `allocs/op` counters exclude Rust allocations and solver su
 
 | Completed cycles | Process RSS | Live Go heap |
 |---:|---:|---:|
-| 0 | 8.00 MB | 114,904 bytes |
-| 20 | 22.34 MB | 218,632 bytes |
-| 40 | 23.33 MB | 219,616 bytes |
-| 60 | 23.77 MB | 219,904 bytes |
-| 80 | 24.24 MB | 220,352 bytes |
-| 100 | 24.29 MB | 220,808 bytes |
+| 0 | 8.01 MB | 115,176 bytes |
+| 20 | 21.82 MB | 213,240 bytes |
+| 40 | 22.97 MB | 219,584 bytes |
+| 60 | 23.49 MB | 213,760 bytes |
+| 80 | 23.49 MB | 220,568 bytes |
+| 100 | 23.98 MB | 214,968 bytes |
 
 [The first resource record](../testdata/performance/native-migration/resources.txt) contains exact checkpoint values.
 [Three further runs in one process](../testdata/performance/native-migration/resources-followup.txt) cover 300 additional cycles.
 After the first 100 cycles, RSS remained near 24 MB during the next 200 cycles.
-The final checkpoint was 24.41 MB, with a live Go heap of 230,648 bytes.
+The final checkpoint was 24.59 MB, with a live Go heap of 230,424 bytes.
 These short runs show stable later checkpoints, but they do not establish a zero-leak guarantee.
 RSS includes allocator retention and excludes memory from the already closed solver processes.
-The follow-up run measured resource counts and memory; its durations are outside the controlled timing comparison.
+All resource runs used the same verified executable while competing builds, tests, and fuzzing remained paused.
+Their durations are outside the benchmark comparison.
 
 ## Reproduce
 
@@ -108,10 +111,10 @@ Pause competing builds, tests, and fuzzing before running the comparison.
 
 ```bash
 CVC5=/path/to/cvc5 scripts/measure-native-performance.sh /path/to/pinned-wasm-checkout /tmp/cedar-performance
-CVC5=/path/to/cvc5 GOMAXPROCS=2 go test -count=3 -cpu=2 -run '^TestNativeResourceTrend$' -v ./internal/verification/performance
 ```
 
 The script creates a temporary consumer for the pinned Wasm interfaces.
 It uses the same benchmark inputs without editing the comparison checkout.
 It rejects source or native archive changes during the comparison.
+It records 100 resource cycles, then another 300 cycles in a new process using the same executable.
 Re-measure affected workloads when their implementation or inputs change.

@@ -12,7 +12,7 @@ import (
 )
 
 // ActionEntities extracts native action entities with their transitive parent relationships.
-func (rt *Client) ActionEntities(ctx context.Context, schema Schema) (entity.Entities, error) {
+func (rt *Client) ActionEntities(ctx context.Context, schema Schema) (decoded entity.Entities, decodeErr error) {
 	var result struct {
 		Entities json.RawMessage `json:"entities"`
 	}
@@ -22,6 +22,7 @@ func (rt *Client) ActionEntities(ctx context.Context, schema Schema) (entity.Ent
 	}{"actions", schema.Wire()}, &result); err != nil {
 		return entity.Entities{}, err
 	}
+	defer execution.FinishDecode(ctx, &decoded, &decodeErr)
 	var entities []json.RawMessage
 	if err := json.Unmarshal(result.Entities, &entities); err != nil || entities == nil {
 		return entity.Entities{}, diagnostic.FaultError(fmt.Errorf("schema action response has no entity array"))
@@ -29,11 +30,12 @@ func (rt *Client) ActionEntities(ctx context.Context, schema Schema) (entity.Ent
 	return entity.EntitiesFromJSON(result.Entities), nil
 }
 
-func (rt *Client) schemaOperation(ctx context.Context, input any, result any) error {
+func (rt *Client) schemaOperation(ctx context.Context, input any, result any) (decodeErr error) {
 	in, err := execution.Encode(input, "schema operation input", rt.runtime.MaxSourceBytes)
 	if err != nil {
 		return err
 	}
+	defer func() { decodeErr = execution.CompletionError(ctx, decodeErr) }()
 	out, err := rt.runtime.CallOnce(ctx, "cgw_schemas", in)
 	if err != nil {
 		return err

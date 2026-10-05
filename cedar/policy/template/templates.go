@@ -85,7 +85,7 @@ func TemplateUTF8(texts ...string) error {
 	return nil
 }
 
-func (rt *Client) templateCall(ctx context.Context, policies policy.PolicySet, op any) (TemplateOutput, error) {
+func (rt *Client) templateCall(ctx context.Context, policies policy.PolicySet, op any) (decoded TemplateOutput, decodeErr error) {
 	if err := TemplateUTF8(policies.Text()); err != nil {
 		return TemplateOutput{}, err
 	}
@@ -93,6 +93,7 @@ func (rt *Client) templateCall(ctx context.Context, policies policy.PolicySet, o
 	if err != nil {
 		return TemplateOutput{}, err
 	}
+	defer execution.FinishDecode(ctx, &decoded, &decodeErr)
 	out, err := rt.runtime.CallOnce(ctx, "cgw_templates", in)
 	if err != nil {
 		return TemplateOutput{}, err

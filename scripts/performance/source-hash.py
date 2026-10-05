@@ -6,14 +6,15 @@ import pathlib
 import sys
 
 root = pathlib.Path(sys.argv[1])
-files = {root / name for name in ["go.mod", "go.sum", "rust/Cargo.toml", "rust/Cargo.lock", "internal/native/include/cedar.h"]}
+files = {root / name for name in ["go.mod", "go.sum", "rust-toolchain.toml", "rust/Cargo.toml", "rust/Cargo.lock", "internal/native/include/cedar.h"]}
 for directory in ["cedar", "analysis", "internal"]:
     for path in (root / directory).rglob("*.go"):
         if not path.name.endswith("_test.go") or "verification/performance" in str(path):
             files.add(path)
-for path in (root / "rust/crates").rglob("*"):
-    if path.is_file() and (path.suffix == ".rs" or path.name == "Cargo.toml"):
-        files.add(path)
+for directory in ["rust/crates", "rust/vendor"]:
+    for path in (root / directory).rglob("*"):
+        if path.is_file() and (path.suffix == ".rs" or path.name == "Cargo.toml"):
+            files.add(path)
 for directory in ["testdata/joy", "scripts/performance"]:
     files.update(path for path in (root / directory).rglob("*") if path.is_file() and path.suffix != ".pyc")
 files.add(root / "scripts/measure-native-performance.sh")

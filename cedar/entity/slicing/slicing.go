@@ -59,7 +59,7 @@ type SliceOutput struct {
 // SliceEntities uses Cedar 4.13.0's experimental TPE loader to select whole entities
 // from a complete source snapshot. Request.Entities is merged with cfg.Entities.
 // The caller's context bounds execution; WithMaxSourceBytes bounds the whole input.
-func (rt *Client) SliceEntities(ctx context.Context, cfg SliceConfig, req request.Request) (SliceResult, error) {
+func (rt *Client) SliceEntities(ctx context.Context, cfg SliceConfig, req request.Request) (decoded SliceResult, decodeErr error) {
 	iterations := cfg.MaxIterations
 	if iterations == 0 {
 		iterations = DefaultSliceIterations
@@ -73,6 +73,7 @@ func (rt *Client) SliceEntities(ctx context.Context, cfg SliceConfig, req reques
 	if err != nil {
 		return SliceResult{}, err
 	}
+	defer execution.FinishDecode(ctx, &decoded, &decodeErr)
 	out, err := rt.runtime.CallOnce(ctx, "cgw_slice_entities", in)
 	if err != nil {
 		return SliceResult{}, err

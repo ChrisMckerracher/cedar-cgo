@@ -7,6 +7,7 @@ import (
 	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
 	syntax "github.com/ChrisMckerracher/cedar-go-wasm/cedar/syntax"
+	execution "github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
 	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
 )
 
@@ -77,7 +78,7 @@ func (rt *Client) ConvertSchemaFragment(ctx context.Context, fragment SchemaFrag
 
 // ComposeSchema resolves references after Cedar combines all fragments.
 // The JSON result retains declarations and can be used by all schema operations.
-func (rt *Client) ComposeSchema(ctx context.Context, fragments ...SchemaFragment) (Schema, error) {
+func (rt *Client) ComposeSchema(ctx context.Context, fragments ...SchemaFragment) (decoded Schema, decodeErr error) {
 	sources := make([]wire.Source, len(fragments))
 	for i, fragment := range fragments {
 		sources[i] = fragment.Wire()
@@ -91,6 +92,7 @@ func (rt *Client) ComposeSchema(ctx context.Context, fragments ...SchemaFragment
 	}{"compose", sources}, &result); err != nil {
 		return Schema{}, err
 	}
+	defer execution.FinishDecode(ctx, &decoded, &decodeErr)
 	if !JsonObject(result.Schema) {
 		return Schema{}, diagnostic.FaultError(fmt.Errorf("schema composition response has no schema object"))
 	}
@@ -98,7 +100,7 @@ func (rt *Client) ComposeSchema(ctx context.Context, fragments ...SchemaFragment
 }
 
 // InspectSchema returns native type resolution, action applicability, and transitive entity hierarchy.
-func (rt *Client) InspectSchema(ctx context.Context, schema Schema) (SchemaInspection, error) {
+func (rt *Client) InspectSchema(ctx context.Context, schema Schema) (decoded SchemaInspection, decodeErr error) {
 	var result struct {
 		Inspection *SchemaInspection `json:"inspection"`
 	}
@@ -108,6 +110,7 @@ func (rt *Client) InspectSchema(ctx context.Context, schema Schema) (SchemaInspe
 	}{"inspect", schema.Wire()}, &result); err != nil {
 		return SchemaInspection{}, err
 	}
+	defer execution.FinishDecode(ctx, &decoded, &decodeErr)
 	if result.Inspection == nil || !JsonObject(result.Inspection.ResolvedSchema) || !JsonObject(result.Inspection.ExpandedSchema) || result.Inspection.Ancestors == nil || result.Inspection.Actions == nil || result.Inspection.ActionGroups == nil || result.Inspection.Environments == nil {
 		return SchemaInspection{}, diagnostic.FaultError(fmt.Errorf("schema inspection response is incomplete"))
 	}

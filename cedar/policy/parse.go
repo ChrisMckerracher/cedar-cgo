@@ -62,7 +62,7 @@ func PolicyInputUTF8(input map[string]any) bool {
 	return true
 }
 
-func (rt *Client) policyCall(ctx context.Context, input map[string]any) (PolicyOutput, error) {
+func (rt *Client) policyCall(ctx context.Context, input map[string]any) (decoded PolicyOutput, decodeErr error) {
 	var resp PolicyOutput
 	if !PolicyInputUTF8(input) {
 		return resp, &diagnostic.Error{Kind: diagnostic.KindInput, Message: "policy operation input must be valid UTF-8"}
@@ -71,6 +71,7 @@ func (rt *Client) policyCall(ctx context.Context, input map[string]any) (PolicyO
 	if err != nil {
 		return resp, err
 	}
+	defer execution.FinishDecode(ctx, &decoded, &decodeErr)
 	out, err := rt.runtime.CallOnce(ctx, "cgw_policies", in)
 	if err != nil {
 		return resp, err

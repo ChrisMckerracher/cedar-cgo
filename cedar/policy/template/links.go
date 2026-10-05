@@ -6,6 +6,7 @@ import (
 	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
 	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
+	execution "github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
 	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
 )
 
@@ -82,13 +83,14 @@ func (rt *Client) Templates(ctx context.Context, policies policy.PolicySet) ([]T
 }
 
 // TemplateLinks returns linked policies sorted by policy ID; static policies are omitted.
-func (rt *Client) TemplateLinks(ctx context.Context, policies policy.PolicySet) ([]TemplateLink, error) {
+func (rt *Client) TemplateLinks(ctx context.Context, policies policy.PolicySet) (decoded []TemplateLink, decodeErr error) {
 	resp, err := rt.templateCall(ctx, policies, struct {
 		Op string `json:"op"`
 	}{"links"})
 	if err != nil {
 		return nil, err
 	}
+	defer execution.FinishDecode(ctx, &decoded, &decodeErr)
 	if resp.Links == nil {
 		return nil, diagnostic.FaultError(fmt.Errorf("template response has no links"))
 	}

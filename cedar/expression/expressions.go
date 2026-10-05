@@ -60,11 +60,12 @@ type ExpressionOutput struct {
 	Error      *wire.Error     `json:"error"`
 }
 
-func (rt *Client) expressionCall(ctx context.Context, input ExpressionInput) (ExpressionOutput, error) {
+func (rt *Client) expressionCall(ctx context.Context, input ExpressionInput) (decoded ExpressionOutput, decodeErr error) {
 	in, err := execution.Encode(input, "expression input", rt.runtime.MaxSourceBytes)
 	if err != nil {
 		return ExpressionOutput{}, err
 	}
+	defer execution.FinishDecode(ctx, &decoded, &decodeErr)
 	out, err := rt.runtime.CallOnce(ctx, "cgw_expressions", in)
 	if err != nil {
 		return ExpressionOutput{}, err
@@ -101,7 +102,7 @@ func (rt *Client) ParseRestrictedExpression(ctx context.Context, text string) (R
 
 // EvalExpression evaluates with native Cedar semantics and exact signed 64-bit integers.
 // The caller's context bounds time; runtime source and response byte limits apply.
-func (rt *Client) EvalExpression(ctx context.Context, expr Expression, env ExpressionEnv) (cedarvalue.EvalResult, error) {
+func (rt *Client) EvalExpression(ctx context.Context, expr Expression, env ExpressionEnv) (decoded cedarvalue.EvalResult, decodeErr error) {
 	if !expr.valid {
 		return nil, &diagnostic.Error{Kind: diagnostic.KindInput, Message: "zero Expression is invalid"}
 	}
@@ -109,6 +110,7 @@ func (rt *Client) EvalExpression(ctx context.Context, expr Expression, env Expre
 	if err != nil {
 		return nil, err
 	}
+	defer execution.FinishDecode(ctx, &decoded, &decodeErr)
 	value, err := cedarvalue.DecodeEvalResult(result.Result)
 	if err != nil {
 		return nil, diagnostic.FaultError(fmt.Errorf("decode evaluation result: %w", err))
