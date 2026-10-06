@@ -50,7 +50,11 @@ impl Inputs {
     }
 
     pub fn request(&self, schema: &Schema) -> Result<Request> {
-        let uid = |kind, id| EntityUid::from_json(serde_json::json!({"type": kind, "id": id}));
+        let uid = |kind, id| -> Result<EntityUid> {
+            Ok(EntityUid::from_json(
+                serde_json::json!({"type": kind, "id": id}),
+            )?)
+        };
         let action = uid("Joy::Action", "session.write")?;
         let context = Context::from_json_str(CONTEXT, Some((schema, &action)))?;
         Ok(Request::new(
