@@ -14,6 +14,8 @@ Explicit nil options preserve unknown inputs and known empty records, collection
 Operation envelopes retain HTML and JavaScript escaping for existing encoded-byte limits.
 Raw-source checks remain where error classification or check order requires them.
 
+Raw strings retain existing escape sequences. This removes repeated unquoting and preserves encoded-byte limits.
+
 Cedar JSON replaces the parallel typed policy syntax interface.
 Native Cedar owns parsing, construction, scope normalization, and expression semantics.
 Individual bodies retain exact integers. Complete sets retain IDs, templates, links, and slot bindings.
@@ -68,18 +70,18 @@ Moved local test helpers count with their destination test files, not production
 
 | Category | Baseline files / lines | Cleanup files / lines |
 |---|---:|---:|
-| Go production | 115 / 6,871 | 118 / 6,459 |
+| Go production | 115 / 6,871 | 118 / 6,480 |
 | Rust production | 54 / 4,088 | 53 / 3,871 |
 | C interface contract | 1 / 30 | 1 / 30 |
 | Supporting scripts | 43 / 1,161 | 25 / 967 |
 | New explicit case data | 0 / 0 | 2 / 47 |
-| Go test files, including local helpers | 185 / 15,065 | 205 / 16,170 |
+| Go test files, including local helpers | 185 / 15,065 | 206 / 16,222 |
 | Shared Go support and consumer programs | 38 / 2,119 | 25 / 1,407 |
 | Rust separate tests and independent programs | 36 / 3,027 | 36 / 3,027 |
 | Rust inline test modules | 6 / 106 | 7 / 152 |
 | Python script tests | 7 / 425 | 9 / 667 |
 
-Combined Go and Rust production decreases by 629 lines. Supporting scripts and explicit catalogs decrease by 147 lines.
+Combined Go and Rust production decreases by 608 lines. Supporting scripts and explicit catalogs decrease by 147 lines.
 Removed vendor footprint is 76 files and 1,022,445 bytes. It is not custom-code savings.
 Shared support moves into focused packages or local test files. Rapid's ten generator files remain unchanged.
 Analysis adds 159 production lines for explicit configuration, decoding, callback, and shutdown boundaries.
@@ -100,7 +102,7 @@ Counts include implementation and tests. They are review triggers, not fixed lim
 | `cedar/schema` | 12 | Source, fragment composition, and native inspection share schema ownership. Separate contracts remain explicit. |
 | `cedar/utility` | 15 | Small native language and value utilities. Tests cover different upstream contracts; no mutable ownership is shared. |
 | `internal/artifact` | 14 | One strict artifact identity policy and target/object-header tests. |
-| `internal/execution` | 12 | Runtime admission and loaded native session lifetime, with common encoding and cancellation. |
+| `internal/execution` | 13 | Runtime admission, loaded-session lifetime, encoding, and cancellation. New tests verify raw-string compatibility. |
 | `internal/testsupport/generator` | 10 | Coherent Rapid generators and state-machine data. No implementation or assertions are removed. |
 | `cedar/integration` | 17 | Corpus and cross-feature checks, examples, failure modes, and performance. Domain-only helpers moved beside feature tests. |
 

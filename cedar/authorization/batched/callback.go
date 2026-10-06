@@ -114,7 +114,11 @@ func EncodeEntityLoadResult(result EntityLoadResult, limit int) ([]byte, error) 
 	body, err := jsonv2.Marshal(struct {
 		Entities json.RawMessage `json:"entities"`
 		Missing  []wire.UID      `json:"missing"`
-	}{result.Entities, missing}, jsontext.EscapeForHTML(true), jsontext.EscapeForJS(true))
+	}{result.Entities, missing},
+		jsontext.EscapeForHTML(true),
+		jsontext.EscapeForJS(true),
+		jsontext.PreserveRawStrings(true),
+	)
 	if err != nil {
 		return nil, &diagnostic.Error{Kind: diagnostic.KindLoader, Message: err.Error(), Err: err}
 	}

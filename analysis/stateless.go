@@ -31,7 +31,11 @@ func (a *Analyzer) run(ctx context.Context, query string, schema schemas.Schema,
 		A:      wire.Source{Format: pa.Format().String(), Text: pa.Text()},
 		B:      wire.Source{Format: pb.Format().String(), Text: pb.Text()},
 		Query:  query,
-	}, jsontext.EscapeForHTML(true), jsontext.EscapeForJS(true))
+	},
+		jsontext.EscapeForHTML(true),
+		jsontext.EscapeForJS(true),
+		jsontext.PreserveRawStrings(true),
+	)
 	if err != nil {
 		return report.Report{}, &report.Error{Kind: string(diagnostic.KindInput), Message: err.Error()}
 	}

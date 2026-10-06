@@ -29,7 +29,11 @@ type compiledInput struct {
 }
 
 func (s *Session) encodeCompiled(input compiledInput) ([]byte, error) {
-	data, err := json.Marshal(input, jsontext.EscapeForHTML(true), jsontext.EscapeForJS(true))
+	data, err := json.Marshal(input,
+		jsontext.EscapeForHTML(true),
+		jsontext.EscapeForJS(true),
+		jsontext.PreserveRawStrings(true),
+	)
 	if err != nil {
 		return nil, &report.Error{Kind: "input", Message: err.Error()}
 	}
