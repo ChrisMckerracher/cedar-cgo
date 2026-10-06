@@ -5,19 +5,20 @@ import (
 	json "encoding/json"
 	errors "errors"
 	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
-	cedarpartial "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial"
+	partialinput "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial/input"
 	cedarrequest "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
 	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	cedarentity "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
 	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	testing "testing"
 )
 
 func TestAuthorizeRejectsInvalidUTF8Identity(t *testing.T) {
-	a, err := testsupport.TestRuntime(t).NewAuthorizer(context.Background(), authorization.Config{
+	a, err := testruntime.New(t).NewAuthorizer(context.Background(), authorization.Config{
 		Policies: cedarpolicy.PoliciesFromCedar(`permit(principal == User::"\u{fffd}", action, resource);`),
 	})
 	if err != nil {
@@ -56,12 +57,12 @@ func TestRejectInvalidUTF8Values(t *testing.T) {
 		"entity tag":       cedarentity.Entity{Tags: record},
 		"raw entities":     cedarentity.EntitiesFromJSON([]byte(`[{"uid":{"type":"User","id":"` + bad + `"}}]`)),
 		"raw context":      cedarrequest.ContextFromJSON([]byte(`{"a":"` + bad + `"}`)),
-		"partial UID type": cedarpartial.UnknownEntityUID(bad), "partial UID ID": cedarpartial.KnownEntityUID(uid),
-		"partial entity UID":        cedarpartial.PartialEntity{UID: uid},
-		"partial entity parent":     cedarpartial.PartialEntity{Parents: []entityuid.EntityUID{uid}},
-		"partial entity attributes": cedarpartial.PartialEntity{Attrs: &record},
-		"partial entity tags":       cedarpartial.PartialEntity{Tags: &record},
-		"raw partial entities":      cedarpartial.PartialEntitiesFromJSON([]byte(`[{"uid":{"type":"User","id":"` + bad + `"}}]`)),
+		"partial UID type": partialinput.UnknownEntityUID(bad), "partial UID ID": partialinput.KnownEntityUID(uid),
+		"partial entity UID":        partialinput.PartialEntity{UID: uid},
+		"partial entity parent":     partialinput.PartialEntity{Parents: []entityuid.EntityUID{uid}},
+		"partial entity attributes": partialinput.PartialEntity{Attrs: &record},
+		"partial entity tags":       partialinput.PartialEntity{Tags: &record},
+		"raw partial entities":      partialinput.PartialEntitiesFromJSON([]byte(`[{"uid":{"type":"User","id":"` + bad + `"}}]`)),
 	}
 	for name, value := range cases {
 		t.Run(name, func(t *testing.T) {

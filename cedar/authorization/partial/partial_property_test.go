@@ -1,7 +1,10 @@
 package partial_test
 
 import (
+	partialinput "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial/input"
 	generator "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/generator"
+	joy "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/joy"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
 
 	context "context"
 	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
@@ -9,7 +12,7 @@ import (
 	cedarrequest "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
 	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+
 	rapid "pgregory.net/rapid"
 	testing "testing"
 )
@@ -17,8 +20,8 @@ import (
 // Soundness: reauthorizing residuals with a concrete completion equals direct
 // authorization of that completion (docs/partial-evaluation.md).
 func TestPropertyPartialReauthorizeMatchesDirect(t *testing.T) {
-	d := testsupport.LoadJoy(t)
-	rt := testsupport.TestRuntime(t)
+	d := joy.LoadJoy(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	rapid.Check(t, func(pt *rapid.T) {
 		TextValue := generator.PropGenPolicySet(2).Draw(pt, "policies")
@@ -29,16 +32,16 @@ func TestPropertyPartialReauthorizeMatchesDirect(t *testing.T) {
 		}
 		defer a.Close()
 		req := generator.PropGenRequest().Draw(pt, "request")
-		partialReq := cedarpartial.PartialRequest{Action: req.Action, Context: nil}
+		partialReq := partialinput.PartialRequest{Action: req.Action, Context: nil}
 		if rapid.Bool().Draw(pt, "knownPrincipal") {
-			partialReq.Principal = cedarpartial.KnownEntityUID(req.Principal)
+			partialReq.Principal = partialinput.KnownEntityUID(req.Principal)
 		} else {
-			partialReq.Principal = cedarpartial.UnknownEntityUID("Joy::Device")
+			partialReq.Principal = partialinput.UnknownEntityUID("Joy::Device")
 		}
 		if rapid.Bool().Draw(pt, "knownResource") {
-			partialReq.Resource = cedarpartial.KnownEntityUID(req.Resource)
+			partialReq.Resource = partialinput.KnownEntityUID(req.Resource)
 		} else {
-			partialReq.Resource = cedarpartial.UnknownEntityUID("Joy::Session")
+			partialReq.Resource = partialinput.UnknownEntityUID("Joy::Session")
 		}
 		res, err := a.Partial().PartialAuthorize(ctx, partialReq)
 		if err != nil {
@@ -69,8 +72,8 @@ func TestPropertyPartialReauthorizeMatchesDirect(t *testing.T) {
 // With no unknown data, partial evaluation decides exactly like full evaluation.
 // TPE treats missing entities as unknown, so the request uses stored entities.
 func TestPropertyPartialFullyKnownMatchesDirect(t *testing.T) {
-	d := testsupport.LoadJoy(t)
-	rt := testsupport.TestRuntime(t)
+	d := joy.LoadJoy(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	rapid.Check(t, func(pt *rapid.T) {
 		TextValue := generator.PropGenPolicySet(2).Draw(pt, "policies")
@@ -83,10 +86,10 @@ func TestPropertyPartialFullyKnownMatchesDirect(t *testing.T) {
 		req := generator.PropGenRequest().Draw(pt, "request")
 		req.Principal = entityuid.NewEntityUID("Joy::Device", "phone1")
 		req.Resource = entityuid.NewEntityUID("Joy::Session", "s1")
-		res, err := a.Partial().PartialAuthorize(ctx, cedarpartial.PartialRequest{
-			Principal: cedarpartial.KnownEntityUID(req.Principal),
+		res, err := a.Partial().PartialAuthorize(ctx, partialinput.PartialRequest{
+			Principal: partialinput.KnownEntityUID(req.Principal),
 			Action:    req.Action,
-			Resource:  cedarpartial.KnownEntityUID(req.Resource),
+			Resource:  partialinput.KnownEntityUID(req.Resource),
 			Context:   &req.Context,
 		})
 		if err != nil {

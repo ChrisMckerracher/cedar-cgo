@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	fault "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fault"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
 	"os"
 	"os/exec"
 	"strings"
@@ -17,7 +19,6 @@ import (
 	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
 )
 
 func nestedPolicy(depth int) policy.PolicySet {
@@ -56,12 +57,12 @@ func TestFailClosedOnStackOverflow(t *testing.T) {
 		})
 	}
 	// A failed child must leave the parent process and an ordinary native session usable.
-	authorizer, err := testsupport.TestRuntime(t).NewAuthorizer(context.Background(), authorization.Config{Policies: nestedPolicy(400)})
+	authorizer, err := testruntime.New(t).NewAuthorizer(context.Background(), authorization.Config{Policies: nestedPolicy(400)})
 	if err != nil {
 		t.Fatalf("400 nested parentheses: %v", err)
 	}
 	defer authorizer.Close()
-	response, err := authorizer.Authorize(context.Background(), testsupport.SimpleRequest(request.Context{}))
+	response, err := authorizer.Authorize(context.Background(), fault.SimpleRequest(request.Context{}))
 	if err != nil || response.Decision != request.Allow {
 		t.Fatalf("parent authorization after deep-input child: %+v %v", response, err)
 	}
@@ -97,7 +98,7 @@ func TestNativeStackOverflowHelper(t *testing.T) {
 			t.Fatalf("unexpected deep-input error: %v", err)
 		}
 	}
-	authorizer, err := runtime.NewAuthorizer(ctx, authorization.Config{Policies: testsupport.PermitAll})
+	authorizer, err := runtime.NewAuthorizer(ctx, authorization.Config{Policies: fault.PermitAll})
 	if err != nil {
 		t.Fatalf("native runtime did not recover from a returned deep-input result: %v", err)
 	}

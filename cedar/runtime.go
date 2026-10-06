@@ -3,12 +3,13 @@ package cedar
 import (
 	"context"
 	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
-	entity "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
 	slicing "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/slicing"
+	entitystore "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/store"
 	expression "github.com/ChrisMckerracher/cedar-go-wasm/cedar/expression"
 	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	applicability "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/applicability"
 	policyformat "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/format"
+	literal "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/literal"
 	policysource "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/source"
 	template "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/template"
 	schema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
@@ -32,10 +33,11 @@ func (rt *Runtime) NewAuthorizer(ctx context.Context, cfg authorization.Config) 
 }
 func (rt *Runtime) Applicability() *applicability.Client { return applicability.New(rt.runtime) }
 func (rt *Runtime) Schemas() *schema.Client              { return schema.New(rt.runtime) }
-func (rt *Runtime) Entities() *entity.Client             { return entity.New(rt.runtime) }
+func (rt *Runtime) EntityStore() *entitystore.Client     { return entitystore.New(rt.runtime) }
 func (rt *Runtime) Expressions() *expression.Client      { return expression.New(rt.runtime) }
 func (rt *Runtime) Formatter() *policyformat.Client      { return policyformat.New(rt.runtime) }
 func (rt *Runtime) Policies() *policy.Client             { return policy.New(rt.runtime) }
+func (rt *Runtime) PolicyLiterals() *literal.Client      { return literal.New(rt.runtime) }
 func (rt *Runtime) Slicing() *slicing.Client             { return slicing.New(rt.runtime) }
 func (rt *Runtime) Source() *policysource.Client         { return policysource.New(rt.runtime) }
 func (rt *Runtime) Templates() *template.Client          { return template.New(rt.runtime) }

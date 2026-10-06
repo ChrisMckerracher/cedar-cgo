@@ -2,7 +2,7 @@ package format
 
 import (
 	context "context"
-	json "encoding/json"
+	json "encoding/json/v2"
 	fmt "fmt"
 	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	execution "github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
@@ -66,7 +66,7 @@ func (rt *Client) FormatPolicies(ctx context.Context, TextValue string, opts ...
 	if len(TextValue) > rt.runtime.MaxSourceBytes {
 		return "", diagnostic.LimitError("format source", len(TextValue), rt.runtime.MaxSourceBytes)
 	}
-	// encoding/json replaces invalid UTF-8, which would silently change the source.
+	// Check the source size before strict JSON encoding allocates the envelope.
 	if !utf8.ValidString(TextValue) {
 		return "", &diagnostic.Error{Kind: diagnostic.KindInput, Message: "format source is not valid UTF-8"}
 	}

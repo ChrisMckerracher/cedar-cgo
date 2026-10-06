@@ -2,16 +2,16 @@ package policy_test
 
 import (
 	context "context"
-	json "encoding/json"
 	errors "errors"
 	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	testing "testing"
 )
 
 func TestPolicyInvalidUTF8(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	invalid := string([]byte{0xff})
 	source := "permit(principal,action,resource);"
@@ -28,21 +28,17 @@ func TestPolicyInvalidUTF8(t *testing.T) {
 			return e
 		},
 		func() error {
-			s := testsupport.LoadPolicyFixture(t).Constructed.Syntax
-			s.ID = invalid
-			_, e := rt.Policies().PolicyFromSyntax(ctx, s)
+			_, e := rt.Policies().PolicyFromJSON(ctx, invalid, LoadPolicyFixture(t).Constructed.JSON)
 			return e
 		},
 		func() error {
-			s := testsupport.LoadPolicyFixture(t).Constructed.Syntax
-			s.Conditions[0].Body = json.RawMessage(`{"Value":"` + invalid + `"}`)
-			_, e := rt.Policies().PolicyFromSyntax(ctx, s)
+			data := []byte(`{"effect":"permit","conditions":[{"kind":"when","body":{"Value":"` + invalid + `"}}]}`)
+			_, e := rt.Policies().PolicyFromJSON(ctx, "id", data)
 			return e
 		},
 		func() error {
-			s := testsupport.LoadPolicyFixture(t).Constructed.Syntax
-			s.Annotations[invalid] = "x"
-			_, e := rt.Policies().PolicyFromSyntax(ctx, s)
+			data := []byte(`{"annotations":{"` + invalid + `":"x"}}`)
+			_, e := rt.Policies().PolicyFromJSON(ctx, "id", data)
 			return e
 		},
 		func() error {

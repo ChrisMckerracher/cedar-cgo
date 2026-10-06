@@ -5,11 +5,20 @@ import (
 
 	batched "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/batched"
 	partial "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial"
+	query "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial/query"
 	request "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
+	entity "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
 
 	schema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 	execution "github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
+	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
 )
+
+type loadInput struct {
+	Schema   *wire.Source    `json:"schema"`
+	Policies wire.Source     `json:"policies"`
+	Entities entity.Entities `json:"entities,omitzero"`
+}
 
 // Authorizer permits concurrent calls. Each pooled native handle owns parsed configuration.
 // Close invalidates ordinary, batched, and partial clients, including their continuations.
@@ -18,7 +27,7 @@ type Authorizer struct {
 }
 
 func NewAuthorizer(ctx context.Context, rt *execution.Runtime, cfg Config) (*Authorizer, error) {
-	load, err := execution.Encode(LoadInput{Schema: schema.OptionalSchema(cfg.Schema), Policies: cfg.Policies.Wire(), Entities: cfg.Entities}, "schema, policies and entities", rt.MaxSourceBytes)
+	load, err := execution.Encode(loadInput{Schema: schema.OptionalSchema(cfg.Schema), Policies: cfg.Policies.Wire(), Entities: cfg.Entities}, "schema, policies and entities", rt.MaxSourceBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -55,5 +64,7 @@ func (a *Authorizer) Close() { a.session.Close() }
 
 func (a *Authorizer) Batched() *batched.Client { return batched.New(a.session) }
 func (a *Authorizer) Partial() *partial.Client { return partial.New(a.session) }
+
+func (a *Authorizer) Queries() *query.Client { return query.New(a.session) }
 
 func (a *Authorizer) Stats() Stats { return a.session.Stats() }

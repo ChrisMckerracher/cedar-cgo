@@ -8,27 +8,31 @@ import (
 	cedarrequest "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
 	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	fault "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fault"
+	partialfixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/partial"
+	policysupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/policy"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	slices "slices"
 	testing "testing"
 )
 
 func TestPartialRawPolicyIDs(t *testing.T) {
 	ctx := context.Background()
-	schema := cedarschema.SchemaFromCedar(testsupport.PartialSchema)
+	schema := cedarschema.SchemaFromCedar(partialfixture.PartialSchema)
 	const suffix = "\"\n\\\x00"
 	const permitID, forbidID, errorID = "permit" + suffix, "forbid" + suffix, "error" + suffix
-	policies := testsupport.PartialIDPolicies(t, map[string]json.RawMessage{
-		permitID: testsupport.PartialIDPolicy("permit", "when", `{"Value":true}`),
-		forbidID: testsupport.PartialIDPolicy("forbid", "unless", `{".":{"left":{"Var":"context"},"attr":"mfa"}}`),
-		errorID:  testsupport.PartialIDPolicy("permit", "when", `{"==":{"left":{"+":{"left":{"Value":9223372036854775807},"right":{"Value":1}}},"right":{"Value":0}}}`),
+	policies := policysupport.PartialIDPolicies(t, map[string]json.RawMessage{
+		permitID: policysupport.PartialIDPolicy("permit", "when", `{"Value":true}`),
+		forbidID: policysupport.PartialIDPolicy("forbid", "unless", `{".":{"left":{"Var":"context"},"attr":"mfa"}}`),
+		errorID:  policysupport.PartialIDPolicy("permit", "when", `{"==":{"left":{"+":{"left":{"Value":9223372036854775807},"right":{"Value":1}}},"right":{"Value":0}}}`),
 	})
-	a, err := testsupport.TestRuntime(t).NewAuthorizer(ctx, authorization.Config{Schema: &schema, Policies: policies})
+	a, err := testruntime.New(t).NewAuthorizer(ctx, authorization.Config{Schema: &schema, Policies: policies})
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer a.Close()
-	partial, err := a.Partial().PartialAuthorize(ctx, testsupport.PartialRequest())
+	partial, err := a.Partial().PartialAuthorize(ctx, partialfixture.PartialRequest())
 	if err != nil || partial.Decision != cedarpartial.Undecided {
 		t.Fatalf("partial: %+v %v", partial, err)
 	}
@@ -40,12 +44,12 @@ func TestPartialRawPolicyIDs(t *testing.T) {
 		t.Errorf("residual IDs = %q, want original JSON keys %q", ids, []string{errorID, forbidID, permitID})
 	}
 	for _, mfa := range []bool{true, false} {
-		concrete := testsupport.SimpleRequest(cedarrequest.NewContext(cedarvalue.Record{"mfa": cedarvalue.Bool(mfa)}))
+		concrete := fault.SimpleRequest(cedarrequest.NewContext(cedarvalue.Record{"mfa": cedarvalue.Bool(mfa)}))
 		wantReason, wantDecision, wantPartialDecision := permitID, cedarrequest.Allow, cedarpartial.PartialAllow
 		if !mfa {
 			wantReason, wantDecision, wantPartialDecision = forbidID, cedarrequest.Deny, cedarpartial.PartialDeny
 		}
-		known := testsupport.PartialRequest()
+		known := partialfixture.PartialRequest()
 		known.Context = &concrete.Context
 		decided, err := a.Partial().PartialAuthorize(ctx, known)
 		if err != nil || decided.Decision != wantPartialDecision || !slices.Equal(decided.Reasons, []string{wantReason}) {
@@ -65,9 +69,9 @@ func TestPartialRawPolicyIDs(t *testing.T) {
 
 	t.Run("validation", func(t *testing.T) {
 		const invalidID, warningID = "invalid" + suffix, "warning" + suffix
-		result, err := testsupport.TestRuntime(t).Validation().Validate(ctx, schema, testsupport.PartialIDPolicies(t, map[string]json.RawMessage{
-			invalidID: testsupport.PartialIDPolicy("permit", "when", `{".":{"left":{"Var":"principal"},"attr":"missing"}}`),
-			warningID: testsupport.PartialIDPolicy("permit", "when", `{"Value":false}`),
+		result, err := testruntime.New(t).Validation().Validate(ctx, schema, policysupport.PartialIDPolicies(t, map[string]json.RawMessage{
+			invalidID: policysupport.PartialIDPolicy("permit", "when", `{".":{"left":{"Var":"principal"},"attr":"missing"}}`),
+			warningID: policysupport.PartialIDPolicy("permit", "when", `{"Value":false}`),
 		}))
 		if err != nil || result.Passed || len(result.Errors) == 0 || len(result.Warnings) == 0 {
 			t.Fatalf("validation: %+v %v", result, err)

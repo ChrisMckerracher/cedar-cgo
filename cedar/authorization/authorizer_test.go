@@ -10,13 +10,15 @@ import (
 	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	joy "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/joy"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	testing "testing"
 )
 
 func TestAuthorizeJoy(t *testing.T) {
-	a := testsupport.NewJoyAuthorizer(t, authorization.Limits{})
-	resp, err := a.Authorize(context.Background(), testsupport.JoyRequest())
+	a := joy.NewJoyAuthorizer(t, authorization.Limits{})
+	resp, err := a.Authorize(context.Background(), joy.JoyRequest())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -24,7 +26,7 @@ func TestAuthorizeJoy(t *testing.T) {
 		t.Fatalf("got %+v, want allow by policy1", resp)
 	}
 
-	req := testsupport.JoyRequest()
+	req := joy.JoyRequest()
 	req.Action = entityuid.NewEntityUID("Joy::Action", "terminal.open")
 	resp, err = a.Authorize(context.Background(), req)
 	if err != nil {
@@ -36,8 +38,8 @@ func TestAuthorizeJoy(t *testing.T) {
 }
 
 func TestAuthorizeRequestEntities(t *testing.T) {
-	a := testsupport.NewJoyAuthorizer(t, authorization.Limits{})
-	req := testsupport.JoyRequest()
+	a := joy.NewJoyAuthorizer(t, authorization.Limits{})
+	req := joy.JoyRequest()
 	req.Principal = entityuid.NewEntityUID("Joy::Device", "tablet9")
 	resp, err := a.Authorize(context.Background(), req)
 	if err != nil || resp.Decision != cedarrequest.Deny {
@@ -54,7 +56,7 @@ func TestAuthorizeRequestEntities(t *testing.T) {
 }
 
 func TestAuthorizeErrorsDeny(t *testing.T) {
-	a := testsupport.NewJoyAuthorizer(t, authorization.Limits{})
+	a := joy.NewJoyAuthorizer(t, authorization.Limits{})
 	cases := map[string]struct {
 		mutate func(*cedarrequest.Request)
 		kind   diagnostic.ErrorKind
@@ -77,7 +79,7 @@ func TestAuthorizeErrorsDeny(t *testing.T) {
 	}
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			req := testsupport.JoyRequest()
+			req := joy.JoyRequest()
 			c.mutate(&req)
 			resp, err := a.Authorize(context.Background(), req)
 			if resp.Decision != cedarrequest.Deny {
@@ -95,7 +97,7 @@ func TestAuthorizeErrorsDeny(t *testing.T) {
 }
 
 func TestNewAuthorizerRejectsBadPolicies(t *testing.T) {
-	_, err := testsupport.TestRuntime(t).NewAuthorizer(context.Background(), authorization.Config{
+	_, err := testruntime.New(t).NewAuthorizer(context.Background(), authorization.Config{
 		Policies: cedarpolicy.PoliciesFromCedar("permit(principal, action, resource) when { 1 + };"),
 	})
 	var cerr *diagnostic.Error
@@ -105,8 +107,8 @@ func TestNewAuthorizerRejectsBadPolicies(t *testing.T) {
 }
 
 func TestValidate(t *testing.T) {
-	d := testsupport.LoadJoy(t)
-	rt := testsupport.TestRuntime(t)
+	d := joy.LoadJoy(t)
+	rt := testruntime.New(t)
 	res, err := rt.Validation().Validate(context.Background(), d.Schema, d.Old)
 	if err != nil {
 		t.Fatal(err)

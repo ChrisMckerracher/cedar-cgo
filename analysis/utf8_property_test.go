@@ -7,6 +7,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/ChrisMckerracher/cedar-go-wasm/analysis"
+	reports "github.com/ChrisMckerracher/cedar-go-wasm/analysis/report"
 	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
@@ -49,7 +50,7 @@ func TestPropertyMalformedUTF8AnalysisInputRejected(t *testing.T) {
 		}
 		for _, in := range inputs {
 			_, err := a.Equivalent(ctx, in.schema, in.first, in.second)
-			var e *analysis.Error
+			var e *reports.Error
 			if !errors.As(err, &e) || e.Kind != string(diagnostic.KindInput) {
 				pt.Fatalf("Equivalent: got %v; want input error", err)
 			}

@@ -3,18 +3,11 @@
 import hashlib
 import json
 import re
-import subprocess
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from native_linker import link_source
-
-TARGETS = {
-    "x86_64-unknown-linux-gnu": "linux_amd64",
-    "aarch64-unknown-linux-gnu": "linux_arm64",
-    "aarch64-apple-darwin": "darwin_arm64",
-}
+from artifact_verifier import link_source, targets
 
 
 def sha(data):
@@ -22,7 +15,7 @@ def sha(data):
 
 
 def generate(directory, commit, target, toolchain):
-    platform = TARGETS[target]
+    platform = targets()[target]
     output = Path(directory)
     matches = re.findall(r"native-static-libs: (.+)", (output / "build.log").read_text())
     if not matches:

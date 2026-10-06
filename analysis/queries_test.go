@@ -2,42 +2,18 @@ package analysis_test
 
 import (
 	"context"
-	"fmt"
 	"reflect"
 	"testing"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis"
+	fixtures "github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/testsupport"
+	reports "github.com/ChrisMckerracher/cedar-go-wasm/analysis/report"
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
 	requests "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
 	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 )
 
-const querySchema = `entity User; entity Document; action view appliesTo { principal: User, resource: Document, context: { n: Long } };`
-
-func queryPolicy(effect, condition string) policy.PolicySet {
-	if condition == "" {
-		return policy.PoliciesFromCedar(effect + `(principal, action, resource);`)
-	}
-	return policy.PoliciesFromCedar(fmt.Sprintf(`%s(principal, action, resource) when { %s };`, effect, condition))
-}
-
-func replayEvaluation(t testing.TB, rt *cedar.Runtime, schema schemas.Schema, policy policy.PolicySet, request requests.Request) requests.Response {
-	t.Helper()
-	authorizer, err := rt.NewAuthorizer(context.Background(), authorization.Config{Schema: &schema, Policies: policy})
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer authorizer.Close()
-	result, err := authorizer.Authorize(context.Background(), request)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return result
-}
-
-func checkPolicyReplay(t testing.TB, observation *analysis.PolicyEvaluation, response requests.Response) {
+func checkPolicyReplay(t testing.TB, observation *reports.PolicyEvaluation, response requests.Response) {
 	t.Helper()
 	if observation == nil {
 		return
@@ -54,14 +30,14 @@ func checkPolicyReplay(t testing.TB, observation *analysis.PolicyEvaluation, res
 
 func TestNativeErrorAndMatchingQueries(t *testing.T) {
 	a, ctx := newAnalyzer(t), context.Background()
-	schema := schemas.SchemaFromCedar(querySchema)
+	schema := schemas.SchemaFromCedar(fixtures.Schema)
 	rt, err := cedar.NewRuntime(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer rt.Close(ctx)
-	type unary func(context.Context, schemas.Schema, policy.PolicySet) (analysis.Report, error)
-	type binary func(context.Context, schemas.Schema, policy.PolicySet, policy.PolicySet) (analysis.Report, error)
+	type unary func(context.Context, schemas.Schema, policy.PolicySet) (reports.Report, error)
+	type binary func(context.Context, schemas.Schema, policy.PolicySet, policy.PolicySet) (reports.Report, error)
 	cases := []struct {
 		name  string
 		one   unary
@@ -69,25 +45,25 @@ func TestNativeErrorAndMatchingQueries(t *testing.T) {
 		x, y  policy.PolicySet
 		holds bool
 	}{
-		{"never-errors-safe", a.NeverErrors, nil, queryPolicy("forbid", "context.n < 0"), policy.PolicySet{}, true},
-		{"never-errors-overflow", a.NeverErrors, nil, queryPolicy("forbid", "context.n + 1 > 0"), policy.PolicySet{}, false},
-		{"always-matches-forbid", a.AlwaysMatches, nil, queryPolicy("forbid", ""), policy.PolicySet{}, true},
-		{"not-always-matches-forbid", a.AlwaysMatches, nil, queryPolicy("forbid", "context.n < 0"), policy.PolicySet{}, false},
-		{"never-matches-false", a.NeverMatches, nil, queryPolicy("forbid", "false"), policy.PolicySet{}, true},
-		{"does-match-forbid", a.NeverMatches, nil, queryPolicy("forbid", "context.n < 0"), policy.PolicySet{}, false},
-		{"same-match-different-effects", nil, a.MatchesEquivalent, queryPolicy("permit", "context.n < 0"), queryPolicy("forbid", "context.n < 0"), true},
-		{"different-match-both-forbid", nil, a.MatchesEquivalent, queryPolicy("forbid", "context.n < 0"), queryPolicy("forbid", "context.n >= 0"), false},
-		{"matching-implication", nil, a.MatchesImplies, queryPolicy("forbid", "context.n < 0"), queryPolicy("permit", "context.n < 1"), true},
-		{"matching-implication-counterexample", nil, a.MatchesImplies, queryPolicy("forbid", "context.n < 1"), queryPolicy("permit", "context.n < 0"), false},
-		{"matching-disjoint", nil, a.MatchesDisjoint, queryPolicy("forbid", "context.n < 0"), queryPolicy("forbid", "context.n >= 0"), true},
-		{"matching-overlap-both-forbid", nil, a.MatchesDisjoint, queryPolicy("forbid", "context.n < 0"), queryPolicy("forbid", "context.n < 1"), false},
-		{"allow-disjoint", nil, a.Disjoint, queryPolicy("permit", "context.n < 0"), queryPolicy("permit", "context.n >= 0"), true},
-		{"allow-overlap", nil, a.Disjoint, queryPolicy("permit", "context.n < 0"), queryPolicy("permit", "context.n < 1"), false},
-		{"forbid-sets-allow-nothing", nil, a.Disjoint, queryPolicy("forbid", ""), queryPolicy("forbid", ""), true},
+		{"never-errors-safe", a.NeverErrors, nil, fixtures.Policy("forbid", "context.n < 0"), policy.PolicySet{}, true},
+		{"never-errors-overflow", a.NeverErrors, nil, fixtures.Policy("forbid", "context.n + 1 > 0"), policy.PolicySet{}, false},
+		{"always-matches-forbid", a.AlwaysMatches, nil, fixtures.Policy("forbid", ""), policy.PolicySet{}, true},
+		{"not-always-matches-forbid", a.AlwaysMatches, nil, fixtures.Policy("forbid", "context.n < 0"), policy.PolicySet{}, false},
+		{"never-matches-false", a.NeverMatches, nil, fixtures.Policy("forbid", "false"), policy.PolicySet{}, true},
+		{"does-match-forbid", a.NeverMatches, nil, fixtures.Policy("forbid", "context.n < 0"), policy.PolicySet{}, false},
+		{"same-match-different-effects", nil, a.MatchesEquivalent, fixtures.Policy("permit", "context.n < 0"), fixtures.Policy("forbid", "context.n < 0"), true},
+		{"different-match-both-forbid", nil, a.MatchesEquivalent, fixtures.Policy("forbid", "context.n < 0"), fixtures.Policy("forbid", "context.n >= 0"), false},
+		{"matching-implication", nil, a.MatchesImplies, fixtures.Policy("forbid", "context.n < 0"), fixtures.Policy("permit", "context.n < 1"), true},
+		{"matching-implication-counterexample", nil, a.MatchesImplies, fixtures.Policy("forbid", "context.n < 1"), fixtures.Policy("permit", "context.n < 0"), false},
+		{"matching-disjoint", nil, a.MatchesDisjoint, fixtures.Policy("forbid", "context.n < 0"), fixtures.Policy("forbid", "context.n >= 0"), true},
+		{"matching-overlap-both-forbid", nil, a.MatchesDisjoint, fixtures.Policy("forbid", "context.n < 0"), fixtures.Policy("forbid", "context.n < 1"), false},
+		{"allow-disjoint", nil, a.Disjoint, fixtures.Policy("permit", "context.n < 0"), fixtures.Policy("permit", "context.n >= 0"), true},
+		{"allow-overlap", nil, a.Disjoint, fixtures.Policy("permit", "context.n < 0"), fixtures.Policy("permit", "context.n < 1"), false},
+		{"forbid-sets-allow-nothing", nil, a.Disjoint, fixtures.Policy("forbid", ""), fixtures.Policy("forbid", ""), true},
 	}
 	for _, test := range cases {
 		t.Run(test.name, func(t *testing.T) {
-			var report analysis.Report
+			var report reports.Report
 			var err error
 			if test.one != nil {
 				report, err = test.one(ctx, schema, test.x)
@@ -107,8 +83,8 @@ func TestNativeErrorAndMatchingQueries(t *testing.T) {
 			if cex == nil {
 				t.Fatal("no concrete counterexample")
 			}
-			first := replayEvaluation(t, rt, schema, test.x, cex.Request)
-			second := replayEvaluation(t, rt, schema, test.y, cex.Request)
+			first := fixtures.Replay(t, rt, schema, test.x, cex.Request)
+			second := fixtures.Replay(t, rt, schema, test.y, cex.Request)
 			if first.Decision != cex.First || second.Decision != cex.Second {
 				t.Fatalf("decision replay differs %+v %+v %+v", first, second, cex)
 			}

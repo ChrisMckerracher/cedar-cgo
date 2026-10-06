@@ -1,6 +1,18 @@
 """Build a native archive fixture for source-bundle rejection tests."""
 import json
-from native import ARTIFACT_FILES, TARGETS, generated_names, link_source, sha
+import hashlib
+from native import ARTIFACT_FILES, generated_names
+from artifact_verifier import HEADER, link_source
+
+TARGETS = {
+    "x86_64-unknown-linux-gnu": "linux_amd64",
+    "aarch64-unknown-linux-gnu": "linux_arm64",
+    "aarch64-apple-darwin": "darwin_arm64",
+}
+
+
+def sha(data):
+    return hashlib.sha256(data).hexdigest()
 
 
 def native_fixture(commit, header, target="x86_64-unknown-linux-gnu", flags=None):
@@ -50,7 +62,7 @@ class BundleCase(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
         self.directory = Path(self.temporary.name)
-        source = {"go.mod": b"module example.com/test\n", "go.sum": b"", "cedar/source.go": b"package cedar\n", "internal/native/include/cedar.h": b"native ABI 2 header\n"}
+        source = {"go.mod": b"module example.com/test\n", "go.sum": b"", "cedar/source.go": b"package cedar\n", "internal/native/include/cedar.h": HEADER.read_bytes()}
         native = native_fixture(COMMIT, source["internal/native/include/cedar.h"])
         self.files = source | native | {
             "SOURCE_SHA256SUMS": checksums(source), "SHA256SUMS": checksums(native),

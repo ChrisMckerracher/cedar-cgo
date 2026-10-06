@@ -2,6 +2,7 @@ package utility_test
 
 import (
 	generator "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/generator"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
 
 	context "context"
 	errors "errors"
@@ -10,14 +11,14 @@ import (
 	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+
 	rapid "pgregory.net/rapid"
 	reflect "reflect"
 	testing "testing"
 )
 
 func TestPropertyConfusableDetection(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	rapid.Check(t, func(pt *rapid.T) {
 		// Variant A: pure-ASCII literals never mix scripts.
@@ -52,7 +53,7 @@ func TestPropertyConfusableDetection(t *testing.T) {
 }
 
 func TestPropertyScopeValidation(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	schema := cedarschema.SchemaFromCedar(generator.PropUtilSchema)
 	rapid.Check(t, func(pt *rapid.T) {

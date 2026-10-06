@@ -2,11 +2,13 @@ package validation_test
 
 import (
 	generator "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/generator"
+	joy "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/joy"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
 
 	context "context"
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+
 	rapid "pgregory.net/rapid"
 	testing "testing"
 )
@@ -14,8 +16,8 @@ import (
 // Increasing the level preserves successful validation. Diagnostic comparisons
 // exclude native hint choices and list order, as ordinary validation does.
 func TestPropertyValidationDepthMonotonic(t *testing.T) {
-	d := testsupport.LoadJoy(t)
-	rt := testsupport.TestRuntime(t)
+	d := joy.LoadJoy(t)
+	rt := testruntime.New(t)
 	rapid.Check(t, func(pt *rapid.T) {
 		policies := cedarpolicy.PoliciesFromCedar(generator.PropGenPolicySet(3).Draw(pt, "policies"))
 		for n := uint32(0); n < 5; n++ {
@@ -44,8 +46,8 @@ func TestPropertyValidationDepthMonotonic(t *testing.T) {
 // Level zero forbids dereferences exactly: hierarchy clauses fail at 0 and pass
 // at 4, while dereference-free clauses pass at both levels.
 func TestPropertyValidationDepthZeroForbidsDereferences(t *testing.T) {
-	d := testsupport.LoadJoy(t)
-	rt := testsupport.TestRuntime(t)
+	d := joy.LoadJoy(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	rapid.Check(t, func(pt *rapid.T) {
 		cc := generator.PropGenDepthCondition().Draw(pt, "condition")

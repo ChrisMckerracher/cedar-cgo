@@ -14,7 +14,8 @@ import (
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	strings "strings"
 	sync "sync"
 	testing "testing"
@@ -22,8 +23,8 @@ import (
 )
 
 func TestSliceEntitiesCancellation(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
-	cfg, req := testsupport.SliceFixtures(t)[0].Input()
+	rt := testruntime.New(t)
+	cfg, req := SliceFixtures(t)[0].Input()
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 	result, err := rt.Slicing().SliceEntities(ctx, cfg, req)
@@ -37,24 +38,24 @@ func TestSliceEntitiesCancellation(t *testing.T) {
 	if !errors.Is(err, context.DeadlineExceeded) || result.Decision != cedarrequest.Deny {
 		t.Fatalf("deadline: %+v, %v", result, err)
 	}
-	cfg, req = testsupport.SliceFixtures(t)[0].Input()
+	cfg, req = SliceFixtures(t)[0].Input()
 	if _, err := rt.Slicing().SliceEntities(context.Background(), cfg, req); err != nil {
 		t.Fatal(err)
 	}
 }
 
 func TestSliceEntitiesRequestData(t *testing.T) {
-	cfg, req := testsupport.SliceFixtures(t)[1].Input()
+	cfg, req := SliceFixtures(t)[1].Input()
 	req.Entities, cfg.Entities = cfg.Entities, cedarentity.NewEntities()
-	result, err := testsupport.TestRuntime(t).Slicing().SliceEntities(context.Background(), cfg, req)
+	result, err := testruntime.New(t).Slicing().SliceEntities(context.Background(), cfg, req)
 	if err != nil || result.Decision != cedarrequest.Allow || len(result.Batches) < 2 {
 		t.Fatalf("request-specific entities: %+v, %v", result, err)
 	}
 }
 
 func TestSliceEntitiesLastIteration(t *testing.T) {
-	cfg, req := testsupport.SliceFixtures(t)[1].Input()
-	rt := testsupport.TestRuntime(t)
+	cfg, req := SliceFixtures(t)[1].Input()
+	rt := testruntime.New(t)
 	result, err := rt.Slicing().SliceEntities(context.Background(), cfg, req)
 	if err != nil || len(result.Batches) < 2 {
 		t.Fatalf("expected a relationship chain: %+v, %v", result, err)
@@ -73,8 +74,8 @@ func TestSliceEntitiesLastIteration(t *testing.T) {
 }
 
 func TestSliceEntitiesConcurrent(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
-	fixtures := testsupport.SliceFixtures(t)
+	rt := testruntime.New(t)
+	fixtures := SliceFixtures(t)
 	var wg sync.WaitGroup
 	for i := range 8 {
 		wg.Go(func() {

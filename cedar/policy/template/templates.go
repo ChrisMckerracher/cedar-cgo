@@ -11,7 +11,6 @@ import (
 	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	syntax "github.com/ChrisMckerracher/cedar-go-wasm/cedar/syntax"
 	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
-	utf8 "unicode/utf8"
 )
 
 // Template is an immutable template source, parsed by Rust when added to a set.
@@ -60,12 +59,12 @@ type TemplateLink struct {
 	Bindings   SlotBindings
 }
 
-type TemplateInput struct {
+type templateInput struct {
 	Policies  wire.Source `json:"policies"`
 	Operation any         `json:"operation"`
 }
 
-type TemplateOutput struct {
+type templateOutput struct {
 	Policies  json.RawMessage `json:"policies"`
 	Templates *[]TemplateInfo `json:"templates"`
 	Links     *[]struct {
@@ -73,39 +72,11 @@ type TemplateOutput struct {
 		TemplateID string              `json:"template_id"`
 		Bindings   map[SlotID]wire.UID `json:"bindings"`
 	} `json:"links"`
-	Error *wire.Error `json:"error"`
+	wire.Response
 }
 
-func TemplateUTF8(texts ...string) error {
-	for _, text := range texts {
-		if !utf8.ValidString(text) {
-			return &diagnostic.Error{Kind: diagnostic.KindInput, Message: "template input is not valid UTF-8"}
-		}
-	}
-	return nil
-}
-
-func (rt *Client) templateCall(ctx context.Context, policies policy.PolicySet, op any) (decoded TemplateOutput, decodeErr error) {
-	if err := TemplateUTF8(policies.Text()); err != nil {
-		return TemplateOutput{}, err
-	}
-	in, err := execution.Encode(TemplateInput{Policies: policies.Wire(), Operation: op}, "template input", rt.runtime.MaxSourceBytes)
-	if err != nil {
-		return TemplateOutput{}, err
-	}
-	defer execution.FinishDecode(ctx, &decoded, &decodeErr)
-	out, err := rt.runtime.CallOnce(ctx, "cgw_templates", in)
-	if err != nil {
-		return TemplateOutput{}, err
-	}
-	var resp TemplateOutput
-	if err := json.Unmarshal(out, &resp); err != nil {
-		return TemplateOutput{}, diagnostic.FaultError(fmt.Errorf("decode template response: %w", err))
-	}
-	if resp.Error != nil {
-		return TemplateOutput{}, diagnostic.ModuleError(resp.Error)
-	}
-	return resp, nil
+func (rt *Client) templateCall(ctx context.Context, policies policy.PolicySet, op any) (templateOutput, error) {
+	return execution.Exchange[templateOutput](ctx, rt.runtime, "cgw_templates", "template", templateInput{Policies: policies.Wire(), Operation: op})
 }
 
 func (rt *Client) editTemplates(ctx context.Context, policies policy.PolicySet, op any) (policy.PolicySet, error) {

@@ -6,14 +6,16 @@ import (
 	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
 	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	fault "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fault"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	testing "testing"
 	utf8 "unicode/utf8"
 )
 
 func FuzzScopeValidation(f *testing.F) {
-	rt := testsupport.TestRuntime(f)
-	schema := cedarschema.SchemaFromCedar(testsupport.FuzzUtilSchema)
+	rt := testruntime.New(f)
+	schema := cedarschema.SchemaFromCedar(FuzzUtilSchema)
 	f.Add("User", "view", "Photo")
 	f.Add("Photo", "view", "Photo")
 	f.Add("User", "edit", "Photo")
@@ -25,9 +27,9 @@ func FuzzScopeValidation(f *testing.F) {
 		}
 		err := rt.Utilities().ValidateScopeVariables(context.Background(), schema,
 			entityuid.NewEntityUID(pType, "x"), entityuid.NewEntityUID("Action", actionID), entityuid.NewEntityUID(rType, "p"))
-		testsupport.CheckNoFault(t, err)
+		fault.CheckNoFault(t, err)
 		if !utf8.ValidString(pType) || !utf8.ValidString(actionID) || !utf8.ValidString(rType) {
-			testsupport.RequireUtilKind(t, err, diagnostic.KindInput)
+			RequireUtilKind(t, err, diagnostic.KindInput)
 			return
 		}
 		if pType == "User" && actionID == "view" && rType == "Photo" {

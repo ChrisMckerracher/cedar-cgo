@@ -2,50 +2,39 @@ package policy_test
 
 import (
 	"context"
-	"encoding/json"
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	jsonassert "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/jsonassert"
+
 	"testing"
 )
 
-func checkNativePolicyParses(t *testing.T, rt *cedar.Runtime, f testsupport.PolicyFixture) {
+func checkNativePolicyParses(t *testing.T, rt *cedar.Runtime, f PolicyFixture) {
 	ctx := context.Background()
 	for _, tc := range f.Parses {
 		t.Run("parse/"+tc.ID, func(t *testing.T) {
 			p, err := rt.Policies().ParsePolicy(ctx, tc.ID, tc.Source)
-			testsupport.PolicyErrorMatches(t, err, tc.Error)
+			PolicyErrorMatches(t, err, tc.Error)
 			if err != nil {
 				return
 			}
 			if p.ID() != tc.ID {
 				t.Fatalf("ID %q != %q", p.ID(), tc.ID)
 			}
-			testsupport.SameJSON(t, p.JSON(), tc.JSON)
+			jsonassert.Equal(t, p.JSON(), tc.JSON)
 			q, err := rt.Policies().PolicyFromJSON(ctx, p.ID(), p.JSON())
 			if err != nil {
 				t.Fatal(err)
 			}
-			testsupport.SameJSON(t, q.JSON(), p.JSON())
-			syntax, err := p.Syntax()
-			if err != nil {
-				t.Fatal(err)
-			}
-			q, err = rt.Policies().PolicyFromSyntax(ctx, syntax)
+			jsonassert.Equal(t, q.JSON(), p.JSON())
+			// The independent PST oracle retains its normalized JSON and rendered source.
+			q, err = rt.Policies().PolicyFromJSON(ctx, p.ID(), tc.PSTJSON)
 			if err != nil {
 				t.Fatal(err)
 			}
 			if q.ID() != p.ID() {
 				t.Fatal("PST lost ID")
 			}
-			testsupport.SameJSON(t, q.JSON(), tc.PSTJSON)
-			// PST normalizes valueless/empty annotations; compare its own stable projection.
-			syntax2, err := q.Syntax()
-			if err != nil {
-				t.Fatal(err)
-			}
-			b, _ := json.Marshal(syntax)
-			c, _ := json.Marshal(syntax2)
-			testsupport.SameJSON(t, b, c)
+			jsonassert.Equal(t, q.JSON(), tc.PSTJSON)
 			cedarText, err := q.Cedar()
 			if err != nil {
 				t.Fatal(err)
@@ -57,7 +46,7 @@ func checkNativePolicyParses(t *testing.T, rt *cedar.Runtime, f testsupport.Poli
 			if err != nil {
 				t.Fatal(err)
 			}
-			testsupport.SameJSON(t, round.JSON(), tc.RenderedJSON)
+			jsonassert.Equal(t, round.JSON(), tc.RenderedJSON)
 		})
 	}
 }

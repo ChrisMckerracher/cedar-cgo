@@ -1,141 +1,166 @@
-# Change analysis
+# Cedar policy analysis for Go developers
 
 [Documentation](README.md) · [API](api.md) · [Performance](performance.md#change-analysis)
 
-## Contents
+## Lesson 1: Configure a solver
 
-- [Setup](#setup)
-- [Compare policies](#compare-policies)
-- [Interpret results](#interpret-results)
-- [Configure the analyzer](#configure-the-analyzer)
-- [Implementation](#implementation)
+Objective: Create an analyzer with a caller-supplied solver.
 
-## Setup
+Package `analysis` compares Cedar policies with SymCC, Cedar's symbolic compiler.
+SymCC produces SMT-LIB queries. Go sends these queries to an external solver.
 
-Package `analysis` compares policy sets with Cedar's symbolic compiler,
-SymCC. It turns a question into SMT-LIB queries, which the Go host sends to
-an external solver.
+1. Obtain **cvc5 1.3.1** from its [official release](https://github.com/cvc5/cvc5/releases/tag/cvc5-1.3.1).
+2. Pass its executable path to `solver.CVC5`.
+3. Create the analyzer with `analysis.New`.
+4. Close the analyzer when its work ends.
 
-Use the **cvc5 1.3.1** executable from the
-[official release](https://github.com/cvc5/cvc5/releases/tag/cvc5-1.3.1),
-the version used by this repository's CI. Pass its path to `solver.CVC5`.
-Analysis and authorization use the same linked native library with separate state handles.
+Worked example:
 
 ```go
 analyzer, err := analysis.New(ctx, solver.CVC5("/path/to/cvc5"))
 if err != nil {
-	return err
+    return err
 }
 defer analyzer.Close(ctx)
 ```
 
-Applications distributing cvc5 should account for its dependencies' licenses;
-the default cvc5 build links LGPL-3.0 GMP.
+CI uses this cvc5 version. Its default build links LGPL-3.0 GMP.
+If you distribute cvc5, account for its dependency licenses.
+Analysis and authorization use the same linked native library. They use separate native state handles.
 
-## Compare policies
+Knowledge check: Which application supplies and owns the solver executable?
 
-`NewlyPermitted` finds requests that a policy change would newly allow:
+## Lesson 2: Compare policy sets
+
+Objective: Find requests affected by a policy change.
+
+1. Supply a schema and strictly valid static policies.
+2. Call `validation.Client.Validate` to establish full-schema validity.
+3. Call `NewlyPermitted` or `Equivalent`.
+4. Check the error before reading the report.
+
+Worked example:
 
 ```go
-report, err := analyzer.NewlyPermitted(ctx, schema, before, after)
+result, err := analyzer.NewlyPermitted(ctx, schema, before, after)
 if err != nil {
-	return err
+    return err
 }
-for _, result := range report.Results {
-	if !result.Holds {
-		fmt.Println(result.Action, result.Counterexample.Text)
-	}
+for _, environment := range result.Results {
+    if !environment.Holds {
+        fmt.Println(environment.Action, environment.Counterexample.Text)
+    }
 }
 ```
 
-`Equivalent(ctx, schema, first, second)` checks whether two policy sets
-make the same decision for every request described by the schema.
+`NewlyPermitted` holds when the change permits nothing new.
+Its counterexample has `First == request.Deny` and `Second == request.Allow`.
+`Equivalent(ctx, schema, first, second)` checks whether both sets always produce the same decision.
+Its counterexample has different decisions.
 
-All operations require a schema and strictly valid static policies.
-Call `validation.Client.Validate` to establish full-schema validity before analysis.
 Native compilation checks strict types only in the analyzed request environments.
 See the [complete example](../analysis/example_test.go).
 
-## Check errors and matching
+Knowledge check: Does a compiled empty selection establish full-schema validity?
 
-Use matching queries when permit and forbid conditions matter independently of the final decision.
-Pass a policy set with exactly one policy to each singleton argument.
-Templates are rejected.
+## Lesson 3: Check matching and evaluation errors
+
+Objective: Compare policy matching separately from authorization decisions.
+
+1. Use a singleton policy set for each matching or error query argument.
+2. Reject templates before running these queries.
+3. Inspect concrete evaluation records when a property fails.
 
 | Method | Property |
 | --- | --- |
 | `NeverErrors(ctx, schema, policy)` | The policy never produces an evaluation error |
 | `AlwaysMatches(ctx, schema, policy)` | The policy matches every schema-valid request |
-| `NeverMatches(ctx, schema, policy)` | The policy matches no schema-valid requests |
+| `NeverMatches(ctx, schema, policy)` | The policy matches no schema-valid request |
 | `MatchesEquivalent(ctx, schema, first, second)` | Both policies match the same requests |
-| `MatchesImplies(ctx, schema, first, second)` | A match for the first policy implies a match for the second |
+| `MatchesImplies(ctx, schema, first, second)` | Matching the first policy implies matching the second |
 | `MatchesDisjoint(ctx, schema, first, second)` | No request matches both policies |
 | `Disjoint(ctx, schema, first, second)` | No request is allowed by both policy sets |
 
 `Disjoint` accepts complete policy sets.
-Matching queries use the original permit or forbid effects.
-For example, two forbid policies can deny every request and still match different requests.
-An evaluation error also differs from an ordinary nonmatch.
+Matching queries preserve the original permit or forbid effects.
+Two forbid policies can deny every request and still match different requests.
+An evaluation error differs from an ordinary nonmatch.
 `NeverErrors` checks native symbolic error behavior directly.
 
-Every method returns the same `Report` structure.
-Matching and error counterexamples also contain `FirstEvaluation` and, for pairwise queries, `SecondEvaluation`.
-Each `PolicyEvaluation` contains a `Matched` flag and native policy evaluation errors.
-The concrete authorizer confirms these observations before the result crosses the Go boundary.
+Worked example:
 
 ```go
-report, err := analyzer.NeverErrors(ctx, schema, policy)
+result, err := analyzer.NeverErrors(ctx, schema, policy)
 if err != nil {
     return err
 }
-for _, result := range report.Results {
-    if result.Counterexample != nil {
-        fmt.Println(result.Counterexample.FirstEvaluation.Errors)
+for _, environment := range result.Results {
+    if environment.Counterexample != nil {
+        fmt.Println(environment.Counterexample.FirstEvaluation.Errors)
     }
 }
 ```
 
-To check always-allow behavior, compare a policy set with an unconditional permit using `Equivalent`.
-To check always-deny behavior, compare it with an empty policy set.
+Matching and error counterexamples contain `FirstEvaluation`.
+Pairwise queries also contain `SecondEvaluation`.
+Each `report.PolicyEvaluation` contains a `Matched` flag and native policy evaluation errors.
+The concrete authorizer confirms these observations before Go returns the result.
 
-## Interpret results
+To check always-allow behavior, compare against an unconditional permit with `Equivalent`.
+To check always-deny behavior, compare against an empty policy set.
 
-A `Report` contains one `Result` per request environment: a principal type,
-action, and resource type allowed by the schema.
+Knowledge check: Can two policies produce identical decisions but match different requests?
 
-| Field or method | Meaning |
-|---|---|
-| `Report.Holds()` | The property holds in every returned environment |
-| `Result.Holds` | The property holds in this environment |
-| `Result.Counterexample` | A concrete request demonstrating a failed property |
-| `Counterexample.Request` | Request, context, and entities for reproduction |
-| `Counterexample.Text` | Human-readable Cedar description |
-| `Counterexample.First`, `Second` | Decisions in the caller's policy-set argument order |
-| `Counterexample.FirstEvaluation`, `SecondEvaluation` | Concrete singleton matching and errors for matching or error queries |
+## Lesson 4: Read reports and replay counterexamples
 
-For `NewlyPermitted`, **holds means the change permits nothing new**.
-A counterexample has `First == request.Deny` and `Second == request.Allow`.
-For `Equivalent`, a counterexample has different decisions.
+Objective: Interpret result records without losing their qualifications.
+
+All queries return `report.Report` from `analysis/report`.
+A report contains one result per schema request environment.
+Each environment identifies a principal type, an action, and a resource type.
+
+| Record or method | Meaning |
+| --- | --- |
+| `report.Report.Holds()` | The property holds in every returned environment |
+| `report.Result.Holds` | The property holds in this environment |
+| `report.Result.Counterexample` | A concrete request that demonstrates a failed property |
+| `report.Counterexample.Request` | Request, context, and entities for reproduction |
+| `report.Counterexample.Text` | Cedar text that describes the request |
+| `report.Counterexample.First`, `Second` | Decisions in the caller's policy-set argument order |
+| `report.Counterexample.FirstEvaluation`, `SecondEvaluation` | Concrete policy matching and evaluation errors |
+
+1. Check the Go error.
+2. Read each environment's `Holds` flag.
+3. Replay each counterexample with the supplied request records.
+
 For `Disjoint`, both policy sets allow the counterexample.
+A zero-value report contains no results. Its `Holds()` method returns true.
+This result does not establish full-schema policy validity.
 
-Check the Go error before using the report. A zero-value report has no
-results, so its `Holds()` method returns true vacuously.
+The native module rechecks every counterexample with Cedar's concrete authorizer.
+Solver values can include a `Long` of 2^63−1 or a datetime before 1970.
+A successful property result depends on SymCC's encoding and the solver's `unsat` answer.
+See [Verification](verification.md#independent-fixtures).
 
-Every counterexample is re-evaluated with Cedar's concrete authorizer inside
-the module before being returned. Solver-generated values may be extreme,
-such as a `Long` of 2^63−1 or a datetime before 1970. A successful property
-result depends on SymCC's encoding and the solver's `unsat` answer; see
-[Verification](verification.md#independent-fixtures).
+Knowledge check: Which decision belongs to the caller's first policy-set argument?
 
-## Reuse compiled policy sets
+## Lesson 5: Reuse compiled policy sets
 
-`Analyzer.OpenCompiled(ctx, schema, selection)` creates a reusable `CompiledSession`.
-The constructor context controls the whole session lifetime.
-Pass nil to select all schema request environments.
-Pass an explicit list to select particular environments.
-An empty list selects none.
-Duplicate and unknown environments fail.
-`Environments()` returns a copy of the native selection.
+Objective: Retain compiled policies while preserving session ownership.
+
+`Analyzer.OpenCompiled(ctx, schema, selection)` returns `compiled.Session` from `analysis/compiled`.
+The constructor context controls the complete session lifetime.
+Use `compiled.RequestEnvironment` for explicit selections.
+A nil selection includes every schema request environment. An empty selection includes none.
+Duplicate and unknown environments fail. `Environments()` returns a copy of the native selection.
+
+1. Open the session.
+2. Compile each policy set into a `compiled.PolicySet` handle.
+3. Reuse those handles for supported queries.
+4. Release unneeded handles.
+5. Close the session when its work ends.
+
+Worked example:
 
 ```go
 session, err := analyzer.OpenCompiled(ctx, schema, nil)
@@ -151,68 +176,74 @@ second, err := session.Compile(ctx, after)
 if err != nil {
     return err
 }
-report, err := session.Equivalent(ctx, first, second)
+result, err := session.Equivalent(ctx, first, second)
 if err != nil {
     return err
 }
-fmt.Println(report.Holds())
+fmt.Println(result.Holds())
 ```
 
-`Compile` creates native compiled sets once for every selected environment.
-With an empty selection, it checks policy syntax and rejects templates, but does not check policy types.
-An empty report's `Holds()` result does not establish full-schema policy validity.
-The native session retains the original policies for concrete counterexample replay.
-`Equivalent`, `Implies`, and `Disjoint` reuse those sets and the same solver transport.
-Their `Report` and `Counterexample` types match the stateless API.
-`Implies(first, second)` checks whether every request allowed by the first set is also allowed by the second.
+`Compile` creates native compiled sets for each selected environment.
+An empty selection checks policy syntax and rejects templates. It does not check policy types.
+The session retains original policies for concrete counterexample replay.
+`Equivalent`, `Implies`, and `Disjoint` reuse compiled sets and one solver transport.
+They return the same `report.Report` and `report.Counterexample` records as stateless queries.
+`Implies(first, second)` checks whether every request allowed by the first set is allowed by the second.
 
 Handles belong to one session.
-`Release(ctx, handle)` removes a handle's native data.
+`Release(ctx, handle)` removes the handle's native data.
 Foreign, zero, and released handles fail before native execution.
-Native handle IDs increase and are never reused within a session.
-Each session supports 128 active handles.
-The analyzer's source, response, and solver-output limits still apply.
+Native handle IDs increase. The session never reuses them.
+Each session supports 128 active handles. Configured source, response, and solver-output limits still apply.
 
-Calls use an exclusive gate.
-A canceled caller that waits for the gate leaves the active call and solver unchanged.
-The analyzer timeout starts after the caller acquires the gate.
-An active cancellation or timeout closes the solver and invalidates the entire session.
-A solver failure, native library fault, or malformed response also invalidates it.
-Create a new session after these failures.
-Ordinary input or compilation errors preserve the session.
+An exclusive gate serializes calls.
+If a queued caller cancels, the active call and solver continue.
+The timeout starts after the caller acquires the gate.
+Active cancellation or timeout closes the solver and invalidates the session.
+Solver failure, a native library fault, or a malformed response also invalidates it.
+Create a new session after these failures. Ordinary input and compilation errors preserve the session.
+Use `compiled.ErrClosed` with `errors.Is` to identify closed sessions.
 
-`Close` closes solver transport, waits for native execution, and releases session resources.
-`Analyzer.Close` also closes its compiled sessions.
+`Close` interrupts solver transport, waits for native execution, and releases resources.
+`Analyzer.Close` closes its compiled sessions and cancels pending constructors.
 Custom solver transports must unblock active reads and writes when `Close` runs.
-Stateless calls continue to create their own instances and solver transports.
+Stateless calls create their own native instances and solver transports.
 
-The [ownership design](compiled-analysis-design.md) records the API scope before implementation.
+The [ownership design](compiled-analysis-design.md) records the interface scope before implementation.
 Raw symbolic terms, custom assertions, and custom symbolic environments remain native internals.
 Their upstream contracts need additional validation and concrete replay rules before public exposure.
 
-## Configure the analyzer
+Knowledge check: Can a compiled handle move between sessions?
 
-`Analyzer` is safe for concurrent use. Each stateless call creates and closes
-its own module instance and solver session. A compiled session retains both
-resources until the session closes.
+## Lesson 6: Set limits and understand cancellation
+
+Objective: Configure analysis limits without weakening resource ownership.
+
+`Analyzer` supports concurrent calls. Compiled sessions serialize their own calls.
+Package `analysis/options` supplies configuration functions for both.
 
 | Option | Default |
-|---|---|
-| `WithTimeout` | 60 s, including solver time |
-| `WithMaxSourceBytes` | 64 MiB encoded schema and policies |
-| `WithMaxSolverOutput` | 256 MiB read from the solver per call |
+| --- | --- |
+| `options.WithTimeout` | 60 seconds, including solver time |
+| `options.WithMaxSourceBytes` | 64 MiB of encoded schema and policies |
+| `options.WithMaxSolverOutput` | 256 MiB read from the solver per call |
 
-`Solver` and `Session` support custom solver integrations. `Command` runs
-an executable with explicit arguments and an empty environment. It closes
-the process when its session closes or its context expires. The solver remains
-a host process; see [Security model](security.md#solver-process).
+Worked example:
 
-## Implementation
+```go
+analyzer, err := analysis.New(ctx, solver.CVC5("/path/to/cvc5"),
+    options.WithTimeout(30*time.Second))
+```
 
-SymCC 0.7.0 runs in the native Rust library. Explicit state owns compiled sessions.
-Go callbacks provide each session's solver transport. No callback persists after its active call.
-The vendored pin and existing patch remain checked against the pinned upstream archive.
+`solver.Solver` and `solver.Session` support custom solver integrations.
+`solver.Command` runs an executable with explicit arguments and an empty environment.
+It closes the process when its session closes or its context expires.
+The solver remains a host process. See the [Security model](security.md#solver-process).
 
-The native analyzer removes Wasm memory limits and compilation caches.
-A deadline closes external solver transport but cannot forcibly stop native CPU work.
+SymCC 0.7.0 runs in the native Rust library.
+Native state owns compiled policy data. Go callbacks connect each active call to its solver transport.
+No callback persists after its active call.
+A deadline closes external solver transport. It cannot forcibly stop native CPU work.
 Read the [native contract](migration/native-contract.md) and [security model](security.md).
+
+Knowledge check: Which resources remain owned until active native CPU work returns?

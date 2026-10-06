@@ -6,15 +6,18 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/compiled"
+	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/settings"
+	fixtures "github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/testsupport"
 	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/solver"
 	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 )
 
 func TestCompiledAnalyzerCloseCancelsPendingConstruction(t *testing.T) {
 	started := make(chan struct{})
-	transport := &compiledTestTransport{closed: make(chan struct{})}
-	a := &Analyzer{maxSourceBytes: 1 << 20, maxSolverOutput: 1 << 20}
-	a.solver = compiledTestSolver(func(ctx context.Context) (solver.Session, error) {
+	transport := &fixtures.Transport{Closed: make(chan struct{})}
+	a := &Analyzer{config: settings.Config{MaxSourceBytes: 1 << 20, MaxSolverOutput: 1 << 20}}
+	a.solver = fixtures.Solver(func(ctx context.Context) (solver.Session, error) {
 		close(started)
 		<-ctx.Done()
 		return transport, nil
@@ -30,29 +33,27 @@ func TestCompiledAnalyzerCloseCancelsPendingConstruction(t *testing.T) {
 	}
 	select {
 	case err := <-result:
-		if !errors.Is(err, ErrCompiledClosed) {
+		if !errors.Is(err, compiled.ErrClosed) {
 			t.Fatalf("pending constructor error: %v", err)
 		}
 	case <-time.After(5 * time.Second):
 		t.Fatal("analyzer closure did not cancel constructor")
 	}
-	if transport.closes.Load() != 1 {
+	if transport.Closes.Load() != 1 {
 		t.Fatal("constructor retained late solver transport")
 	}
-	a.mu.Lock()
-	defer a.mu.Unlock()
-	if len(a.sessions) != 0 {
-		t.Fatal("failed constructor retained session registration")
+	if _, err := a.OpenCompiled(context.Background(), schemas.SchemaFromCedar(querySchemaForUTF8), nil); !errors.Is(err, compiled.ErrClosed) {
+		t.Fatalf("closed analyzer accepted constructor: %v", err)
 	}
 }
 
 type compiledCloseErrorTransport struct {
-	*compiledTestTransport
+	*fixtures.Transport
 	failure error
 }
 
 func (s *compiledCloseErrorTransport) Close() error {
-	_ = s.compiledTestTransport.Close()
+	_ = s.Transport.Close()
 	return s.failure
 }
 
@@ -64,20 +65,12 @@ func TestCompiledPendingConstructionReportsCloseErrors(t *testing.T) {
 		}
 		t.Run(name, func(t *testing.T) {
 			failure := errors.New("late solver cleanup failed")
-			transport := &compiledCloseErrorTransport{compiledTestTransport: &compiledTestTransport{closed: make(chan struct{})}, failure: failure}
+			transport := &compiledCloseErrorTransport{Transport: &fixtures.Transport{Closed: make(chan struct{})}, failure: failure}
 			started := make(chan struct{})
-			a := &Analyzer{maxSourceBytes: 1 << 20, maxSolverOutput: 1 << 20}
-			a.solver = compiledTestSolver(func(ctx context.Context) (solver.Session, error) {
-				a.mu.Lock()
-				var pending *CompiledSession
-				for session := range a.sessions {
-					pending = session
-				}
-				a.mu.Unlock()
+			a := &Analyzer{config: settings.Config{MaxSourceBytes: 1 << 20, MaxSolverOutput: 1 << 20}}
+			a.solver = fixtures.Solver(func(ctx context.Context) (solver.Session, error) {
 				close(started)
 				<-ctx.Done()
-				// Return the transport after cancellation marks the registered session closed.
-				<-pending.done
 				return transport, nil
 			})
 			ctx, cancel := context.WithCancel(context.Background())
@@ -97,7 +90,7 @@ func TestCompiledPendingConstructionReportsCloseErrors(t *testing.T) {
 			}
 			select {
 			case err := <-opened:
-				if !errors.Is(err, failure) || !errors.Is(err, ErrCompiledClosed) {
+				if !errors.Is(err, failure) || !errors.Is(err, compiled.ErrClosed) {
 					t.Fatalf("constructor discarded cleanup or closed error: %v", err)
 				}
 				if !throughAnalyzer && !errors.Is(err, context.Canceled) {
@@ -106,14 +99,8 @@ func TestCompiledPendingConstructionReportsCloseErrors(t *testing.T) {
 			case <-time.After(5 * time.Second):
 				t.Fatal("pending constructor did not close")
 			}
-			if transport.closes.Load() != 1 {
+			if transport.Closes.Load() != 1 {
 				t.Fatal("late transport did not close once")
-			}
-			a.mu.Lock()
-			registered := len(a.sessions)
-			a.mu.Unlock()
-			if registered != 0 {
-				t.Fatal("failed constructor retained session registration")
 			}
 			if !throughAnalyzer {
 				if err := a.Close(context.Background()); err != nil {
@@ -123,3 +110,5 @@ func TestCompiledPendingConstructionReportsCloseErrors(t *testing.T) {
 		})
 	}
 }
+
+const querySchemaForUTF8 = `entity User; entity Doc; action view appliesTo {principal: User, resource: Doc, context: {}};`

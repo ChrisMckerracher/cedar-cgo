@@ -11,7 +11,8 @@ import (
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	applicability "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/applicability"
 	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	reflect "reflect"
 	testing "testing"
 )
@@ -58,7 +59,7 @@ func TestRequestEnvironmentJSONRejectsInvalidUTF8(t *testing.T) {
 }
 
 func TestApplicabilityDoesNotAuthorize(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	schema := cedarschema.SchemaFromCedar(`entity User; entity Photo; action view appliesTo {principal: User, resource: Photo, context: {}};`)
 	policies := cedarpolicy.PoliciesFromCedar(`permit(principal, action, resource) when {principal == User::"alice"};`)
@@ -78,7 +79,7 @@ func TestApplicabilityDoesNotAuthorize(t *testing.T) {
 }
 
 func TestApplicabilityBoundaries(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	got, err := rt.Applicability().ApplicableEnvironments(ctx, cedarschema.SchemaFromJSON([]byte(`{}`)), cedarpolicy.PoliciesFromCedar(`permit(principal, action, resource);`))
 	if err != nil || len(got.Policies["policy0"]) != 0 {

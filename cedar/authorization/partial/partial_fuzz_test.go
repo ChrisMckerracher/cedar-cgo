@@ -4,9 +4,13 @@ import (
 	context "context"
 	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
 	cedarpartial "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial"
+	partialinput "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial/input"
 	cedarrequest "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
 	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	fault "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fault"
+	fuzz "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fuzz"
+	partialfixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/partial"
+
 	testing "testing"
 	utf8 "unicode/utf8"
 )
@@ -19,17 +23,17 @@ func FuzzPartialEntities(f *testing.F) {
 	} {
 		f.Add([]byte(seed))
 	}
-	a := testsupport.PartialAuthorizer(f, authorization.Limits{MaxInstances: 1, MaxRequestBytes: 32 << 10, CallTimeout: testsupport.FuzzLimits.CallTimeout})
+	a := partialfixture.PartialAuthorizer(f, authorization.Limits{MaxInstances: 1, MaxRequestBytes: 32 << 10, CallTimeout: fuzz.FuzzLimits.CallTimeout})
 	f.Fuzz(func(t *testing.T, data []byte) {
-		if len(data) > 16<<10 || testsupport.Nesting(string(data)) > 40 {
+		if len(data) > 16<<10 || fuzz.Nesting(string(data)) > 40 {
 			t.Skip()
 		}
-		req := testsupport.PartialRequest()
-		req.Entities = cedarpartial.PartialEntitiesFromJSON(data)
+		req := partialfixture.PartialRequest()
+		req.Entities = partialinput.PartialEntitiesFromJSON(data)
 		r, err := a.Partial().PartialAuthorize(context.Background(), req)
-		testsupport.CheckNoFault(t, err)
+		fault.CheckNoFault(t, err)
 		if !utf8.Valid(data) {
-			testsupport.RequireUTF8InputError(t, err)
+			fault.RequireUTF8InputError(t, err)
 			if r.Decision != cedarpartial.Undecided {
 				t.Fatalf("malformed input decided: %+v", r)
 			}
@@ -56,13 +60,13 @@ func FuzzPartialReauthorize(f *testing.F) {
 	f.Add("", "", `{`)
 	f.Add("alice", "beach", `{"mfa":"yes"}`)
 	f.Add("a\n\"雪\x00", "b", `{"mfa":{"nested":true}}`)
-	a := testsupport.PartialAuthorizer(f, authorization.Limits{MaxInstances: 1, MaxRequestBytes: 32 << 10, CallTimeout: testsupport.FuzzLimits.CallTimeout})
+	a := partialfixture.PartialAuthorizer(f, authorization.Limits{MaxInstances: 1, MaxRequestBytes: 32 << 10, CallTimeout: fuzz.FuzzLimits.CallTimeout})
 	f.Fuzz(func(t *testing.T, principalID, resourceID, ctxJSON string) {
-		if len(principalID)+len(resourceID)+len(ctxJSON) > 4096 || testsupport.Nesting(ctxJSON) > 40 {
+		if len(principalID)+len(resourceID)+len(ctxJSON) > 4096 || fuzz.Nesting(ctxJSON) > 40 {
 			t.Skip()
 		}
-		partial, err := a.Partial().PartialAuthorize(context.Background(), testsupport.PartialRequest())
-		testsupport.CheckNoFault(t, err)
+		partial, err := a.Partial().PartialAuthorize(context.Background(), partialfixture.PartialRequest())
+		fault.CheckNoFault(t, err)
 		if err != nil {
 			if partial.Decision != cedarpartial.Undecided {
 				t.Fatalf("error grants decision: %+v %v", partial, err)
@@ -79,9 +83,9 @@ func FuzzPartialReauthorize(f *testing.F) {
 			Context:   cedarrequest.ContextFromJSON([]byte(ctxJSON)),
 		}
 		residual, err := partial.Reauthorize(context.Background(), concrete)
-		testsupport.CheckNoFault(t, err)
+		fault.CheckNoFault(t, err)
 		if !utf8.ValidString(principalID) || !utf8.ValidString(resourceID) || !utf8.ValidString(ctxJSON) {
-			testsupport.RequireUTF8InputError(t, err)
+			fault.RequireUTF8InputError(t, err)
 			if residual.Decision != cedarrequest.Deny {
 				t.Fatalf("malformed input allowed: %+v", residual)
 			}
@@ -91,7 +95,7 @@ func FuzzPartialReauthorize(f *testing.F) {
 			t.Fatalf("error came with %v: %v", residual.Decision, err)
 		}
 		direct, derr := a.Authorize(context.Background(), concrete)
-		testsupport.CheckNoFault(t, derr)
+		fault.CheckNoFault(t, derr)
 		if derr != nil && direct.Decision != cedarrequest.Deny {
 			t.Fatalf("error came with %v: %v", direct.Decision, derr)
 		}

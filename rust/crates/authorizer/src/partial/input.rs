@@ -1,5 +1,5 @@
-use crate::entity_uid;
-use cedar_policy::{Context, Entities, PartialEntities, PartialEntityUid, PartialRequest, Schema};
+use crate::{authorize::request_context, entity_uid};
+use cedar_policy::{Entities, PartialEntities, PartialEntityUid, PartialRequest, Schema};
 use cgw_abi::OpError;
 use serde::Deserialize;
 use serde_json::{Value, value::RawValue};
@@ -36,10 +36,7 @@ impl PartialInput {
         let context = self
             .context
             .as_deref()
-            .map(|json| {
-                Context::from_json_str(json.get(), Some((schema, &action)))
-                    .map_err(|e| OpError::new("context", &e))
-            })
+            .map(|json| request_context(Some(json), Some((schema, &action))))
             .transpose()?;
         PartialRequest::new(
             self.principal.parse("principal")?,

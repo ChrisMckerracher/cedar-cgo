@@ -21,14 +21,15 @@ solver=$(command -v "${CVC5:-cvc5}")
 solver_version=$("$solver" --version)
 [[ ${solver_version%%$'\n'*} =~ ^This\ is\ cvc5\ version\ 1\.3\.1([[:space:]]|$) ]] || { echo 'consumer proof requires cvc5 1.3.1' >&2; exit 1; }
 export CVC5="$solver"
-python3 "$repo/scripts/consumer/extract.py" "$bundle" "$2" "$consumer_tmp" "$target"
-mkdir "$consumer_tmp/consumer" "$consumer_tmp/bin"
-cp "$repo/scripts/consumer/smoke/main.go" "$consumer_tmp/consumer/main.go"
+mkdir "$consumer_tmp/bin"
 for tool in cargo rustc rustup; do
  printf '#!/bin/sh\necho "Unexpected Rust invocation" >&2\nexit 99\n' >"$consumer_tmp/bin/$tool"
  chmod +x "$consumer_tmp/bin/$tool"
 done
 export PATH="$consumer_tmp/bin:$PATH"
+python3 "$repo/scripts/consumer/extract.py" "$bundle" "$2" "$consumer_tmp" "$target"
+mkdir "$consumer_tmp/consumer"
+cp "$repo/scripts/consumer/smoke/main.go" "$consumer_tmp/consumer/main.go"
 export GOMODCACHE="$consumer_tmp/modcache" GOCACHE="$consumer_tmp/buildcache"
 export GOWORK=off GOFLAGS= GOTOOLCHAIN=local CGO_ENABLED=1
 if [[ -n ${CONSUMER_GOPROXY:-} ]]; then export GOPROXY="$CONSUMER_GOPROXY"; fi

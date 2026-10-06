@@ -3,6 +3,7 @@ package schema
 import (
 	context "context"
 	json "encoding/json"
+	jsonv2 "encoding/json/v2"
 	fmt "fmt"
 	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
@@ -48,11 +49,11 @@ type SchemaInspection struct {
 // MarshalJSON preserves the flat UID form used by native schema results.
 func (s SchemaInspection) MarshalJSON() ([]byte, error) {
 	type inspection SchemaInspection
-	return json.Marshal(struct {
+	return jsonv2.Marshal(struct {
 		inspection
 		Actions      []wire.UID `json:"actions"`
 		ActionGroups []wire.UID `json:"action_groups"`
-	}{inspection(s), entityuid.MetadataUIDs(s.Actions), entityuid.MetadataUIDs(s.ActionGroups)})
+	}{inspection(s), entityuid.MetadataUIDs(s.Actions), entityuid.MetadataUIDs(s.ActionGroups)}, jsonv2.Deterministic(true), jsonv2.FormatNilSliceAsNull(true), jsonv2.FormatNilMapAsNull(true))
 }
 
 // ConvertSchemaFragment uses Cedar's native fragment conversions without resolving external declarations.

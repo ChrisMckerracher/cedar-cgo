@@ -6,7 +6,9 @@ import (
 	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	fixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fixture"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	reflect "reflect"
 	strings "strings"
 	testing "testing"
@@ -17,7 +19,7 @@ func TestStructuredDiagnosticsNativeFixtures(t *testing.T) {
 		Name, Schema, Policies string
 		PoliciesJSON           json.RawMessage `json:"policies_json"`
 	}
-	if err := json.Unmarshal(testsupport.ReadFile(t, "../testdata/parity/diagnostics/input.json"), &input); err != nil {
+	if err := json.Unmarshal(fixture.MustReadFile(t, "../testdata/parity/diagnostics/input.json"), &input); err != nil {
 		t.Fatal(err)
 	}
 	// The wire uses snake_case for schema warnings.
@@ -27,13 +29,13 @@ func TestStructuredDiagnosticsNativeFixtures(t *testing.T) {
 		Errors, Warnings []diagnostic.PolicyMessage
 		SchemaWarnings   []diagnostic.SchemaWarning `json:"schema_warnings"`
 	}
-	if err := json.Unmarshal(testsupport.ReadFile(t, "../testdata/parity/diagnostics/expected.json"), &native); err != nil {
+	if err := json.Unmarshal(fixture.MustReadFile(t, "../testdata/parity/diagnostics/expected.json"), &native); err != nil {
 		t.Fatal(err)
 	}
 	if len(input) != len(native) {
 		t.Fatal("fixture count differs")
 	}
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	for i, tc := range input {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -46,7 +48,7 @@ func TestStructuredDiagnosticsNativeFixtures(t *testing.T) {
 				t.Fatal(err)
 			}
 			want := native[i]
-			if tc.Name != want.Name || result.Passed != want.Passed || !reflect.DeepEqual(testsupport.StableDiagnostics(result.Errors), testsupport.StableDiagnostics(want.Errors)) || !reflect.DeepEqual(testsupport.StableDiagnostics(result.Warnings), testsupport.StableDiagnostics(want.Warnings)) || !reflect.DeepEqual(result.SchemaWarnings, want.SchemaWarnings) {
+			if tc.Name != want.Name || result.Passed != want.Passed || !reflect.DeepEqual(StableDiagnostics(result.Errors), StableDiagnostics(want.Errors)) || !reflect.DeepEqual(StableDiagnostics(result.Warnings), StableDiagnostics(want.Warnings)) || !reflect.DeepEqual(result.SchemaWarnings, want.SchemaWarnings) {
 				t.Fatalf("Go %+v; native %+v", result, want)
 			}
 			standalone, err := rt.Schemas().SchemaWarnings(ctx, cedarschema.SchemaFromCedar(tc.Schema))
@@ -78,7 +80,7 @@ func TestStructuredDiagnosticsNativeFixtures(t *testing.T) {
 }
 
 func TestDiagnosticJSONPolicySpans(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	schema := cedarschema.SchemaFromCedar(`entity User; action view appliesTo {principal: User, resource: User, context: {}};`)
 	for _, TextValue := range []string{

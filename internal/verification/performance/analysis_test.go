@@ -72,7 +72,6 @@ func BenchmarkControlledSolver(b *testing.B) {
 	defer analyzer.Close(context.Background())
 	source, first, second := analysisInputs()
 	b.ReportAllocs()
-	b.ResetTimer()
 	for b.Loop() {
 		report, err := analyzer.Equivalent(context.Background(), source, first, second)
 		if err != nil || !report.Holds() {
@@ -102,7 +101,6 @@ func BenchmarkControlledCompiled(b *testing.B) {
 		b.Fatal(err)
 	}
 	b.ReportAllocs()
-	b.ResetTimer()
 	for b.Loop() {
 		report, err := session.Equivalent(context.Background(), handleA, handleB)
 		if err != nil || !report.Holds() {

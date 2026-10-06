@@ -2,7 +2,7 @@
 package wire
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"errors"
 	"unicode/utf8"
 )
@@ -24,9 +24,6 @@ type Source struct {
 }
 
 func (s Source) MarshalJSON() ([]byte, error) {
-	if err := CheckUTF8(s.Format, s.Text); err != nil {
-		return nil, err
-	}
 	type source Source
 	return json.Marshal(source(s))
 }
@@ -37,9 +34,6 @@ type UID struct {
 }
 
 func (u UID) MarshalJSON() ([]byte, error) {
-	if err := CheckUTF8(u.Type, u.ID); err != nil {
-		return nil, err
-	}
 	type uid UID
 	return json.Marshal(uid(u))
 }
@@ -48,3 +42,9 @@ type Error struct {
 	Kind    string `json:"kind"`
 	Message string `json:"message"`
 }
+
+type Response struct {
+	Error *Error `json:"error"`
+}
+
+func (r Response) ResponseError() *Error { return r.Error }

@@ -18,7 +18,7 @@ mod templates;
 mod utilities;
 mod validation;
 
-use authorize::{AuthorizeInput, AuthorizeOutput, PolicyMessage, entity_uid};
+use authorize::{AuthorizeInput, AuthorizeOutput, entity_uid};
 use cgw_abi::{Callback, OpError};
 use serde::Serialize;
 use serde_json::Value;
@@ -36,7 +36,7 @@ pub fn execute(
     bytes: &[u8],
     callback: Callback,
 ) -> Result<Value, OpError> {
-    match operation.strip_prefix("cgw_").unwrap_or(operation) {
+    match operation {
         "load" => project(state::load(state, bytes)),
         "authorize" => project(authorize::authorize(state, bytes)),
         "authorize_batched" => project(batched::authorize(state, bytes, callback)),

@@ -4,6 +4,8 @@ import (
 	context "context"
 	json "encoding/json"
 	errors "errors"
+	fixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fixture"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
 
 	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
 	cedarrequest "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
@@ -14,7 +16,7 @@ import (
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+
 	reflect "reflect"
 	testing "testing"
 )
@@ -26,10 +28,10 @@ func TestSliceEntitiesNativeParity(t *testing.T) {
 		Entities json.RawMessage
 		Batches  [][]entityuid.EntityUID
 	}
-	if err := json.Unmarshal(testsupport.ReadFile(t, "../testdata/parity/slicing/expected.json"), &expected); err != nil {
+	if err := json.Unmarshal(fixture.MustReadFile(t, "../testdata/parity/slicing/expected.json"), &expected); err != nil {
 		t.Fatal(err)
 	}
-	fixtures := testsupport.SliceFixtures(t)
+	fixtures := SliceFixtures(t)
 	if len(fixtures) != len(expected) {
 		t.Fatal("regenerate slicing native fixtures")
 	}
@@ -37,7 +39,7 @@ func TestSliceEntitiesNativeParity(t *testing.T) {
 		t.Run(fixture.Name, func(t *testing.T) {
 			cfg, req := fixture.Input()
 			ctx := context.Background()
-			rt := testsupport.TestRuntime(t)
+			rt := testruntime.New(t)
 			result, err := rt.Slicing().SliceEntities(ctx, cfg, req)
 			if err != nil {
 				t.Fatal(err)
@@ -50,7 +52,7 @@ func TestSliceEntitiesNativeParity(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			if testsupport.CanonicalEntities(t, gotEntities) != testsupport.CanonicalEntities(t, want.Entities) {
+			if CanonicalEntities(t, gotEntities) != CanonicalEntities(t, want.Entities) {
 				t.Fatalf("entity slice differs from native\ngot %s\nwant %s", gotEntities, want.Entities)
 			}
 			for name, entities := range map[string]cedarentity.Entities{"full": cfg.Entities, "slice": result.Entities} {
@@ -69,8 +71,8 @@ func TestSliceEntitiesNativeParity(t *testing.T) {
 }
 
 func TestSliceEntitiesBoundaries(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
-	fixtures := testsupport.SliceFixtures(t)
+	rt := testruntime.New(t)
+	fixtures := SliceFixtures(t)
 	cases := []struct {
 		name string
 		edit func(*slicing.SliceConfig, *cedarrequest.Request)

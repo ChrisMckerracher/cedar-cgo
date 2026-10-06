@@ -5,21 +5,22 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis"
+	fixtures "github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/testsupport"
+	reports "github.com/ChrisMckerracher/cedar-go-wasm/analysis/report"
 	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 )
 
 func TestMatchingQueriesRequireOnePolicy(t *testing.T) {
 	a, ctx := newAnalyzer(t), context.Background()
-	schema := schemas.SchemaFromCedar(querySchema)
+	schema := schemas.SchemaFromCedar(fixtures.Schema)
 	for _, source := range []string{"", `permit(principal,action,resource); forbid(principal,action,resource);`, `permit(principal == ?principal,action,resource);`} {
 		if _, err := a.NeverErrors(ctx, schema, policy.PoliciesFromCedar(source)); err == nil {
 			t.Fatalf("invalid singleton accepted %s", source)
 		}
 	}
-	_, err := a.NeverErrors(ctx, schema, queryPolicy("permit", "context.n == true"))
-	var input *analysis.Error
+	_, err := a.NeverErrors(ctx, schema, fixtures.Policy("permit", "context.n == true"))
+	var input *reports.Error
 	if !errors.As(err, &input) || input.Kind != "compile_a" {
 		t.Fatalf("strict validation error %v", err)
 	}
@@ -32,10 +33,10 @@ func TestSetQueriesRejectTemplatesWithoutEnvironments(t *testing.T) {
 	a, ctx := newAnalyzer(t), context.Background()
 	schema := schemas.SchemaFromJSON([]byte(`{}`))
 	template := policy.PoliciesFromCedar(`permit(principal == ?principal, action, resource);`)
-	static := queryPolicy("permit", "")
+	static := fixtures.Policy("permit", "")
 	for _, query := range []struct {
 		name                  string
-		run                   func(context.Context, schemas.Schema, policy.PolicySet, policy.PolicySet) (analysis.Report, error)
+		run                   func(context.Context, schemas.Schema, policy.PolicySet, policy.PolicySet) (reports.Report, error)
 		firstKind, secondKind string
 	}{
 		{"equivalent", a.Equivalent, "compile_a", "compile_b"},
@@ -51,7 +52,7 @@ func TestSetQueriesRejectTemplatesWithoutEnvironments(t *testing.T) {
 				{static, template, query.secondKind},
 			} {
 				_, err := query.run(ctx, schema, tc.first, tc.second)
-				var input *analysis.Error
+				var input *reports.Error
 				if !errors.As(err, &input) || input.Kind != tc.kind {
 					t.Fatalf("template accepted without environments: %v; want %s", err, tc.kind)
 				}

@@ -10,8 +10,9 @@ cedar/                          Runtime composition and feature factories
   syntax/                       Cedar and JSON formats
   diagnostic/                   Errors, policy diagnostics, and source spans
   value/                        Values, expression results, and entity references
-  entity/                       Entity records, collections, and stores
+  entity/                       Entity records and collections
     uid/                        Entity identity
+    store/                      Parsed entity snapshots, inspection, and graph edits
     slicing/                    Request-specific entity slicing
   schema/                       Schema sources, composition, and inspection
   policy/                       Policy sources, immutable snapshots, edits, and persistence
@@ -19,22 +20,32 @@ cedar/                          Runtime composition and feature factories
     format/                     Formatting and output limits
     source/                     Tokens and source spans
     applicability/              Potential request environments
+    literal/                    Entity-literal inspection and substitution
   authorization/                Configuration and concrete authorization
     request/                    Requests, contexts, decisions, and responses
     batched/                    Call-local entity loading
-    partial/                    Unknown inputs, residuals, persistence, and queries
+    partial/                    Residual continuations, persistence, and reauthorization
+      input/                    Unknown and known partial input records
+      query/                    Permission query records and operations
   validation/                   Explicit strict validation and depth limits
   expression/                   Expression parsing and evaluation
   utility/                      Language and request utilities
   integration/                  Corpus and cross-feature verification
-analysis/                       Stateless and compiled policy analysis
+analysis/                       Stateless queries, compiled factory, and parent shutdown
+  compiled/                     Compiled handles, serialized queries, and session shutdown
+  options/                      Shared analysis configuration
+  report/                       Public analysis results and errors
   solver/                       External solver processes and transport
+  internal/lifetime/            Parent registration and pending constructor ownership
+  internal/settings/            Private option state and defaults
+  internal/transport/           Call-local solver callbacks and bounded error output
   internal/report/              Checked counterexample and diagnostic decoding
 internal/
   execution/                    Scheduling, limits, and loaded session ownership
   native/                       Cgo interface, callbacks, and native lifetimes
   artifact/                     Native file and identity verification
-  testsupport/                  Shared test fixtures and generators
+  testsupport/                  Focused shared runtime, fixtures, corpus, and assertions
+    generator/                  Rapid input generation and state-machine support
   verification/                 Source-linked native arithmetic checks
 rust/crates/
   abi/                          Shared parsing, conversion, callbacks, and diagnostics
@@ -46,6 +57,7 @@ rust/crates/
 
 Feature packages own their records, operations, and tests. They do not import the composition package.
 Authorization child packages share internal session ownership. They do not import their parent implementation.
+Partial input and permission-query packages do not own continuations.
 Entity collections depend on values. Values depend on entity identity through `entity/uid`.
 Policy sets own persistence. The template package uses policy sets without an inverse dependency.
 
@@ -68,7 +80,7 @@ Read the [native contract](docs/migration/native-contract.md) before changing re
 
 Objective: Verify native execution with pinned inputs.
 
-1. Use Go 1.26 or 1.27, the pinned Rust toolchain, and a supported C compiler.
+1. Use Go 1.27.1, the pinned Rust toolchain, and a supported C compiler.
 2. Commit source changes before building verified native artifacts.
 3. Build the native archive and generated linker requirements.
 4. Run formatting, static analysis, and Go tests.
@@ -98,13 +110,18 @@ go test -count=1 -coverpkg=./... -coverprofile=coverage.out ./...
 python3 scripts/check-coverage.py coverage.out
 go test -race -count=1 ./...
 GOEXPERIMENT=cgocheck2 go test -count=1 ./...
-scripts/fuzz-native.sh
+python3 scripts/fuzz/run.py
 scripts/check-rust.sh
 python3 -m unittest discover -s scripts/consumer -p 'test_*.py'
 python3 -m unittest discover -s scripts/release -p 'test_*.py'
+python3 -m unittest discover -s scripts/parity -p 'test_*.py'
+python3 -m unittest discover -s scripts/fuzz -p 'test_*.py'
 ```
 
-The fuzz script discovers all 25 preserved targets and runs each for 60 seconds.
+The fuzz runner requires the exact 25 target names and package paths.
+It rejects missing, moved, duplicate, or unexpected targets. Each target runs for at least 60 seconds.
+Use `FUZZTIME` and `FUZZWORKERS` for longer durations or worker changes.
+The existing `FUZZ_SECONDS` and `FUZZ_WORKERS` inputs remain available.
 The Rust script checks native tests, Clippy, independent fixtures, dependency policy, advisories, and license output.
 Expected fixture files remain read-only. Use the relevant explicit update command only for an approved expectation change.
 
@@ -117,6 +134,8 @@ Knowledge check: Can a missing tool or skipped check count as a pass? No. Resolv
 Keep one implementation for each shared behavior.
 Shared execution owns acquisition, cancellation checks, invalidation, and close ordering.
 Shared wire checks reject invalid UTF-8. Domain decoders enforce their required fields and result variants.
+Strict standard-library JSON encoding rejects malformed strings, duplicate names, and invalid nested values.
+Raw JSON inputs retain preflight checks where error order or kind requires them.
 Schema and policy sources share format vocabulary. Their snapshots retain distinct domain ownership.
 Shared test support resolves fixture paths after package moves.
 
@@ -127,7 +146,8 @@ These distinctions preserve domain input and output contracts.
 Target 150 lines per maintained code file. Rust inline tests can exceed the production-line target.
 Before splitting a file, identify its separate responsibilities. Name each resulting file for its responsibility.
 Document each necessary exception in the change report.
-The [migration report](docs/migration/verification.md) records before-and-after counts and remaining exceptions.
+The [cleanup report](docs/refactor-46.md) records counts, responsibility reviews, interface changes, and verification.
+The [migration report](docs/migration/verification.md) retains the earlier v0.2.0 evidence.
 
 ## Publication and releases
 

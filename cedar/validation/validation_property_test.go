@@ -1,7 +1,10 @@
 package validation_test
 
 import (
+	corpus "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/corpus"
 	generator "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/generator"
+	joy "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/joy"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
 
 	fixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fixture"
 
@@ -9,7 +12,7 @@ import (
 	context "context"
 	json "encoding/json"
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+
 	os "os"
 	filepath "path/filepath"
 	rapid "pgregory.net/rapid"
@@ -20,8 +23,8 @@ import (
 
 // Validation of the same (schema, policies) pair always yields identical diagnostics.
 func TestPropertyValidationDeterministic(t *testing.T) {
-	d := testsupport.LoadJoy(t)
-	rt := testsupport.TestRuntime(t)
+	d := joy.LoadJoy(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	rapid.Check(t, func(pt *rapid.T) {
 		policies := cedarpolicy.PoliciesFromCedar(generator.PropGenPolicySet(3).Draw(pt, "policies"))
@@ -54,7 +57,7 @@ func TestPropertyCorpusValidationStable(t *testing.T) {
 		info, err := os.Stat(f)
 		return err != nil || info.Size() > 128<<10
 	})
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	rapid.Check(t, func(pt *rapid.T) {
 		file := rapid.SampledFrom(files).Draw(pt, "file")
@@ -62,7 +65,7 @@ func TestPropertyCorpusValidationStable(t *testing.T) {
 		if err != nil {
 			pt.Fatalf("read: %v", err)
 		}
-		var tt testsupport.CorpusTest
+		var tt corpus.CorpusTest
 		decoder := json.NewDecoder(bytes.NewReader(raw))
 		decoder.DisallowUnknownFields()
 		if err := decoder.Decode(&tt); err != nil {
@@ -75,8 +78,8 @@ func TestPropertyCorpusValidationStable(t *testing.T) {
 			}
 			return b
 		}
-		schema := testsupport.ParseSchema(tt.SchemaFormat, string(read(tt.Schema)))
-		policies := testsupport.ParsePolicies(tt.PolicyFormat, string(read(tt.Policies)))
+		schema := corpus.ParseSchema(tt.SchemaFormat, string(read(tt.Schema)))
+		policies := corpus.ParsePolicies(tt.PolicyFormat, string(read(tt.Policies)))
 		first, err := rt.Validation().Validate(ctx, schema, policies)
 		if err != nil {
 			pt.Fatalf("validate: %v", err)

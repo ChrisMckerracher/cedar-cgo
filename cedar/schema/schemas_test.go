@@ -9,7 +9,10 @@ import (
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 	syntax "github.com/ChrisMckerracher/cedar-go-wasm/cedar/syntax"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	fixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fixture"
+	jsonassert "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/jsonassert"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	reflect "reflect"
 	sort "sort"
 	testing "testing"
@@ -32,16 +35,16 @@ func TestSchemaNativeFixtures(t *testing.T) {
 		ActionEntities json.RawMessage `json:"action_entities"`
 		Valid          bool
 	}
-	if err := json.Unmarshal(testsupport.ReadFile(t, "../testdata/parity/schemas/input.json"), &cases); err != nil {
+	if err := json.Unmarshal(fixture.MustReadFile(t, "../testdata/parity/schemas/input.json"), &cases); err != nil {
 		t.Fatal(err)
 	}
-	if err := json.Unmarshal(testsupport.ReadFile(t, "../testdata/parity/schemas/expected.json"), &expected); err != nil {
+	if err := json.Unmarshal(fixture.MustReadFile(t, "../testdata/parity/schemas/expected.json"), &expected); err != nil {
 		t.Fatal(err)
 	}
 	if len(cases) != len(expected) {
 		t.Fatal("fixture count differs")
 	}
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	for i, test := range cases {
 		t.Run(test.Name, func(t *testing.T) {
@@ -67,7 +70,7 @@ func TestSchemaNativeFixtures(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				testsupport.AssertSchemaJSON(t, []byte(converted.Text()), want.Conversions[j].JSON)
+				jsonassert.Equal(t, []byte(converted.Text()), want.Conversions[j].JSON)
 				cedarForm, err := rt.Schemas().ConvertSchemaFragment(ctx, converted, syntax.FormatCedar)
 				if err != nil {
 					t.Fatal(err)
@@ -96,7 +99,7 @@ func TestSchemaNativeFixtures(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			testsupport.AssertSchemaJSON(t, gotJSON, wantJSON)
+			jsonassert.Equal(t, gotJSON, wantJSON)
 			entities, err := rt.Schemas().ActionEntities(ctx, schema)
 			if err != nil {
 				t.Fatal(err)
@@ -123,7 +126,7 @@ func TestSchemaNativeFixtures(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			testsupport.AssertSchemaJSON(t, actualEntities, want.ActionEntities)
+			jsonassert.Equal(t, actualEntities, want.ActionEntities)
 			validation, err := rt.Validation().Validate(ctx, schema, cedarpolicy.PoliciesFromCedar(test.Policies))
 			if err != nil || validation.Passed != want.Valid {
 				t.Fatalf("composed validation: %+v %v", validation, err)

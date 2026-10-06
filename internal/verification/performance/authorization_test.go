@@ -62,7 +62,6 @@ func BenchmarkControlledSerial(b *testing.B) {
 	authorizer := benchmarkAuthorizer(b)
 	req := joyRequest()
 	b.ReportAllocs()
-	b.ResetTimer()
 	for b.Loop() {
 		response, err := authorizer.Authorize(context.Background(), req)
 		if err != nil || response.Decision != request.Allow {
@@ -112,7 +111,6 @@ func BenchmarkControlledLoad(b *testing.B) {
 	config := joyConfig(b)
 	created, discarded := uint64(0), uint64(0)
 	b.ReportAllocs()
-	b.ResetTimer()
 	for b.Loop() {
 		authorizer, err := runtime.NewAuthorizer(context.Background(), config)
 		if err != nil {

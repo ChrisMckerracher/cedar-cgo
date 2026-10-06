@@ -1,7 +1,10 @@
 package partial_test
 
 import (
+	fault "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fault"
 	generator "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/generator"
+	partialfixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/partial"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
 
 	bytes "bytes"
 	context "context"
@@ -12,22 +15,22 @@ import (
 	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 	syntax "github.com/ChrisMckerracher/cedar-go-wasm/cedar/syntax"
 	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+
 	reflect "reflect"
 	testing "testing"
 )
 
 func TestResidualProjectionPreservesNestedErrors(t *testing.T) {
 	ctx := context.Background()
-	schema := cedarschema.SchemaFromCedar(testsupport.PartialSchema)
-	rt := testsupport.TestRuntime(t)
+	schema := cedarschema.SchemaFromCedar(partialfixture.PartialSchema)
+	rt := testruntime.New(t)
 	policies := cedarpolicy.PoliciesFromCedar(`@note("雪") permit(principal, action, resource) when { context.mfa || 9223372036854775807 + 1 > 0 };`)
 	a, err := rt.NewAuthorizer(ctx, authorization.Config{Schema: &schema, Policies: policies})
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer a.Close()
-	r, err := a.Partial().PartialAuthorize(ctx, testsupport.PartialRequest())
+	r, err := a.Partial().PartialAuthorize(ctx, partialfixture.PartialRequest())
 	if err != nil || r.Decision != cedarpartial.Undecided || r.Residuals[0].State != cedarpartial.ResidualUnknown {
 		t.Fatalf("partial: %+v %v", r, err)
 	}
@@ -57,7 +60,7 @@ func TestResidualProjectionPreservesNestedErrors(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, mfa := range []bool{true, false} {
-		req := testsupport.SimpleRequest(cedarrequest.NewContext(cedarvalue.Record{"mfa": cedarvalue.Bool(mfa)}))
+		req := fault.SimpleRequest(cedarrequest.NewContext(cedarvalue.Record{"mfa": cedarvalue.Bool(mfa)}))
 		got, err := imported.Reauthorize(ctx, req)
 		if err != nil {
 			t.Fatal(err)

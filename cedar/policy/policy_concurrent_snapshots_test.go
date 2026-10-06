@@ -2,13 +2,16 @@ package policy_test
 
 import (
 	context "context"
+	json "encoding/json"
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	policysupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/policy"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	testing "testing"
 )
 
 func TestPolicyConcurrentSnapshots(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	p, err := rt.Policies().ParsePolicy(ctx, "base", `@owner("original") permit(principal == User::"alice",action,resource);`)
 	if err != nil {
@@ -18,18 +21,21 @@ func TestPolicyConcurrentSnapshots(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	principalID := func(p cedarpolicy.ParsedPolicy) any {
+		return policysupport.MustPolicyJSON(t, p)["principal"].(map[string]any)["entity"].(map[string]any)["id"]
+	}
 	for _, id := range []string{"first", "second", "third", "fourth"} {
 		t.Run(id, func(t *testing.T) {
 			t.Parallel()
 			for range 3 {
-				syntax, err := p.Syntax()
+				document := policysupport.MustPolicyJSON(t, p)
+				document["annotations"].(map[string]any)["owner"] = id
+				document["principal"].(map[string]any)["entity"].(map[string]any)["id"] = id
+				data, err := json.Marshal(document)
 				if err != nil {
 					t.Fatal(err)
 				}
-				syntax.ID = id
-				syntax.Annotations["owner"] = id
-				syntax.Principal.Entity.ID = id
-				edited, err := rt.Policies().PolicyFromSyntax(ctx, syntax)
+				edited, err := rt.Policies().PolicyFromJSON(ctx, id, data)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -38,10 +44,10 @@ func TestPolicyConcurrentSnapshots(t *testing.T) {
 					t.Fatal(err)
 				}
 				q, ok := set.Policy(id)
-				if !ok || q.PrincipalConstraint().Entity.ID != id {
+				if !ok || principalID(q) != id {
 					t.Fatal("concurrent edit mixed policy state")
 				}
-				if len(base.Policies()) != 1 || p.PrincipalConstraint().Entity.ID != "alice" {
+				if len(base.Policies()) != 1 || principalID(p) != "alice" {
 					t.Fatal("concurrent edit mutated original")
 				}
 				if owner, _ := p.Annotation("owner"); owner != "original" {

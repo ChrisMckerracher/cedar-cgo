@@ -1,7 +1,12 @@
 package value_test
 
 import (
+	fault "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fault"
+	fixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fixture"
+	fuzz "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fuzz"
 	generator "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/generator"
+	joy "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/joy"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
 
 	bytes "bytes"
 	context "context"
@@ -10,7 +15,7 @@ import (
 	cedarrequest "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
 	cedarentity "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
 	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+
 	rapid "pgregory.net/rapid"
 	testing "testing"
 )
@@ -33,7 +38,7 @@ func TestPropertyValueJSONFixpoint(t *testing.T) {
 
 // Entity snapshots pass their raw JSON through unchanged on marshal.
 func TestPropertyEntitiesJSONPassthrough(t *testing.T) {
-	joyJSON := testsupport.ReadFile(t, "../testdata/joy/entities.json")
+	joyJSON := fixture.MustReadFile(t, "../testdata/joy/entities.json")
 	rapid.Check(t, func(pt *rapid.T) {
 		first, err := json.Marshal(generator.PropGenEntityStore(joyJSON).Draw(pt, "store").Entities)
 		if err != nil {
@@ -51,9 +56,9 @@ func TestPropertyEntitiesJSONPassthrough(t *testing.T) {
 
 // Malformed entity input fails closed: no module fault, and any error denies.
 func TestPropertyMalformedEntitiesFailClosed(t *testing.T) {
-	d := testsupport.LoadJoy(t)
-	rt := testsupport.TestRuntime(t)
-	joyJSON := testsupport.ReadFile(t, "../testdata/joy/entities.json")
+	d := joy.LoadJoy(t)
+	rt := testruntime.New(t)
+	joyJSON := fixture.MustReadFile(t, "../testdata/joy/entities.json")
 	ctx := context.Background()
 	rapid.Check(t, func(pt *rapid.T) {
 		var raw []byte
@@ -77,18 +82,18 @@ func TestPropertyMalformedEntitiesFailClosed(t *testing.T) {
 			valid[pos] = byte('a' + rapid.IntRange(0, 25).Draw(pt, "letter"))
 			raw = valid
 		}
-		if testsupport.Nesting(string(raw)) > testsupport.MaxFuzzNesting {
+		if fuzz.Nesting(string(raw)) > fuzz.MaxFuzzNesting {
 			pt.Skip("entity input exceeds the nesting limit")
 		}
 		for _, schema := range []*cedarschema.Schema{&d.Schema, nil} {
 			a, err := rt.NewAuthorizer(ctx, authorization.Config{
-				Policies: testsupport.PermitAll, Entities: cedarentity.EntitiesFromJSON(raw), Schema: schema, Limits: testsupport.FuzzLimits,
+				Policies: fault.PermitAll, Entities: cedarentity.EntitiesFromJSON(raw), Schema: schema, Limits: fuzz.FuzzLimits,
 			})
 			generator.PropCheckNoFault(pt, err)
 			if err != nil {
 				continue
 			}
-			resp, err := a.Authorize(ctx, testsupport.JoyRequest())
+			resp, err := a.Authorize(ctx, joy.JoyRequest())
 			a.Close()
 			generator.PropCheckNoFault(pt, err)
 			if err != nil && resp.Decision != cedarrequest.Deny {

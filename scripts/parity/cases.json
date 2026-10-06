@@ -1,0 +1,20 @@
+{
+  "slicing": {"bin": "slicing-fixtures", "offline": true, "args": ["testdata/parity/slicing/cases.json"], "expected": "testdata/parity/slicing/expected.json"},
+  "policies": {"bin": "policies_oracle", "offline": true, "expected": "testdata/parity/policies/native.json"},
+  "partial": {"bin": "partial_fixture", "offline": true, "input": "testdata/parity/partial/input.json", "expected": "testdata/parity/partial/expected.json"},
+  "format": {"bin": "format_parity", "managed": true},
+  "validation-depth": {"bin": "validation_depth", "input": "testdata/parity/validation-depth/input.json", "expected": "testdata/parity/validation-depth/expected.json"},
+  "expressions": {"bin": "expression_fixtures", "input": "testdata/parity/expressions/input.json", "expected": "testdata/parity/expressions/expected.json"},
+  "literals": {"bin": "literal_fixtures", "input": "testdata/parity/literals/input.json", "expected": "testdata/parity/literals/expected.json"},
+  "applicability": {"bin": "applicability_fixtures", "input": "testdata/parity/applicability/input.json", "expected": "testdata/parity/applicability/expected.json"},
+  "diagnostics": {"bin": "diagnostic_fixtures", "input": "testdata/parity/diagnostics/input.json", "expected": "testdata/parity/diagnostics/expected.json"},
+  "schema": {"bin": "schema_fixtures", "input": "testdata/parity/schemas/input.json", "expected": "testdata/parity/schemas/expected.json"},
+  "entity-store": {"bin": "entity_store_fixtures", "input": "testdata/parity/entity-store/input.json", "expected": "testdata/parity/entity-store/expected.json"},
+  "utilities": {"bin": "utility_fixtures", "input": "testdata/parity/utilities/input.json", "expected": "testdata/parity/utilities/expected.json"},
+  "queries": {"bin": "query_fixtures", "input": "testdata/parity/queries/input.json", "expected": "testdata/parity/queries/expected.json"},
+  "pst": {"bin": "pst_fixtures", "input": "testdata/parity/pst/input.json", "expected": "testdata/parity/pst/expected.json"},
+  "source-tokens": {"bin": "source_token_fixtures", "input": "testdata/parity/source-tokens/input.json", "expected": "testdata/parity/source-tokens/expected.json"},
+  "analysis-queries": {"bin": "analysis_queries", "solver": true, "input": "testdata/parity/analysis-queries/input.json", "expected": "testdata/parity/analysis-queries/expected.json"},
+  "templates": {"bin": "template_fixtures", "expected": "testdata/parity/templates/native.json", "go": ["^TestTemplateNativeParity$", "./cedar/policy/template"]},
+  "batched": {"bin": "batched-oracle", "offline": true, "input": "testdata/parity/batched/input.json", "expected": "testdata/parity/batched/expected.json", "go": ["^TestBatchedNativeParity$", "./cedar/authorization/batched"]}
+}

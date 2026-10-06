@@ -1,7 +1,9 @@
 package integration_test
 
 import (
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	corpus "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/corpus"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	os "os"
 	filepath "path/filepath"
 	runtime "runtime"
@@ -22,17 +24,17 @@ func TestCorpus(t *testing.T) {
 		t.Fatal(err)
 	}
 	files = slices.DeleteFunc(files, func(f string) bool { return strings.HasSuffix(f, ".entities.json") })
-	if len(files) == 0 {
-		t.Fatalf("no corpus tests in %s", dir)
+	if len(files) != 7523 {
+		t.Fatalf("corpus has %d test files; want 7523 from the pinned archive", len(files))
 	}
-	rt := testsupport.TestRuntime(t)
-	var tally testsupport.CorpusTally
+	rt := testruntime.New(t)
+	var tally corpus.CorpusTally
 	work := make(chan string)
 	var wg sync.WaitGroup
 	for range runtime.GOMAXPROCS(0) {
 		wg.Go(func() {
 			for f := range work {
-				testsupport.RunCorpusTest(rt, dir, f, &tally)
+				corpus.RunCorpusTest(rt, dir, f, &tally)
 			}
 		})
 	}
@@ -51,7 +53,7 @@ func TestCorpus(t *testing.T) {
 	if tally.DecisionMismatch+tally.ReasonMismatch+tally.ErrorMismatch+tally.ValidationMismatch+tally.SetupFailure+tally.RequestFailure != 0 {
 		t.Fatal("the corpus disagrees with this package")
 	}
-	if tally.Requests == 0 {
-		t.Fatal("the corpus has no requests")
+	if tally.Tests != 7523 || tally.Requests != 60184 {
+		t.Fatalf("incomplete corpus: tests=%d requests=%d; want 7523 tests and 60184 requests", tally.Tests, tally.Requests)
 	}
 }

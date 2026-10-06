@@ -1,4 +1,3 @@
-use super::syntax::Syntax;
 use cgw_abi::Source;
 use serde::Deserialize;
 use serde_json::Value;
@@ -9,9 +8,6 @@ pub(super) enum Input {
     Parse {
         id: String,
         source: Source,
-    },
-    Construct {
-        syntax: Box<Syntax>,
     },
     Inspect {
         set: Source,

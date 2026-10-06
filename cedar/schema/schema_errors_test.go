@@ -7,12 +7,13 @@ import (
 	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 	syntax "github.com/ChrisMckerracher/cedar-go-wasm/cedar/syntax"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	testing "testing"
 )
 
 func TestSchemaErrors(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	for _, test := range []struct {
 		Fragments []cedarschema.SchemaFragment
@@ -38,7 +39,7 @@ func TestSchemaErrors(t *testing.T) {
 }
 
 func TestSchemaCompositionNamespaceAnnotations(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	schema, err := rt.Schemas().ComposeSchema(context.Background(),
 		cedarschema.SchemaFragmentFromCedar(`@doc("first") namespace App { entity User; }`),
 		cedarschema.SchemaFragmentFromCedar(`@doc("second") namespace App { entity Photo; }`))

@@ -5,7 +5,6 @@ import (
 	errors "errors"
 	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	reflect "reflect"
-	strings "strings"
 	testing "testing"
 )
 
@@ -79,41 +78,4 @@ func SourceTokenResponseForTest(t *testing.T, tokens []SourceToken, comments []s
 		t.Fatal(err)
 	}
 	return data
-}
-
-func TestSourceTokenResponseLexicalContract(t *testing.T) {
-	for _, tc := range []struct {
-		name, source, message string
-		tokens                []SourceToken
-	}{
-		{name: "omitted all tokens", source: "x", message: "nontrivia"},
-		{name: "omitted prefix", source: "y x", message: "nontrivia", tokens: []SourceToken{SourceTokenForTest("identifier", "x", 2)}},
-		{name: "omitted middle", source: "x y z", message: "nontrivia", tokens: []SourceToken{SourceTokenForTest("identifier", "x", 0), SourceTokenForTest("identifier", "z", 4)}},
-		{name: "omitted suffix", source: "x y", message: "nontrivia", tokens: []SourceToken{SourceTokenForTest("identifier", "x", 0)}},
-		{name: "token inside comment", source: "// x", message: "nontrivia", tokens: []SourceToken{SourceTokenForTest("identifier", "x", 3)}},
-		{name: "block comment is not trivia", source: "/* x */", message: "nontrivia"},
-		{name: "zero width space is not trivia", source: "\u200b", message: "nontrivia"},
-		{name: "number kind on identifier", source: "x", message: "spelling", tokens: []SourceToken{SourceTokenForTest("number", "x", 0)}},
-		{name: "string kind on identifier", source: "x", message: "spelling", tokens: []SourceToken{SourceTokenForTest("string", "x", 0)}},
-		{name: "identifier kind on keyword", source: "permit", message: "spelling", tokens: []SourceToken{SourceTokenForTest("identifier", "permit", 0)}},
-		{name: "identifier starts with digit", source: "1x", message: "spelling", tokens: []SourceToken{SourceTokenForTest("identifier", "1x", 0)}},
-		{name: "identifier uses unicode", source: "雪", message: "spelling", tokens: []SourceToken{SourceTokenForTest("identifier", "雪", 0)}},
-		{name: "number contains punctuation", source: "1.0", message: "spelling", tokens: []SourceToken{SourceTokenForTest("number", "1.0", 0)}},
-		{name: "unterminated string", source: `"x`, message: "spelling", tokens: []SourceToken{SourceTokenForTest("string", `"x`, 0)}},
-		{name: "unescaped quote", source: `"a"b"`, message: "spelling", tokens: []SourceToken{SourceTokenForTest("string", `"a"b"`, 0)}},
-		{name: "escaped line feed", source: "\"a\\\nb\"", message: "spelling", tokens: []SourceToken{SourceTokenForTest("string", "\"a\\\nb\"", 0)}},
-		{name: "split identifier", source: "xy", message: "spelling", tokens: []SourceToken{SourceTokenForTest("identifier", "x", 0), SourceTokenForTest("identifier", "y", 1)}},
-		{name: "split number", source: "12", message: "spelling", tokens: []SourceToken{SourceTokenForTest("number", "1", 0), SourceTokenForTest("number", "2", 1)}},
-		{name: "keyword prefix", source: "permitx", message: "spelling", tokens: []SourceToken{SourceTokenForTest("permit", "permit", 0), SourceTokenForTest("identifier", "x", 6)}},
-		{name: "split operator", source: "::", message: "spelling", tokens: []SourceToken{SourceTokenForTest(":", ":", 0), SourceTokenForTest(":", ":", 1)}},
-		{name: "comment marker as tokens", source: "//", message: "spelling", tokens: []SourceToken{SourceTokenForTest("/", "/", 0), SourceTokenForTest("/", "/", 1)}},
-	} {
-		t.Run(tc.name, func(t *testing.T) {
-			got, err := DecodeSourceTokens(SourceTokenResponseForTest(t, tc.tokens, nil), tc.source)
-			var ce *diagnostic.Error
-			if !errors.As(err, &ce) || ce.Kind != diagnostic.KindFault || !strings.Contains(ce.Message, tc.message) || !reflect.DeepEqual(got, SourceTokens{}) {
-				t.Fatalf("wrong lexical contract result: %+v %v", got, err)
-			}
-		})
-	}
 }

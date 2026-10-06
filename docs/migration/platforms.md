@@ -9,7 +9,7 @@ The migration replaces the previous Windows and macOS amd64 support matrix with 
 | Linux arm64 | `aarch64-unknown-linux-gnu` | Ubuntu 24.04 ARM | System GCC | Native reproduction and independent consumer |
 | macOS arm64 | `aarch64-apple-darwin` | macOS 15 ARM | Apple Clang | Native reproduction and independent consumer |
 
-CI tests Go 1.26 and 1.27 on each target.
+CI tests Go 1.27.1 on each target.
 Each runner builds two independent archives and compares them byte for byte.
 Consumer tests use the exact verified artifact for their target.
 Each consumer executes concrete authorization and solver-backed analysis.

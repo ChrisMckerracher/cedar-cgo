@@ -2,10 +2,11 @@ package policy_test
 
 import (
 	generator "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/generator"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
 
 	context "context"
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+
 	rapid "pgregory.net/rapid"
 	testing "testing"
 )
@@ -13,7 +14,7 @@ import (
 // Adding and removing a policy restores the set exactly; unrelated policies
 // keep their JSON untouched.
 func TestPropertyEditsIsolateUnrelatedPolicies(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	rapid.Check(t, func(pt *rapid.T) {
 		first, err := rt.Policies().ParsePolicy(ctx, "first", generator.PropGenPolicy("first").Draw(pt, "first"))

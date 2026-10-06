@@ -5,12 +5,6 @@ import (
 	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 )
 
-// PolicyFromSyntax constructs a static policy through upstream PST validation.
-// This API is experimental, and may change with Cedar's PST representation.
-func (rt *Client) PolicyFromSyntax(ctx context.Context, syntax PolicySyntax) (ParsedPolicy, error) {
-	return rt.policy(ctx, map[string]any{"op": "construct", "syntax": syntax})
-}
-
 func (rt *Client) ParsePolicySet(ctx context.Context, source PolicySet) (ParsedPolicySet, error) {
 	s, _, err := rt.policySet(ctx, map[string]any{"op": "inspect", "set": source.Wire()})
 	return s, err
@@ -20,7 +14,7 @@ func (rt *Client) ParsePolicySet(ctx context.Context, source PolicySet) (ParsedP
 // only static policies. All edit methods leave their inputs unchanged on errors.
 func (rt *Client) AddPolicy(ctx context.Context, set PolicySet, policy ParsedPolicy) (ParsedPolicySet, error) {
 	if policy.data == nil {
-		return ParsedPolicySet{}, InvalidParsedPolicy()
+		return ParsedPolicySet{}, invalidParsedPolicy()
 	}
 	if !policy.IsStatic() {
 		return ParsedPolicySet{}, &diagnostic.Error{Kind: diagnostic.KindPolicies, Message: "expected a static policy; use template linking to add a linked policy"}

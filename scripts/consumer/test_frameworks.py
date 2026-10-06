@@ -4,8 +4,8 @@ import json
 import unittest
 
 from bundle import checksums
-from fixture import BundleCase, COMMIT, NATIVE_FILES, native_fixture
-from native import ARTIFACT_FILES, TARGETS, generated_names
+from fixture import BundleCase, COMMIT, NATIVE_FILES, TARGETS, native_fixture
+from native import ARTIFACT_FILES, generated_names
 
 DARWIN = "aarch64-apple-darwin"
 FLAGS = ["-liconv", "-framework", "CoreFoundation", "-lSystem", "-lc", "-lm", "-framework", "CoreFoundation", "-lc"]

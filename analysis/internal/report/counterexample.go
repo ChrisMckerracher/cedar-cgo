@@ -1,15 +1,17 @@
 package report
 
 import (
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"errors"
 
+	records "github.com/ChrisMckerracher/cedar-go-wasm/analysis/report"
 	requests "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
 	entities "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
 	uids "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
 )
 
-func decodeCounterexample(c *counterexampleOutput, res Result, query string, swap bool) (*Counterexample, error) {
+func decodeCounterexample(c *counterexampleOutput, res records.Result, query string, swap bool) (*records.Counterexample, error) {
 	if res.Holds {
 		return nil, errors.New("analysis: module returned a counterexample for a property that holds")
 	}
@@ -18,11 +20,11 @@ func decodeCounterexample(c *counterexampleOutput, res Result, query string, swa
 		!c.Request.Resource.matchesType(res.ResourceType) {
 		return nil, errors.New("analysis: counterexample request does not match its environment")
 	}
-	var contextRecord map[string]json.RawMessage
+	var contextRecord map[string]jsontext.Value
 	if err := json.Unmarshal(c.Request.Context, &contextRecord); err != nil || contextRecord == nil {
 		return nil, errors.New("analysis: counterexample context is not a JSON object")
 	}
-	var entityArray []json.RawMessage
+	var entityArray []jsontext.Value
 	if err := json.Unmarshal(c.Entities, &entityArray); err != nil || entityArray == nil {
 		return nil, errors.New("analysis: counterexample entities are not a JSON array")
 	}
@@ -48,7 +50,7 @@ func decodeCounterexample(c *counterexampleOutput, res Result, query string, swa
 		first, second = db, da
 		firstEval, secondEval = secondEval, firstEval
 	}
-	res.Counterexample = &Counterexample{
+	res.Counterexample = &records.Counterexample{
 		Request: requests.Request{
 			Principal: uids.NewEntityUID(*c.Request.Principal.Type, *c.Request.Principal.ID),
 			Action:    uids.NewEntityUID(*c.Request.Action.Type, *c.Request.Action.ID),

@@ -9,13 +9,15 @@ import (
 	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
 	expression "github.com/ChrisMckerracher/cedar-go-wasm/cedar/expression"
 	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	fault "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fault"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	reflect "reflect"
 	testing "testing"
 )
 
 func TestExpressionEvaluationVariants(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	principal := entityuid.NewEntityUID("User", "雪")
 	env := expression.ExpressionEnv{Principal: &principal, Context: cedarrequest.NewContext(cedarvalue.Record{"number": cedarvalue.Long(9007199254740993)}), Entities: cedarentity.NewEntities(cedarentity.Entity{UID: principal, Attrs: cedarvalue.Record{"age": cedarvalue.Long(9007199254740993)}})}
 	cases := map[string]cedarvalue.EvalResult{
@@ -47,7 +49,7 @@ func TestExpressionEvaluationVariants(t *testing.T) {
 }
 
 func TestExpressionErrors(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	for _, source := range []string{"1 +", ""} {
 		_, err := rt.Expressions().ParseExpression(context.Background(), source)
 		var e *diagnostic.Error
@@ -77,9 +79,9 @@ func TestExpressionErrors(t *testing.T) {
 	if result != nil {
 		t.Fatal("zero expression returned a value")
 	}
-	testsupport.RequireUTF8InputError(t, err)
+	fault.RequireUTF8InputError(t, err)
 	_, err = rt.Expressions().ParseExpression(context.Background(), string([]byte{0xff}))
-	testsupport.RequireUTF8InputError(t, err)
+	fault.RequireUTF8InputError(t, err)
 	restricted, err := rt.Expressions().ParseRestrictedExpression(context.Background(), `{value: decimal("1.25"), numbers: [1, 2]}`)
 	if err != nil {
 		t.Fatal(err)

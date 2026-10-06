@@ -1,13 +1,14 @@
 package execution
 
 import (
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 )
 
 // Encode checks the complete JSON envelope against its domain's byte limit.
 func Encode(input any, what string, max int) ([]byte, error) {
-	in, err := json.Marshal(input)
+	in, err := json.Marshal(input, json.Deterministic(true), json.FormatNilSliceAsNull(true), json.FormatNilMapAsNull(true), jsontext.EscapeForHTML(true), jsontext.EscapeForJS(true))
 	if err != nil {
 		return nil, &diagnostic.Error{Kind: diagnostic.KindInput, Message: err.Error()}
 	}

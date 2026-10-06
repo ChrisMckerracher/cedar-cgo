@@ -1,5 +1,8 @@
 # Native operation inventory
 
+This inventory records the v0.2.0 migration baseline. It is not the current public export list.
+See the [consumer guide](consumer.md) for the v0.3.0 removals and package moves.
+
 Reference source: `a7083b5cb27dae4ec8be5f84d8f7b88b4a1fbcc6`.
 
 The first native implementation preserves JSON envelopes and all 22 feature operation names.

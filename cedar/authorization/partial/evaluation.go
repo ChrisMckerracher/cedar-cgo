@@ -5,6 +5,7 @@ import (
 	json "encoding/json"
 	"errors"
 	fmt "fmt"
+	partialinput "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial/input"
 	request "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
 	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	schema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
@@ -15,13 +16,13 @@ import (
 
 // PartialAuthorize runs Rust TPE, including strict policy validation. It requires
 // Config.Schema and applies the authorizer's ordinary request byte limits and deadlines.
-func (a *Client) PartialAuthorize(ctx context.Context, req PartialRequest) (PartialResponse, error) {
+func (a *Client) PartialAuthorize(ctx context.Context, req partialinput.PartialRequest) (PartialResponse, error) {
 	in, err := execution.Encode(PartialInput{req.Principal, req.Action.Wire(), req.Resource, req.Context, req.Entities}, "request", a.session.Limits.MaxRequestBytes)
 	if err != nil {
 		return PartialResponse{}, err
 	}
 	var response PartialResponse
-	err = a.partialCall(ctx, "cgw_partial_authorize", in, func(out []byte) error {
+	err = a.session.Call(ctx, "cgw_partial_authorize", in, func(out []byte) error {
 		var err error
 		response, err = DecodePartial(out)
 		return err
@@ -49,7 +50,7 @@ func (r PartialResponse) Reauthorize(ctx context.Context, req request.Request) (
 		return request.Response{}, err
 	}
 	var response request.Response
-	err = r.authorizer.partialCall(ctx, "cgw_reauthorize", in, func(out []byte) error {
+	err = r.authorizer.session.Call(ctx, "cgw_reauthorize", in, func(out []byte) error {
 		var err error
 		response, err = request.DecodeAuthorize(out)
 		return err
@@ -58,10 +59,6 @@ func (r PartialResponse) Reauthorize(ctx context.Context, req request.Request) (
 		return request.Response{}, err
 	}
 	return response, nil
-}
-
-func (a *Client) partialCall(ctx context.Context, op string, in []byte, decode func([]byte) error) error {
-	return a.session.Call(ctx, op, in, decode)
 }
 
 func DecodePartial(out []byte) (PartialResponse, error) {

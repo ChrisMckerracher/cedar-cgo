@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	partialinput "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial/input"
 	cedarrequest "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
 	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	cedarentity "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
@@ -34,10 +35,10 @@ func TestPartialTypedEntitiesAndSnapshot(t *testing.T) {
 	defer a.session.Close()
 	uid := entityuid.NewEntityUID("Photo", "one")
 	empty := cedarvalue.Record{}
-	req := PartialRequest{Principal: UnknownEntityUID("User"), Action: entityuid.NewEntityUID("Action", "view"), Resource: UnknownEntityUID("Photo")}
-	req.Resource = KnownEntityUID(uid)
+	req := partialinput.PartialRequest{Principal: partialinput.UnknownEntityUID("User"), Action: entityuid.NewEntityUID("Action", "view"), Resource: partialinput.UnknownEntityUID("Photo")}
+	req.Resource = partialinput.KnownEntityUID(uid)
 	req.Context = &cedarrequest.Context{}
-	req.Entities = NewPartialEntities(PartialEntity{UID: uid, Parents: []entityuid.EntityUID{}, Tags: &empty})
+	req.Entities = partialinput.NewPartialEntities(partialinput.PartialEntity{UID: uid, Parents: []entityuid.EntityUID{}, Tags: &empty})
 	res, err := a.PartialAuthorize(ctx, req)
 	if err != nil || res.Decision != Undecided {
 		t.Fatalf("partial: %+v %v", res, err)

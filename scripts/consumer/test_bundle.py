@@ -1,9 +1,11 @@
 """Test malformed bundle rejection through the extraction command."""
 
 import stat
+import os
 import unittest
 import zipfile
 from pathlib import Path
+from unittest.mock import patch
 
 from bundle import ROOT, checksums
 from fixture import BundleCase, COMMIT, NATIVE_FILES
@@ -62,6 +64,34 @@ class BundleTests(BundleCase):
             with self.subTest(commit=commit):
                 result = self.extract(self.files, expected=commit)
                 self.assertNotEqual(result.returncode, 0)
+
+    def test_extraction_refuses_existing_source_tree_and_symlink(self):
+        outside = self.directory / "outside"
+        outside.mkdir()
+        marker = outside / "marker"
+        marker.write_bytes(b"preserve")
+        output = self.directory / "out"
+        output.mkdir()
+        root = output / ROOT
+        root.symlink_to(outside, target_is_directory=True)
+        result = self.extract(self.files)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(list(outside.iterdir()), [marker])
+        self.assertEqual(marker.read_bytes(), b"preserve")
+
+    def test_extraction_builds_trusted_verifier_with_rust_blocked(self):
+        binaries = self.directory / "bin"
+        binaries.mkdir()
+        for tool in ("cargo", "rustc", "rustup"):
+            path = binaries / tool
+            path.write_text("#!/bin/sh\necho 'Unexpected Rust invocation' >&2\nexit 99\n")
+            path.chmod(0o755)
+        source = {name: data for name, data in self.files.items() if name not in NATIVE_FILES and name not in ("SOURCE_COMMIT", "SHA256SUMS", "SOURCE_SHA256SUMS")}
+        source["cmd/verify-native-artifact/main.go"] = b"untrusted verifier source must never execute\n"
+        files = self.files | source | {"SOURCE_SHA256SUMS": checksums(source)}
+        with patch.dict(os.environ, {"PATH": str(binaries) + os.pathsep + os.environ["PATH"], "CGO_ENABLED": "1"}):
+            result = self.extract(files)
+        self.assertEqual(result.returncode, 0, result.stderr)
 
 
 

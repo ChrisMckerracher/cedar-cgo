@@ -1,7 +1,11 @@
 package partial_test
 
 import (
+	fault "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fault"
 	generator "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/generator"
+	partialfixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/partial"
+	policysupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/policy"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
 
 	context "context"
 	json "encoding/json"
@@ -13,20 +17,20 @@ import (
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+
 	reflect "reflect"
 	testing "testing"
 )
 
 func TestResidualImportRejectsEditedExports(t *testing.T) {
 	ctx := context.Background()
-	schema := cedarschema.SchemaFromCedar(testsupport.PartialSchema)
-	a, err := testsupport.TestRuntime(t).NewAuthorizer(ctx, authorization.Config{Schema: &schema, Policies: cedarpolicy.PoliciesFromCedar(`permit(principal, action, resource) when { context.mfa };`)})
+	schema := cedarschema.SchemaFromCedar(partialfixture.PartialSchema)
+	a, err := testruntime.New(t).NewAuthorizer(ctx, authorization.Config{Schema: &schema, Policies: cedarpolicy.PoliciesFromCedar(`permit(principal, action, resource) when { context.mfa };`)})
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer a.Close()
-	partial, err := a.Partial().PartialAuthorize(ctx, testsupport.PartialRequest())
+	partial, err := a.Partial().PartialAuthorize(ctx, partialfixture.PartialRequest())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -65,7 +69,7 @@ func TestResidualImportRejectsEditedExports(t *testing.T) {
 			t.Fatalf("edited export accepted: %+v %v", got, err)
 		}
 	}
-	other, err := testsupport.TestRuntime(t).NewAuthorizer(ctx, authorization.Config{Schema: &schema, Policies: cedarpolicy.PoliciesFromCedar(`forbid(principal, action, resource);`)})
+	other, err := testruntime.New(t).NewAuthorizer(ctx, authorization.Config{Schema: &schema, Policies: cedarpolicy.PoliciesFromCedar(`forbid(principal, action, resource);`)})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -88,16 +92,16 @@ func TestResidualImportRejectsEditedExports(t *testing.T) {
 
 func TestResidualRawPolicyIDs(t *testing.T) {
 	ctx := context.Background()
-	schema := cedarschema.SchemaFromCedar(testsupport.PartialSchema)
+	schema := cedarschema.SchemaFromCedar(partialfixture.PartialSchema)
 	for _, id := range []string{"", "policy\"\n\\\x00"} {
-		a, err := testsupport.TestRuntime(t).NewAuthorizer(ctx, authorization.Config{Schema: &schema, Policies: testsupport.PartialIDPolicies(t, map[string]json.RawMessage{
-			id: testsupport.PartialIDPolicy("permit", "when", `{".":{"left":{"Var":"context"},"attr":"mfa"}}`),
+		a, err := testruntime.New(t).NewAuthorizer(ctx, authorization.Config{Schema: &schema, Policies: policysupport.PartialIDPolicies(t, map[string]json.RawMessage{
+			id: policysupport.PartialIDPolicy("permit", "when", `{".":{"left":{"Var":"context"},"attr":"mfa"}}`),
 		})})
 		if err != nil {
 			t.Fatal(err)
 		}
 		t.Cleanup(func() { a.Close() })
-		partial, err := a.Partial().PartialAuthorize(ctx, testsupport.PartialRequest())
+		partial, err := a.Partial().PartialAuthorize(ctx, partialfixture.PartialRequest())
 		if err != nil || partial.Decision != cedarpartial.Undecided || len(partial.Residuals) != 1 || partial.Residuals[0].PolicyID != id {
 			t.Fatalf("partial policy ID %q: %+v %v", id, partial, err)
 		}
@@ -113,7 +117,7 @@ func TestResidualRawPolicyIDs(t *testing.T) {
 			t.Fatalf("imported policy ID %q: %+v %v", id, imported, err)
 		}
 		for _, mfa := range []bool{true, false} {
-			req := testsupport.SimpleRequest(cedarrequest.NewContext(cedarvalue.Record{"mfa": cedarvalue.Bool(mfa)}))
+			req := fault.SimpleRequest(cedarrequest.NewContext(cedarvalue.Record{"mfa": cedarvalue.Bool(mfa)}))
 			got, err := imported.Reauthorize(ctx, req)
 			if err != nil {
 				t.Fatal(err)

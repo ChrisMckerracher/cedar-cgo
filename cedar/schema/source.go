@@ -31,6 +31,5 @@ func OptionalSchema(s *Schema) *wire.Source {
 	if s == nil {
 		return nil
 	}
-	w := s.Wire()
-	return &w
+	return new(s.Wire())
 }

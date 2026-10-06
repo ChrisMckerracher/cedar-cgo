@@ -3,7 +3,11 @@ package policy_test
 import (
 	context "context"
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	fault "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fault"
+	fuzz "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fuzz"
+	jsonassert "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/jsonassert"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	slices "slices"
 	testing "testing"
 	time "time"
@@ -18,10 +22,10 @@ func FuzzPolicyEdits(f *testing.F) {
 	f.Add(`permit(principal, action, resource);`, `permit(principal, action, resource) when { 1 + };`, "dup", "dup", "dup")
 	f.Add("", "", "", "", "")
 	f.Add(`@id("x") permit(principal, action, resource) when { context.a };`, `forbid(principal, action, resource) unless { principal has b };`, "a\n\"雪", "\x00", "missing")
-	rt := testsupport.TestRuntime(f)
+	rt := testruntime.New(f)
 	f.Fuzz(func(t *testing.T, sourceA, sourceB, idA, idB, removeID string) {
 		if len(sourceA)+len(sourceB)+len(idA)+len(idB)+len(removeID) > 8192 ||
-			testsupport.Nesting(sourceA) > testsupport.MaxFuzzNesting || testsupport.Nesting(sourceB) > testsupport.MaxFuzzNesting {
+			fuzz.Nesting(sourceA) > fuzz.MaxFuzzNesting || fuzz.Nesting(sourceB) > fuzz.MaxFuzzNesting {
 			t.Skip()
 		}
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -32,12 +36,12 @@ func FuzzPolicyEdits(f *testing.F) {
 		for _, input := range []struct{ id, source string }{{idA, sourceA}, {idB, sourceB}} {
 			if !utf8.ValidString(input.id) || !utf8.ValidString(input.source) {
 				_, err := rt.Policies().ParsePolicy(ctx, input.id, input.source)
-				testsupport.CheckNoFault(t, err)
-				testsupport.RequireUTF8InputError(t, err)
+				fault.CheckNoFault(t, err)
+				fault.RequireUTF8InputError(t, err)
 				continue
 			}
 			p, err := rt.Policies().ParsePolicy(ctx, input.id, input.source)
-			testsupport.CheckNoFault(t, err)
+			fault.CheckNoFault(t, err)
 			if err != nil {
 				continue
 			}
@@ -48,9 +52,9 @@ func FuzzPolicyEdits(f *testing.F) {
 			if err != nil {
 				t.Fatal("JSON round trip:", err)
 			}
-			testsupport.SameJSON(t, q.JSON(), p.JSON())
+			jsonassert.Equal(t, q.JSON(), p.JSON())
 			next, err := rt.Policies().AddPolicy(ctx, set, p)
-			testsupport.CheckNoFault(t, err)
+			fault.CheckNoFault(t, err)
 			if err != nil {
 				continue
 			}
@@ -61,9 +65,9 @@ func FuzzPolicyEdits(f *testing.F) {
 			added = append(added, input.id)
 		}
 		next, err := rt.Policies().RemovePolicy(ctx, set, removeID)
-		testsupport.CheckNoFault(t, err)
+		fault.CheckNoFault(t, err)
 		if !utf8.ValidString(removeID) {
-			testsupport.RequireUTF8InputError(t, err)
+			fault.RequireUTF8InputError(t, err)
 			return
 		}
 		if err != nil {
@@ -82,8 +86,8 @@ func FuzzPolicyEdits(f *testing.F) {
 		if err != nil {
 			t.Fatal("reparsing the edited set:", err)
 		}
-		testsupport.SameJSON(t, parsed.JSON(), snapshot.JSON())
-		if !slices.Equal(testsupport.FuzzPolicyIDs(parsed), testsupport.FuzzPolicyIDs(snapshot)) {
+		jsonassert.Equal(t, parsed.JSON(), snapshot.JSON())
+		if !slices.Equal(fuzzPolicyIDs(parsed), fuzzPolicyIDs(snapshot)) {
 			t.Fatal("reparsed set lists different policies")
 		}
 	})

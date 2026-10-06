@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"testing"
 )
 
 // Path resolves repository fixtures independently of a test package's working directory.
@@ -21,3 +22,12 @@ func Path(name string) string {
 }
 
 func ReadFile(name string) ([]byte, error) { return os.ReadFile(Path(name)) }
+
+func MustReadFile(t testing.TB, name string) []byte {
+	t.Helper()
+	data, err := ReadFile(name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return data
+}

@@ -1,7 +1,7 @@
 package report
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"testing"
 
 	requests "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"

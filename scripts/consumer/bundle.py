@@ -69,6 +69,9 @@ def extract_bundle(path, expected_commit, destination, expected_target=None):
     with zipfile.ZipFile(path) as archive:
         modes = {entry.filename[len(ROOT):]: (entry.external_attr >> 16) & 0o777 for entry in archive.infolist()}
     root = Path(destination) / ROOT
+    if root.exists() or root.is_symlink():
+        raise ValueError("consumer destination must not contain a source tree")
+    root.mkdir(parents=True)
     for name, data in files.items():
         output = root / name
         output.parent.mkdir(parents=True, exist_ok=True)

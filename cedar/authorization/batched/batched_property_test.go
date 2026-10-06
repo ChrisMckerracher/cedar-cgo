@@ -1,14 +1,17 @@
 package batched_test
 
 import (
+	fixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fixture"
 	generator "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/generator"
+	joy "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/joy"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
 
 	context "context"
 	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
 	batched "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/batched"
 	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+
 	rapid "pgregory.net/rapid"
 	testing "testing"
 )
@@ -16,9 +19,9 @@ import (
 // Batched authorization with an on-demand loader agrees with the same call
 // using preloaded entities and with ordinary sequential authorization.
 func TestPropertyBatchedMatchesSequential(t *testing.T) {
-	d := testsupport.LoadJoy(t)
-	rt := testsupport.TestRuntime(t)
-	joyJSON := testsupport.ReadFile(t, "../testdata/joy/entities.json")
+	d := joy.LoadJoy(t)
+	rt := testruntime.New(t)
+	joyJSON := fixture.MustReadFile(t, "../testdata/joy/entities.json")
 	ctx := context.Background()
 	rapid.Check(t, func(pt *rapid.T) {
 		TextValue := generator.PropGenPolicySet(2).Draw(pt, "policies")

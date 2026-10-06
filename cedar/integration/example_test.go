@@ -11,7 +11,7 @@ import (
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+
 	log "log"
 )
 
@@ -23,11 +23,11 @@ func Example() {
 	}
 	defer rt.Close(ctx)
 
-	schema := cedarschema.SchemaFromCedar(testsupport.PhotoSchema)
+	schema := cedarschema.SchemaFromCedar(PhotoSchema)
 	alice := entityuid.NewEntityUID("User", "alice")
 	a, err := rt.NewAuthorizer(ctx, authorization.Config{
 		Schema:   &schema,
-		Policies: cedarpolicy.PoliciesFromCedar(testsupport.PhotoPolicies),
+		Policies: cedarpolicy.PoliciesFromCedar(PhotoPolicies),
 		Entities: cedarentity.NewEntities(
 			cedarentity.Entity{UID: alice},
 			cedarentity.Entity{
@@ -66,7 +66,7 @@ func Example_validate() {
 	}
 	defer rt.Close(ctx)
 
-	res, err := rt.Validation().Validate(ctx, cedarschema.SchemaFromCedar(testsupport.PhotoSchema),
+	res, err := rt.Validation().Validate(ctx, cedarschema.SchemaFromCedar(PhotoSchema),
 		cedarpolicy.PoliciesFromCedar(`permit(principal, action, resource) when { resource.owner == "alice" };`))
 	if err != nil {
 		log.Fatal(err)

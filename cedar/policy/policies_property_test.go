@@ -2,12 +2,12 @@ package policy_test
 
 import (
 	generator "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/generator"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
 
 	context "context"
-	json "encoding/json"
 	fmt "fmt"
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+
 	maps "maps"
 	rapid "pgregory.net/rapid"
 	slices "slices"
@@ -16,7 +16,7 @@ import (
 
 // Add→list→remove sequences keep the set consistent with a Go-side model of IDs.
 func TestPropertyPolicyEditSequences(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	rapid.Check(t, func(pt *rapid.T) {
 		ops := rapid.SliceOfN(rapid.Custom(func(t *rapid.T) generator.PropEditOp {
@@ -70,9 +70,9 @@ func TestPropertyPolicyEditSequences(t *testing.T) {
 	})
 }
 
-// The JSON and EST views of a parsed policy round-trip through their parsers.
+// Cedar JSON and source text preserve policies through the upstream parsers.
 func TestPropertyPolicyViewsRoundtrip(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	rapid.Check(t, func(pt *rapid.T) {
 		id := generator.PropGenPolicyID().Draw(pt, "id")
@@ -85,21 +85,15 @@ func TestPropertyPolicyViewsRoundtrip(t *testing.T) {
 			pt.Fatalf("JSON view rejected: %v", err)
 		}
 		generator.PropSameJSON(pt, fromJSON.JSON(), p.JSON())
-		syntax, err := p.Syntax()
+		cedarText, err := p.Cedar()
 		if err != nil {
-			pt.Fatalf("syntax: %v", err)
+			pt.Fatalf("Cedar view: %v", err)
 		}
-		fromSyntax, err := rt.Policies().PolicyFromSyntax(ctx, syntax)
+		fromCedar, err := rt.Policies().ParsePolicy(ctx, p.ID(), cedarText)
 		if err != nil {
-			pt.Fatalf("EST view rejected: %v", err)
+			pt.Fatalf("Cedar view rejected: %v", err)
 		}
-		again, err := fromSyntax.Syntax()
-		if err != nil {
-			pt.Fatalf("reconstructed EST: %v", err)
-		}
-		b, _ := json.Marshal(syntax)
-		c, _ := json.Marshal(again)
-		generator.PropSameJSON(pt, b, c)
+		generator.PropSameJSON(pt, fromCedar.JSON(), p.JSON())
 		set, err := rt.Policies().AddPolicy(ctx, cedarpolicy.ParsedPolicySet{}.Source(), p)
 		if err != nil {
 			pt.Fatalf("add: %v", err)

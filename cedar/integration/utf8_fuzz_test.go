@@ -2,7 +2,7 @@ package integration_test
 
 import (
 	json "encoding/json"
-	cedarpartial "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial"
+	partialinput "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial/input"
 	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
 	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
 	testing "testing"
@@ -16,7 +16,7 @@ func FuzzUTF8Values(f *testing.F) {
 	}
 	f.Fuzz(func(t *testing.T, TextValue string) {
 		uid := entityuid.NewEntityUID(TextValue, TextValue)
-		for _, value := range []any{uid, cedarvalue.String(TextValue), cedarvalue.Record{TextValue: cedarvalue.String(TextValue)}, cedarvalue.Set{cedarvalue.EntityRef(uid), cedarvalue.String(TextValue)}, cedarvalue.Decimal(TextValue), cedarvalue.IPAddr(TextValue), cedarvalue.Datetime(TextValue), cedarvalue.Duration(TextValue), cedarpartial.KnownEntityUID(uid), cedarpartial.UnknownEntityUID(TextValue)} {
+		for _, value := range []any{uid, cedarvalue.String(TextValue), cedarvalue.Record{TextValue: cedarvalue.String(TextValue)}, cedarvalue.Set{cedarvalue.EntityRef(uid), cedarvalue.String(TextValue)}, cedarvalue.Decimal(TextValue), cedarvalue.IPAddr(TextValue), cedarvalue.Datetime(TextValue), cedarvalue.Duration(TextValue), partialinput.KnownEntityUID(uid), partialinput.UnknownEntityUID(TextValue)} {
 			encoded, err := json.Marshal(value)
 			if !utf8.ValidString(TextValue) {
 				if err == nil {

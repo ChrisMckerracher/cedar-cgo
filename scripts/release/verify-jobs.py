@@ -12,8 +12,7 @@ EXPECTED = {
 }
 for platform in ("linux_amd64", "linux_arm64", "darwin_arm64"):
     EXPECTED.add(f"Native artifact ({platform})")
-    for version in ("1.26.x", "1.27.x"):
-        EXPECTED.add(f"Go tests ({platform}, Go {version})")
+    EXPECTED.add(f"Go tests ({platform}, Go 1.27.1)")
 
 
 def verify(rows):

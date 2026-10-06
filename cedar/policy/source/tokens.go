@@ -4,9 +4,8 @@ import (
 	execution "github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
 
 	context "context"
-	json "encoding/json"
+	json "encoding/json/v2"
 	fmt "fmt"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
 )
 
@@ -94,9 +93,6 @@ type SourceTokensOutput struct {
 // TokenizePolicies uses Cedar's formatter lexer without performing semantic policy validation.
 // Token spans apply only to the supplied source; lex again after changing it.
 func (rt *Client) TokenizePolicies(ctx context.Context, TextValue string) (decoded SourceTokens, decodeErr error) {
-	if err := wire.CheckUTF8(TextValue); err != nil {
-		return SourceTokens{}, &diagnostic.Error{Kind: diagnostic.KindInput, Message: err.Error()}
-	}
 	in, err := execution.Encode(struct {
 		Text string `json:"text"`
 	}{TextValue}, "token source input", rt.runtime.MaxSourceBytes)

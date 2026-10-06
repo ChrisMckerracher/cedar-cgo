@@ -12,7 +12,9 @@ import (
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 	syntax "github.com/ChrisMckerracher/cedar-go-wasm/cedar/syntax"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	jsonassert "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/jsonassert"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	reflect "reflect"
 	strings "strings"
 	testing "testing"
@@ -45,7 +47,7 @@ func TestSchemaInspectionJSONRoundTrip(t *testing.T) {
 }
 
 func TestSchemaCompositionResolvesAfterCombining(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	first := cedarschema.SchemaFragmentFromCedar(`entity User {profile: Profile}; entity Photo; action view appliesTo {principal: User, resource: Photo};`)
 	second := cedarschema.SchemaFragmentFromCedar(`type Profile = {name: String};`)
@@ -75,7 +77,7 @@ func TestSchemaCompositionResolvesAfterCombining(t *testing.T) {
 }
 
 func TestSchemaFragmentAnnotations(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	fragment := cedarschema.SchemaFragmentFromCedar(`@doc("雪") namespace App { @doc("person") entity User { @doc("label") name: String }; action view appliesTo {principal: User, resource: User}; }`)
 	jsonForm, err := rt.Schemas().ConvertSchemaFragment(ctx, fragment, syntax.FormatJSON)
@@ -106,7 +108,7 @@ func TestSchemaFragmentAnnotations(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	testsupport.AssertSchemaJSON(t, original.ExpandedSchema, reparsed.ExpandedSchema)
+	jsonassert.Equal(t, original.ExpandedSchema, reparsed.ExpandedSchema)
 	if !strings.Contains(cedarForm.Text(), "雪") || !strings.Contains(back.Text(), "person") || !strings.Contains(back.Text(), "label") {
 		t.Fatal("Unicode annotation changed")
 	}

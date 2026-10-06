@@ -1,5 +1,5 @@
-use crate::{State, entity_uid};
-use cedar_policy::{Context, Decision, Request};
+use crate::{State, authorize::request_context, entity_uid, state::merged_entities};
+use cedar_policy::{Decision, Request};
 use cgw_abi::{Callback, OpError, parse_input};
 use serde::{Deserialize, Serialize};
 use serde_json::value::RawValue;
@@ -43,28 +43,13 @@ pub(crate) fn authorize(
     let principal = entity_uid(input.principal, "principal")?;
     let action = entity_uid(input.action, "action")?;
     let resource = entity_uid(input.resource, "resource")?;
-    let context = Context::from_json_str(
-        input.context.as_deref().map_or("{}", RawValue::get),
-        Some((schema, &action)),
-    )
-    .map_err(|e| OpError::new("context", &e))?;
+    let context = request_context(input.context.as_deref(), Some((schema, &action)))?;
     let request = Request::new(principal, action, resource, context, Some(schema))
         .map_err(|e| OpError::new("request", &e))?;
-    let extra;
-    let cached = match input.entities.as_deref() {
-        None => &loaded.entities,
-        Some(json) => {
-            extra = loaded
-                .entities
-                .clone()
-                .add_entities_from_json_str(json.get(), Some(schema))
-                .map_err(|e| OpError::new("entities", &e))?;
-            &extra
-        }
-    };
+    let cached = merged_entities(loaded, input.entities.as_deref())?;
     let mut loader = Loader {
         schema,
-        cached,
+        cached: &cached,
         max_bytes: input.max_batch_bytes,
         callback,
         error: None,

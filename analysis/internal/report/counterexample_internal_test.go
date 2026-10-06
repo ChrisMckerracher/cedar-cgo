@@ -1,8 +1,10 @@
 package report
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"testing"
+
+	records "github.com/ChrisMckerracher/cedar-go-wasm/analysis/report"
 )
 
 func TestPolicyEvaluationErrorFields(t *testing.T) {
@@ -13,7 +15,7 @@ func TestPolicyEvaluationErrorFields(t *testing.T) {
 		`{"policy_id":"p","message":null}`,
 		`{"policy_id":"p","message":""}`,
 	} {
-		var evaluation PolicyEvaluation
+		var evaluation records.PolicyEvaluation
 		if err := json.Unmarshal([]byte(`{"matched":false,"errors":[`+errorRecord+`]}`), &evaluation); err == nil {
 			t.Fatalf("incomplete error accepted: %s", errorRecord)
 		}
@@ -23,7 +25,7 @@ func TestPolicyEvaluationErrorFields(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		var evaluation PolicyEvaluation
+		var evaluation records.PolicyEvaluation
 		if err := json.Unmarshal([]byte(`{"matched":false,"errors":[{"policy_id":`+string(encoded)+`,"message":"overflow"}]}`), &evaluation); err != nil {
 			t.Fatal(err)
 		}
@@ -33,7 +35,7 @@ func TestPolicyEvaluationErrorFields(t *testing.T) {
 	}
 }
 
-func decodeCounterexampleRecord(t *testing.T, counterexample []byte) (Report, error) {
+func decodeCounterexampleRecord(t *testing.T, counterexample []byte) (records.Report, error) {
 	t.Helper()
 	input := `{"results":[{"principal_type":"User","action":{"type":"Action","id":""},"resource_type":"Document","holds":false,"counterexample":` + string(counterexample) + `}]}`
 	var output analyzeOutput

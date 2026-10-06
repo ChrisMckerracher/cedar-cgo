@@ -5,7 +5,8 @@ import (
 	json "encoding/json"
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	template "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/template"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	reflect "reflect"
 	testing "testing"
 )
@@ -54,13 +55,13 @@ func TestTemplateExactIntegerPreservation(t *testing.T) {
 			}
 		}
 	}
-	ctx, rt := context.Background(), testsupport.TestRuntime(t)
-	set, err := rt.Templates().AddTemplate(ctx, original, "share", template.TemplateFromCedar(testsupport.ShareTemplate))
+	ctx, rt := context.Background(), testruntime.New(t)
+	set, err := rt.Templates().AddTemplate(ctx, original, "share", template.TemplateFromCedar(ShareTemplate))
 	if err != nil {
 		t.Fatal(err)
 	}
 	check(set)
-	set, err = rt.Templates().LinkTemplate(ctx, set, "share", "linked", testsupport.ShareBindings())
+	set, err = rt.Templates().LinkTemplate(ctx, set, "share", "linked", ShareBindings())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -75,7 +76,7 @@ func TestTemplateExactIntegerPreservation(t *testing.T) {
 		t.Fatal(err)
 	}
 	check(set)
-	if !reflect.DeepEqual(testsupport.NormalizedPolicyJSON(t, []byte(original.Text())), testsupport.NormalizedPolicyJSON(t, []byte(set.Text()))) {
+	if !reflect.DeepEqual(NormalizedPolicyJSON(t, []byte(original.Text())), NormalizedPolicyJSON(t, []byte(set.Text()))) {
 		t.Fatalf("template round trip changed the original policy set:\noriginal %s\nresult %s", original.Text(), set.Text())
 	}
 }

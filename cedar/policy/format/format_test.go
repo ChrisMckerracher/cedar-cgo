@@ -10,27 +10,30 @@ import (
 	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	policyformat "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/format"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	fault "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fault"
+	fixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fixture"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	reflect "reflect"
 	strings "strings"
 	testing "testing"
 )
 
 func TestFormatNativeParity(t *testing.T) {
-	var cases []testsupport.FormatCase
-	var expected []testsupport.FormatExpected
+	var cases []FormatCase
+	var expected []FormatExpected
 	for path, into := range map[string]any{
 		"../testdata/parity/format/cases.json":    &cases,
 		"../testdata/parity/format/expected.json": &expected,
 	} {
-		if err := json.Unmarshal(testsupport.ReadFile(t, path), into); err != nil {
+		if err := json.Unmarshal(fixture.MustReadFile(t, path), into); err != nil {
 			t.Fatal(err)
 		}
 	}
 	if len(cases) != len(expected) || len(cases) == 0 {
 		t.Fatalf("fixture counts: %d cases, %d results", len(cases), len(expected))
 	}
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	for i, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {
 			want := expected[i]
@@ -43,7 +46,7 @@ func TestFormatNativeParity(t *testing.T) {
 			opts := []policyformat.FormatOption{policyformat.WithFormatLineWidth(tc.LineWidth), policyformat.WithFormatIndentWidth(tc.IndentWidth)}
 			formatted, err := rt.Formatter().FormatPolicies(context.Background(), tc.Input, opts...)
 			if want.Formatted == nil {
-				testsupport.RequireFormatError(t, formatted, err, diagnostic.KindPolicies)
+				RequireFormatError(t, formatted, err, diagnostic.KindPolicies)
 				return
 			}
 			if err != nil || formatted != *want.Formatted {
@@ -65,7 +68,7 @@ func TestFormatNativeParity(t *testing.T) {
 				defer a.Close()
 				var responses []cedarrequest.Response
 				for j, ctx := range tc.Contexts {
-					resp, err := a.Authorize(context.Background(), testsupport.SimpleRequest(cedarrequest.ContextFromJSON(ctx)))
+					resp, err := a.Authorize(context.Background(), fault.SimpleRequest(cedarrequest.ContextFromJSON(ctx)))
 					if err != nil {
 						t.Fatal(err)
 					}
@@ -89,7 +92,7 @@ func TestFormatNativeParity(t *testing.T) {
 }
 
 func TestFormatDiagnosticsAndInput(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	for _, TextValue := range []string{
 		"// café\npermit(principal, action, resource) when { 1 + };",
 		`@id("one") @id("two") permit(principal, action, resource);`,
@@ -97,7 +100,7 @@ func TestFormatDiagnosticsAndInput(t *testing.T) {
 		"\x00",
 	} {
 		out, err := rt.Formatter().FormatPolicies(context.Background(), TextValue)
-		testsupport.RequireFormatError(t, out, err, diagnostic.KindPolicies)
+		RequireFormatError(t, out, err, diagnostic.KindPolicies)
 		if !strings.Contains(err.Error(), "bytes ") {
 			t.Fatalf("diagnostic lost source span: %v", err)
 		}
@@ -110,13 +113,13 @@ func TestFormatDiagnosticsAndInput(t *testing.T) {
 	}
 	for _, TextValue := range []string{"\xff", "//\xc0\x80", `@id("` + "\xed\xa0\x80" + `") permit(principal,action,resource);`} {
 		out, err := rt.Formatter().FormatPolicies(context.Background(), TextValue)
-		testsupport.RequireFormatError(t, out, err, diagnostic.KindInput)
+		RequireFormatError(t, out, err, diagnostic.KindInput)
 	}
 	for _, opts := range [][]policyformat.FormatOption{
 		{nil}, {policyformat.WithFormatMaxOutputBytes(0)}, {policyformat.WithFormatMaxOutputBytes(-1)},
 		{policyformat.WithFormatMaxOutputBytes(cedar.DefaultMaxResponseBytes + 1)},
 	} {
-		out, err := rt.Formatter().FormatPolicies(context.Background(), testsupport.PermitAll.Text(), opts...)
-		testsupport.RequireFormatError(t, out, err, diagnostic.KindInput)
+		out, err := rt.Formatter().FormatPolicies(context.Background(), fault.PermitAll.Text(), opts...)
+		RequireFormatError(t, out, err, diagnostic.KindInput)
 	}
 }

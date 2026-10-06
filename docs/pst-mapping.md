@@ -133,4 +133,4 @@ Fixtures cover scopes, slots, links, annotations, every main expression form, ex
 Special expression fixtures record `Unknown`, `ResidualError`, and expression slots.
 They check native expression conversion, including forms that ordinary policy parsing rejects.
 The residual import tests verify projection equality and native PST reconstruction before replay.
-Run `scripts/pst-parity.sh --check` to check the committed fixtures.
+Run `python3 scripts/parity/run.py pst --check` to check the committed fixtures.
