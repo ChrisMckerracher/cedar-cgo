@@ -18,7 +18,7 @@ def executable():
     atexit.register(directory.cleanup)
     binary = Path(directory.name) / "verify-native-artifact"
     environment = os.environ | {"CGO_ENABLED": "0", "GOTOOLCHAIN": "local", "GOWORK": "off", "GOFLAGS": ""}
-    subprocess.run(["go", "build", "-o", str(binary), "./cmd/verify-native-artifact"],
+    subprocess.run(["go", "build", "-buildvcs=false", "-o", str(binary), "./cmd/verify-native-artifact"],
                    cwd=REPOSITORY, env=environment, check=True)
     return binary
 

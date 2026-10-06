@@ -77,7 +77,7 @@ Moved local test helpers count with their destination test files, not production
 | Shared Go support and consumer programs | 38 / 2,119 | 25 / 1,407 |
 | Rust separate tests and independent programs | 36 / 3,027 | 36 / 3,027 |
 | Rust inline test modules | 6 / 106 | 7 / 152 |
-| Python script tests | 7 / 425 | 9 / 652 |
+| Python script tests | 7 / 425 | 9 / 667 |
 
 Combined Go and Rust production decreases by 629 lines. Supporting scripts and explicit catalogs decrease by 147 lines.
 Removed vendor footprint is 76 files and 1,022,445 bytes. It is not custom-code savings.

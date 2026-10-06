@@ -9,6 +9,7 @@ from unittest.mock import patch
 
 from bundle import ROOT, checksums
 from fixture import BundleCase, COMMIT, NATIVE_FILES
+import artifact_verifier
 
 
 
@@ -92,6 +93,20 @@ class BundleTests(BundleCase):
         with patch.dict(os.environ, {"PATH": str(binaries) + os.pathsep + os.environ["PATH"], "CGO_ENABLED": "1"}):
             result = self.extract(files)
         self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_trusted_verifier_build_disables_vcs_stamping_and_cgo(self):
+        environment = {"CGO_ENABLED": "1", "GOTOOLCHAIN": "auto", "GOWORK": "/tmp/untrusted.work", "GOFLAGS": "--untrusted"}
+        with patch.dict(os.environ, environment), patch.object(artifact_verifier.subprocess, "run") as build:
+            artifact_verifier.executable.__wrapped__()
+        command = build.call_args.args[0]
+        self.assertIn("-buildvcs=false", command)
+        self.assertEqual(command[-1], "./cmd/verify-native-artifact")
+        self.assertEqual(build.call_args.kwargs["cwd"], artifact_verifier.REPOSITORY)
+        settings = build.call_args.kwargs["env"]
+        self.assertEqual(settings["CGO_ENABLED"], "0")
+        self.assertEqual(settings["GOTOOLCHAIN"], "local")
+        self.assertEqual(settings["GOWORK"], "off")
+        self.assertEqual(settings["GOFLAGS"], "")
 
 
 
