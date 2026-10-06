@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Hash the source, inputs, and controls used by migration measurements."""
+"""Hash the source, inputs, and controls used by performance measurements."""
 import hashlib
 import json
 import pathlib
@@ -17,7 +17,6 @@ for directory in ["rust/crates"]:
             files.add(path)
 for directory in ["testdata/joy", "scripts/performance"]:
     files.update(path for path in (root / directory).rglob("*") if path.is_file() and path.suffix != ".pyc")
-files.add(root / "scripts/measure-native-performance.sh")
 files.add(root / "scripts/measure-rust-cgo-performance.sh")
 entries = {
     str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest()
