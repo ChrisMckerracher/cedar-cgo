@@ -42,7 +42,9 @@ Rust shares concrete decision projection, matching request parsing, and entity m
 Go shares stateless input encoding, native calls, error envelopes, cancellation, and result clearing.
 Domain packages retain result variants and required fields.
 Loaded authorization, partial continuations, compiled analysis, and formatter limits retain their different ownership or error contracts.
+
 The arithmetic source guard was reviewed after changing loader serialization. Its size, subtraction, and positive-length premises remain unchanged.
+Raw-string preservation retains the final-length checks and the same arithmetic premises. The SMT model and assertions remain unchanged.
 
 Python build and consumer tools invoke the existing Go artifact policy through a trusted, cgo-free command.
 They never execute verifier source from an unvalidated bundle.

@@ -28,7 +28,7 @@ func TestBatchedProofSource(t *testing.T) {
 		"../../cedar/authorization/batched/callback.go": {
 			"charge":                 "bcdc4920f823a1b13a76abc3de6e23270e7f35c7066616ad903856e12c63a148",
 			"LoadEntityBatch":        "56dd39db215beea321944e547dae1651c6d1c5386fd509de68be6c9883e9f6d3",
-			"EncodeEntityLoadResult": "181358cbdd074cd4ec0f78097ea4cd2c0395fdd49062b2f6dd56a572dd328651",
+			"EncodeEntityLoadResult": "9fcf62b608186a9db5b9101f0c28aae3ab7cb2655c93a8bc6ee133f214fe4a9c",
 		},
 		"../../internal/execution/runtime.go": {
 			"DefaultMaxSourceBytes": "3e3dd176f77d783ffd18525efa54c9e6bdc8f46317be81336484cd6a20c1696d",
