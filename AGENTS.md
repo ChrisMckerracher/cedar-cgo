@@ -4,6 +4,11 @@ Comments should explain rationale, invariants, or non-obvious contracts in one
 line, usually two at most. Preserve directives, executable example output, and
 Rust safety contracts; use longer explanations only when complexity requires it.
 
+## README format
+
+Use the README for the package overview, requirements, installation, a working example, limitations, and links to detailed documentation.
+Chris rejected lesson headings, learning objectives, and knowledge checks in READMEs. Reserve lesson structure for requested primers and tutorials.
+
 ## Package structure
 
 Treat directories approaching 12 Go files, including tests, as a design smell that requires a responsibility review.
