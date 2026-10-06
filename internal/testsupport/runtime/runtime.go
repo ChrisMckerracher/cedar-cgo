@@ -6,7 +6,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar"
 )
 
 var (

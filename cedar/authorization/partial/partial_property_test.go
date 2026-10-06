@@ -1,17 +1,17 @@
 package partial_test
 
 import (
-	partialinput "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial/input"
-	generator "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/generator"
-	joy "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/joy"
-	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+	partialinput "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/partial/input"
+	generator "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/generator"
+	joy "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/joy"
+	testruntime "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/runtime"
 
 	context "context"
-	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
-	cedarpartial "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial"
-	cedarrequest "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
+	authorization "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization"
+	cedarpartial "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/partial"
+	cedarrequest "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	cedarpolicy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
 
 	rapid "pgregory.net/rapid"
 	testing "testing"

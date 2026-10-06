@@ -1,12 +1,12 @@
 package source
 
 import (
-	execution "github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
+	execution "github.com/ChrisMckerracher/cedar-cgo/internal/execution"
 
 	context "context"
 	json "encoding/json/v2"
 	fmt "fmt"
-	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	wire "github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 // TokenSpan contains UTF-8 byte offsets. Start is inclusive; End is exclusive.

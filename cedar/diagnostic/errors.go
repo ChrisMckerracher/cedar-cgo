@@ -3,7 +3,7 @@ package diagnostic
 import (
 	errors "errors"
 	fmt "fmt"
-	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	wire "github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 type ErrorKind string

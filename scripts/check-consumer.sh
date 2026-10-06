@@ -36,8 +36,8 @@ if [[ -n ${CONSUMER_GOPROXY:-} ]]; then export GOPROXY="$CONSUMER_GOPROXY"; fi
 if [[ -n ${CONSUMER_GOSUMDB:-} ]]; then export GOSUMDB="$CONSUMER_GOSUMDB"; fi
 cd "$consumer_tmp/consumer"
 go mod init consumer.example
-go mod edit -replace="github.com/ChrisMckerracher/cedar-go-wasm=$consumer_tmp/cedar-go-wasm"
-go get github.com/ChrisMckerracher/cedar-go-wasm/cedar github.com/ChrisMckerracher/cedar-go-wasm/analysis
+go mod edit -replace="github.com/ChrisMckerracher/cedar-cgo=$consumer_tmp/cedar-cgo"
+go get github.com/ChrisMckerracher/cedar-cgo/cedar github.com/ChrisMckerracher/cedar-cgo/analysis
 go version
 go env GOOS GOARCH CC CGO_ENABLED
 # Source identity comes from checked bundle manifests; extraction has no Git checkout.

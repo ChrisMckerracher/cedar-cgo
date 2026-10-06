@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	requests "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
+	requests "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
 )
 
 const propertyRequestJSON = `{"principal":{"type":"User","id":""},"action":{"type":"Action","id":""},"resource":{"type":"Document","id":""},"context":{}}`

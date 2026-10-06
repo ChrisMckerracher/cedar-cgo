@@ -2,7 +2,7 @@ package generator
 
 import (
 	fmt "fmt"
-	template "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/template"
+	template "github.com/ChrisMckerracher/cedar-cgo/cedar/policy/template"
 	rapid "pgregory.net/rapid"
 	strings "strings"
 )

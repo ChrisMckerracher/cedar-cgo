@@ -5,13 +5,13 @@ import (
 	json "encoding/json"
 	"errors"
 	fmt "fmt"
-	partialinput "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial/input"
-	request "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	schema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	syntax "github.com/ChrisMckerracher/cedar-go-wasm/cedar/syntax"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
-	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	partialinput "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/partial/input"
+	request "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	schema "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
+	syntax "github.com/ChrisMckerracher/cedar-cgo/cedar/syntax"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/execution"
+	wire "github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 // PartialAuthorize runs Rust TPE, including strict policy validation. It requires

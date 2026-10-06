@@ -3,8 +3,8 @@ package execution
 import (
 	"context"
 	"fmt"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/native"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/native"
 )
 
 const (

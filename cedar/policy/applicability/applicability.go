@@ -1,15 +1,15 @@
 package applicability
 
 import (
-	execution "github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
+	execution "github.com/ChrisMckerracher/cedar-cgo/internal/execution"
 
 	context "context"
 	json "encoding/json"
 	fmt "fmt"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	policy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	cedarschema "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
+	wire "github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 // PolicyApplicability lists native environments by policy and template ID.

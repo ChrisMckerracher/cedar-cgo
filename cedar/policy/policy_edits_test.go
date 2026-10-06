@@ -2,11 +2,11 @@ package policy_test
 
 import (
 	context "context"
-	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	fault "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fault"
-	fuzz "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fuzz"
-	jsonassert "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/jsonassert"
-	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+	cedarpolicy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	fault "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/fault"
+	fuzz "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/fuzz"
+	jsonassert "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/jsonassert"
+	testruntime "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/runtime"
 
 	slices "slices"
 	testing "testing"

@@ -3,9 +3,9 @@ package schema_test
 import (
 	context "context"
 	errors "errors"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	cedarschema "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
+	testruntime "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/runtime"
 
 	testing "testing"
 )

@@ -2,7 +2,7 @@ package policy
 
 import (
 	context "context"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
 )
 
 func (rt *Client) ParsePolicySet(ctx context.Context, source PolicySet) (ParsedPolicySet, error) {

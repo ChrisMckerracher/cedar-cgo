@@ -1,6 +1,6 @@
 # Post-cgo cleanup report for maintainers
 
-Issue [#46](https://github.com/ChrisMckerracher/cedar-go-wasm/issues/46) uses released main `1b635277b1bb5183083279622059aa414c74487e` as its baseline.
+Issue [#46](https://github.com/ChrisMckerracher/cedar-cgo/issues/46) uses released main `1b635277b1bb5183083279622059aa414c74487e` as its baseline.
 The cleanup targets the breaking pre-v1 v0.3.0 interface. It does not tag a release.
 The module path, supported platforms, Cedar 4.13.0, and SymCC 0.7.0 remain unchanged.
 Go 1.27.1 is the sole supported Go release.

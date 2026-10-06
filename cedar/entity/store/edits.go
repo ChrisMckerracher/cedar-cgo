@@ -2,10 +2,10 @@ package store
 
 import (
 	context "context"
-	entity "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	execution "github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
-	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	entity "github.com/ChrisMckerracher/cedar-cgo/cedar/entity"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	execution "github.com/ChrisMckerracher/cedar-cgo/internal/execution"
+	wire "github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 // Remove deletes entities and native edges to them, then recomputes ancestry.

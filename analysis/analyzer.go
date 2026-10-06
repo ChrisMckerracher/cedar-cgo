@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/lifetime"
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/settings"
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/options"
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/solver"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/native"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/internal/lifetime"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/internal/settings"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/options"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/solver"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/native"
 )
 
 // Analyzer owns stateless calls and child compiled sessions.

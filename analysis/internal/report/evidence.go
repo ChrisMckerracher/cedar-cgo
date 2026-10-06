@@ -3,8 +3,8 @@ package report
 import (
 	"errors"
 
-	records "github.com/ChrisMckerracher/cedar-go-wasm/analysis/report"
-	requests "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
+	records "github.com/ChrisMckerracher/cedar-cgo/analysis/report"
+	requests "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
 )
 
 func validateEvidence(query string, da, db requests.Decision, firstEval, secondEval *records.PolicyEvaluation) error {

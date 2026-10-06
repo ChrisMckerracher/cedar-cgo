@@ -2,7 +2,7 @@ package validation_test
 
 import (
 	json "encoding/json"
-	validation "github.com/ChrisMckerracher/cedar-go-wasm/cedar/validation"
+	validation "github.com/ChrisMckerracher/cedar-cgo/cedar/validation"
 	testing "testing"
 )
 

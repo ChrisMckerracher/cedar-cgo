@@ -2,10 +2,10 @@ package generator
 
 import (
 	context "context"
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
-	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	validation "github.com/ChrisMckerracher/cedar-go-wasm/cedar/validation"
+	cedar "github.com/ChrisMckerracher/cedar-cgo/cedar"
+	cedarpolicy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	cedarschema "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
+	validation "github.com/ChrisMckerracher/cedar-cgo/cedar/validation"
 	rapid "pgregory.net/rapid"
 )
 

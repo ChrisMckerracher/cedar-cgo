@@ -2,14 +2,14 @@ package integration_test
 
 import (
 	context "context"
-	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
-	cedarrequest "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	cedarentity "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	fault "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fault"
-	fuzz "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fuzz"
-	joy "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/joy"
-	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+	authorization "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization"
+	cedarrequest "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	cedarentity "github.com/ChrisMckerracher/cedar-cgo/cedar/entity"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	fault "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/fault"
+	fuzz "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/fuzz"
+	joy "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/joy"
+	testruntime "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/runtime"
 
 	testing "testing"
 	utf8 "unicode/utf8"

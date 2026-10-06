@@ -1,14 +1,14 @@
 package utility_test
 
 import (
-	generator "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/generator"
-	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+	generator "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/generator"
+	testruntime "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/runtime"
 
 	context "context"
 	errors "errors"
-	cedarrequest "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
+	cedarrequest "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	cedarvalue "github.com/ChrisMckerracher/cedar-cgo/cedar/value"
 
 	rapid "pgregory.net/rapid"
 	reflect "reflect"

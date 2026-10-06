@@ -3,11 +3,11 @@ package authorization
 import (
 	"context"
 	"errors"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/execution"
 	"testing"
 )
 

@@ -6,7 +6,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
 )
 
 func TestEncodePreservesRawStringsAndEscaping(t *testing.T) {

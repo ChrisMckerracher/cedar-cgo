@@ -5,11 +5,11 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/compiled"
-	fixtures "github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/testsupport"
-	uids "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/compiled"
+	fixtures "github.com/ChrisMckerracher/cedar-cgo/analysis/internal/testsupport"
+	uids "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	policy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	schemas "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
 )
 
 func TestCompiledEnvironmentSelectionAndLifetime(t *testing.T) {

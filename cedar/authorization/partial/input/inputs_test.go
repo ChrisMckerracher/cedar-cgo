@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/value"
 )
 
 func TestUnknownAndKnownEmptyInputs(t *testing.T) {

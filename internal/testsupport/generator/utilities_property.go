@@ -1,7 +1,7 @@
 package generator
 
 import (
-	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
+	cedarvalue "github.com/ChrisMckerracher/cedar-cgo/cedar/value"
 	rapid "pgregory.net/rapid"
 )
 

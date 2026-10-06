@@ -1,20 +1,20 @@
 package value_test
 
 import (
-	fault "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fault"
-	fixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fixture"
-	fuzz "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fuzz"
-	generator "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/generator"
-	joy "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/joy"
-	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+	fault "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/fault"
+	fixture "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/fixture"
+	fuzz "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/fuzz"
+	generator "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/generator"
+	joy "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/joy"
+	testruntime "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/runtime"
 
 	bytes "bytes"
 	context "context"
 	json "encoding/json"
-	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
-	cedarrequest "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	cedarentity "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
-	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
+	authorization "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization"
+	cedarrequest "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	cedarentity "github.com/ChrisMckerracher/cedar-cgo/cedar/entity"
+	cedarschema "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
 
 	rapid "pgregory.net/rapid"
 	testing "testing"

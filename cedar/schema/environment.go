@@ -2,8 +2,8 @@ package schema
 
 import (
 	"encoding/json/v2"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 // RequestEnvironment describes a schema principal/action/resource combination.

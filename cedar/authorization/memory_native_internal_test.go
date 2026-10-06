@@ -10,11 +10,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/native"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/entity"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/execution"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/native"
 )
 
 // Process RSS includes Rust allocations that Go heap measurements exclude.

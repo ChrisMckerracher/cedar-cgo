@@ -1,14 +1,14 @@
 package store
 
 import (
-	entity "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
-	execution "github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
+	entity "github.com/ChrisMckerracher/cedar-cgo/cedar/entity"
+	execution "github.com/ChrisMckerracher/cedar-cgo/internal/execution"
 
 	context "context"
 	json "encoding/json"
 	errors "errors"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
 	testing "testing"
 )
 

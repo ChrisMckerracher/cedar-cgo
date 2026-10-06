@@ -5,11 +5,11 @@ import (
 	json "encoding/json"
 	jsonv2 "encoding/json/v2"
 	fmt "fmt"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	syntax "github.com/ChrisMckerracher/cedar-go-wasm/cedar/syntax"
-	execution "github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
-	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	syntax "github.com/ChrisMckerracher/cedar-cgo/cedar/syntax"
+	execution "github.com/ChrisMckerracher/cedar-cgo/internal/execution"
+	wire "github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 // SchemaFragment retains declarations that can reference other fragments.

@@ -3,11 +3,11 @@ package batched_test
 import (
 	context "context"
 	json "encoding/json"
-	batched "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/batched"
-	cedarrequest "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	fault "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fault"
-	fuzz "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fuzz"
+	batched "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/batched"
+	cedarrequest "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	fault "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/fault"
+	fuzz "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/fuzz"
 
 	testing "testing"
 	utf8 "unicode/utf8"

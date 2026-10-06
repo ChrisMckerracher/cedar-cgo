@@ -3,14 +3,14 @@ package integration_test
 import (
 	context "context"
 	fmt "fmt"
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
-	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
-	cedarrequest "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	cedarentity "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
+	cedar "github.com/ChrisMckerracher/cedar-cgo/cedar"
+	authorization "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization"
+	cedarrequest "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	cedarentity "github.com/ChrisMckerracher/cedar-cgo/cedar/entity"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	cedarpolicy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	cedarschema "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
+	cedarvalue "github.com/ChrisMckerracher/cedar-cgo/cedar/value"
 
 	log "log"
 )

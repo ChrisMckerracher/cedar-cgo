@@ -1,20 +1,20 @@
 package partial_test
 
 import (
-	fault "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fault"
-	generator "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/generator"
-	partialfixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/partial"
-	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+	fault "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/fault"
+	generator "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/generator"
+	partialfixture "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/partial"
+	testruntime "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/runtime"
 
 	bytes "bytes"
 	context "context"
-	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
-	cedarpartial "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial"
-	cedarrequest "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	syntax "github.com/ChrisMckerracher/cedar-go-wasm/cedar/syntax"
-	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
+	authorization "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization"
+	cedarpartial "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/partial"
+	cedarrequest "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	cedarpolicy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	cedarschema "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
+	syntax "github.com/ChrisMckerracher/cedar-cgo/cedar/syntax"
+	cedarvalue "github.com/ChrisMckerracher/cedar-cgo/cedar/value"
 
 	reflect "reflect"
 	testing "testing"

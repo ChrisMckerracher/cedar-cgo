@@ -1,12 +1,12 @@
 package schema
 
 import (
-	execution "github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
+	execution "github.com/ChrisMckerracher/cedar-cgo/internal/execution"
 
 	context "context"
 	errors "errors"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	syntax "github.com/ChrisMckerracher/cedar-go-wasm/cedar/syntax"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	syntax "github.com/ChrisMckerracher/cedar-cgo/cedar/syntax"
 	testing "testing"
 )
 

@@ -4,9 +4,9 @@ import (
 	bytes "bytes"
 	json "encoding/json"
 	fmt "fmt"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	cedarpolicy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	cedarschema "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
 
 	sync "sync"
 )

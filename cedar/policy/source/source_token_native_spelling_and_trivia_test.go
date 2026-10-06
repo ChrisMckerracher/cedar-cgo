@@ -3,8 +3,8 @@ package source
 import (
 	context "context"
 	errors "errors"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	execution "github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	execution "github.com/ChrisMckerracher/cedar-cgo/internal/execution"
 	reflect "reflect"
 	strings "strings"
 	testing "testing"

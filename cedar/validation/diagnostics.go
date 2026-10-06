@@ -3,8 +3,8 @@ package validation
 import (
 	json "encoding/json"
 	fmt "fmt"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	wire "github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 func DecodeValidation(data []byte, policyBytes, schemaBytes int) (ValidationResult, error) {

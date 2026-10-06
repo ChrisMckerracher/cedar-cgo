@@ -1,12 +1,12 @@
 package source
 
 import (
-	fixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fixture"
+	fixture "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/fixture"
 
 	context "context"
 	json "encoding/json"
 	errors "errors"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
 
 	reflect "reflect"
 	testing "testing"

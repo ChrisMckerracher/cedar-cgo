@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/solver"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/solver"
 )
 
 const solverReadChunk = 1 << 16

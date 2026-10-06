@@ -3,9 +3,9 @@ package policy_test
 import (
 	context "context"
 	json "encoding/json"
-	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	policysupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/policy"
-	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+	cedarpolicy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	policysupport "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/policy"
+	testruntime "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/runtime"
 
 	testing "testing"
 )

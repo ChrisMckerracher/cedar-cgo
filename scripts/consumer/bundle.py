@@ -6,7 +6,7 @@ import stat
 import zipfile
 from pathlib import Path, PurePosixPath
 
-ROOT = "cedar-go-wasm/"
+ROOT = "cedar-cgo/"
 if __package__:
     from .native import verify_native
 else:

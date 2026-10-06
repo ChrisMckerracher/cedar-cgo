@@ -1,12 +1,12 @@
 package authorization_test
 
 import (
-	generator "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/generator"
-	joy "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/joy"
-	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+	generator "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/generator"
+	joy "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/joy"
+	testruntime "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/runtime"
 
 	context "context"
-	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
+	authorization "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization"
 
 	rapid "pgregory.net/rapid"
 	testing "testing"

@@ -2,8 +2,8 @@ package generator
 
 import (
 	json "encoding/json"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	validation "github.com/ChrisMckerracher/cedar-go-wasm/cedar/validation"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	validation "github.com/ChrisMckerracher/cedar-cgo/cedar/validation"
 	rapid "pgregory.net/rapid"
 	reflect "reflect"
 	regexp "regexp"

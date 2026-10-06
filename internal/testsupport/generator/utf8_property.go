@@ -2,7 +2,7 @@ package generator
 
 import (
 	errors "errors"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
 	rapid "pgregory.net/rapid"
 	unicode "unicode"
 	utf8 "unicode/utf8"

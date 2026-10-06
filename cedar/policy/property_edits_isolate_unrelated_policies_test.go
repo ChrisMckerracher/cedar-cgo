@@ -1,11 +1,11 @@
 package policy_test
 
 import (
-	generator "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/generator"
-	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+	generator "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/generator"
+	testruntime "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/runtime"
 
 	context "context"
-	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
+	cedarpolicy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
 
 	rapid "pgregory.net/rapid"
 	testing "testing"

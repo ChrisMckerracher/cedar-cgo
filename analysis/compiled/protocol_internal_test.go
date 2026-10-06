@@ -7,8 +7,8 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/report"
-	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/report"
+	policy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
 )
 
 func TestCompiledProtocolFaultsAndOrdinaryErrors(t *testing.T) {

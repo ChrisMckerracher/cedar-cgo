@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis"
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/solver"
-	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/solver"
+	policy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	schemas "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
 )
 
 // Omit Output because running the example requires an external cvc5 executable.

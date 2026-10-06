@@ -4,7 +4,7 @@ package options
 import (
 	"time"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/settings"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/internal/settings"
 )
 
 const (

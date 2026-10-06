@@ -18,6 +18,7 @@ for directory in ["rust/crates"]:
 for directory in ["testdata/joy", "scripts/performance"]:
     files.update(path for path in (root / directory).rglob("*") if path.is_file() and path.suffix != ".pyc")
 files.add(root / "scripts/measure-native-performance.sh")
+files.add(root / "scripts/measure-rust-cgo-performance.sh")
 entries = {
     str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest()
     for path in sorted(files) if path.is_file()

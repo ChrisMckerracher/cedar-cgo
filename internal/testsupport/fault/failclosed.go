@@ -3,11 +3,11 @@ package fault
 import (
 	context "context"
 	errors "errors"
-	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
-	request "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
+	authorization "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization"
+	request "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	cedarpolicy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
 	strings "strings"
 	testing "testing"
 )

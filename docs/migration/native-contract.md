@@ -1,6 +1,6 @@
 # Native execution contract for Cedar Go consumers
 
-This migration implements [tracker #49](https://github.com/ChrisMckerracher/cedar-go-wasm/issues/49).
+This migration implements [tracker #49](https://github.com/ChrisMckerracher/cedar-cgo/issues/49).
 The comparison source is commit `a7083b5cb27dae4ec8be5f84d8f7b88b4a1fbcc6`.
 Cedar remains pinned to 4.13.0. SymCC remains pinned to 0.7.0.
 
@@ -64,7 +64,8 @@ Go allocation counters exclude Rust allocation. Process memory must be measured 
 | Embedded module hash | Artifact manifest, source identity, and checksums |
 | Interruptible guest CPU timeout | Context checks before entry, during callbacks, and after return |
 
-Changed imports and constructors require a breaking release. The module and repository names remain unchanged.
+Changed imports and constructors require a breaking release.
+The module and repository use `cedar-cgo`.
 Consumers must enable cgo and use a supported C compiler.
 A source build also requires the pinned Rust toolchain. A verified prebuilt consumer bundle does not require Rust.
 Analysis requires a separate solver. Verification uses cvc5 1.3.1.

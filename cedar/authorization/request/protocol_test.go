@@ -2,7 +2,7 @@ package request
 
 import (
 	"errors"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
 	"testing"
 )
 

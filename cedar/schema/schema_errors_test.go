@@ -4,10 +4,10 @@ import (
 	context "context"
 	json "encoding/json"
 	errors "errors"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	syntax "github.com/ChrisMckerracher/cedar-go-wasm/cedar/syntax"
-	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	cedarschema "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
+	syntax "github.com/ChrisMckerracher/cedar-cgo/cedar/syntax"
+	testruntime "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/runtime"
 
 	testing "testing"
 )

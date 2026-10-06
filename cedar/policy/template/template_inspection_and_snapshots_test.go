@@ -2,11 +2,11 @@ package template_test
 
 import (
 	context "context"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	template "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/template"
-	syntax "github.com/ChrisMckerracher/cedar-go-wasm/cedar/syntax"
-	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	cedarpolicy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	template "github.com/ChrisMckerracher/cedar-cgo/cedar/policy/template"
+	syntax "github.com/ChrisMckerracher/cedar-cgo/cedar/syntax"
+	testruntime "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/runtime"
 
 	reflect "reflect"
 	strings "strings"

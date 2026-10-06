@@ -1,13 +1,13 @@
 package validation_test
 
 import (
-	generator "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/generator"
-	joy "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/joy"
-	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+	generator "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/generator"
+	joy "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/joy"
+	testruntime "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/runtime"
 
 	context "context"
-	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
+	cedarpolicy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	cedarschema "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
 
 	rapid "pgregory.net/rapid"
 	testing "testing"

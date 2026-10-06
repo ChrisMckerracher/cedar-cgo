@@ -5,11 +5,11 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis"
-	reports "github.com/ChrisMckerracher/cedar-go-wasm/analysis/report"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis"
+	reports "github.com/ChrisMckerracher/cedar-cgo/analysis/report"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	policy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	schemas "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
 )
 
 func TestRejectInvalidUTF8SourcesBeforeSolver(t *testing.T) {

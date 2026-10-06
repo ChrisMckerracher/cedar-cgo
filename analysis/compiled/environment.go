@@ -3,8 +3,8 @@ package compiled
 import (
 	"encoding/json/v2"
 
-	uids "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	uids "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 // RequestEnvironment identifies one schema-defined principal/action/resource combination.

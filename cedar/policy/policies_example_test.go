@@ -4,12 +4,12 @@ import (
 	context "context"
 	json "encoding/json/v2"
 	fmt "fmt"
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
-	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
-	cedarrequest "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
+	cedar "github.com/ChrisMckerracher/cedar-cgo/cedar"
+	authorization "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization"
+	cedarrequest "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	cedarpolicy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	cedarvalue "github.com/ChrisMckerracher/cedar-cgo/cedar/value"
 	log "log"
 )
 

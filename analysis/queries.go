@@ -3,9 +3,9 @@ package analysis
 import (
 	"context"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/report"
-	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/report"
+	policy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	schemas "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
 )
 
 // NewlyPermitted holds when after permits nothing new; a counterexample is newly allowed.

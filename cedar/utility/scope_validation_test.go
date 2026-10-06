@@ -3,11 +3,11 @@ package utility_test
 import (
 	context "context"
 	errors "errors"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	fault "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fault"
-	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	cedarschema "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
+	fault "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/fault"
+	testruntime "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/runtime"
 
 	testing "testing"
 	utf8 "unicode/utf8"

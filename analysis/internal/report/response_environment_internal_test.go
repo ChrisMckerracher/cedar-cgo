@@ -4,7 +4,7 @@ import (
 	"encoding/json/v2"
 	"testing"
 
-	requests "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
+	requests "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
 )
 
 func TestRejectIncompletePropertyEnvironment(t *testing.T) {

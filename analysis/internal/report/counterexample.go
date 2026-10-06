@@ -5,10 +5,10 @@ import (
 	"encoding/json/v2"
 	"errors"
 
-	records "github.com/ChrisMckerracher/cedar-go-wasm/analysis/report"
-	requests "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	entities "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
-	uids "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
+	records "github.com/ChrisMckerracher/cedar-cgo/analysis/report"
+	requests "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	entities "github.com/ChrisMckerracher/cedar-cgo/cedar/entity"
+	uids "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
 )
 
 func decodeCounterexample(c *counterexampleOutput, res records.Result, query string, swap bool) (*records.Counterexample, error) {

@@ -7,10 +7,10 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis"
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/options"
-	reports "github.com/ChrisMckerracher/cedar-go-wasm/analysis/report"
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/solver"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/options"
+	reports "github.com/ChrisMckerracher/cedar-cgo/analysis/report"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/solver"
 )
 
 type countingSolver struct {

@@ -14,7 +14,7 @@ rustup_home=$(cd "${RUSTUP_HOME:-$HOME/.rustup}" && pwd)
 mkdir -p "${CARGO_TARGET_DIR:-$repo/rust/target}" "$output"
 export CARGO_TARGET_DIR=$(cd "${CARGO_TARGET_DIR:-$repo/rust/target}" && pwd)
 output=$(cd "$output" && pwd)
-export RUSTFLAGS="--remap-path-prefix=$snapshot=/cedar-go-wasm --remap-path-prefix=$cargo_home=/cargo --remap-path-prefix=$rustup_home=/rustup --remap-path-prefix=$CARGO_TARGET_DIR=/cedar-target"
+export RUSTFLAGS="--remap-path-prefix=$snapshot=/cedar-cgo --remap-path-prefix=$cargo_home=/cargo --remap-path-prefix=$rustup_home=/rustup --remap-path-prefix=$CARGO_TARGET_DIR=/cedar-target"
 export CARGO_INCREMENTAL=0
 unset CARGO_BUILD_RUSTFLAGS CARGO_ENCODED_RUSTFLAGS RUSTC RUSTC_WRAPPER RUSTC_WORKSPACE_WRAPPER
 (cd "$snapshot" && cargo +"$toolchain" rustc --manifest-path "$snapshot/rust/Cargo.toml" --locked --profile native --target "$target" -p cgw-native -- --print=native-static-libs) 2> "$output/build.log"

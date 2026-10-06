@@ -3,9 +3,9 @@ package entity
 import (
 	bytes "bytes"
 	json "encoding/json/v2"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
-	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	cedarvalue "github.com/ChrisMckerracher/cedar-cgo/cedar/value"
+	wire "github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 type Entity struct {

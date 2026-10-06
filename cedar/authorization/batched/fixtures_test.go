@@ -1,17 +1,17 @@
 package batched_test
 
 import (
-	fixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fixture"
-	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+	fixture "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/fixture"
+	testruntime "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/runtime"
 
 	context "context"
 	json "encoding/json"
-	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
-	batched "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/batched"
-	request "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
+	authorization "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization"
+	batched "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/batched"
+	request "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	cedarpolicy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	cedarschema "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
 
 	testing "testing"
 )

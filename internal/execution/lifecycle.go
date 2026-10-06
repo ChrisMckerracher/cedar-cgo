@@ -1,7 +1,7 @@
 package execution
 
 import (
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/native"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/native"
 	"github.com/jackc/puddle/v2"
 )
 

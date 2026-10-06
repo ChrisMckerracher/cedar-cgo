@@ -5,7 +5,7 @@ import (
 	jsontext "encoding/json/jsontext"
 	json "encoding/json/v2"
 	fmt "fmt"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
 )
 
 func DecodeEvalResult(data []byte) (EvalResult, error) {

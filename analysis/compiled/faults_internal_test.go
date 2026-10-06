@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
-	uids "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/native"
+	uids "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	policy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/native"
 )
 
 func TestCompiledHostFaultOverridesCompileError(t *testing.T) {

@@ -1,16 +1,16 @@
 package literal
 
 import (
-	execution "github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
+	execution "github.com/ChrisMckerracher/cedar-cgo/internal/execution"
 
 	context "context"
 	json "encoding/json"
 	jsonv2 "encoding/json/v2"
 	fmt "fmt"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	policy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	wire "github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 	slices "slices"
 	strings "strings"
 )

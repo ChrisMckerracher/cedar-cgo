@@ -3,7 +3,7 @@ package integration
 import (
 	"context"
 	"errors"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/native"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/native"
 	"testing"
 )
 

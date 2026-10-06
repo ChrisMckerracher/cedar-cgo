@@ -6,10 +6,11 @@ import sys
 
 repo, baseline, output = map(pathlib.Path, sys.argv[1:])
 output.mkdir(parents=True, exist_ok=True)
-module = "github.com/ChrisMckerracher/cedar-go-wasm"
+module = "github.com/ChrisMckerracher/cedar-cgo"
 manifest = (baseline / "go.mod").read_text()
-manifest = manifest.replace(f"module {module}", "module example.invalid/cedar-migration-wasm-performance", 1)
-manifest += f"\nrequire {module} v0.0.0\nreplace {module} => {baseline}\n"
+baseline_module = re.search(r"^module (\S+)$", manifest, re.MULTILINE).group(1)
+manifest = manifest.replace(f"module {baseline_module}", "module example.invalid/cedar-migration-wasm-performance", 1)
+manifest += f"\nrequire {baseline_module} v0.0.0\nreplace {baseline_module} => {baseline}\n"
 (output / "go.mod").write_text(manifest)
 (output / "go.sum").write_bytes((baseline / "go.sum").read_bytes())
 packages = ["authorization", "request", "entity", "uid", "policy", "schema", "batched"]
@@ -24,4 +25,5 @@ for name in ["authorization_test.go", "callback_test.go", "analysis_test.go"]:
     source = re.sub(r"\bsolver\.", "analysis.", source)
     source = source.replace(", cedar.WithMaxConcurrentCalls(2)", "")
     source = source.replace(".Batched().AuthorizeBatched", ".AuthorizeBatched")
+    source = source.replace(module, baseline_module)
     (output / name).write_text(source)

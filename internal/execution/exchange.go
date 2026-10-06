@@ -5,8 +5,8 @@ import (
 	"encoding/json/v2"
 	"fmt"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 // Exchange shares stateless encoding, cancellation, and native error-envelope handling.

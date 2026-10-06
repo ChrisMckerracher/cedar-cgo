@@ -3,7 +3,7 @@ package source
 import (
 	json "encoding/json/v2"
 	fmt "fmt"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
 	utf8 "unicode/utf8"
 )
 

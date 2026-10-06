@@ -2,10 +2,10 @@ package generator
 
 import (
 	json "encoding/json"
-	request "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	cedarentity "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
+	request "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	cedarentity "github.com/ChrisMckerracher/cedar-cgo/cedar/entity"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	cedarvalue "github.com/ChrisMckerracher/cedar-cgo/cedar/value"
 	rapid "pgregory.net/rapid"
 )
 

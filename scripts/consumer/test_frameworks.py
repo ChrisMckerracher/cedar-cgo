@@ -23,7 +23,7 @@ class FrameworkBundleTests(BundleCase):
         files = self.platform_bundle(DARWIN, FLAGS)
         result = self.extract(files, target=DARWIN)
         self.assertEqual(result.returncode, 0, result.stderr)
-        source = (self.directory / "out/cedar-go-wasm/internal/native/link_flags.go").read_text()
+        source = (self.directory / "out/cedar-cgo/internal/native/link_flags.go").read_text()
         self.assertIn("-lcgw_native " + " ".join(FLAGS) + "\n", source)
         self.assertIn("//go:build darwin && arm64 && cgo\n", source)
 

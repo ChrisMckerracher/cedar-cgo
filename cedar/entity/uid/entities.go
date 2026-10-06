@@ -2,7 +2,7 @@ package uid
 
 import (
 	json "encoding/json/v2"
-	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	wire "github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 	strconv "strconv"
 )
 

@@ -3,21 +3,21 @@ package integration_test
 import (
 	context "context"
 	json "encoding/json"
-	partialinput "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial/input"
-	policysupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/policy"
-	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+	partialinput "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/partial/input"
+	policysupport "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/policy"
+	testruntime "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/runtime"
 
-	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
+	authorization "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization"
 
-	cedarpartial "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial"
-	cedarrequest "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	cedarentity "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
+	cedarpartial "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/partial"
+	cedarrequest "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	cedarentity "github.com/ChrisMckerracher/cedar-cgo/cedar/entity"
 
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	template "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/template"
-	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	cedarpolicy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	template "github.com/ChrisMckerracher/cedar-cgo/cedar/policy/template"
+	cedarschema "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
+	cedarvalue "github.com/ChrisMckerracher/cedar-cgo/cedar/value"
 
 	testing "testing"
 )

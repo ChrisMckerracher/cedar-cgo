@@ -1,9 +1,9 @@
 package request
 
 import (
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	entity "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	entity "github.com/ChrisMckerracher/cedar-cgo/cedar/entity"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
 )
 
 // Decision defaults to Deny so uninitialized responses fail closed.

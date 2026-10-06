@@ -6,8 +6,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/native"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/native"
 
 	"sync/atomic"
 	"time"

@@ -1,9 +1,9 @@
-# cedar-go-wasm
+# cedar-cgo
 
 Cedar's pinned Rust implementation runs through cgo for Go consumers.
 The package provides authorization, strict validation, policy tools, partial evaluation, and solver-backed analysis.
 It uses Cedar 4.13.0, the Cedar formatter 4.13.0, and SymCC 0.7.0.
-The module and repository names remain unchanged.
+The Go module is `github.com/ChrisMckerracher/cedar-cgo`.
 
 The native migration changes public imports and constructors.
 Read the [migration lessons](docs/migration/consumer.md) before updating an existing consumer.
@@ -45,20 +45,22 @@ Knowledge check: Does ordinary `go get` include native release attachments? No. 
 
 Objective: Link the exact native files that passed the release checks.
 
-1. Download your platform's source ZIP and checksum file from a [release](https://github.com/ChrisMckerracher/cedar-go-wasm/releases).
-2. Verify the ZIP checksum and its build attestation.
-3. Extract the verified source bundle to a permanent directory.
-4. Set a local module replacement in your consumer project.
+1. Select a release that uses the `cedar-cgo` module path.
+2. Download your platform's source ZIP and checksum file from a [release](https://github.com/ChrisMckerracher/cedar-cgo/releases).
+3. Verify the ZIP checksum and its build attestation.
+4. Extract the verified source bundle to a permanent directory.
+5. Set a local module replacement in your consumer project.
 
 ```bash
-gh attestation verify cedar-go-wasm-linux_amd64-source.zip --repo ChrisMckerracher/cedar-go-wasm
-go mod edit -replace=github.com/ChrisMckerracher/cedar-go-wasm=/absolute/path/cedar-go-wasm
-CGO_ENABLED=1 go get github.com/ChrisMckerracher/cedar-go-wasm/cedar
+gh attestation verify cedar-cgo-linux_amd64-source.zip --repo ChrisMckerracher/cedar-cgo
+go mod edit -replace=github.com/ChrisMckerracher/cedar-cgo=/absolute/path/cedar-cgo
+CGO_ENABLED=1 go get github.com/ChrisMckerracher/cedar-cgo/cedar
 ```
 
 Use `linux_arm64` or `darwin_arm64` for the other selected platforms.
 Verify the complete checksum file as described in [release maintenance](docs/maintenance.md).
 Keep the replacement directory available for later builds.
+Older releases retain the `cedar-go-wasm` module path and bundle names.
 
 Worked example: CI builds a separate consumer with isolated caches and blocks every Rust command.
 
@@ -106,7 +108,7 @@ Independent fixture programs call pinned Cedar and SymCC directly.
 The migration preserves all 25 fuzz targets, saved inputs, property tests, examples, and domain benchmarks.
 
 The [verification guide](docs/verification.md) records evidence and its limits.
-The [performance guide](docs/performance.md) separates production measurements from the historical prototype.
+The [performance guide](docs/performance.md) compares direct Rust execution with the production Go/cgo interfaces.
 
 ## Documentation
 

@@ -2,7 +2,7 @@ package policy
 
 import (
 	json "encoding/json"
-	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
+	cedarpolicy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
 	testing "testing"
 )
 

@@ -7,9 +7,9 @@ import (
 	"os"
 	"testing"
 
-	fixtures "github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/testsupport"
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/solver"
-	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
+	fixtures "github.com/ChrisMckerracher/cedar-cgo/analysis/internal/testsupport"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/solver"
+	policy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
 )
 
 func TestCompiledCloseInterruptsActiveCall(t *testing.T) {

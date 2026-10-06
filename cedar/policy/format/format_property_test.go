@@ -1,16 +1,16 @@
 package format_test
 
 import (
-	generator "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/generator"
-	joy "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/joy"
-	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+	generator "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/generator"
+	joy "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/joy"
+	testruntime "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/runtime"
 
 	context "context"
-	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
-	cedarrequest "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	policyformat "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/format"
-	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
+	authorization "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization"
+	cedarrequest "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	cedarpolicy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	policyformat "github.com/ChrisMckerracher/cedar-cgo/cedar/policy/format"
+	cedarschema "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
 
 	rapid "pgregory.net/rapid"
 	testing "testing"

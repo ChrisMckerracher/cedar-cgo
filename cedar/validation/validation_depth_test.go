@@ -3,11 +3,11 @@ package validation_test
 import (
 	context "context"
 	json "encoding/json"
-	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	validation "github.com/ChrisMckerracher/cedar-go-wasm/cedar/validation"
-	fixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fixture"
-	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+	cedarpolicy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	cedarschema "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
+	validation "github.com/ChrisMckerracher/cedar-cgo/cedar/validation"
+	fixture "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/fixture"
+	testruntime "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/runtime"
 
 	reflect "reflect"
 	testing "testing"

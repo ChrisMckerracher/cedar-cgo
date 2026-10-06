@@ -2,7 +2,7 @@ package applicability_test
 
 import (
 	json "encoding/json"
-	applicability "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/applicability"
+	applicability "github.com/ChrisMckerracher/cedar-cgo/cedar/policy/applicability"
 	testing "testing"
 )
 

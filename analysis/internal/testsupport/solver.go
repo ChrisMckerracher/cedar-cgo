@@ -6,7 +6,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/solver"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/solver"
 )
 
 type Solver func(context.Context) (solver.Session, error)

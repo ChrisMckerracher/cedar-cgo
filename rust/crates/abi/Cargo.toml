@@ -1,6 +1,6 @@
 [package]
 name = "cgw-abi"
-description = "Memory exchange between the cedar-go-wasm Go host and its WebAssembly modules"
+description = "Shared parsing, conversion, callbacks, and diagnostics for the cedar-cgo native interface"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

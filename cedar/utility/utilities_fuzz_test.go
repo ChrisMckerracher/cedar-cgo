@@ -3,12 +3,12 @@ package utility_test
 import (
 	context "context"
 	json "encoding/json"
-	cedarrequest "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	fault "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fault"
-	fuzz "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fuzz"
-	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+	cedarrequest "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	cedarpolicy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	fault "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/fault"
+	fuzz "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/fuzz"
+	testruntime "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/runtime"
 
 	reflect "reflect"
 	testing "testing"

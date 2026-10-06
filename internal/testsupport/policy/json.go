@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
+	cedarpolicy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
 )
 
 func MustPolicyJSON(t testing.TB, p cedarpolicy.ParsedPolicy) map[string]any {

@@ -1,8 +1,8 @@
 package syntax_test
 
 import (
-	syntax "github.com/ChrisMckerracher/cedar-go-wasm/cedar/syntax"
-	fixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fixture"
+	syntax "github.com/ChrisMckerracher/cedar-cgo/cedar/syntax"
+	fixture "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/fixture"
 
 	regexp "regexp"
 	testing "testing"

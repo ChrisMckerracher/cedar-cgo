@@ -1,6 +1,6 @@
 package literal
 
-import "github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
+import "github.com/ChrisMckerracher/cedar-cgo/internal/execution"
 
 // Client permits concurrent calls. Runtime.Close invalidates this client.
 type Client struct{ runtime *execution.Runtime }

@@ -5,8 +5,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/execution"
 )
 
 type cancelSchemaDecode struct {

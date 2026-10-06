@@ -5,8 +5,8 @@ import (
 	"encoding/json/v2"
 	"errors"
 
-	records "github.com/ChrisMckerracher/cedar-go-wasm/analysis/report"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	records "github.com/ChrisMckerracher/cedar-cgo/analysis/report"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 type counterexampleUID struct {

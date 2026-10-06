@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	fault "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fault"
-	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+	fault "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/fault"
+	testruntime "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/runtime"
 	"os"
 	"os/exec"
 	"strings"
@@ -13,12 +13,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/authorization"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
 )
 
 func nestedPolicy(depth int) policy.PolicySet {

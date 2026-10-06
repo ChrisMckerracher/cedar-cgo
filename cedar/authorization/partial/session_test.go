@@ -3,10 +3,10 @@ package partial
 import (
 	"context"
 	"encoding/json"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/execution"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 type TestConfig struct {

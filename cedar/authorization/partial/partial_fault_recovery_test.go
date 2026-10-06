@@ -1,19 +1,19 @@
 package partial
 
 import (
-	partialinput "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial/input"
+	partialinput "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/partial/input"
 	"strings"
 
 	context "context"
 	errors "errors"
 
-	cedarrequest "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
-	execution "github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
+	cedarrequest "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	cedarpolicy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	cedarschema "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
+	cedarvalue "github.com/ChrisMckerracher/cedar-cgo/cedar/value"
+	execution "github.com/ChrisMckerracher/cedar-cgo/internal/execution"
 
 	testing "testing"
 	time "time"

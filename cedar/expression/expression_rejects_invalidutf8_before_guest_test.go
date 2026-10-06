@@ -3,12 +3,12 @@ package expression
 import (
 	context "context"
 	errors "errors"
-	cedarrequest "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	cedarentity "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
-	execution "github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
+	cedarrequest "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	cedarentity "github.com/ChrisMckerracher/cedar-cgo/cedar/entity"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	cedarvalue "github.com/ChrisMckerracher/cedar-cgo/cedar/value"
+	execution "github.com/ChrisMckerracher/cedar-cgo/internal/execution"
 	testing "testing"
 )
 

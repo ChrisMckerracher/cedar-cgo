@@ -2,8 +2,8 @@ package policy_test
 
 import (
 	"context"
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
-	jsonassert "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/jsonassert"
+	cedar "github.com/ChrisMckerracher/cedar-cgo/cedar"
+	jsonassert "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/jsonassert"
 
 	"testing"
 )

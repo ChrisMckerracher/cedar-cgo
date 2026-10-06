@@ -5,9 +5,9 @@ import (
 	"encoding/json/v2"
 	"testing"
 
-	fixtures "github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/testsupport"
-	uids "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
+	fixtures "github.com/ChrisMckerracher/cedar-cgo/analysis/internal/testsupport"
+	uids "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	schemas "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
 )
 
 func TestCompiledEnvironmentJSONRoundTrip(t *testing.T) {

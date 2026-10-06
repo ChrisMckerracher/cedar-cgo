@@ -1,16 +1,16 @@
 package slicing_test
 
 import (
-	fixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fixture"
-	generator "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/generator"
-	joy "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/joy"
-	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+	fixture "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/fixture"
+	generator "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/generator"
+	joy "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/joy"
+	testruntime "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/runtime"
 
 	context "context"
-	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
-	cedarentity "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
-	slicing "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/slicing"
-	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
+	authorization "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization"
+	cedarentity "github.com/ChrisMckerracher/cedar-cgo/cedar/entity"
+	slicing "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/slicing"
+	cedarpolicy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
 
 	rapid "pgregory.net/rapid"
 	testing "testing"

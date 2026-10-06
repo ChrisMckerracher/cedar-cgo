@@ -1,8 +1,8 @@
 package schema
 
 import (
-	syntax "github.com/ChrisMckerracher/cedar-go-wasm/cedar/syntax"
-	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	syntax "github.com/ChrisMckerracher/cedar-cgo/cedar/syntax"
+	wire "github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 // Schema defers parsing until a native client uses it.

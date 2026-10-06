@@ -1,18 +1,18 @@
 package store
 
 import (
-	entity "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
-	schema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	execution "github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
+	entity "github.com/ChrisMckerracher/cedar-cgo/cedar/entity"
+	schema "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
+	execution "github.com/ChrisMckerracher/cedar-cgo/internal/execution"
 
 	bytes "bytes"
 	context "context"
 	json "encoding/json"
 	fmt "fmt"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
-	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	cedarvalue "github.com/ChrisMckerracher/cedar-cgo/cedar/value"
+	wire "github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 // ParsedEntityStore is an immutable native entity graph tied to its Runtime.

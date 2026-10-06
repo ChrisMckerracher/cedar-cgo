@@ -2,7 +2,7 @@ package diagnostic_test
 
 import (
 	json "encoding/json"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
 	slices "slices"
 	strings "strings"
 )

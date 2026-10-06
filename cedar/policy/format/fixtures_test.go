@@ -3,7 +3,7 @@ package format_test
 import (
 	json "encoding/json"
 	errors "errors"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
 	testing "testing"
 )
 

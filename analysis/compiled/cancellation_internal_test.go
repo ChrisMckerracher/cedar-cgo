@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	fixtures "github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/testsupport"
+	fixtures "github.com/ChrisMckerracher/cedar-cgo/analysis/internal/testsupport"
 )
 
 func TestCompiledQueuedCancellationPreservesActiveCall(t *testing.T) {

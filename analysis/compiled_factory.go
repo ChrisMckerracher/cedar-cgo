@@ -4,11 +4,11 @@ import (
 	"context"
 	"errors"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/compiled"
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/lifetime"
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/settings"
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/options"
-	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/compiled"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/internal/lifetime"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/internal/settings"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/options"
+	schemas "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
 )
 
 // OpenCompiled registers construction before opening child native resources.

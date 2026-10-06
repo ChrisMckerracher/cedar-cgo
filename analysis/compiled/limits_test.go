@@ -5,10 +5,10 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/compiled"
-	fixtures "github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/testsupport"
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/options"
-	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/compiled"
+	fixtures "github.com/ChrisMckerracher/cedar-cgo/analysis/internal/testsupport"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/options"
+	schemas "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
 )
 
 func TestCompiledSolverOutputLimitInvalidates(t *testing.T) {

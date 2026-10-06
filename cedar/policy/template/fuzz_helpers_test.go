@@ -2,12 +2,12 @@ package template_test
 
 import (
 	context "context"
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
-	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
-	request "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	fault "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fault"
-	fuzz "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fuzz"
+	cedar "github.com/ChrisMckerracher/cedar-cgo/cedar"
+	authorization "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization"
+	request "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	cedarpolicy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	fault "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/fault"
+	fuzz "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/fuzz"
 	testing "testing"
 )
 

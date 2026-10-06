@@ -5,11 +5,11 @@ import (
 	context "context"
 	json "encoding/json"
 	fmt "fmt"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
-	execution "github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
-	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	cedarvalue "github.com/ChrisMckerracher/cedar-cgo/cedar/value"
+	execution "github.com/ChrisMckerracher/cedar-cgo/internal/execution"
+	wire "github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 func nativeUIDs(values []wire.UID) ([]entityuid.EntityUID, error) {

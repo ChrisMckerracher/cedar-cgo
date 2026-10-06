@@ -10,7 +10,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/capbuf"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/capbuf"
 )
 
 // Solver sessions serve stateless calls or explicitly owned compiled sessions.
