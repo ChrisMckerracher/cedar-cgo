@@ -110,6 +110,22 @@ The migration preserves all 25 fuzz targets, saved inputs, property tests, examp
 The [verification guide](docs/verification.md) records evidence and its limits.
 The [performance guide](docs/performance.md) compares direct Rust execution with the production Go/cgo interfaces.
 
+## Performance
+
+These medians compare direct Rust execution with Go/cgo on the same 45-policy Joy workload.
+Each workload has five samples, recorded on October 6, 2026, on an AMD Ryzen 5 5600X.
+
+| Operation | Direct Rust | Go/cgo | Go/cgo ÷ Rust |
+|---|---:|---:|---:|
+| Authorization with request construction and result serialization | 93.345 µs | 137.769 µs | 1.48 |
+| Load and close an authorizer | 1.655 ms | 1.996 ms | 1.21 |
+| Strict validation with schema and policy parsing | 3.854 ms | 4.361 ms | 1.13 |
+
+The Go path also includes encoding, limits, pooling, cgo calls, and decoding.
+These ratios describe this workload and machine.
+Read the [measurement scope and reproduction commands](docs/performance.md) before comparing other workloads.
+The [raw samples](testdata/performance/rust-cgo/) include the source, archive, executable, and environment records.
+
 ## Documentation
 
 Read the [feature guide](docs/api.md), [partial evaluation guide](docs/partial-evaluation.md), and [analysis guide](docs/analysis.md).

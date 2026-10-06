@@ -1,0 +1,98 @@
+{
+  "authorize": {
+    "iterations": 20000,
+    "rust": {
+      "samples_ns_per_op": [
+        91310.63655,
+        92536.3622,
+        93345.0676,
+        95743.74335,
+        94376.22465
+      ],
+      "median_ns_per_op": 93345.0676,
+      "minimum_ns_per_op": 91310.63655,
+      "maximum_ns_per_op": 95743.74335
+    },
+    "go_cgo": {
+      "samples_ns_per_op": [
+        139614.0,
+        137647.0,
+        137769.0,
+        135735.0,
+        140383.0
+      ],
+      "median_ns_per_op": 137769.0,
+      "minimum_ns_per_op": 135735.0,
+      "maximum_ns_per_op": 140383.0
+    },
+    "go_over_rust": 1.475910870731428
+  },
+  "load": {
+    "iterations": 500,
+    "rust": {
+      "samples_ns_per_op": [
+        1676199.552,
+        1661948.442,
+        1641167.114,
+        1655124.928,
+        1637224.868
+      ],
+      "median_ns_per_op": 1655124.928,
+      "minimum_ns_per_op": 1637224.868,
+      "maximum_ns_per_op": 1676199.552
+    },
+    "go_cgo": {
+      "samples_ns_per_op": [
+        1983684.0,
+        1995955.0,
+        2027471.0,
+        2028198.0,
+        1959173.0
+      ],
+      "median_ns_per_op": 1995955.0,
+      "minimum_ns_per_op": 1959173.0,
+      "maximum_ns_per_op": 2028198.0
+    },
+    "go_over_rust": 1.205924076324467
+  },
+  "validate": {
+    "iterations": 200,
+    "rust": {
+      "samples_ns_per_op": [
+        3853763.32,
+        3829751.135,
+        3742217.535,
+        3869276.9,
+        3862814.52
+      ],
+      "median_ns_per_op": 3853763.32,
+      "minimum_ns_per_op": 3742217.535,
+      "maximum_ns_per_op": 3869276.9
+    },
+    "go_cgo": {
+      "samples_ns_per_op": [
+        4380412.0,
+        4249807.0,
+        4378585.0,
+        4360432.0,
+        4360979.0
+      ],
+      "median_ns_per_op": 4360979.0,
+      "minimum_ns_per_op": 4249807.0,
+      "maximum_ns_per_op": 4380412.0
+    },
+    "go_over_rust": 1.1316156800205364
+  },
+  "parsed_request_decision": {
+    "samples_ns_per_op": [
+      40406.28245,
+      41550.1979,
+      42178.02355,
+      40658.48,
+      39811.254
+    ],
+    "median_ns_per_op": 40658.48,
+    "minimum_ns_per_op": 39811.254,
+    "maximum_ns_per_op": 42178.02355
+  }
+}

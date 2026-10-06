@@ -1,0 +1,25 @@
+{
+  "abi": 2,
+  "cedar": "4.13.0",
+  "files": {
+    "cedar.h": "8f144f5e6076378e926d44cbbbed21ab9c2b5187a3f02fe2b1addb57defc11f5",
+    "libcgw_native.a": "727427cf9fc6af8653b3688952c5254e5511901663b9fc897e5a551a09d3c809",
+    "link_flags.go": "00f85e1ec2aef064a75a3263d9806436c1d7968b07a90fca81a018e4dc47711b"
+  },
+  "native_static_libs": [
+    "-lgcc_s",
+    "-lutil",
+    "-lrt",
+    "-lpthread",
+    "-lm",
+    "-ldl",
+    "-lc"
+  ],
+  "panic": "unwind",
+  "platform": "linux_amd64",
+  "profile": "native",
+  "source_commit": "4dfe6c71ef716cd2ea2ada5b0f16f2e7d0d6bb38",
+  "symcc": "0.7.0",
+  "target": "x86_64-unknown-linux-gnu",
+  "toolchain": "1.99.0"
+}

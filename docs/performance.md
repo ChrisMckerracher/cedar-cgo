@@ -1,8 +1,95 @@
-# Native performance
+# Performance
 
 [Documentation](README.md) · [API](api.md) · [Change analysis](analysis.md)
 
-## Measurement scope
+## Native Rust and production Go/cgo
+
+These measurements were recorded on 2026-10-06.
+The native artifact identifies source commit `4dfe6c71ef716cd2ea2ada5b0f16f2e7d0d6bb38`.
+The machine used an AMD Ryzen 5 5600X, Linux 6.19.10, Go 1.27.1, and Rust 1.99.0.
+Both executables used pinned Cedar 4.13.0 and the optimized Cargo `native` profile.
+That profile uses optimization level three, link-time optimization, one code generation unit, and panic unwinding.
+
+Both implementations use the [Joy fixture](../testdata/joy): 45 policies, five supplied entities, and five schema action entities.
+Authorization uses the same permitted `session.write` request, context values, schema, policies, and entities.
+Every authorization result must allow access, report reason `policy1`, and contain no errors.
+Strict validation must pass without errors, policy warnings, or schema warnings.
+Both implementations check results inside their measured loops.
+
+### Results and scope
+
+The table reports the median of five samples for each workload.
+The ratio divides the Go/cgo median by the native Rust median.
+Ratios describe these inputs and measured scopes on this machine.
+They do not isolate the cost of one cgo call.
+
+| Workload | Native Rust median | Production Go/cgo median | Go/cgo ÷ Rust |
+|---|---:|---:|---:|
+| Authorization with request construction and result serialization | 93.345 µs | 137.769 µs | 1.48 |
+| Load and release an authorizer | 1.655 ms | 1.996 ms | 1.21 |
+| Strict validation with schema and policy parsing | 3.854 ms | 4.361 ms | 1.13 |
+
+Native Rust calls upstream Cedar APIs directly.
+Authorization reconstructs entity identifiers, parses the context JSON, builds the request, evaluates policies, and serializes the complete successful result.
+It reuses the loaded schema, policies, entities, and Cedar authorizer.
+Loading parses the schema, policies, and entities, then creates and releases Cedar state.
+Validation parses the schema and policies, constructs a strict validator, and serializes the successful result.
+
+Production Go/cgo measures the public Go interfaces.
+It also encodes inputs, decodes the outer request in Rust, crosses cgo, and decodes results in Go.
+Its runtime checks deadlines and input limits.
+Authorization also obtains and returns a pooled authorizer instance.
+Loading creates and closes that pool.
+Native Rust excludes these Go interface and transport operations.
+
+The separate native decision median is **40.658 µs**.
+That workload reuses a parsed request and excludes request construction and result serialization.
+It includes result checks and response release.
+Its scope differs from the authorization row above.
+These measurements exclude solver analysis, loader callbacks, partial evaluation, and concurrent authorization.
+
+### Controls and evidence
+
+Each sample starts a fresh process for one workload.
+Engine order alternates between samples.
+All workloads run serially.
+`GOMAXPROCS`, the Go pool limit, and the native call limit are two.
+Setup, input file reads, compilation, and static linking are outside measured loops.
+Competing builds, tests, and fuzzing were paused during measurement.
+
+Authorization and parsed-request decisions use 20,000 operations per sample.
+Loading uses 500 operations; validation uses 200.
+Each Go authorization sample retained one idle instance and reported zero discarded instances.
+Each Go load operation checked one created instance and zero discarded instances before closing the authorizer.
+CPU frequency and all host scheduling were not controlled.
+
+[Raw samples](../testdata/performance/rust-cgo/) retain all five values for every workload.
+[The summary](../testdata/performance/rust-cgo/summary.json) records medians, minimum values, maximum values, and ratios.
+[The environment record](../testdata/performance/rust-cgo/environment.txt) identifies the kernel, CPU, toolchains, controls, and executable hashes.
+[The artifact manifest](../testdata/performance/rust-cgo/artifact.json) identifies the installed native archive and its source commit.
+[The source manifest](../testdata/performance/rust-cgo/source.json) identifies the measured implementation, inputs, and scripts.
+Source and archive hashes remained unchanged throughout the measurements.
+Go allocation counters exclude Rust allocations.
+
+### Reproduce the Rust and Go/cgo comparison
+
+Use a clean checkout with the existing pinned toolchains and cached dependencies.
+Build and install the native artifact before measurement.
+Pause competing builds, tests, and fuzzing.
+
+```bash
+scripts/build-native.sh
+scripts/measure-rust-cgo-performance.sh /tmp/cedar-rust-cgo-performance
+```
+
+The runner builds both executables before taking samples.
+It uses Cargo offline mode and preserves every raw sample.
+If the verified artifact uses another directory, set `CEDAR_BENCH_ARTIFACT`.
+If an implementation or input changes, re-measure the affected workloads.
+
+## Earlier Go/cgo and Wasm measurements
+
+### Measurement scope
 
 These measurements were recorded on 2026-10-05 with the production Go interfaces.
 Both backends include Go encoding, Cedar parsing and evaluation, result serialization, and Go decoding.
@@ -24,7 +111,7 @@ The callback workload loads one missing entity through the Go loader.
 Analysis compares equivalent integer bounds through the real cvc5 process.
 These measurements exclude partial evaluation and partial reauthorization.
 
-## Controls and results
+### Controls and results
 
 Each workload has five raw samples.
 Each sample starts a new process, and backend order alternates between samples.
@@ -65,7 +152,7 @@ Each sample starts and closes one solver session, with 101 solver reads and writ
 Each stateless sample starts and closes 20 solver sessions, with 20 reads and writes.
 Compiled timings exclude initial compilation; stateless timings include it.
 
-## Runtime construction
+### Runtime construction
 
 | Workload | Native median | Wasm median |
 |---|---:|---:|
@@ -76,7 +163,7 @@ Wasm Runtime construction includes cold, uncached module compilation.
 Native static linking occurs before process execution and lies outside the timed operation.
 This comparison measures API construction cost, rather than total application startup or build cost.
 
-## Resource observations
+### Resource observations
 
 The release workload creates and closes 100 runtimes, authorizers, analyzers, and compiled sessions.
 It performs 100 loader callbacks and explicitly releases 200 compiled handles.
@@ -105,7 +192,7 @@ RSS includes allocator retention and excludes memory from the already closed sol
 All resource runs used the same verified executable while competing builds, tests, and fuzzing remained paused.
 Their durations are outside the benchmark comparison.
 
-## Reproduce
+### Reproduce the earlier comparison
 
 Use existing pinned tools and a checkout at the comparison commit.
 Build the native artifact before the measurements.
