@@ -5,9 +5,8 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
-	"encoding/json"
+	"encoding/json/v2"
 	"fmt"
-	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -35,13 +34,8 @@ func Verify(dir, expectedCommit, expectedTarget string, header []byte) error {
 		return fmt.Errorf("artifact header does not match source header")
 	}
 	var manifest Manifest
-	decoder := json.NewDecoder(bytes.NewReader(files["manifest.json"]))
-	decoder.DisallowUnknownFields()
-	if err := decoder.Decode(&manifest); err != nil {
+	if err := json.Unmarshal(files["manifest.json"], &manifest, json.RejectUnknownMembers(true)); err != nil {
 		return fmt.Errorf("decode native manifest: %w", err)
-	}
-	if err := decoder.Decode(new(any)); err != io.EOF {
-		return fmt.Errorf("native manifest contains trailing data")
 	}
 	if err := manifest.verify(expectedCommit, expectedTarget, files); err != nil {
 		return err

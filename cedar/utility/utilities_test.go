@@ -9,14 +9,15 @@ import (
 	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
 	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	rapid "pgregory.net/rapid"
 	reflect "reflect"
 	testing "testing"
 )
 
 func TestNativeUIDRoundTripProperty(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	rapid.Check(t, func(pt *rapid.T) {
 		id := rapid.StringN(0, 40, 160).Draw(pt, "id")
@@ -38,7 +39,7 @@ func TestNativeUIDRoundTripProperty(t *testing.T) {
 }
 
 func TestContextMergeContract(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	left := cedarrequest.NewContext(cedarvalue.Record{"left": cedarvalue.Record{"a": cedarvalue.Long(1)}})
 	right := cedarrequest.NewContext(cedarvalue.Record{"right": cedarvalue.Set{cedarvalue.Bool(true), cedarvalue.Bool(false)}, "decimal": cedarvalue.Decimal("1.25")})
@@ -80,7 +81,7 @@ func TestContextMergeContract(t *testing.T) {
 }
 
 func TestContextMergeDisjointProperty(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	rapid.Check(t, func(pt *rapid.T) {
 		a := rapid.Int64().Draw(pt, "left")

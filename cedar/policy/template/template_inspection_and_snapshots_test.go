@@ -6,16 +6,17 @@ import (
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	template "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/template"
 	syntax "github.com/ChrisMckerracher/cedar-go-wasm/cedar/syntax"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	reflect "reflect"
 	strings "strings"
 	testing "testing"
 )
 
 func TestTemplateInspectionAndSnapshots(t *testing.T) {
-	ctx, rt := context.Background(), testsupport.TestRuntime(t)
+	ctx, rt := context.Background(), testruntime.New(t)
 	original := cedarpolicy.PoliciesFromCedar(`forbid(principal, action, resource) when { false };`)
-	set, err := rt.Templates().AddTemplate(ctx, original, "share", template.TemplateFromCedar(testsupport.ShareTemplate))
+	set, err := rt.Templates().AddTemplate(ctx, original, "share", template.TemplateFromCedar(ShareTemplate))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -32,10 +33,10 @@ func TestTemplateInspectionAndSnapshots(t *testing.T) {
 		t.Fatal("JSON constructor lost source")
 	}
 	copySet, err := rt.Templates().AddTemplate(ctx, original, "share", jsonSource)
-	if err != nil || !reflect.DeepEqual(testsupport.NormalizedPolicyJSON(t, []byte(set.Text())), testsupport.NormalizedPolicyJSON(t, []byte(copySet.Text()))) {
+	if err != nil || !reflect.DeepEqual(NormalizedPolicyJSON(t, []byte(set.Text())), NormalizedPolicyJSON(t, []byte(copySet.Text()))) {
 		t.Fatalf("JSON template round trip: %v", err)
 	}
-	bindings := testsupport.ShareBindings()
+	bindings := ShareBindings()
 	bindings[template.PrincipalSlot] = entityuid.NewEntityUID("User", "a\n\"\\雪\x00")
 	linked, err := rt.Templates().LinkTemplate(ctx, set, "share", "link\"\n雪", bindings)
 	if err != nil {
@@ -73,7 +74,7 @@ func TestTemplateInspectionAndSnapshots(t *testing.T) {
 }
 
 func TestTemplateMalformedInputs(t *testing.T) {
-	ctx, rt := context.Background(), testsupport.TestRuntime(t)
+	ctx, rt := context.Background(), testruntime.New(t)
 	for _, template := range []template.Template{
 		{}, template.TemplateFromCedar("nonsense"), template.TemplateFromCedar(`permit(principal, action, resource);`),
 		template.TemplateFromCedar(`permit(principal, action == ?action, resource);`),
@@ -84,7 +85,7 @@ func TestTemplateMalformedInputs(t *testing.T) {
 			t.Fatalf("accepted malformed template %s", template.Text())
 		}
 	}
-	set, err := rt.Templates().AddTemplate(ctx, cedarpolicy.PolicySet{}, "share", template.TemplateFromCedar(testsupport.ShareTemplate))
+	set, err := rt.Templates().AddTemplate(ctx, cedarpolicy.PolicySet{}, "share", template.TemplateFromCedar(ShareTemplate))
 	if err != nil {
 		t.Fatal(err)
 	}

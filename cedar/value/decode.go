@@ -2,45 +2,23 @@ package value
 
 import (
 	bytes "bytes"
-	json "encoding/json"
+	jsontext "encoding/json/jsontext"
+	json "encoding/json/v2"
 	fmt "fmt"
 	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
-	io "io"
 )
 
 func DecodeEvalResult(data []byte) (EvalResult, error) {
-	if err := wire.CheckUTF8(string(data)); err != nil {
+	var variants map[string]jsontext.Value
+	if err := json.Unmarshal(data, &variants); err != nil {
 		return nil, err
 	}
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	start, err := decoder.Token()
-	if err != nil || start != json.Delim('{') {
-		return nil, fmt.Errorf("evaluation result must be an object")
-	}
-	if !decoder.More() {
-		return nil, fmt.Errorf("missing evaluation variant")
-	}
-	name, err := decoder.Token()
-	if err != nil {
-		return nil, err
-	}
-	kind, ok := name.(string)
-	if !ok {
-		return nil, fmt.Errorf("invalid evaluation variant")
-	}
-	var value json.RawMessage
-	if err := decoder.Decode(&value); err != nil {
-		return nil, err
-	}
-	if decoder.More() {
+	if len(variants) != 1 {
 		return nil, fmt.Errorf("evaluation result must have one variant")
 	}
-	if end, err := decoder.Token(); err != nil || end != json.Delim('}') {
-		return nil, fmt.Errorf("invalid evaluation result end")
-	}
-	if _, err := decoder.Token(); err != io.EOF {
-		return nil, fmt.Errorf("trailing evaluation result data")
+	var kind string
+	var value jsontext.Value
+	for kind, value = range variants {
 	}
 
 	if bytes.Equal(bytes.TrimSpace(value), []byte("null")) {
@@ -67,8 +45,8 @@ func DecodeEvalResult(data []byte) (EvalResult, error) {
 		return String(v), nil
 	case "entity_uid":
 		var v struct {
-			Type *string
-			ID   *string
+			Type *string `json:"type"`
+			ID   *string `json:"id"`
 		}
 		if err := json.Unmarshal(value, &v); err != nil {
 			return nil, err
@@ -87,7 +65,7 @@ func DecodeEvalResult(data []byte) (EvalResult, error) {
 		}
 		return ExtensionValue(v), nil
 	case "set":
-		var members []json.RawMessage
+		var members []jsontext.Value
 		if err := json.Unmarshal(value, &members); err != nil {
 			return nil, err
 		}
@@ -101,7 +79,7 @@ func DecodeEvalResult(data []byte) (EvalResult, error) {
 		}
 		return result, nil
 	case "record":
-		var attrs map[string]json.RawMessage
+		var attrs map[string]jsontext.Value
 		if err := json.Unmarshal(value, &attrs); err != nil {
 			return nil, err
 		}

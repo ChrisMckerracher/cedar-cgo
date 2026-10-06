@@ -51,8 +51,7 @@ func (rt *Client) SchemaWarnings(ctx context.Context, schema Schema) (decoded []
 	}
 	warnings, err := DecodeSchemaWarnings(out, len(schema.text))
 	if err != nil {
-		var ce *diagnostic.Error
-		if errors.As(err, &ce) {
+		if _, ok := errors.AsType[*diagnostic.Error](err); ok {
 			return nil, err
 		}
 		return nil, diagnostic.FaultError(fmt.Errorf("decode schema warnings: %w", err))

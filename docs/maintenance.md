@@ -11,14 +11,13 @@ Cedar, the formatter, and SymCC remain pinned together through the workspace dep
 Objective: Preserve semantics and verification when the upstream version changes.
 
 1. Update the workspace Cedar and formatter pins together.
-2. Review SymCC compatibility and its existing vendor patch.
+2. Review SymCC compatibility and verify its registry checksum.
 3. Update the corpus pin and checksum for the selected Cedar version.
 4. Build native libraries and run complete verification.
 5. Review each intentional fixture change before updating its expected output.
 6. Regenerate notices from the final locked graph.
 
 ```bash
-scripts/vendor-symcc.sh
 scripts/build-native.sh
 scripts/third-party-licenses.sh
 scripts/check-rust.sh
@@ -27,6 +26,16 @@ scripts/check-rust.sh
 Worked example: A patch that changes schema diagnostics requires fixture review and Go diagnostic checks.
 
 Knowledge check: Can a fixture check silently regenerate expected output? No. Check commands must leave expectations unchanged.
+
+Use one command for all 18 independent fixture checks:
+
+```bash
+python3 scripts/parity/run.py --check
+python3 scripts/parity/run.py partial --update
+```
+
+Default execution compares committed expectations. Only `--update` writes them.
+Formatting retains its oracle assertions. Template and batched checks also run their Go comparisons.
 
 ## Lesson 2: Verify native build identity
 

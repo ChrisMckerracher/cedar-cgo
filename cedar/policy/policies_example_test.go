@@ -2,7 +2,7 @@ package policy_test
 
 import (
 	context "context"
-	json "encoding/json"
+	json "encoding/json/v2"
 	fmt "fmt"
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
@@ -25,7 +25,15 @@ func Example_parsePolicy() {
 		log.Fatal(err)
 	}
 	owner, _ := policy.Annotation("owner")
-	fmt.Println(policy.ID(), policy.Effect(), owner, policy.ResourceConstraint().EntityType)
+	var document struct {
+		Resource struct {
+			EntityType string `json:"entity_type"`
+		} `json:"resource"`
+	}
+	if err := json.Unmarshal(policy.JSON(), &document); err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(policy.ID(), policy.Effect(), owner, document.Resource.EntityType)
 	set, err := rt.Policies().AddPolicy(ctx, cedarpolicy.PoliciesFromCedar(""), policy)
 	if err != nil {
 		log.Fatal(err)
@@ -41,20 +49,17 @@ func Example_parsePolicy() {
 	// true read-photos
 }
 
-func Example_policyFromSyntax() {
+func Example_policyFromJSON() {
 	ctx := context.Background()
 	rt, err := cedar.NewRuntime(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer rt.Close(ctx)
-	policy, err := rt.Policies().PolicyFromSyntax(ctx, cedarpolicy.PolicySyntax{
-		ID: "require-mfa", Effect: cedarpolicy.Forbid,
-		Principal:  cedarpolicy.ScopeConstraint{Kind: cedarpolicy.ConstraintAny},
-		Action:     cedarpolicy.ActionConstraint{Kind: cedarpolicy.ConstraintAny},
-		Resource:   cedarpolicy.ScopeConstraint{Kind: cedarpolicy.ConstraintAny},
-		Conditions: []cedarpolicy.PolicyCondition{{Kind: "unless", Body: json.RawMessage(`{".":{"left":{"Var":"context"},"attr":"mfa"}}`)}},
-	})
+	policy, err := rt.Policies().PolicyFromJSON(ctx, "require-mfa", []byte(`{
+		"effect":"forbid", "principal":{"op":"All"}, "action":{"op":"All"}, "resource":{"op":"All"},
+		"conditions":[{"kind":"unless","body":{".":{"left":{"Var":"context"},"attr":"mfa"}}}]
+	}`))
 	if err != nil {
 		log.Fatal(err)
 	}

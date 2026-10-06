@@ -50,7 +50,7 @@ func callHandle(ctx context.Context, handle uint64, operation string, input []by
 	name := []byte(operation)
 	var state *callbackState
 	var callbackID cgo.Handle
-	if callback, ok := ctx.Value(callbackKey{}).(Callback); ok {
+	if callback := CallbackFrom(ctx); callback != nil {
 		state = &callbackState{ctx: ctx, callback: callback}
 		callbackID = cgo.NewHandle(state)
 		defer callbackID.Delete()

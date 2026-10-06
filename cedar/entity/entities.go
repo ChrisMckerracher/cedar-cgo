@@ -2,7 +2,7 @@ package entity
 
 import (
 	bytes "bytes"
-	json "encoding/json"
+	json "encoding/json/v2"
 	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
 	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
 	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
@@ -16,7 +16,7 @@ type Entity struct {
 	Tags    cedarvalue.Record
 }
 
-type EntityJSON struct {
+type entityJSON struct {
 	UID     wire.UID          `json:"uid"`
 	Attrs   cedarvalue.Record `json:"attrs"`
 	Parents []wire.UID        `json:"parents"`
@@ -28,7 +28,7 @@ func (e Entity) MarshalJSON() ([]byte, error) {
 	for i, p := range e.Parents {
 		parents[i] = p.Wire()
 	}
-	return json.Marshal(EntityJSON{UID: e.UID.Wire(), Attrs: e.Attrs, Parents: parents, Tags: e.Tags})
+	return json.Marshal(entityJSON{UID: e.UID.Wire(), Attrs: e.Attrs, Parents: parents, Tags: e.Tags})
 }
 
 // Entities defaults to an empty collection.

@@ -1,6 +1,6 @@
-# Limit THIRD_PARTY_LICENSES.txt to dependencies embedded in the shipped Wasm modules.
+# Include dependencies embedded in the supported native libraries.
 accepted = ["Apache-2.0", "Apache-2.0 WITH LLVM-exception", "MIT", "Unicode-3.0", "Zlib"]
-targets = ["wasm32-wasip1"]
+targets = ["x86_64-unknown-linux-gnu", "aarch64-unknown-linux-gnu", "aarch64-apple-darwin"]
 ignore-build-dependencies = true
 ignore-dev-dependencies = true
 private = { ignore = true }

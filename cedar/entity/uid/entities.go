@@ -1,7 +1,7 @@
 package uid
 
 import (
-	json "encoding/json"
+	json "encoding/json/v2"
 	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
 	strconv "strconv"
 )

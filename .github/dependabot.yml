@@ -10,7 +10,7 @@ updates:
     schedule:
       interval: weekly
     ignore:
-      # Cedar and vendored SymCC must move together; follow CONTRIBUTING.md.
+      # Cedar and SymCC must move together; follow CONTRIBUTING.md.
       - dependency-name: cedar-policy
       - dependency-name: cedar-policy-core
       - dependency-name: cedar-policy-symcc

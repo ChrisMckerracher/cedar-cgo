@@ -10,7 +10,6 @@ import (
 	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	entity "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
 	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
 	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
 )
@@ -57,27 +56,11 @@ type ExpressionInput struct {
 type ExpressionOutput struct {
 	Expression *string         `json:"expression"`
 	Result     json.RawMessage `json:"result"`
-	Error      *wire.Error     `json:"error"`
+	wire.Response
 }
 
-func (rt *Client) expressionCall(ctx context.Context, input ExpressionInput) (decoded ExpressionOutput, decodeErr error) {
-	in, err := execution.Encode(input, "expression input", rt.runtime.MaxSourceBytes)
-	if err != nil {
-		return ExpressionOutput{}, err
-	}
-	defer execution.FinishDecode(ctx, &decoded, &decodeErr)
-	out, err := rt.runtime.CallOnce(ctx, "cgw_expressions", in)
-	if err != nil {
-		return ExpressionOutput{}, err
-	}
-	var result ExpressionOutput
-	if err := json.Unmarshal(out, &result); err != nil {
-		return ExpressionOutput{}, diagnostic.FaultError(fmt.Errorf("decode expression response: %w", err))
-	}
-	if result.Error != nil {
-		return ExpressionOutput{}, diagnostic.ModuleError(result.Error)
-	}
-	return result, nil
+func (rt *Client) expressionCall(ctx context.Context, input ExpressionInput) (ExpressionOutput, error) {
+	return execution.Exchange[ExpressionOutput](ctx, rt.runtime, "cgw_expressions", "expression", input)
 }
 
 func (rt *Client) parseExpression(ctx context.Context, text string, restricted bool) (Expression, error) {
@@ -106,7 +89,7 @@ func (rt *Client) EvalExpression(ctx context.Context, expr Expression, env Expre
 	if !expr.valid {
 		return nil, &diagnostic.Error{Kind: diagnostic.KindInput, Message: "zero Expression is invalid"}
 	}
-	result, err := rt.expressionCall(ctx, ExpressionInput{Operation: "evaluate", Expression: wire.Source{Format: "cedar", Text: expr.text}, Environment: &ExpressionEnvWire{policy.PolicyUID(env.Principal), policy.PolicyUID(env.Action), policy.PolicyUID(env.Resource), env.Context, env.Entities}})
+	result, err := rt.expressionCall(ctx, ExpressionInput{Operation: "evaluate", Expression: wire.Source{Format: "cedar", Text: expr.text}, Environment: &ExpressionEnvWire{optionalUID(env.Principal), optionalUID(env.Action), optionalUID(env.Resource), env.Context, env.Entities}})
 	if err != nil {
 		return nil, err
 	}
@@ -116,4 +99,11 @@ func (rt *Client) EvalExpression(ctx context.Context, expr Expression, env Expre
 		return nil, diagnostic.FaultError(fmt.Errorf("decode evaluation result: %w", err))
 	}
 	return value, nil
+}
+
+func optionalUID(uid *entityuid.EntityUID) *wire.UID {
+	if uid == nil {
+		return nil
+	}
+	return new(uid.Wire())
 }

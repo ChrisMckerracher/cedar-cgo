@@ -1,7 +1,10 @@
 //! Permission queries use native TPE and schema enumeration; no Go candidate loop is involved.
-use crate::{State, entity_uid, partial::parse_partial_entities};
+use crate::{
+    State, authorize::request_context, entity_uid, partial::parse_partial_entities,
+    state::merged_entities,
+};
 use cedar_policy::{
-    ActionQueryRequest, Context, Decision, EntityUid, PrincipalQueryRequest, ResourceQueryRequest,
+    ActionQueryRequest, Decision, EntityUid, PrincipalQueryRequest, ResourceQueryRequest,
 };
 use cgw_abi::OpError;
 use serde_json::{Value, json};
@@ -37,8 +40,7 @@ pub fn execute(state: &State, bytes: &[u8]) -> Result<Value, OpError> {
             ..
         }) => {
             let action = entity_uid(action, "action")?;
-            let context = Context::from_json_str(context.get(), Some((schema, &action)))
-                .map_err(|e| OpError::new("context", &e))?;
+            let context = request_context(Some(&context), Some((schema, &action)))?;
             let request = ResourceQueryRequest::new(
                 entity_uid(principal, "principal")?,
                 action,
@@ -49,14 +51,7 @@ pub fn execute(state: &State, bytes: &[u8]) -> Result<Value, OpError> {
                 schema,
             )
             .map_err(|e| OpError::new("request", &e))?;
-            let entities = match entities {
-                Some(e) => loaded
-                    .entities
-                    .clone()
-                    .add_entities_from_json_str(e.get(), Some(schema))
-                    .map_err(|e| OpError::new("entities", &e))?,
-                None => loaded.entities.clone(),
-            };
+            let entities = merged_entities(loaded, entities.as_deref())?;
             let allowed = loaded
                 .policies
                 .query_resource(&request, &entities, schema)
@@ -72,8 +67,7 @@ pub fn execute(state: &State, bytes: &[u8]) -> Result<Value, OpError> {
             ..
         }) => {
             let action = entity_uid(action, "action")?;
-            let context = Context::from_json_str(context.get(), Some((schema, &action)))
-                .map_err(|e| OpError::new("context", &e))?;
+            let context = request_context(Some(&context), Some((schema, &action)))?;
             let request = PrincipalQueryRequest::new(
                 principal_type
                     .parse()
@@ -84,14 +78,7 @@ pub fn execute(state: &State, bytes: &[u8]) -> Result<Value, OpError> {
                 schema,
             )
             .map_err(|e| OpError::new("request", &e))?;
-            let entities = match entities {
-                Some(e) => loaded
-                    .entities
-                    .clone()
-                    .add_entities_from_json_str(e.get(), Some(schema))
-                    .map_err(|e| OpError::new("entities", &e))?,
-                None => loaded.entities.clone(),
-            };
+            let entities = merged_entities(loaded, entities.as_deref())?;
             let allowed = loaded
                 .policies
                 .query_principal(&request, &entities, schema)
@@ -108,9 +95,7 @@ pub fn execute(state: &State, bytes: &[u8]) -> Result<Value, OpError> {
             let entities = parse_partial_entities(entities.as_deref(), &loaded.entities, schema)?;
             let context = context
                 .as_deref()
-                .map(|c| {
-                    Context::from_json_str(c.get(), None).map_err(|e| OpError::new("context", &e))
-                })
+                .map(|c| request_context(Some(c), None))
                 .transpose()?;
             let request = ActionQueryRequest::new(
                 principal.parse("principal")?,

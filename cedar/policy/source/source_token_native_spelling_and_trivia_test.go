@@ -63,26 +63,6 @@ func TestSourceTokenNativeSpellingAndTrivia(t *testing.T) {
 	}
 }
 
-func TestSourceTokenCommentAttachment(t *testing.T) {
-	for _, tc := range []struct {
-		name, source, message string
-		token                 SourceToken
-		comments              []string
-	}{
-		{name: "wrong leading summary", source: "// leading  \nx", message: "leading comments", token: SourceToken{Kind: "identifier", Text: "x", Span: TokenSpan{Start: 13, End: 14}, LeadingComments: []string{"// leading  "}}},
-		{name: "wrong trailing summary", source: "x// trailing", message: "trailing comment", token: SourceTokenForTest("identifier", "x", 0)},
-		{name: "wrong final summary", source: "x\n// final", message: "final comments", token: SourceTokenForTest("identifier", "x", 0)},
-	} {
-		t.Run(tc.name, func(t *testing.T) {
-			got, err := DecodeSourceTokens(SourceTokenResponseForTest(t, []SourceToken{tc.token}, tc.comments), tc.source)
-			var ce *diagnostic.Error
-			if !errors.As(err, &ce) || ce.Kind != diagnostic.KindFault || !strings.Contains(ce.Message, tc.message) || !reflect.DeepEqual(got, SourceTokens{}) {
-				t.Fatalf("wrong comment attachment result: %+v %v", got, err)
-			}
-		})
-	}
-}
-
 func TestSourceTokenPreflight(t *testing.T) {
 	rt := &Client{runtime: &execution.Runtime{MaxSourceBytes: execution.DefaultMaxSourceBytes}}
 	result, err := rt.TokenizePolicies(context.Background(), string([]byte{0xff}))

@@ -6,7 +6,9 @@ import (
 	batched "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/batched"
 	cedarrequest "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
 	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	fault "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fault"
+	fuzz "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fuzz"
+
 	testing "testing"
 	utf8 "unicode/utf8"
 )
@@ -19,18 +21,18 @@ func FuzzBatchedEntities(f *testing.F) {
 	} {
 		f.Add([]byte(seed))
 	}
-	fixture := testsupport.BatchedFixtures(f)[0]
-	a := testsupport.BatchAuthorizer(f, fixture, testsupport.FuzzLimits)
+	fixture := BatchedFixtures(f)[0]
+	a := BatchAuthorizer(f, fixture, fuzz.FuzzLimits)
 	f.Fuzz(func(t *testing.T, data []byte) {
-		if len(data) > 4096 || testsupport.Nesting(string(data)) > 40 {
+		if len(data) > 4096 || fuzz.Nesting(string(data)) > 40 {
 			t.Skip()
 		}
-		decision, err := a.Batched().AuthorizeBatched(context.Background(), testsupport.BatchRequest(fixture), batched.EntityLoaderFunc(func(context.Context, []entityuid.EntityUID) (batched.EntityLoadResult, error) {
+		decision, err := a.Batched().AuthorizeBatched(context.Background(), BatchRequest(fixture), batched.EntityLoaderFunc(func(context.Context, []entityuid.EntityUID) (batched.EntityLoadResult, error) {
 			return batched.EntityLoadResult{Entities: json.RawMessage(data)}, nil
 		}), batched.BatchedOptions{MaxIterations: 2, MaxBatchBytes: 8192})
-		testsupport.CheckNoFault(t, err)
+		fault.CheckNoFault(t, err)
 		if !utf8.Valid(data) {
-			testsupport.RequireUTF8InputError(t, err)
+			fault.RequireUTF8InputError(t, err)
 			if decision != cedarrequest.Deny {
 				t.Fatalf("malformed loader result allowed: %s", decision)
 			}

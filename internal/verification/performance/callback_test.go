@@ -43,7 +43,6 @@ func BenchmarkControlledCallback(b *testing.B) {
 		return batched.EntityLoadResult{Entities: json.RawMessage(callbackEntities)}, nil
 	})
 	b.ReportAllocs()
-	b.ResetTimer()
 	for b.Loop() {
 		decision, err := authorizer.Batched().AuthorizeBatched(context.Background(), callbackRequest(), loader, batched.BatchedOptions{MaxIterations: 4})
 		if err != nil || decision != request.Allow {

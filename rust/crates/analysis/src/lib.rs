@@ -24,7 +24,7 @@ pub fn execute(
     bytes: &[u8],
     callback: Callback,
 ) -> Result<Value, OpError> {
-    match operation.strip_prefix("cgw_").unwrap_or(operation) {
+    match operation {
         "analyze" => serde_json::to_value(stateless::analyze(bytes, callback)?)
             .map_err(|e| OpError::msg("internal", e.to_string())),
         "compiled" => sessions::execute(state, bytes, callback),

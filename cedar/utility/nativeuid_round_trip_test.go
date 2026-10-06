@@ -5,13 +5,14 @@ import (
 	errors "errors"
 	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	testing "testing"
 	utf8 "unicode/utf8"
 )
 
 func FuzzNativeUIDRoundTrip(f *testing.F) {
-	rt := testsupport.TestRuntime(f)
+	rt := testruntime.New(f)
 	for _, id := range []string{"", "雪😀", "\x00\a\b\f\n\r\t\"\\", "plain", string([]byte{0xff})} {
 		f.Add(id)
 	}

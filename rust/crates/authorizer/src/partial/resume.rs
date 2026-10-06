@@ -1,10 +1,12 @@
 use super::residual::{ResidualProjection, import_projection};
 use super::{PartialInput, parse_partial_entities};
-use crate::{AuthorizeInput, AuthorizeOutput, PolicyMessage, State, entity_uid};
-use cedar_policy::{Context, Decision, Request};
+use crate::{
+    AuthorizeInput, AuthorizeOutput, State, authorize::request_context, entity_uid,
+    state::merged_entities,
+};
+use cedar_policy::Request;
 use cgw_abi::{OpError, parse_input};
 use serde::Deserialize;
-use serde_json::value::RawValue;
 
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -33,11 +35,7 @@ pub(crate) fn reauthorize(state: &State, bytes: &[u8]) -> Result<AuthorizeOutput
         .map_err(|e| OpError::new("policies", &e))?;
     let concrete = input.request;
     let action = entity_uid(concrete.action, "action")?;
-    let context = Context::from_json_str(
-        concrete.context.as_deref().map_or("{}", RawValue::get),
-        Some((schema, &action)),
-    )
-    .map_err(|e| OpError::new("context", &e))?;
+    let context = request_context(concrete.context.as_deref(), Some((schema, &action)))?;
     let request = Request::new(
         entity_uid(concrete.principal, "principal")?,
         action,
@@ -46,14 +44,7 @@ pub(crate) fn reauthorize(state: &State, bytes: &[u8]) -> Result<AuthorizeOutput
         Some(schema),
     )
     .map_err(|e| OpError::new("request", &e))?;
-    let entities = match concrete.entities.as_deref() {
-        Some(json) => loaded
-            .entities
-            .clone()
-            .add_entities_from_json_str(json.get(), Some(schema))
-            .map_err(|e| OpError::new("entities", &e))?,
-        None => loaded.entities.clone(),
-    };
+    let entities = merged_entities(loaded, concrete.entities.as_deref())?;
     // Native reauthorization enforces consistency with all previously known data.
     let checked = response
         .reauthorize(&request, &entities)
@@ -65,29 +56,5 @@ pub(crate) fn reauthorize(state: &State, bytes: &[u8]) -> Result<AuthorizeOutput
     } else {
         checked
     };
-    let mut reasons: Vec<_> = result
-        .diagnostics()
-        .reason()
-        .map(|id| AsRef::<str>::as_ref(id).to_owned())
-        .collect();
-    reasons.sort_unstable();
-    let mut errors: Vec<_> = result
-        .diagnostics()
-        .errors()
-        .map(|e| match e {
-            cedar_policy::AuthorizationError::PolicyEvaluationError(pe) => PolicyMessage {
-                policy_id: AsRef::<str>::as_ref(pe.policy_id()).to_owned(),
-                message: cgw_abi::diagnostics::render(pe.inner()),
-            },
-        })
-        .collect();
-    errors.sort_unstable_by(|a, b| a.policy_id.cmp(&b.policy_id));
-    Ok(AuthorizeOutput {
-        decision: match result.decision() {
-            Decision::Allow => "allow",
-            Decision::Deny => "deny",
-        },
-        reasons,
-        errors,
-    })
+    Ok(AuthorizeOutput::from(result))
 }

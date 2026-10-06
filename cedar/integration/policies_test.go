@@ -5,7 +5,12 @@ import (
 	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
 	cedarrequest "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	fault "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fault"
+	fixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fixture"
+	fuzz "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fuzz"
+	joy "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/joy"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	os "os"
 	filepath "path/filepath"
 	testing "testing"
@@ -13,8 +18,8 @@ import (
 )
 
 func FuzzPolicies(f *testing.F) {
-	d := testsupport.LoadJoy(f)
-	rt := testsupport.TestRuntime(f)
+	d := joy.LoadJoy(f)
+	rt := testruntime.New(f)
 	f.Add(d.Old.Text())
 	f.Add(`permit(principal is Joy::Device in Joy::Account::"a", action, resource) when { context.sourceIp.isInRange(ip("10.0.0.0/8")) && "x" like "*" };`)
 	f.Add(`forbid(principal, action, resource) unless { context.now.toTime() >= duration("23h") || decimal("1.5").lessThan(decimal("2.0")) };`)
@@ -81,30 +86,30 @@ forbid(
 	if dir := os.Getenv("CEDAR_CORPUS_DIR"); dir != "" {
 		files, _ := filepath.Glob(filepath.Join(dir, "corpus-tests", "*.cedar"))
 		for _, name := range files[:min(len(files), 200)] {
-			f.Add(string(testsupport.ReadFile(f, name)))
+			f.Add(string(fixture.MustReadFile(f, name)))
 		}
 	}
 	f.Fuzz(func(t *testing.T, TextValue string) {
-		if testsupport.Nesting(TextValue) > testsupport.MaxFuzzNesting {
+		if fuzz.Nesting(TextValue) > fuzz.MaxFuzzNesting {
 			t.Skip()
 		}
 		policies := cedarpolicy.PoliciesFromCedar(TextValue)
 		_, err := rt.Validation().Validate(context.Background(), d.Schema, policies)
-		testsupport.CheckNoFault(t, err)
+		fault.CheckNoFault(t, err)
 		if !utf8.ValidString(TextValue) {
-			testsupport.RequireUTF8InputError(t, err)
+			fault.RequireUTF8InputError(t, err)
 		}
 		if err != nil {
 			return
 		}
-		a, err := rt.NewAuthorizer(context.Background(), authorization.Config{Schema: &d.Schema, Policies: policies, Entities: d.Entities, Limits: testsupport.FuzzLimits})
-		testsupport.CheckNoFault(t, err)
+		a, err := rt.NewAuthorizer(context.Background(), authorization.Config{Schema: &d.Schema, Policies: policies, Entities: d.Entities, Limits: fuzz.FuzzLimits})
+		fault.CheckNoFault(t, err)
 		if err != nil {
 			return
 		}
 		defer a.Close()
-		resp, err := a.Authorize(context.Background(), testsupport.JoyRequest())
-		testsupport.CheckNoFault(t, err)
+		resp, err := a.Authorize(context.Background(), joy.JoyRequest())
+		fault.CheckNoFault(t, err)
 		if err != nil && resp.Decision != cedarrequest.Deny {
 			t.Fatalf("error %v came with %v", err, resp.Decision)
 		}

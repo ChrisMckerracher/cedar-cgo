@@ -2,15 +2,17 @@ package analysis
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"fmt"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/report"
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/solver"
+	decoded "github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/report"
+	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/settings"
+	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/transport"
+	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/report"
 	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	syntax "github.com/ChrisMckerracher/cedar-go-wasm/cedar/syntax"
 	"github.com/ChrisMckerracher/cedar-go-wasm/internal/native"
 	"github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
 )
@@ -22,49 +24,43 @@ type analyzeInput struct {
 	Query  string      `json:"query"`
 }
 
-type Error struct {
-	Kind    string
-	Message string
-}
-
-func (e *Error) Error() string { return fmt.Sprintf("analysis: %s: %s", e.Kind, e.Message) }
-
-func source(f syntax.Format, text string) wire.Source {
-	return wire.Source{Format: f.String(), Text: text}
-}
-
 // swap restores the caller's argument order after a reversed implication query.
-func (a *Analyzer) run(ctx context.Context, query string, schema schemas.Schema, pa, pb policy.PolicySet, swap bool) (Report, error) {
+func (a *Analyzer) run(ctx context.Context, query string, schema schemas.Schema, pa, pb policy.PolicySet, swap bool) (report.Report, error) {
 	in, err := json.Marshal(analyzeInput{
-		Schema: source(schema.Format(), schema.Text()),
-		A:      source(pa.Format(), pa.Text()),
-		B:      source(pb.Format(), pb.Text()),
+		Schema: wire.Source{Format: schema.Format().String(), Text: schema.Text()},
+		A:      wire.Source{Format: pa.Format().String(), Text: pa.Text()},
+		B:      wire.Source{Format: pb.Format().String(), Text: pb.Text()},
 		Query:  query,
-	})
+	},
+		jsontext.EscapeForHTML(true),
+		jsontext.EscapeForJS(true),
+		jsontext.PreserveRawStrings(true),
+	)
 	if err != nil {
-		return Report{}, &Error{Kind: string(diagnostic.KindInput), Message: err.Error()}
+		return report.Report{}, &report.Error{Kind: string(diagnostic.KindInput), Message: err.Error()}
 	}
-	if len(in) > a.maxSourceBytes {
-		return Report{}, fmt.Errorf("analysis: input is %d bytes, above the limit of %d", len(in), a.maxSourceBytes)
+	if len(in) > a.config.MaxSourceBytes {
+		return report.Report{}, fmt.Errorf("analysis: input is %d bytes, above the limit of %d", len(in), a.config.MaxSourceBytes)
 	}
-	ctx, finish, err := a.beginCall(ctx)
+	lease, err := a.owner.Begin(ctx)
 	if err != nil {
-		return Report{}, err
+		return report.Report{}, err
 	}
-	defer finish()
-	if a.timeout > 0 {
+	ctx = lease.Context
+	defer lease.Finish(nil)
+	if a.config.Timeout > 0 {
 		var cancel context.CancelFunc
-		ctx, cancel = context.WithTimeout(ctx, a.timeout)
+		ctx, cancel = context.WithTimeout(ctx, a.config.Timeout)
 		defer cancel()
 	}
 	if err := ctx.Err(); err != nil {
-		return Report{}, err
+		return report.Report{}, err
 	}
 	session, err := a.solver.Start(ctx)
 	if err != nil {
-		return Report{}, fmt.Errorf("analysis: %w", err)
+		return report.Report{}, fmt.Errorf("analysis: %w", err)
 	}
-	state := &sessionState{session: session, limit: a.maxSolverOutput}
+	state := transport.New(session, a.config.MaxSolverOutput)
 	closed := make(chan struct{})
 	stopCancellation := context.AfterFunc(ctx, func() { _ = session.Close(); close(closed) })
 	defer func() {
@@ -76,43 +72,31 @@ func (a *Analyzer) run(ctx context.Context, query string, schema schemas.Schema,
 
 	inst, err := a.module.Instantiate(ctx)
 	if err != nil {
-		return Report{}, fmt.Errorf("analysis: %w", err)
+		return report.Report{}, fmt.Errorf("analysis: %w", err)
 	}
 	defer inst.Close(context.WithoutCancel(ctx))
-	out, err := inst.Call(native.WithCallback(context.WithValue(ctx, sessionKey{}, state), state), "cgw_analyze", in, defaultMaxResponseBytes)
+	out, err := inst.Call(native.WithCallback(ctx, state), "cgw_analyze", in, settings.MaxResponseBytes)
 	if ctx.Err() != nil {
 		err = ctx.Err()
 	}
 	if err != nil {
-		return Report{}, a.withSolverDetail(fmt.Errorf("analysis: %w", err), state, session)
+		return report.Report{}, state.Detail(fmt.Errorf("analysis: %w", err))
 	}
 	var w struct {
 		Error *wire.Error `json:"error"`
 	}
 	if err := json.Unmarshal(out, &w); err != nil {
-		return Report{}, fmt.Errorf("analysis: decode response: %w", err)
+		return report.Report{}, fmt.Errorf("analysis: decode response: %w", err)
 	}
 	if w.Error != nil {
-		return Report{}, a.withSolverDetail(&Error{Kind: w.Error.Kind, Message: w.Error.Message}, state, session)
+		return report.Report{}, state.Detail(&report.Error{Kind: w.Error.Kind, Message: w.Error.Message})
 	}
-	result, err := report.Decode(out, swap, query)
+	result, err := decoded.Decode(out, swap, query)
 	if err != nil {
-		return Report{}, err
+		return report.Report{}, err
 	}
 	if err := ctx.Err(); err != nil {
-		return Report{}, fmt.Errorf("analysis: %w", err)
+		return report.Report{}, fmt.Errorf("analysis: %w", err)
 	}
 	return result, nil
-}
-
-func (a *Analyzer) withSolverDetail(err error, state *sessionState, session solver.Session) error {
-	if state.err != nil {
-		err = fmt.Errorf("%w (host: %v)", err, state.err)
-	}
-	if p, ok := session.(interface{ Stderr() string }); ok {
-		if s := p.Stderr(); s != "" {
-			err = fmt.Errorf("%w (solver stderr: %s)", err, s)
-		}
-	}
-	return err
 }

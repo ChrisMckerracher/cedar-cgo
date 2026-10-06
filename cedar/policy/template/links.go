@@ -13,9 +13,6 @@ import (
 // AddTemplate returns a new set with the template under templateID. Rust rejects
 // static policies and duplicate IDs. The input set is unchanged, including on error.
 func (rt *Client) AddTemplate(ctx context.Context, policies policy.PolicySet, templateID string, template Template) (policy.PolicySet, error) {
-	if err := TemplateUTF8(templateID, template.text); err != nil {
-		return policy.PolicySet{}, err
-	}
 	return rt.editTemplates(ctx, policies, struct {
 		Op       string      `json:"op"`
 		ID       string      `json:"id"`
@@ -26,14 +23,8 @@ func (rt *Client) AddTemplate(ctx context.Context, policies policy.PolicySet, te
 // LinkTemplate returns a new set containing the linked policy. Bindings must
 // exactly match the template's slots; a nil map means no bindings.
 func (rt *Client) LinkTemplate(ctx context.Context, policies policy.PolicySet, templateID, policyID string, bindings SlotBindings) (policy.PolicySet, error) {
-	if err := TemplateUTF8(templateID, policyID); err != nil {
-		return policy.PolicySet{}, err
-	}
 	values := make(map[SlotID]wire.UID, len(bindings))
 	for slot, uid := range bindings {
-		if err := TemplateUTF8(string(slot), uid.Type, uid.ID); err != nil {
-			return policy.PolicySet{}, err
-		}
 		values[slot] = uid.Wire()
 	}
 	return rt.editTemplates(ctx, policies, struct {
@@ -47,9 +38,6 @@ func (rt *Client) LinkTemplate(ctx context.Context, policies policy.PolicySet, t
 // UnlinkTemplate returns a new set without the linked policy. The template remains.
 // Rust rejects IDs of templates, static policies, and missing policies.
 func (rt *Client) UnlinkTemplate(ctx context.Context, policies policy.PolicySet, policyID string) (policy.PolicySet, error) {
-	if err := TemplateUTF8(policyID); err != nil {
-		return policy.PolicySet{}, err
-	}
 	return rt.editTemplates(ctx, policies, struct {
 		Op       string `json:"op"`
 		PolicyID string `json:"policy_id"`
@@ -59,9 +47,6 @@ func (rt *Client) UnlinkTemplate(ctx context.Context, policies policy.PolicySet,
 // RemoveTemplate returns a new set without the template. Rust rejects removal
 // while links remain, or when templateID does not identify a template.
 func (rt *Client) RemoveTemplate(ctx context.Context, policies policy.PolicySet, templateID string) (policy.PolicySet, error) {
-	if err := TemplateUTF8(templateID); err != nil {
-		return policy.PolicySet{}, err
-	}
 	return rt.editTemplates(ctx, policies, struct {
 		Op         string `json:"op"`
 		TemplateID string `json:"template_id"`

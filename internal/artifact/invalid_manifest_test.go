@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -21,6 +22,43 @@ func TestRejectInvalidNativeManifest(t *testing.T) {
 	}
 	if err := Verify(filepath.Join(dir, "missing"), testCommit, testTarget, testHeader); err == nil {
 		t.Fatal("accepted missing directory")
+	}
+}
+
+func TestRejectDuplicateManifestMembers(t *testing.T) {
+	for _, nested := range []bool{false, true} {
+		dir := fixture(t)
+		path := filepath.Join(dir, "manifest.json")
+		body, err := os.ReadFile(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		text := string(body)
+		if nested {
+			text = strings.Replace(text, `"files":{`, `"files":{"cedar.h":"duplicate",`, 1)
+		} else {
+			text = `{"abi":2,` + text[1:]
+		}
+		write(t, path, []byte(text))
+		rewriteManifest(t, dir)
+		if err := Verify(dir, testCommit, testTarget, testHeader); err == nil || !strings.Contains(err.Error(), "duplicate") {
+			t.Fatalf("got %v, want duplicate member rejection", err)
+		}
+	}
+}
+
+func TestRejectInvalidManifestUTF8(t *testing.T) {
+	dir := fixture(t)
+	path := filepath.Join(dir, "manifest.json")
+	body, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	body = []byte(strings.Replace(string(body), testCommit, "\xff"+testCommit[1:], 1))
+	write(t, path, body)
+	rewriteManifest(t, dir)
+	if err := Verify(dir, testCommit, testTarget, testHeader); err == nil {
+		t.Fatal("accepted invalid manifest UTF-8")
 	}
 }
 

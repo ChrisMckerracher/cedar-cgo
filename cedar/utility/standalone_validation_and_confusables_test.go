@@ -11,14 +11,16 @@ import (
 	template "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/template"
 	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	policysupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/policy"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	reflect "reflect"
 	strings "strings"
 	testing "testing"
 )
 
 func TestStandaloneValidationAndConfusables(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	schema := cedarschema.SchemaFromCedar(`entity User; entity Photo; action "view" appliesTo { principal: User, resource: Photo, context: {count: Long} };`)
 	action := entityuid.NewEntityUID("Action", "view")
@@ -52,11 +54,11 @@ func TestStandaloneValidationAndConfusables(t *testing.T) {
 }
 
 func TestConfusableMetadataAndRawPolicyIDs(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	for _, id := range []string{"", "quote\"\nslash\\\x00雪"} {
-		policies := testsupport.PartialIDPolicies(t, map[string]json.RawMessage{
-			id: testsupport.PartialIDPolicy("permit", "when", `{"==":{"left":{"Value":"aа"},"right":{"Value":"aа"}}}`),
+		policies := policysupport.PartialIDPolicies(t, map[string]json.RawMessage{
+			id: policysupport.PartialIDPolicy("permit", "when", `{"==":{"left":{"Value":"aа"},"right":{"Value":"aа"}}}`),
 		})
 		warnings, err := rt.Utilities().ConfusableStrings(ctx, policies)
 		if err != nil || len(warnings) == 0 {
@@ -71,7 +73,7 @@ func TestConfusableMetadataAndRawPolicyIDs(t *testing.T) {
 }
 
 func TestNativeUtilityErrors(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	for _, TextValue := range []string{`User::"\a"`, ` User::"a"`, `User::"a";`} {
 		uid, err := rt.Utilities().ParseEntityUID(ctx, TextValue)
@@ -108,7 +110,7 @@ func TestNativeUtilityErrors(t *testing.T) {
 }
 
 func TestConfusableStringsDoNotDuplicateLinkedTemplates(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	policies, err := rt.Templates().AddTemplate(ctx, cedarpolicy.PolicySet{}, "template", template.TemplateFromCedar(`permit(principal == ?principal, action, resource) when { "aа" == "aа" };`))
 	if err != nil {

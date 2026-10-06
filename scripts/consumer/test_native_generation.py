@@ -6,8 +6,9 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from fixture import COMMIT, native_fixture
-from native import ARTIFACT_FILES, TARGETS, verify_native
+from fixture import COMMIT, TARGETS, native_fixture
+from native import ARTIFACT_FILES, verify_native
+from artifact_verifier import HEADER
 from test_frameworks import DARWIN, FLAGS
 
 path = Path(__file__).resolve().parents[1] / "native/manifest.py"
@@ -23,7 +24,7 @@ class NativeManifestGenerationTests(unittest.TestCase):
         output = Path(directory.name)
         platform = TARGETS[target]
         prefix = f"internal/native/lib/{platform}/"
-        fixture = native_fixture(COMMIT, b"native ABI 2 header\n", target)
+        fixture = native_fixture(COMMIT, HEADER.read_bytes(), target)
         for name in ("libcgw_native.a", "cedar.h"):
             (output / name).write_bytes(fixture[prefix + name])
         (output / "build.log").write_text("note: native-static-libs: " + " ".join(flags) + "\n")

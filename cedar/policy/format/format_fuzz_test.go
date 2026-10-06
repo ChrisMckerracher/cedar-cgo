@@ -8,21 +8,25 @@ import (
 	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	policyformat "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/format"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	fault "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fault"
+	fuzz "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fuzz"
+	joy "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/joy"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	testing "testing"
 	time "time"
 	utf8 "unicode/utf8"
 )
 
 func FuzzFormatPolicies(f *testing.F) {
-	rt := testsupport.TestRuntime(f)
-	d := testsupport.LoadJoy(f)
+	rt := testruntime.New(f)
+	d := joy.LoadJoy(f)
 	f.Add(`permit(principal,action,resource);`, uint8(80), int8(2))
 	f.Add("// comment\n@id(\"é\") permit(principal==?principal,action,resource);", uint8(20), int8(0))
 	f.Add(`permit(principal,action,resource)when{context.x like "*"};`, uint8(0), int8(-2))
 	f.Add("\xff\x00", uint8(255), int8(127))
 	f.Fuzz(func(t *testing.T, TextValue string, width uint8, indent int8) {
-		if len(TextValue) > 4096 || testsupport.Nesting(TextValue) > 40 {
+		if len(TextValue) > 4096 || fuzz.Nesting(TextValue) > 40 {
 			t.Skip()
 		}
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -37,7 +41,7 @@ func FuzzFormatPolicies(f *testing.F) {
 				t.Fatalf("bounded format failed: %q, %v", out, err)
 			}
 			if !utf8.ValidString(TextValue) {
-				testsupport.RequireUTF8InputError(t, err)
+				fault.RequireUTF8InputError(t, err)
 			}
 			return
 		}
@@ -49,14 +53,14 @@ func FuzzFormatPolicies(f *testing.F) {
 		// Formatting is semantics-preserving: the fixed request must decide
 		// identically against the original and the formatted source.
 		authorize := func(source string) (cedarrequest.Response, error) {
-			a, err := rt.NewAuthorizer(ctx, authorization.Config{Policies: cedarpolicy.PoliciesFromCedar(source), Entities: d.Entities, Limits: testsupport.FuzzLimits})
+			a, err := rt.NewAuthorizer(ctx, authorization.Config{Policies: cedarpolicy.PoliciesFromCedar(source), Entities: d.Entities, Limits: fuzz.FuzzLimits})
 			if err != nil {
-				testsupport.CheckNoFault(t, err)
+				fault.CheckNoFault(t, err)
 				return cedarrequest.Response{Decision: cedarrequest.Deny}, err
 			}
-			resp, err := a.Authorize(ctx, testsupport.JoyRequest())
+			resp, err := a.Authorize(ctx, joy.JoyRequest())
 			a.Close()
-			testsupport.CheckNoFault(t, err)
+			fault.CheckNoFault(t, err)
 			if err != nil && resp.Decision != cedarrequest.Deny {
 				t.Fatalf("error %v came with %v", err, resp.Decision)
 			}

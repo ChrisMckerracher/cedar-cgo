@@ -11,7 +11,7 @@ for directory in ["cedar", "analysis", "internal"]:
     for path in (root / directory).rglob("*.go"):
         if not path.name.endswith("_test.go") or "verification/performance" in str(path):
             files.add(path)
-for directory in ["rust/crates", "rust/vendor"]:
+for directory in ["rust/crates"]:
     for path in (root / directory).rglob("*"):
         if path.is_file() and (path.suffix == ".rs" or path.name == "Cargo.toml"):
             files.add(path)

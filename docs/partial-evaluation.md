@@ -13,6 +13,9 @@ and [`TpeResponse`](https://docs.rs/cedar-policy/4.13.0/cedar_policy/struct.TpeR
 
 ## Inputs and decisions
 
+Import `cedar/authorization/partial/input` for partial request, identity, and entity records.
+Use `a.Partial()` for continuations. Use `a.Queries()` for permission queries from `partial/query`.
+
 Create an ordinary `Authorizer` with `Config.Schema`. Rust TPE requires that
 schema and strictly validates the policies before evaluating them.
 
@@ -133,8 +136,8 @@ and unknown requests/entity data, forbid precedence, integer overflow, invalid
 inputs, and inconsistent completions. Regenerate or verify them with:
 
 ```bash
-scripts/partial-fixtures.sh
-scripts/partial-fixtures.sh --check
+python3 scripts/parity/run.py partial --update
+python3 scripts/parity/run.py partial --check
 go test ./cedar/authorization/partial -run 'TestPartial|ExamplePartial|FuzzPartial' -count=1
 ```
 

@@ -21,30 +21,11 @@ type UtilityOutput struct {
 	Valid    *bool                       `json:"valid"`
 	Warnings *[]diagnostic.PolicyMessage `json:"warnings"`
 	Version  *string                     `json:"version"`
-	Error    *wire.Error                 `json:"error"`
+	wire.Response
 }
 
-func UtilityCall(ctx context.Context, rt Caller, input map[string]any) (decoded UtilityOutput, decodeErr error) {
-	in, err := Encode(input, "utility input", rt.SourceLimit())
-	if err != nil {
-		return UtilityOutput{}, err
-	}
-	defer FinishDecode(ctx, &decoded, &decodeErr)
-	out, err := rt.CallOnce(ctx, "cgw_utilities", in)
-	if err != nil {
-		return UtilityOutput{}, err
-	}
-	if err := wire.CheckUTF8(string(out)); err != nil {
-		return UtilityOutput{}, diagnostic.FaultError(fmt.Errorf("decode utility response: %w", err))
-	}
-	var result UtilityOutput
-	if err := json.Unmarshal(out, &result); err != nil {
-		return UtilityOutput{}, diagnostic.FaultError(fmt.Errorf("decode utility response: %w", err))
-	}
-	if result.Error != nil {
-		return UtilityOutput{}, diagnostic.ModuleError(result.Error)
-	}
-	return result, nil
+func UtilityCall(ctx context.Context, rt Caller, input map[string]any) (UtilityOutput, error) {
+	return Exchange[UtilityOutput](ctx, rt, "cgw_utilities", "utility", input)
 }
 
 func UtilityValidationResult(result UtilityOutput, err error) error {

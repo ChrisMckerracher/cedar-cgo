@@ -11,7 +11,11 @@ import (
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	template "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/template"
 	syntax "github.com/ChrisMckerracher/cedar-go-wasm/cedar/syntax"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	fixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fixture"
+	jsonassert "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/jsonassert"
+	partialfixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/partial"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	reflect "reflect"
 	sort "sort"
 	testing "testing"
@@ -43,23 +47,23 @@ func TestPSTMappingNativeFixtures(t *testing.T) {
 				ID         string
 				Values     template.SlotBindings
 			}
-			Responses []testsupport.PartialFixtureResult
+			Responses []partialfixture.PartialFixtureResult
 		}
 		SpecialExpressions map[string]json.RawMessage `json:"special_expressions"`
 	}
-	if err := json.Unmarshal(testsupport.ReadFile(t, "../testdata/parity/pst/input.json"), &input); err != nil {
+	if err := json.Unmarshal(fixture.MustReadFile(t, "../testdata/parity/pst/input.json"), &input); err != nil {
 		t.Fatal(err)
 	}
-	if err := json.Unmarshal(testsupport.ReadFile(t, "../testdata/parity/pst/expected.json"), &expected); err != nil {
+	if err := json.Unmarshal(fixture.MustReadFile(t, "../testdata/parity/pst/expected.json"), &expected); err != nil {
 		t.Fatal(err)
 	}
 	if expected.Version != cedarpartial.ResidualProjectionVersion || expected.CedarVersion != syntax.CedarVersion || len(expected.Cases) != len(input) {
 		t.Fatal("unsupported native PST fixtures")
 	}
-	testsupport.AssertSchemaJSON(t, expected.SpecialExpressions["residual_error"], []byte(`{"error":[]}`))
-	testsupport.AssertSchemaJSON(t, expected.SpecialExpressions["unknown"], []byte(`{"unknown":[{"Value":"x"}]}`))
-	testsupport.AssertSchemaJSON(t, expected.SpecialExpressions["slot"], []byte(`{"Slot":"?principal"}`))
-	rt := testsupport.TestRuntime(t)
+	jsonassert.Equal(t, expected.SpecialExpressions["residual_error"], []byte(`{"error":[]}`))
+	jsonassert.Equal(t, expected.SpecialExpressions["unknown"], []byte(`{"unknown":[{"Value":"x"}]}`))
+	jsonassert.Equal(t, expected.SpecialExpressions["slot"], []byte(`{"Slot":"?principal"}`))
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	for index, test := range input {
 		t.Run(test.Name, func(t *testing.T) {
@@ -80,14 +84,14 @@ func TestPSTMappingNativeFixtures(t *testing.T) {
 				t.Fatal("native PST policy count differs")
 			}
 			for _, policy := range parsed.Policies() {
-				testsupport.AssertSchemaJSON(t, policy.JSON(), want.Policies[policy.ID()])
+				jsonassert.Equal(t, policy.JSON(), want.Policies[policy.ID()])
 			}
 			templates, err := rt.Templates().Templates(ctx, set)
 			if err != nil || len(templates) != len(want.Templates) {
 				t.Fatalf("native PST templates: %+v %v", templates, err)
 			}
 			for _, template := range templates {
-				testsupport.AssertSchemaJSON(t, template.JSON, want.Templates[template.ID])
+				jsonassert.Equal(t, template.JSON, want.Templates[template.ID])
 			}
 			links, err := rt.Templates().TemplateLinks(ctx, set)
 			if err != nil || len(links) != len(want.Links) {

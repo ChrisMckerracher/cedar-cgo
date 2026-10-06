@@ -2,6 +2,8 @@ package format_test
 
 import (
 	generator "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/generator"
+	joy "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/joy"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
 
 	context "context"
 	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
@@ -9,7 +11,7 @@ import (
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	policyformat "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/format"
 	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+
 	rapid "pgregory.net/rapid"
 	testing "testing"
 )
@@ -17,7 +19,7 @@ import (
 // Formatting is idempotent and its output re-parses (docs/verification.md,
 // "Formatting parity"), for any layout options within the documented ranges.
 func TestPropertyFormatIdempotent(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	rapid.Check(t, func(pt *rapid.T) {
 		TextValue := generator.PropGenPolicySet(3).Draw(pt, "policies")
@@ -42,8 +44,8 @@ func TestPropertyFormatIdempotent(t *testing.T) {
 
 // Concrete authorization results are identical before and after formatting.
 func TestPropertyFormatPreservesAuthorization(t *testing.T) {
-	d := testsupport.LoadJoy(t)
-	rt := testsupport.TestRuntime(t)
+	d := joy.LoadJoy(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	rapid.Check(t, func(pt *rapid.T) {
 		TextValue := generator.PropGenPolicySet(2).Draw(pt, "policies")

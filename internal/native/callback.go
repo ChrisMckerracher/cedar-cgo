@@ -18,6 +18,11 @@ func WithCallback(ctx context.Context, callback Callback) context.Context {
 	return context.WithValue(ctx, callbackKey{}, callback)
 }
 
+func CallbackFrom(ctx context.Context) Callback {
+	callback, _ := ctx.Value(callbackKey{}).(Callback)
+	return callback
+}
+
 type callbackState struct {
 	ctx      context.Context
 	callback Callback

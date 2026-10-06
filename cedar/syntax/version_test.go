@@ -2,13 +2,14 @@ package syntax_test
 
 import (
 	syntax "github.com/ChrisMckerracher/cedar-go-wasm/cedar/syntax"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	fixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fixture"
+
 	regexp "regexp"
 	testing "testing"
 )
 
 func TestVersionsMatchCargoLock(t *testing.T) {
-	lock := string(testsupport.ReadFile(t, "../rust/Cargo.lock"))
+	lock := string(fixture.MustReadFile(t, "../rust/Cargo.lock"))
 	for crate, want := range map[string]string{
 		"cedar-policy":           syntax.CedarVersion,
 		"cedar-policy-core":      syntax.CedarVersion,

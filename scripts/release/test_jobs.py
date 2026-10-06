@@ -16,6 +16,15 @@ class JobGateTests(unittest.TestCase):
     def test_complete_run(self):
         jobs.verify(self.rows)
 
+    def test_latest_patch_on_all_three_platforms(self):
+        expected = {f"Go tests ({platform}, Go 1.27.1)" for platform in ("linux_amd64", "linux_arm64", "darwin_arm64")}
+        self.assertEqual({name for name in jobs.EXPECTED if name.startswith("Go tests")}, expected)
+        for version in ("1.26.x", "1.27.x", "1.27.0"):
+            with self.subTest(version=version):
+                rows = [row.replace("Go 1.27.1", f"Go {version}") for row in self.rows]
+                with self.assertRaises(ValueError):
+                    jobs.verify(rows)
+
     def test_missing_duplicate_skipped_failed_and_active_jobs(self):
         cases = [self.rows[:-1], self.rows + self.rows[:1], [],
                  self.rows + ["unknown\tcompleted\tsuccess"]]

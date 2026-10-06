@@ -2,13 +2,14 @@ package validation_test
 
 import (
 	generator "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/generator"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
 
 	context "context"
 	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 	validation "github.com/ChrisMckerracher/cedar-go-wasm/cedar/validation"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+
 	reflect "reflect"
 	slices "slices"
 	strings "strings"
@@ -21,7 +22,7 @@ action a, b appliesTo {principal: User, resource: User, context: {deviceLevel: L
 	policies := cedarpolicy.PoliciesFromCedar(`permit(principal, action, resource) when { context.deviceLEvel == true };
 permit(principal, action, resource) when { false };
 permit(principal, action, resource) when { false };`)
-	result, err := testsupport.TestRuntime(t).Validation().ValidateWithLevel(context.Background(), schema, policies, 4)
+	result, err := testruntime.New(t).Validation().ValidateWithLevel(context.Background(), schema, policies, 4)
 	if err != nil || len(result.Errors) != 2 || len(result.Warnings) != 2 || len(result.SchemaWarnings) != 1 {
 		t.Fatalf("missing native diagnostics: %+v, %v", result, err)
 	}
@@ -41,7 +42,7 @@ permit(principal, action, resource) when { false };`)
 		}},
 	} {
 		t.Run(change.name, func(t *testing.T) {
-			next := testsupport.CloneValidationComparison(t, result)
+			next := CloneValidationComparison(t, result)
 			change.modify(&next)
 			if reflect.DeepEqual(result, next) {
 				t.Fatal("diagnostic transformation did not change the native output")
@@ -69,7 +70,7 @@ permit(principal, action, resource) when { false };`)
 		{"schema warning", func(r *validation.ValidationResult) { r.SchemaWarnings[0].Message += " different detail" }},
 	} {
 		t.Run(change.name, func(t *testing.T) {
-			next := testsupport.CloneValidationComparison(t, result)
+			next := CloneValidationComparison(t, result)
 			change.modify(&next)
 			if reflect.DeepEqual(want, generator.PropStableValidation(next)) {
 				t.Fatalf("different diagnostics compare equally: %+v versus %+v", result, next)

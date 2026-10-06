@@ -10,14 +10,15 @@ import (
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	template "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/template"
 	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	sync "sync"
 	testing "testing"
 )
 
 func TestTemplateConcurrentSnapshots(t *testing.T) {
-	ctx, rt := context.Background(), testsupport.TestRuntime(t)
-	set, err := rt.Templates().AddTemplate(ctx, cedarpolicy.PolicySet{}, "share", template.TemplateFromCedar(testsupport.ShareTemplate))
+	ctx, rt := context.Background(), testruntime.New(t)
+	set, err := rt.Templates().AddTemplate(ctx, cedarpolicy.PolicySet{}, "share", template.TemplateFromCedar(ShareTemplate))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -29,7 +30,7 @@ func TestTemplateConcurrentSnapshots(t *testing.T) {
 	var wg sync.WaitGroup
 	for range 8 {
 		wg.Go(func() {
-			linked, err := rt.Templates().LinkTemplate(ctx, set, "share", "same-id", testsupport.ShareBindings())
+			linked, err := rt.Templates().LinkTemplate(ctx, set, "share", "same-id", ShareBindings())
 			if err != nil {
 				t.Error(err)
 				return
@@ -41,19 +42,19 @@ func TestTemplateConcurrentSnapshots(t *testing.T) {
 		})
 	}
 	wg.Wait()
-	resp, err := a.Authorize(ctx, testsupport.TemplateRequest())
+	resp, err := a.Authorize(ctx, TemplateRequest())
 	if err != nil || resp.Decision != cedarrequest.Deny {
 		t.Fatalf("existing authorizer changed: %+v, %v", resp, err)
 	}
 }
 
 func TestTemplateRejectsInvalidUTF8(t *testing.T) {
-	ctx, rt := context.Background(), testsupport.TestRuntime(t)
+	ctx, rt := context.Background(), testruntime.New(t)
 	bad := string([]byte{0xff})
 	set := cedarpolicy.PolicySet{}
 	calls := []func() error{
 		func() error {
-			_, err := rt.Templates().AddTemplate(ctx, set, bad, template.TemplateFromCedar(testsupport.ShareTemplate))
+			_, err := rt.Templates().AddTemplate(ctx, set, bad, template.TemplateFromCedar(ShareTemplate))
 			return err
 		},
 		func() error {
@@ -87,7 +88,7 @@ func TestTemplateRejectsInvalidUTF8(t *testing.T) {
 }
 
 func TestTemplateDiagnosticIDs(t *testing.T) {
-	ctx, rt := context.Background(), testsupport.TestRuntime(t)
+	ctx, rt := context.Background(), testruntime.New(t)
 	templateID, policyID := "template\\\"\n\x00雪", "linked\\\"\n\x00雪"
 	set, err := rt.Templates().AddTemplate(ctx, cedarpolicy.PolicySet{}, templateID, template.TemplateFromCedar(`permit(principal == ?principal, action, resource) when { context.missing };`))
 	if err != nil {
@@ -97,7 +98,7 @@ func TestTemplateDiagnosticIDs(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	validation, err := rt.Validation().Validate(ctx, cedarschema.SchemaFromCedar(testsupport.TemplateSchema), set)
+	validation, err := rt.Validation().Validate(ctx, cedarschema.SchemaFromCedar(TemplateSchema), set)
 	if err != nil || validation.Passed || len(validation.Errors) == 0 {
 		t.Fatalf("invalid context reference: %+v, %v", validation, err)
 	}
@@ -111,7 +112,7 @@ func TestTemplateDiagnosticIDs(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer a.Close()
-	result, err := a.Authorize(ctx, testsupport.TemplateRequest())
+	result, err := a.Authorize(ctx, TemplateRequest())
 	if err != nil || result.Decision != cedarrequest.Deny || len(result.Errors) != 1 || result.Errors[0].PolicyID != policyID {
 		t.Fatalf("evaluation diagnostic %+v, %v", result, err)
 	}

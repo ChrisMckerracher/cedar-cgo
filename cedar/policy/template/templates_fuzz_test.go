@@ -7,7 +7,10 @@ import (
 	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	template "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/template"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	fault "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fault"
+	fuzz "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fuzz"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	reflect "reflect"
 	strings "strings"
 	testing "testing"
@@ -15,18 +18,18 @@ import (
 )
 
 func FuzzTemplates(f *testing.F) {
-	f.Add(testsupport.ShareTemplate, "share", "alice-access", "User", "alice", "Photo", "beach", "")
+	f.Add(ShareTemplate, "share", "alice-access", "User", "alice", "Photo", "beach", "")
 	f.Add("", "", "", "", "", "", "", "")
 	f.Add(`permit(principal, action == ?action, resource);`, "action-slot", "link", "User", "alice", "Photo", "beach", "")
 	f.Add(`permit(principal == ?principal, action, resource) when { principal == ?principal };`, "cond-slot", "link", "User", "alice", "Photo", "beach", "")
 	f.Add("@a(\"1\")\n@b(\"2\")\n@c(\"3\")\n@description(\"deeply annotated\")\nforbid(principal == ?principal, action, resource == ?resource);", "deep", "link", "User", "alice", "Photo", "beach", "s")
 	f.Add(`permit(principal, action, resource);`, "static", "link", "User", "alice", "Photo", "beach", "")
-	f.Add(testsupport.ShareTemplate, "share", "share", "User", "alice", "Photo", "beach", testsupport.FuzzTemplateJSON)
-	f.Add(testsupport.ShareTemplate, "t\"\\\n", "l\"雪\x00", "User", "a\n\"\\雪\x00", "Photo", "", "x")
-	rt := testsupport.TestRuntime(f)
+	f.Add(ShareTemplate, "share", "share", "User", "alice", "Photo", "beach", FuzzTemplateJSON)
+	f.Add(ShareTemplate, "t\"\\\n", "l\"雪\x00", "User", "a\n\"\\雪\x00", "Photo", "", "x")
+	rt := testruntime.New(f)
 	f.Fuzz(func(t *testing.T, source, templateID, linkID, principalType, principalID, resourceType, resourceID, opSeed string) {
 		if len(source)+len(templateID)+len(linkID)+len(principalType)+len(principalID)+len(resourceType)+len(resourceID)+len(opSeed) > 8192 ||
-			testsupport.Nesting(source) > testsupport.MaxFuzzNesting {
+			fuzz.Nesting(source) > fuzz.MaxFuzzNesting {
 			t.Skip()
 		}
 		ctx := context.Background()
@@ -45,7 +48,7 @@ func FuzzTemplates(f *testing.F) {
 			!utf8.ValidString(resourceType) || !utf8.ValidString(resourceID)
 		if badBinding || !utf8.ValidString(opSeed) {
 			base := cedarpolicy.PoliciesFromCedar(`permit(principal, action, resource);`)
-			set, err := rt.Templates().AddTemplate(ctx, base, "t", template.TemplateFromCedar(testsupport.ShareTemplate))
+			set, err := rt.Templates().AddTemplate(ctx, base, "t", template.TemplateFromCedar(ShareTemplate))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -70,13 +73,13 @@ func FuzzTemplates(f *testing.F) {
 		}
 		if strings.HasPrefix(opSeed, "{") {
 			_, err := rt.Templates().AddTemplate(ctx, cedarpolicy.PolicySet{}, templateID, template.TemplateFromJSON([]byte(opSeed)))
-			testsupport.CheckNoFault(t, err)
+			fault.CheckNoFault(t, err)
 		}
 		// The static policy keeps the pre-link decision non-trivial: linking a
 		// forbid template can flip it, and unlinking must flip it back.
 		base := cedarpolicy.PoliciesFromCedar(`permit(principal, action, resource);`)
 		set, err := rt.Templates().AddTemplate(ctx, base, templateID, template.TemplateFromCedar(source))
-		testsupport.CheckNoFault(t, err)
+		fault.CheckNoFault(t, err)
 		if err != nil {
 			return
 		}
@@ -89,10 +92,10 @@ func FuzzTemplates(f *testing.F) {
 		if err != nil {
 			t.Fatalf("accepted template failed its EST round trip: %v", err)
 		}
-		if !reflect.DeepEqual(testsupport.NormalizedPolicyJSON(t, []byte(set.Text())), testsupport.NormalizedPolicyJSON(t, []byte(jsonSet.Text()))) {
+		if !reflect.DeepEqual(NormalizedPolicyJSON(t, []byte(set.Text())), NormalizedPolicyJSON(t, []byte(jsonSet.Text()))) {
 			t.Fatal("Cedar and JSON template sources produced different sets")
 		}
-		pre, err := testsupport.FuzzTemplateDecision(t, rt, set)
+		pre, err := fuzzTemplateDecision(t, rt, set)
 		if err != nil {
 			return
 		}
@@ -106,7 +109,7 @@ func FuzzTemplates(f *testing.F) {
 			}
 		}
 		linked, err := rt.Templates().LinkTemplate(ctx, set, templateID, linkID, bindings)
-		testsupport.CheckNoFault(t, err)
+		fault.CheckNoFault(t, err)
 		if err != nil {
 			return
 		}
@@ -114,7 +117,7 @@ func FuzzTemplates(f *testing.F) {
 		if err != nil || len(links) != 1 || links[0].PolicyID != linkID || links[0].TemplateID != templateID {
 			t.Fatalf("successful link not listed consistently: %v, %v", links, err)
 		}
-		during, err := testsupport.FuzzTemplateDecision(t, rt, linked)
+		during, err := fuzzTemplateDecision(t, rt, linked)
 		if err != nil {
 			return
 		}
@@ -122,10 +125,10 @@ func FuzzTemplates(f *testing.F) {
 		if err != nil {
 			t.Fatalf("unlinking a listed link failed: %v", err)
 		}
-		if !reflect.DeepEqual(testsupport.NormalizedPolicyJSON(t, []byte(set.Text())), testsupport.NormalizedPolicyJSON(t, []byte(unlinked.Text()))) {
+		if !reflect.DeepEqual(NormalizedPolicyJSON(t, []byte(set.Text())), NormalizedPolicyJSON(t, []byte(unlinked.Text()))) {
 			t.Fatal("unlink did not restore the pre-link set")
 		}
-		after, err := testsupport.FuzzTemplateDecision(t, rt, unlinked)
+		after, err := fuzzTemplateDecision(t, rt, unlinked)
 		if err != nil || after != pre {
 			t.Fatalf("unlink did not restore decision %v (linked %v): %v, %v", pre, during, after, err)
 		}

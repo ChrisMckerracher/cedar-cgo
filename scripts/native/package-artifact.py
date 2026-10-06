@@ -2,19 +2,18 @@
 """Package the verified target artifact without changing its files."""
 
 import json
-import subprocess
 import sys
 import zipfile
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from artifact_verifier import HEADER, run
+
 
 def package(directory, destination):
-    repo = Path(__file__).resolve().parents[2]
     artifact = Path(directory).resolve()
     manifest = json.loads((artifact / "manifest.json").read_text())
-    subprocess.run(["go", "run", "./cmd/verify-native-artifact", str(artifact),
-                    manifest["source_commit"], manifest["target"],
-                    str(repo / "internal/native/include/cedar.h")], cwd=repo, check=True)
+    run(artifact, manifest["source_commit"], manifest["target"], HEADER)
     with zipfile.ZipFile(destination, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for path in sorted(artifact.iterdir()):
             entry = zipfile.ZipInfo(path.name, (1980, 1, 1, 0, 0, 0))

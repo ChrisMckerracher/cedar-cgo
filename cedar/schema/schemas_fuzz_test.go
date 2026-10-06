@@ -5,7 +5,8 @@ import (
 	errors "errors"
 	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	testing "testing"
 )
 
@@ -14,7 +15,7 @@ func FuzzSchemaFragments(f *testing.F) {
 	f.Add("entity User {profile: Profile};", "type Profile = {name: String};", false)
 	f.Add(`{"":{"entityTypes":{"User":{}},"actions":{}}}`, `{}`, true)
 	f.Add("", "", false)
-	rt := testsupport.TestRuntime(f)
+	rt := testruntime.New(f)
 	f.Fuzz(func(t *testing.T, first, second string, jsonFormat bool) {
 		if len(first)+len(second) > 4096 {
 			t.Skip()

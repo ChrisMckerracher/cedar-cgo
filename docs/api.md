@@ -41,7 +41,8 @@ import (
 
 This migration changes the public Go API.
 See the [consumer migration lessons](migration/consumer.md) for each feature.
-The [operation inventory](migration/operations.md) maps previous names to current packages.
+The [operation inventory](migration/operations.md) records the earlier v0.2.0 migration.
+The consumer guide also lists the v0.3.0 cleanup changes.
 The [authorization example](../cedar/integration/example_test.go) and [analysis example](../analysis/example_test.go) are executable.
 
 ## Runtime lifecycle
@@ -173,8 +174,10 @@ use its fields or JSON representation when passing it to Cedar.
 
 ### Parsed entity stores
 
-`entity.Client.ParseEntityStore(ctx, entities, schema)` returns an immutable `ParsedEntityStore`.
+`store.Client.ParseEntityStore(ctx, entities, schema)` returns an immutable `store.ParsedEntityStore`.
+Import `cedar/entity/store` for parsed stores. Import `cedar/entity` for entity collections.
 Pass a nil schema to omit schema validation.
+The schema argument is `*schema.Schema`, not the removed `entity.SchemaSource` interface.
 A supplied schema validates entities and inserts its action entities.
 The store remains tied to its runtime.
 Close the runtime when all operations finish.
@@ -207,7 +210,7 @@ Reparsing normalized JSON treats all exported ancestors as direct parents, as na
 Deep equality compares ancestry, so it does not distinguish these direct-parent histories.
 
 ```go
-store, err := rt.Entities().ParseEntityStore(ctx, entities, &schema)
+store, err := rt.EntityStore().ParseEntityStore(ctx, entities, &schema)
 if err != nil {
     return err
 }
@@ -401,11 +404,13 @@ Invalid UTF-8 returns `KindInput` before module execution.
 
 ## Entity literals
 
-`policy.Client.EntityLiterals` lists sorted literal occurrences by policy and template
+`literal.Client.EntityLiterals` lists sorted literal occurrences by policy and template
 ID. The method delegates inspection to Cedar's native syntax tree. Slot bindings
 are available through `template.Client.TemplateLinks`.
 
-`policy.Client.SubstituteEntityLiterals` accepts a map from original UIDs to replacement
+Use `rt.PolicyLiterals()` and import `cedar/policy/literal` for this client and its records.
+
+`literal.Client.SubstituteEntityLiterals` accepts a map from original UIDs to replacement
 UIDs. Cedar applies the map simultaneously. With `A → B` and `B → C`, the
 original `A` becomes `B`. String literals that contain entity-like text stay
 unchanged. Policy IDs, template IDs, annotations, slots, and link IDs retain their
@@ -427,7 +432,9 @@ It returns `SourceTokens` containing native tokens, comment summaries, and UTF-8
 `TokenSpan.Start` is the first byte offset.
 `TokenSpan.End` is the byte offset immediately after the token.
 Each token's `Text` exactly matches that source range.
-The decoder checks native lexical spelling, complete token coverage, and comment attachment.
+The decoder checks required fields, UTF-8, ordered spans, source bounds, and source-text equality.
+The pinned native formatter owns spelling, keyword, trivia, and comment-attachment rules.
+Fabricated native token streams receive no second semantic lexer check in Go.
 
 `SourceToken.Kind` is `identifier`, `number`, or `string` for those token variants.
 For other variants, the kind is the native token spelling, such as `permit`, `?principal`, or `==`.
@@ -642,8 +649,6 @@ that are not `*diagnostic.Error`.
 | `WithMaxSourceBytes(bytes)` | Encoded operation input cap; default 64 MiB |
 | `WithMaxResponseBytes(bytes)` | Encoded response cap; default 16 MiB |
 | `WithMaxConcurrentCalls(count)` | Shared active native call cap; default 8 |
-| `WithMemoryLimit(bytes)` | Rejected: native execution has no linear-memory cap |
-| `WithCompilationCache(cache)` | Rejected: native execution has no Wasm compilation cache |
 
 | `authorization.Config.Limits` field | Purpose |
 |---|---|
@@ -651,7 +656,6 @@ that are not `*diagnostic.Error`.
 | `CallTimeout` | Result deadline after pool acquisition; default one second |
 | `LoadTimeout` | State creation and load deadline; default 30 seconds |
 | `MaxRequestBytes` | Encoded request cap; default 1 MiB |
-| `RecycleMemoryBytes` | Rejected when nonzero; native heap retention is not linear-memory size |
 
 Zero-valued supported limit fields select defaults.
 A negative `CallTimeout` disables its deadline.
@@ -660,6 +664,7 @@ Deadlines cannot interrupt native computation without cooperative callbacks.
 `Stats()` retains `Created`, `Discarded`, and `Idle` counts.
 The native artifact manifest identifies Cedar, SymCC, ABI, compiler, target, and source commit.
 `ModuleSHA256()` is removed.
+The v0.3.0 interface removes the previously rejected Wasm options and `RecycleMemoryBytes`.
 See the [native contract](migration/native-contract.md) and [release maintenance](maintenance.md).
 
 ## Supported operations
@@ -753,12 +758,12 @@ policy with an explicit ID. `policy.Client.PolicyFromJSON` accepts one policy's 
 JSON and an explicit ID. Even the empty ID is preserved; `@id` is an annotation,
 not an instruction to set the policy ID.
 
-A `ParsedPolicy` exposes its ID, permit/forbid effect, annotations, principal,
-action and resource constraints, whether it has condition clauses, and whether
-it is linked to a template. `Policy(id)` looks up an ID without parsing again;
+A `ParsedPolicy` exposes its ID, permit/forbid effect, annotations, condition presence,
+and template identity. Inspect head constraints through its Cedar JSON body.
+`Policy(id)` looks up an ID without parsing again;
 `Policies()` lists static and linked policies in ID order, excluding templates.
 Snapshots are independent of the runtime's lifetime and safe to share. Returned
-maps, byte slices, syntax and constraints are copies. The zero `ParsedPolicySet`
+maps and byte slices are copies. The zero `ParsedPolicySet`
 is empty; the zero `ParsedPolicy` is invalid.
 
 `policy.Client.AddPolicy`, `RemovePolicy`, and `MergePolicySets` accept source-based
@@ -781,21 +786,14 @@ if err != nil { return err }
 source := set.Source()
 ```
 
-`PolicySyntax` and `policy.Client.PolicyFromSyntax` are **experimental**. They expose a
-static-policy projection of Cedar 4.13's policy syntax tree (PST): ID, effect,
-annotations, typed head constraints, and ordered `when`/`unless` conditions.
-Rust constructs the actual upstream PST and calls `Policy::from_pst`; inspection
-calls `Policy::to_pst`. Upstream PST has no JSON serialization. Each condition
-body therefore uses Cedar's JSON policy expression format (`json.RawMessage`),
-with its full expression vocabulary and exact integer representation. No Cedar
-parser or evaluator is implemented in Go. `Syntax()` returns an editable copy;
-pass the modified value to `PolicyFromSyntax` to validate it. Scope constraints
-must specify their `Kind`; `eq`/`in` use `Entity`, `is` uses `EntityType`, and
-`is_in` uses both. Action `in` uses `Entities`, including an empty set. Unused
-constraint fields must be empty. Conditions are optional; malformed names,
-constraints, expressions, and slots are rejected by Rust. A parsed policy need
-not pass schema validation: call `Validate` before using it if schema validity
-is required.
+Use Cedar's documented JSON policy representation for editing and construction.
+`JSON()` returns an owned copy. Pass the changed body and explicit ID to `PolicyFromJSON`.
+Keep expression integers exact. Use `json.RawMessage` or `json.Decoder.UseNumber()` when editing untyped nodes.
+Rust validates the body through pinned upstream Cedar APIs.
+This format is not direct serialization of the upstream Programmatic Syntax Tree (PST).
+The v0.3.0 interface removes `PolicySyntax`, `Syntax()`, `PolicyFromSyntax`, and typed head-constraint records and getters.
+A parsed policy can fail schema validation. If schema correctness is required, call `Validate` before use.
+See the [JSON mapping](pst-mapping.md) and [consumer editing example](migration/consumer.md#lesson-8-edit-cedar-json-policies).
 
 Persistence and display have different contracts:
 
@@ -803,7 +801,6 @@ Persistence and display have different contracts:
 | --- | --- |
 | `ParsedPolicySet.JSON()` / `Source()` | Preserve IDs, templates, and links; use for persistence |
 | `ParsedPolicy.JSON()` | One policy body only; ID must be supplied on reparse; linked bodies are materialized without link metadata |
-| `ParsedPolicy.Syntax()` | Static policies only; includes the explicit ID; PST normalization can change syntax spelling |
 | `Cedar()` on a policy or set | Omits IDs; reparsing a set assigns `policy0`, `policy1`, etc.; rejects linked policies to avoid silently discarding their representation |
 
 Set Cedar output sorts static policies by ID, followed by templates by ID.
@@ -823,12 +820,13 @@ Recovered panics and rejected canceled results return faults; canceled operation
 do not invalidate other snapshots or the runtime.
 
 See the executable `Example_parsePolicy` and
-`Example_policyFromSyntax` examples in `cedar/policy/policies_example_test.go`.
+`Example_policyFromJSON` examples in `cedar/policy/policies_example_test.go`.
 
 ## Partial evaluation (experimental)
 
 `partial.Client.PartialAuthorize` uses Cedar 4.13.0 TPE with explicit unknown inputs
 and a separate `PartialDecision` (`Undecided`, `PartialDeny`, `PartialAllow`).
+Import `cedar/authorization/partial/input` for partial request and entity records.
 Inspect `PartialResponse.Residuals`, then supply consistent concrete data with
 `PartialResponse.Reauthorize`. A schema is required. See
 [partial evaluation](partial-evaluation.md) for supported unknowns, limits,
@@ -879,15 +877,16 @@ Authorization evaluation messages retain their existing policy ID and text field
 Permission queries use Cedar's experimental type-aware partial evaluation API.
 Create an authorizer with a schema before you call these methods.
 The authorizer's request, response, and time limits apply.
+Use `a.Queries()` and import `cedar/authorization/partial/query` for request and result records.
 
-`partial.Client.QueryResources` selects allowed resources of one type from the native entity store.
+`query.Client.QueryResources` selects allowed resources of one type from the native entity store.
 Supply a concrete principal, action, and context.
-`partial.Client.QueryPrincipals` selects allowed principals of one type from the native entity store.
+`query.Client.QueryPrincipals` selects allowed principals of one type from the native entity store.
 Supply a concrete action, resource, and context.
 Per-query `Entities` augments the loaded store through Cedar's existing conflict checks.
 Both methods return only candidates that native Cedar permits.
 
-`partial.Client.QueryActions` enumerates applicable actions through the schema in Rust.
+`query.Client.QueryActions` enumerates applicable actions through the schema in Rust.
 Principal and resource types must be known. Their IDs can be unknown.
 A nil context is wholly unknown. A pointer to `Context{}` is known empty.
 The method returns separate `Allowed` and `Undecided` lists.

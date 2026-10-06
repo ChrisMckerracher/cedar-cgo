@@ -61,7 +61,7 @@ func TestSourceTokenNativeFixtures(t *testing.T) {
 func TestMalformedSourceTokenResponses(t *testing.T) {
 	for _, data := range []string{
 		``, `null`, `{}`, `{"tokens":[],"trailing_comments":null}`,
-		`{"tokens":[{"kind":"unknown","text":"x","span":{"start":0,"end":1},"leading_comments":[],"trailing_comment":""}],"trailing_comments":[]}`,
+		`{"tokens":[{"kind":"","text":"x","span":{"start":0,"end":1},"leading_comments":[],"trailing_comment":""}],"trailing_comments":[]}`,
 		`{"tokens":[{"kind":"identifier","text":"x","span":{"start":1,"end":0},"leading_comments":[],"trailing_comment":""}],"trailing_comments":[]}`,
 		`{"tokens":[{"kind":"identifier","text":"x","span":{"start":0,"end":3},"leading_comments":[],"trailing_comment":""}],"trailing_comments":[]}`,
 		`{"tokens":[{"kind":"identifier","text":"x","span":{"end":1},"leading_comments":[],"trailing_comment":""}],"trailing_comments":[]}`,
@@ -72,7 +72,6 @@ func TestMalformedSourceTokenResponses(t *testing.T) {
 		`{"tokens":[{"kind":"identifier","text":"x","span":{"start":-1,"end":1},"leading_comments":[],"trailing_comment":""}],"trailing_comments":[]}`,
 		`{"tokens":[{"kind":"identifier","text":"x","span":{"start":0,"end":4294967296},"leading_comments":[],"trailing_comment":""}],"trailing_comments":[]}`,
 		`{"tokens":[{"kind":"identifier","text":"wrong","span":{"start":0,"end":1},"leading_comments":[],"trailing_comment":""}],"trailing_comments":[]}`,
-		`{"tokens":[{"kind":"permit","text":"x","span":{"start":0,"end":1},"leading_comments":[],"trailing_comment":""}],"trailing_comments":[]}`,
 		`{"tokens":[{"kind":"identifier","text":"x","span":{"start":0,"end":1},"trailing_comment":""}],"trailing_comments":[]}`,
 		`{"tokens":[{"kind":"identifier","text":"x","span":{"start":0,"end":1},"leading_comments":[],"trailing_comment":""},{"kind":"identifier","text":"x","span":{"start":0,"end":1},"leading_comments":[],"trailing_comment":""}],"trailing_comments":[]}`,
 	} {

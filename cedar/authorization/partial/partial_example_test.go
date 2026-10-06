@@ -5,7 +5,7 @@ import (
 	fmt "fmt"
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
-	cedarpartial "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial"
+	partialinput "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial/input"
 	cedarrequest "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
 	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
@@ -29,10 +29,10 @@ func ExamplePartialResponse_Reauthorize() {
 		log.Fatal(err)
 	}
 	defer a.Close()
-	partial, err := a.Partial().PartialAuthorize(ctx, cedarpartial.PartialRequest{
-		Principal: cedarpartial.UnknownEntityUID("User"),
+	partial, err := a.Partial().PartialAuthorize(ctx, partialinput.PartialRequest{
+		Principal: partialinput.UnknownEntityUID("User"),
 		Action:    entityuid.NewEntityUID("Action", "view"),
-		Resource:  cedarpartial.UnknownEntityUID("Photo"),
+		Resource:  partialinput.UnknownEntityUID("Photo"),
 	})
 	if err != nil {
 		log.Fatal(err)

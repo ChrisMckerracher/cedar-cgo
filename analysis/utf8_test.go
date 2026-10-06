@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/ChrisMckerracher/cedar-go-wasm/analysis"
+	reports "github.com/ChrisMckerracher/cedar-go-wasm/analysis/report"
 	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
@@ -25,7 +26,7 @@ func TestRejectInvalidUTF8SourcesBeforeSolver(t *testing.T) {
 		{second: policy.PoliciesFromJSON([]byte(bad))},
 	} {
 		_, err := a.Equivalent(context.Background(), inputs.schema, inputs.first, inputs.second)
-		var e *analysis.Error
+		var e *reports.Error
 		if !errors.As(err, &e) || e.Kind != string(diagnostic.KindInput) {
 			t.Fatalf("got %v; want input error", err)
 		}

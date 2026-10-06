@@ -3,6 +3,8 @@ package batched
 import (
 	context "context"
 	json "encoding/json"
+	"encoding/json/jsontext"
+	jsonv2 "encoding/json/v2"
 	errors "errors"
 	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
@@ -109,10 +111,14 @@ func EncodeEntityLoadResult(result EntityLoadResult, limit int) ([]byte, error) 
 		}
 		missing[i] = uid.Wire()
 	}
-	body, err := json.Marshal(struct {
+	body, err := jsonv2.Marshal(struct {
 		Entities json.RawMessage `json:"entities"`
 		Missing  []wire.UID      `json:"missing"`
-	}{result.Entities, missing})
+	}{result.Entities, missing},
+		jsontext.EscapeForHTML(true),
+		jsontext.EscapeForJS(true),
+		jsontext.PreserveRawStrings(true),
+	)
 	if err != nil {
 		return nil, &diagnostic.Error{Kind: diagnostic.KindLoader, Message: err.Error(), Err: err}
 	}

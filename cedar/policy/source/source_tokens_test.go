@@ -9,7 +9,8 @@ import (
 	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	policysource "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/source"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	reflect "reflect"
 	strings "strings"
 	testing "testing"
@@ -18,14 +19,14 @@ import (
 )
 
 func TestSourceTokensPreserveCommentsAndSpacing(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	source := "// leading 雪  \r\n@note(\"😀\") // annotation\r\npermit( principal == User::\"old\", action, resource ); // inline  \r\n// end  \r\n"
 	tokens, err := rt.Source().TokenizePolicies(ctx, source)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got := testsupport.ReconstructTokenSource(source, tokens); got != source {
+	if got := ReconstructTokenSource(source, tokens); got != source {
 		t.Fatalf("source changed: %q", got)
 	}
 	if !reflect.DeepEqual(tokens.Tokens[0].LeadingComments, []string{"// leading 雪"}) || !reflect.DeepEqual(tokens.TrailingComments, []string{"// end"}) {
@@ -78,13 +79,13 @@ func TestSourceTokensPreserveCommentsAndSpacing(t *testing.T) {
 		authorizer.Close()
 	}
 	changedTokens, err := rt.Source().TokenizePolicies(ctx, changed)
-	if err != nil || testsupport.ReconstructTokenSource(changed, changedTokens) != changed {
+	if err != nil || ReconstructTokenSource(changed, changedTokens) != changed {
 		t.Fatalf("edited source reconstruction: %+v %v", changedTokens, err)
 	}
 }
 
 func TestSourceTokensSeparateLexingFromValidation(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	tokens, err := rt.Source().TokenizePolicies(ctx, "permit(")
 	if err != nil || len(tokens.Tokens) != 2 {
@@ -101,7 +102,7 @@ func TestSourceTokensSeparateLexingFromValidation(t *testing.T) {
 }
 
 func FuzzSourceTokenSpans(f *testing.F) {
-	rt := testsupport.TestRuntime(f)
+	rt := testruntime.New(f)
 	for _, source := range []string{"", "// 雪\r\n", `permit(principal, action, resource);`, "// leading\n@note(\"😀\") permit(principal == ?principal, action, resource); // end", "permit $", string([]byte{0xff})} {
 		f.Add(source)
 	}
@@ -122,7 +123,7 @@ func FuzzSourceTokenSpans(f *testing.F) {
 			}
 			return
 		}
-		if !utf8.ValidString(source) || testsupport.ReconstructTokenSource(source, tokens) != source {
+		if !utf8.ValidString(source) || ReconstructTokenSource(source, tokens) != source {
 			t.Fatal("token spans changed the original source")
 		}
 	})

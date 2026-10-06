@@ -10,7 +10,11 @@ import (
 	cedarentity "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	fixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fixture"
+	jsonassert "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/jsonassert"
+	partialfixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/partial"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	reflect "reflect"
 	testing "testing"
 )
@@ -22,18 +26,18 @@ func TestPartialNativeFixtures(t *testing.T) {
 			Name, Policies string
 			PoliciesJSON   json.RawMessage `json:"policies_json"`
 			Loaded         json.RawMessage
-			Partial        testsupport.PartialFixtureRequest
-			Completions    []testsupport.PartialFixtureRequest
+			Partial        partialfixture.PartialFixtureRequest
+			Completions    []partialfixture.PartialFixtureRequest
 		}
 	}
 	var expected []struct {
 		Name   string
-		Result testsupport.PartialFixtureResult
+		Result partialfixture.PartialFixtureResult
 	}
-	if err := json.Unmarshal(testsupport.ReadFile(t, "../testdata/parity/partial/input.json"), &input); err != nil {
+	if err := json.Unmarshal(fixture.MustReadFile(t, "../testdata/parity/partial/input.json"), &input); err != nil {
 		t.Fatal(err)
 	}
-	if err := json.Unmarshal(testsupport.ReadFile(t, "../testdata/parity/partial/expected.json"), &expected); err != nil {
+	if err := json.Unmarshal(fixture.MustReadFile(t, "../testdata/parity/partial/expected.json"), &expected); err != nil {
 		t.Fatal(err)
 	}
 	if len(expected) != len(input.Cases) {
@@ -51,7 +55,7 @@ func TestPartialNativeFixtures(t *testing.T) {
 			if tc.PoliciesJSON != nil {
 				policies = cedarpolicy.PoliciesFromJSON(tc.PoliciesJSON)
 			}
-			a, err := testsupport.TestRuntime(t).NewAuthorizer(ctx, authorization.Config{
+			a, err := testruntime.New(t).NewAuthorizer(ctx, authorization.Config{
 				Schema: &schema, Policies: policies, Entities: cedarentity.EntitiesFromJSON(tc.Loaded),
 			})
 			if err != nil {
@@ -60,7 +64,7 @@ func TestPartialNativeFixtures(t *testing.T) {
 			defer a.Close()
 			got, err := a.Partial().PartialAuthorize(ctx, tc.Partial.Partial())
 			if want.Result.ErrorStage != "" {
-				testsupport.RequirePartialError(t, got, err, diagnostic.ErrorKind(want.Result.ErrorStage))
+				partialfixture.RequirePartialError(t, got, err, diagnostic.ErrorKind(want.Result.ErrorStage))
 				return
 			}
 			if err != nil {
@@ -77,7 +81,7 @@ func TestPartialNativeFixtures(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			testsupport.AssertSchemaJSON(t, gotProjection, wantProjection)
+			jsonassert.Equal(t, gotProjection, wantProjection)
 			exported, err := got.Export()
 			if err != nil {
 				t.Fatal(err)

@@ -2,57 +2,62 @@ package policy_test
 
 import (
 	context "context"
-	json "encoding/json"
-	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	fault "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fault"
+	fuzz "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fuzz"
+	jsonassert "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/jsonassert"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	testing "testing"
 	time "time"
 	utf8 "unicode/utf8"
 )
 
+// The historical target name now exercises Cedar's documented JSON policy representation.
 func FuzzPolicySyntax(f *testing.F) {
-	fixture := testsupport.LoadPolicyFixture(f)
-	seed, _ := json.Marshal(fixture.Constructed.Syntax)
-	f.Add(string(seed))
-	f.Add(`{"id":"","effect":"permit","principal":{"kind":"any"},"action":{"kind":"in","entities":[]},"resource":{"kind":"any"},"conditions":[{"kind":"when","body":{"Value":9223372036854775807}}]}`)
-	rt := testsupport.TestRuntime(f)
-	f.Fuzz(func(t *testing.T, input string) {
-		if len(input) > 64<<10 || testsupport.Nesting(input) > testsupport.MaxFuzzNesting {
+	fixture := LoadPolicyFixture(f)
+	f.Add(fixture.Constructed.Syntax.ID, string(fixture.Constructed.JSON))
+	f.Add("", `{"effect":"permit","principal":{"op":"All"},"action":{"op":"in","entities":[]},"resource":{"op":"All"},"conditions":[{"kind":"when","body":{"Value":9223372036854775807}}]}`)
+	f.Add("quote\"\nslash\\雪", string(fixture.Constructed.JSON))
+	rt := testruntime.New(f)
+	f.Fuzz(func(t *testing.T, id, input string) {
+		if len(id)+len(input) > 64<<10 || fuzz.Nesting(input) > fuzz.MaxFuzzNesting {
 			t.Skip()
 		}
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
-		var syntax cedarpolicy.PolicySyntax
-		if json.Unmarshal([]byte(input), &syntax) != nil {
-			// Invalid Go syntax envelopes still exercise the Rust policy JSON parser.
-			_, err := rt.Policies().PolicyFromJSON(ctx, "fuzz", []byte(input))
-			testsupport.CheckNoFault(t, err)
-			if !utf8.ValidString(input) {
-				testsupport.RequireUTF8InputError(t, err)
-			}
-			return
+		p, err := rt.Policies().PolicyFromJSON(ctx, id, []byte(input))
+		fault.CheckNoFault(t, err)
+		if !utf8.ValidString(id) || !utf8.ValidString(input) {
+			fault.RequireUTF8InputError(t, err)
 		}
-		p, err := rt.Policies().PolicyFromSyntax(ctx, syntax)
-		testsupport.CheckNoFault(t, err)
 		if err != nil {
 			return
 		}
-		if p.ID() != syntax.ID {
+		if p.ID() != id {
 			t.Fatal("ID changed")
 		}
 		q, err := rt.Policies().PolicyFromJSON(ctx, p.ID(), p.JSON())
 		if err != nil {
 			t.Fatal("JSON round trip:", err)
 		}
-		testsupport.SameJSON(t, q.JSON(), p.JSON())
-		tree, err := p.Syntax()
+		jsonassert.Equal(t, q.JSON(), p.JSON())
+		cedar, err := p.Cedar()
 		if err != nil {
 			t.Fatal(err)
 		}
-		r, err := rt.Policies().PolicyFromSyntax(ctx, tree)
+		r, err := rt.Policies().ParsePolicy(ctx, p.ID(), cedar)
 		if err != nil {
-			t.Fatal("PST round trip:", err)
+			t.Fatal("Cedar round trip:", err)
 		}
-		testsupport.SameJSON(t, r.JSON(), p.JSON())
+		// Cedar text combines clauses; its normalized projection must remain stable.
+		text, err := r.Cedar()
+		if err != nil {
+			t.Fatal(err)
+		}
+		s, err := rt.Policies().ParsePolicy(ctx, r.ID(), text)
+		if err != nil {
+			t.Fatal(err)
+		}
+		jsonassert.Equal(t, s.JSON(), r.JSON())
 	})
 }

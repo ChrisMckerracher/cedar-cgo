@@ -15,25 +15,26 @@ import (
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	testing "testing"
 )
 
 func TestBatchedCachedEntitiesAndOwnership(t *testing.T) {
-	f := testsupport.BatchedFixtures(t)[0]
-	a := testsupport.BatchAuthorizer(t, f, authorization.Limits{MaxInstances: 1})
-	req := testsupport.BatchRequest(f)
+	f := BatchedFixtures(t)[0]
+	a := BatchAuthorizer(t, f, authorization.Limits{MaxInstances: 1})
+	req := BatchRequest(f)
 	req.Entities = cedarentity.EntitiesFromJSON(f.Batches[0].Entities)
 	var retained []entityuid.EntityUID
 	d, err := a.Batched().AuthorizeBatched(context.Background(), req, batched.EntityLoaderFunc(func(_ context.Context, uids []entityuid.EntityUID) (batched.EntityLoadResult, error) {
 		retained = uids
-		return testsupport.FixtureBatch(f, 1), nil
+		return FixtureBatch(f, 1), nil
 	}), batched.BatchedOptions{MaxIterations: 2})
 	if d != cedarrequest.Allow || err != nil || len(retained) != 1 || retained[0].ID != "manager" {
 		t.Fatalf("cache got %s %v ids=%v", d, err, retained)
 	}
 	n := 0
-	d, err = a.Batched().AuthorizeBatched(context.Background(), testsupport.BatchRequest(f), batched.EntityLoaderFunc(func(context.Context, []entityuid.EntityUID) (batched.EntityLoadResult, error) {
+	d, err = a.Batched().AuthorizeBatched(context.Background(), BatchRequest(f), batched.EntityLoaderFunc(func(context.Context, []entityuid.EntityUID) (batched.EntityLoadResult, error) {
 		n++
 		return batched.EntityLoadResult{}, nil
 	}), batched.BatchedOptions{MaxIterations: 1})
@@ -85,7 +86,7 @@ func TestBatchedLoaderCannotRedefineCachedEntities(t *testing.T) {
 				} else {
 					cfg.Entities = cached
 				}
-				a, err := testsupport.TestRuntime(t).NewAuthorizer(context.Background(), cfg)
+				a, err := testruntime.New(t).NewAuthorizer(context.Background(), cfg)
 				if err != nil {
 					t.Fatal(err)
 				}

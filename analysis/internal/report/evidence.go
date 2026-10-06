@@ -3,10 +3,11 @@ package report
 import (
 	"errors"
 
+	records "github.com/ChrisMckerracher/cedar-go-wasm/analysis/report"
 	requests "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
 )
 
-func validateEvidence(query string, da, db requests.Decision, firstEval, secondEval *PolicyEvaluation) error {
+func validateEvidence(query string, da, db requests.Decision, firstEval, secondEval *records.PolicyEvaluation) error {
 	unary := query == "never_errors" || query == "always_matches" || query == "never_matches"
 	matching := unary || query == "matches_equivalent" || query == "matches_implies" || query == "matches_disjoint"
 	if matching && (firstEval == nil || (!unary && secondEval == nil)) {
@@ -15,7 +16,7 @@ func validateEvidence(query string, da, db requests.Decision, firstEval, secondE
 	if unary && (db != requests.Deny || secondEval != nil) {
 		return errors.New("analysis: module returned an invalid result for the unused policy set")
 	}
-	for i, evaluation := range []*PolicyEvaluation{firstEval, secondEval} {
+	for i, evaluation := range []*records.PolicyEvaluation{firstEval, secondEval} {
 		if evaluation == nil {
 			continue
 		}

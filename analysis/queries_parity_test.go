@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis"
+	reports "github.com/ChrisMckerracher/cedar-go-wasm/analysis/report"
 	uids "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
 	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
@@ -28,9 +28,9 @@ func TestAnalysisQueriesNativeParity(t *testing.T) {
 			Action        uids.EntityUID
 			ResourceType  string `json:"resource_type"`
 			Holds         bool
-			Confirmed     *bool                      `json:"counterexample_confirmed"`
-			AEvaluation   *analysis.PolicyEvaluation `json:"a_evaluation"`
-			BEvaluation   *analysis.PolicyEvaluation `json:"b_evaluation"`
+			Confirmed     *bool                     `json:"counterexample_confirmed"`
+			AEvaluation   *reports.PolicyEvaluation `json:"a_evaluation"`
+			BEvaluation   *reports.PolicyEvaluation `json:"b_evaluation"`
 		}
 	}
 	if err := json.Unmarshal([]byte(readFile(t, "../testdata/parity/analysis-queries/input.json")), &cases); err != nil {
@@ -52,7 +52,7 @@ func TestAnalysisQueriesNativeParity(t *testing.T) {
 			if test.BFormat == "json" {
 				y = policy.PoliciesFromJSON([]byte(test.B))
 			}
-			var report analysis.Report
+			var report reports.Report
 			var err error
 			switch test.Query {
 			case "never_errors":
@@ -78,7 +78,7 @@ func TestAnalysisQueriesNativeParity(t *testing.T) {
 			}
 			want := expected[index]
 			if want.Error != nil {
-				var input *analysis.Error
+				var input *reports.Error
 				if test.Name != want.Name || !errors.As(err, &input) || input.Kind != want.Error.Kind || input.Message != want.Error.Message {
 					t.Fatalf("native error %+v, Go %v", want.Error, err)
 				}
@@ -99,7 +99,7 @@ func TestAnalysisQueriesNativeParity(t *testing.T) {
 					t.Fatal("native counterexample confirmation differs")
 				}
 				if result.Counterexample != nil {
-					compare := func(got, expected *analysis.PolicyEvaluation) {
+					compare := func(got, expected *reports.PolicyEvaluation) {
 						t.Helper()
 						if got == nil || expected == nil {
 							if got != expected {

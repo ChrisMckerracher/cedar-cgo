@@ -12,7 +12,7 @@ Read the [execution contract](docs/migration/native-contract.md) for cancellatio
 ## Supported platforms
 
 Linux amd64 GNU, Linux arm64 GNU, and macOS arm64 are the selected targets.
-CI tests Go 1.26 and 1.27 on each target.
+CI tests Go 1.27.1 on each target.
 See the [platform requirements and verification status](docs/migration/platforms.md).
 
 A source build requires Go, cgo, a supported C compiler, and the pinned Rust toolchain.
@@ -23,7 +23,7 @@ Analysis also requires an external solver. Verification uses cvc5 1.3.1.
 
 Objective: Build the native library and authorize a request.
 
-1. Use Go 1.26 or later and the Rust toolchain in `rust-toolchain.toml`.
+1. Use Go 1.27.1 and the Rust toolchain in `rust-toolchain.toml`.
 2. Enable cgo and use the supported platform's C compiler.
 3. Commit source changes before building verified artifacts.
 4. Build the library from the repository root.

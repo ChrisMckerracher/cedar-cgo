@@ -59,6 +59,9 @@ The historical record retains its claim and limitations.
 The native proof checks response length conversion and checked monotonic handle increment.
 The batched proof retains applicable byte-budget conservation and bounded callback-count arithmetic.
 Source guards require review when the implementation changes.
+The cleanup changes loader serialization to strict standard-library JSON v2.
+The reviewed guard retains raw-size checks, remaining-byte subtraction, encoded-size rejection, and positive result lengths.
+Explicit HTML and JavaScript escaping retain encoded byte budgets. JSON serialization remains outside the arithmetic model.
 
 These proofs do not establish pointer validity, allocator ownership, JSON correctness, or Cedar semantics.
 They also do not establish process fault containment.

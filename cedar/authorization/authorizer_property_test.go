@@ -2,18 +2,20 @@ package authorization_test
 
 import (
 	generator "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/generator"
+	joy "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/joy"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
 
 	context "context"
 	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+
 	rapid "pgregory.net/rapid"
 	testing "testing"
 )
 
 // The same Config+Request always yields the same decision, reasons, and errors.
 func TestPropertyAuthorizeDeterministic(t *testing.T) {
-	d := testsupport.LoadJoy(t)
-	rt := testsupport.TestRuntime(t)
+	d := joy.LoadJoy(t)
+	rt := testruntime.New(t)
 	a, err := rt.NewAuthorizer(context.Background(), authorization.Config{Schema: &d.Schema, Policies: d.Old, Entities: d.Entities})
 	if err != nil {
 		t.Fatal(err)
@@ -36,15 +38,15 @@ func TestPropertyAuthorizeDeterministic(t *testing.T) {
 // Reusing one authorizer is stateless: prior requests, including per-request
 // entity data, never change a fixed request's answer.
 func TestPropertyAuthorizeStateless(t *testing.T) {
-	d := testsupport.LoadJoy(t)
-	rt := testsupport.TestRuntime(t)
+	d := joy.LoadJoy(t)
+	rt := testruntime.New(t)
 	a, err := rt.NewAuthorizer(context.Background(), authorization.Config{Schema: &d.Schema, Policies: d.Old, Entities: d.Entities})
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer a.Close()
 	ctx := context.Background()
-	baseline, err := a.Authorize(ctx, testsupport.JoyRequest())
+	baseline, err := a.Authorize(ctx, joy.JoyRequest())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -59,7 +61,7 @@ func TestPropertyAuthorizeStateless(t *testing.T) {
 				pt.Fatalf("noisy request failed: %v", err)
 			}
 		}
-		again, err := a.Authorize(ctx, testsupport.JoyRequest())
+		again, err := a.Authorize(ctx, joy.JoyRequest())
 		if err != nil {
 			pt.Fatalf("baseline failed: %v", err)
 		}

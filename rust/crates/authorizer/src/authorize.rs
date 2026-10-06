@@ -1,5 +1,5 @@
-use crate::State;
-use cedar_policy::{Context, Decision, EntityUid, Request};
+use crate::{State, state::merged_entities};
+use cedar_policy::{Context, Decision, EntityUid, Request, Response, Schema};
 use cgw_abi::{OpError, parse_input};
 use serde::{Deserialize, Serialize};
 use serde_json::value::RawValue;
@@ -31,6 +31,14 @@ pub(crate) fn entity_uid(v: serde_json::Value, kind: &'static str) -> Result<Ent
     EntityUid::from_json(v).map_err(|e| OpError::new(kind, &e))
 }
 
+pub(crate) fn request_context(
+    input: Option<&RawValue>,
+    schema: Option<(&Schema, &EntityUid)>,
+) -> Result<Context, OpError> {
+    Context::from_json_str(input.map_or("{}", RawValue::get), schema)
+        .map_err(|e| OpError::new("context", &e))
+}
+
 pub(crate) fn authorize(state: &State, bytes: &[u8]) -> Result<AuthorizeOutput, OpError> {
     let input: AuthorizeInput = parse_input(bytes)?;
     let loaded = state
@@ -41,48 +49,41 @@ pub(crate) fn authorize(state: &State, bytes: &[u8]) -> Result<AuthorizeOutput, 
     let principal = entity_uid(input.principal, "principal")?;
     let action = entity_uid(input.action, "action")?;
     let resource = entity_uid(input.resource, "resource")?;
-    let context_json = input.context.as_deref().map_or("{}", RawValue::get);
-    let context = Context::from_json_str(context_json, schema.map(|s| (s, &action)))
-        .map_err(|e| OpError::new("context", &e))?;
+    let context = request_context(input.context.as_deref(), schema.map(|s| (s, &action)))?;
     let request = Request::new(principal, action, resource, context, schema)
         .map_err(|e| OpError::new("request", &e))?;
-    let extra;
-    let entities = match input.entities.as_deref() {
-        None => &loaded.entities,
-        Some(json) => {
-            extra = loaded
-                .entities
-                .clone()
-                .add_entities_from_json_str(json.get(), schema)
-                .map_err(|e| OpError::new("entities", &e))?;
-            &extra
-        }
-    };
+    let entities = merged_entities(loaded, input.entities.as_deref())?;
     let response = loaded
         .authorizer
-        .is_authorized(&request, &loaded.policies, entities);
-    let diagnostics = response.diagnostics();
-    let mut reasons: Vec<String> = diagnostics
-        .reason()
-        .map(|id| AsRef::<str>::as_ref(id).to_owned())
-        .collect();
-    reasons.sort_unstable();
-    let mut errors: Vec<PolicyMessage> = diagnostics
-        .errors()
-        .map(|e| match e {
-            cedar_policy::AuthorizationError::PolicyEvaluationError(pe) => PolicyMessage {
-                policy_id: AsRef::<str>::as_ref(pe.policy_id()).to_owned(),
-                message: cgw_abi::diagnostics::render(pe.inner()),
+        .is_authorized(&request, &loaded.policies, &entities);
+    Ok(AuthorizeOutput::from(response))
+}
+
+impl From<Response> for AuthorizeOutput {
+    fn from(response: Response) -> Self {
+        let diagnostics = response.diagnostics();
+        let mut reasons: Vec<String> = diagnostics
+            .reason()
+            .map(|id| AsRef::<str>::as_ref(id).to_owned())
+            .collect();
+        reasons.sort_unstable();
+        let mut errors: Vec<PolicyMessage> = diagnostics
+            .errors()
+            .map(|e| match e {
+                cedar_policy::AuthorizationError::PolicyEvaluationError(pe) => PolicyMessage {
+                    policy_id: AsRef::<str>::as_ref(pe.policy_id()).to_owned(),
+                    message: cgw_abi::diagnostics::render(pe.inner()),
+                },
+            })
+            .collect();
+        errors.sort_unstable_by(|a, b| a.policy_id.cmp(&b.policy_id));
+        Self {
+            decision: match response.decision() {
+                Decision::Allow => "allow",
+                Decision::Deny => "deny",
             },
-        })
-        .collect();
-    errors.sort_unstable_by(|a, b| a.policy_id.cmp(&b.policy_id));
-    Ok(AuthorizeOutput {
-        decision: match response.decision() {
-            Decision::Allow => "allow",
-            Decision::Deny => "deny",
-        },
-        reasons,
-        errors,
-    })
+            reasons,
+            errors,
+        }
+    }
 }

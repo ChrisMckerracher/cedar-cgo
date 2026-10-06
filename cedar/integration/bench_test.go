@@ -5,15 +5,16 @@ import (
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
 	request "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	joy "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/joy"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	testing "testing"
 )
 
 func BenchmarkAuthorizeJoy(b *testing.B) {
-	a := testsupport.NewJoyAuthorizer(b, authorization.Limits{MaxInstances: 1})
-	req := testsupport.JoyRequest()
+	a := joy.NewJoyAuthorizer(b, authorization.Limits{MaxInstances: 1})
+	req := joy.JoyRequest()
 	ctx := context.Background()
-	b.ResetTimer()
 	for b.Loop() {
 		resp, err := a.Authorize(ctx, req)
 		if err != nil || resp.Decision != request.Allow {
@@ -23,8 +24,8 @@ func BenchmarkAuthorizeJoy(b *testing.B) {
 }
 
 func BenchmarkValidateJoy(b *testing.B) {
-	d := testsupport.LoadJoy(b)
-	rt := testsupport.TestRuntime(b)
+	d := joy.LoadJoy(b)
+	rt := testruntime.New(b)
 	for b.Loop() {
 		res, err := rt.Validation().Validate(context.Background(), d.Schema, d.Old)
 		if err != nil || !res.Passed {
@@ -34,8 +35,8 @@ func BenchmarkValidateJoy(b *testing.B) {
 }
 
 func BenchmarkNewAuthorizerJoy(b *testing.B) {
-	d := testsupport.LoadJoy(b)
-	rt := testsupport.TestRuntime(b)
+	d := joy.LoadJoy(b)
+	rt := testruntime.New(b)
 	for b.Loop() {
 		a, err := rt.NewAuthorizer(context.Background(), authorization.Config{Schema: &d.Schema, Policies: d.Old, Entities: d.Entities})
 		if err != nil {
@@ -46,8 +47,8 @@ func BenchmarkNewAuthorizerJoy(b *testing.B) {
 }
 
 func BenchmarkAuthorizeJoyParallel(b *testing.B) {
-	a := testsupport.NewJoyAuthorizer(b, authorization.Limits{})
-	req := testsupport.JoyRequest()
+	a := joy.NewJoyAuthorizer(b, authorization.Limits{})
+	req := joy.JoyRequest()
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
 			resp, err := a.Authorize(context.Background(), req)

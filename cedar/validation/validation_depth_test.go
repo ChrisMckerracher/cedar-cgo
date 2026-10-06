@@ -6,7 +6,9 @@ import (
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 	validation "github.com/ChrisMckerracher/cedar-go-wasm/cedar/validation"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	fixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fixture"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	reflect "reflect"
 	testing "testing"
 )
@@ -23,16 +25,16 @@ func TestValidationDepthNativeFixtures(t *testing.T) {
 		Name string
 		validation.ValidationResult
 	}
-	if err := json.Unmarshal(testsupport.ReadFile(t, "../testdata/parity/validation-depth/input.json"), &input); err != nil {
+	if err := json.Unmarshal(fixture.MustReadFile(t, "../testdata/parity/validation-depth/input.json"), &input); err != nil {
 		t.Fatal(err)
 	}
-	if err := json.Unmarshal(testsupport.ReadFile(t, "../testdata/parity/validation-depth/expected.json"), &expected); err != nil {
+	if err := json.Unmarshal(fixture.MustReadFile(t, "../testdata/parity/validation-depth/expected.json"), &expected); err != nil {
 		t.Fatal(err)
 	}
 	if len(input.Cases) != len(expected) {
 		t.Fatal("fixture count mismatch")
 	}
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	schema := cedarschema.SchemaFromCedar(input.Schema)
 	for i, tc := range input.Cases {
 		t.Run(tc.Name, func(t *testing.T) {

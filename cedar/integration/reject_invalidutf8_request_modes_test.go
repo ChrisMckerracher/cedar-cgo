@@ -5,6 +5,7 @@ import (
 	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
 	batched "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/batched"
 	cedarpartial "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial"
+	partialinput "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial/input"
 	cedarrequest "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
 	cedarentity "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
 	slicing "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/slicing"
@@ -12,13 +13,16 @@ import (
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	fault "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fault"
+	partialfixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/partial"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	testing "testing"
 )
 
 func TestRejectInvalidUTF8RequestModes(t *testing.T) {
 	ctx := context.Background()
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	schema := cedarschema.SchemaFromCedar(`entity User; entity Photo; action view appliesTo {principal: User, resource: Photo, context: {}};`)
 	policies := cedarpolicy.PoliciesFromCedar(`permit(principal, action, resource);`)
 	a, err := rt.NewAuthorizer(ctx, authorization.Config{Schema: &schema, Policies: policies})
@@ -27,7 +31,7 @@ func TestRejectInvalidUTF8RequestModes(t *testing.T) {
 	}
 	req := cedarrequest.Request{Principal: entityuid.NewEntityUID("User", "a"), Action: entityuid.NewEntityUID("Action", "view"), Resource: entityuid.NewEntityUID("Photo", "p")}
 	empty := cedarrequest.Context{}
-	p := cedarpartial.PartialRequest{Principal: cedarpartial.UnknownEntityUID("User"), Action: req.Action, Resource: cedarpartial.UnknownEntityUID("Photo"), Context: &empty}
+	p := partialinput.PartialRequest{Principal: partialinput.UnknownEntityUID("User"), Action: req.Action, Resource: partialinput.UnknownEntityUID("Photo"), Context: &empty}
 	continuation, err := a.Partial().PartialAuthorize(ctx, p)
 	if err != nil {
 		a.Close()
@@ -69,42 +73,42 @@ func TestRejectInvalidUTF8RequestModes(t *testing.T) {
 			if resp.Decision != cedarrequest.Deny {
 				t.Fatal("malformed request allowed")
 			}
-			testsupport.RequireUTF8InputError(t, err)
+			fault.RequireUTF8InputError(t, err)
 			d, err := a.Batched().AuthorizeBatched(ctx, r, loader, batched.BatchedOptions{MaxIterations: 1})
 			if d != cedarrequest.Deny {
 				t.Fatal("malformed batched request allowed")
 			}
-			testsupport.RequireUTF8InputError(t, err)
+			fault.RequireUTF8InputError(t, err)
 			resp, err = continuation.Reauthorize(ctx, r)
 			if resp.Decision != cedarrequest.Deny {
 				t.Fatal("malformed continuation allowed")
 			}
-			testsupport.RequireUTF8InputError(t, err)
+			fault.RequireUTF8InputError(t, err)
 			_, err = rt.Slicing().SliceEntities(ctx, slicing.SliceConfig{Schema: schema, Policies: policies}, r)
-			testsupport.RequireUTF8InputError(t, err)
-			partial := cedarpartial.PartialRequest{Principal: cedarpartial.KnownEntityUID(r.Principal), Action: r.Action, Resource: cedarpartial.KnownEntityUID(r.Resource), Context: &r.Context}
+			fault.RequireUTF8InputError(t, err)
+			partial := partialinput.PartialRequest{Principal: partialinput.KnownEntityUID(r.Principal), Action: r.Action, Resource: partialinput.KnownEntityUID(r.Resource), Context: &r.Context}
 			if name == "entities" {
-				partial.Entities = cedarpartial.NewPartialEntities(cedarpartial.PartialEntity{UID: entityuid.NewEntityUID("User", bad)})
+				partial.Entities = partialinput.NewPartialEntities(partialinput.PartialEntity{UID: entityuid.NewEntityUID("User", bad)})
 			}
 			if name == "raw entities" {
-				partial.Entities = cedarpartial.PartialEntitiesFromJSON([]byte(`[{"uid":{"type":"User","id":"` + bad + `"}}]`))
+				partial.Entities = partialinput.PartialEntitiesFromJSON([]byte(`[{"uid":{"type":"User","id":"` + bad + `"}}]`))
 			}
 			presp, err := a.Partial().PartialAuthorize(ctx, partial)
 			if presp.Decision != cedarpartial.Undecided {
 				t.Fatal("malformed partial request decided")
 			}
-			testsupport.RequireUTF8InputError(t, err)
+			fault.RequireUTF8InputError(t, err)
 		})
 	}
-	_, err = a.Partial().PartialAuthorize(ctx, cedarpartial.PartialRequest{Principal: cedarpartial.UnknownEntityUID(bad), Action: req.Action, Resource: p.Resource})
-	testsupport.RequireUTF8InputError(t, err)
+	_, err = a.Partial().PartialAuthorize(ctx, partialinput.PartialRequest{Principal: partialinput.UnknownEntityUID(bad), Action: req.Action, Resource: p.Resource})
+	fault.RequireUTF8InputError(t, err)
 }
 
 func TestRejectInvalidUTF8Sources(t *testing.T) {
 	ctx := context.Background()
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	bad := string([]byte{0xff})
-	goodSchema := cedarschema.SchemaFromCedar(testsupport.PartialSchema)
+	goodSchema := cedarschema.SchemaFromCedar(partialfixture.PartialSchema)
 	goodPolicies := cedarpolicy.PoliciesFromCedar(`permit(principal, action, resource);`)
 	for _, schema := range []cedarschema.Schema{cedarschema.SchemaFromCedar(bad), cedarschema.SchemaFromJSON([]byte(`{"` + bad + `":{}}`))} {
 		a, err := rt.NewAuthorizer(ctx, authorization.Config{Schema: &schema, Policies: goodPolicies})
@@ -112,11 +116,11 @@ func TestRejectInvalidUTF8Sources(t *testing.T) {
 			a.Close()
 			t.Fatal("malformed schema loaded")
 		}
-		testsupport.RequireUTF8InputError(t, err)
+		fault.RequireUTF8InputError(t, err)
 		_, err = rt.Validation().Validate(ctx, schema, goodPolicies)
-		testsupport.RequireUTF8InputError(t, err)
+		fault.RequireUTF8InputError(t, err)
 		_, err = rt.Slicing().SliceEntities(ctx, slicing.SliceConfig{Schema: schema, Policies: goodPolicies}, cedarrequest.Request{})
-		testsupport.RequireUTF8InputError(t, err)
+		fault.RequireUTF8InputError(t, err)
 	}
 	for _, policies := range []cedarpolicy.PolicySet{cedarpolicy.PoliciesFromCedar("//" + bad + "\npermit(principal, action, resource);"), cedarpolicy.PoliciesFromJSON([]byte(`{"policies":{"` + bad + `":{}}}`))} {
 		a, err := rt.NewAuthorizer(ctx, authorization.Config{Policies: policies})
@@ -124,10 +128,10 @@ func TestRejectInvalidUTF8Sources(t *testing.T) {
 			a.Close()
 			t.Fatal("malformed policies loaded")
 		}
-		testsupport.RequireUTF8InputError(t, err)
+		fault.RequireUTF8InputError(t, err)
 		_, err = rt.Validation().Validate(ctx, goodSchema, policies)
-		testsupport.RequireUTF8InputError(t, err)
+		fault.RequireUTF8InputError(t, err)
 		_, err = rt.Slicing().SliceEntities(ctx, slicing.SliceConfig{Schema: goodSchema, Policies: policies}, cedarrequest.Request{})
-		testsupport.RequireUTF8InputError(t, err)
+		fault.RequireUTF8InputError(t, err)
 	}
 }

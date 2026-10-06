@@ -12,12 +12,6 @@ Licensed under the Apache License, Version 2.0.
 The library contains the crates cedar-policy 4.13.0, cedar-policy-core 4.13.0,
 cedar-policy-formatter 4.13.0 and cedar-policy-symcc 0.7.0.
 
-cedar-policy-symcc 0.7.0 is modified. rust/vendor/cedar-policy-symcc-0.7.0
-removes LocalSolver and the solver pool from wasm targets, because tokio's
-process feature does not build there. The change is in
-rust/patches/cedar-policy-symcc-0.7.0-wasm.patch, and each changed file
-carries a notice.
-
 The library also contains other Rust crates under the Apache-2.0, MIT and
 Unicode-3.0 licenses. THIRD_PARTY_LICENSES.txt lists each crate with the
 full text of its license.

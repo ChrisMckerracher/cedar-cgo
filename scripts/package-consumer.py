@@ -12,6 +12,7 @@ from pathlib import Path
 from consumer.bundle import METADATA, ROOT, checksums, read_bundle
 from consumer.native import ARTIFACT_FILES, generated_names
 from native.source import committed_source
+from artifact_verifier import HEADER, run
 import json
 
 
@@ -23,10 +24,7 @@ def package(artifact, commit, output):
     manifest = json.loads((artifact / "manifest.json").read_text())
     platform, target = manifest["platform"], manifest["target"]
     native = generated_names(platform)
-    subprocess.run(
-        ["go", "run", "./cmd/verify-native-artifact", str(artifact), commit, target, "internal/native/include/cedar.h"],
-        cwd=repo, check=True,
-    )
+    run(artifact, commit, target, HEADER)
     archive = subprocess.check_output(["git", "archive", "--format=zip", commit], cwd=repo)
     with zipfile.ZipFile(io.BytesIO(archive)) as source:
         entries = {entry.filename: copy.copy(entry) for entry in source.infolist()}

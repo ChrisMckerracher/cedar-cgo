@@ -2,6 +2,8 @@ package template_test
 
 import (
 	generator "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/generator"
+	joy "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/joy"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
 
 	context "context"
 	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
@@ -9,7 +11,7 @@ import (
 	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	template "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/template"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+
 	rapid "pgregory.net/rapid"
 	reflect "reflect"
 	testing "testing"
@@ -18,8 +20,8 @@ import (
 // A linked template authorizes identically to the concrete policy produced by
 // textually substituting the slot bindings, with matching policy IDs.
 func TestPropertyTemplateLinkMatchesSubstitution(t *testing.T) {
-	d := testsupport.LoadJoy(t)
-	rt := testsupport.TestRuntime(t)
+	d := joy.LoadJoy(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	rapid.Check(t, func(pt *rapid.T) {
 		c := generator.PropGenTemplate().Draw(pt, "template")
@@ -78,7 +80,7 @@ func TestPropertyTemplateLinkMatchesSubstitution(t *testing.T) {
 // Templates/TemplateLinks preserve IDs, slots, annotations, and bindings, and
 // unlink removes exactly the linked policy while leaving the template intact.
 func TestPropertyTemplateInspectionRoundtrip(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	rapid.Check(t, func(pt *rapid.T) {
 		c := generator.PropGenTemplate().Draw(pt, "template")

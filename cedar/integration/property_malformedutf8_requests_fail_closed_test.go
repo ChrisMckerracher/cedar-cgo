@@ -1,7 +1,9 @@
 package integration_test
 
 import (
+	partialinput "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial/input"
 	generator "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/generator"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
 
 	context "context"
 	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
@@ -13,7 +15,7 @@ import (
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+
 	rapid "pgregory.net/rapid"
 	testing "testing"
 )
@@ -22,7 +24,7 @@ import (
 // mode, no matter which request field carries it.
 func TestPropertyMalformedUTF8RequestsFailClosed(t *testing.T) {
 	ctx := context.Background()
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	schema := cedarschema.SchemaFromCedar(`entity User; entity Photo; action view appliesTo {principal: User, resource: Photo, context: {}};`)
 	a, err := rt.NewAuthorizer(ctx, authorization.Config{
 		Schema:   &schema,
@@ -67,16 +69,16 @@ func TestPropertyMalformedUTF8RequestsFailClosed(t *testing.T) {
 		case "rawEntities":
 			req.Entities = cedarentity.EntitiesFromJSON([]byte(`[{"uid":{"type":"User","id":"` + bad + `"}}]`))
 		}
-		partial := cedarpartial.PartialRequest{
-			Principal: cedarpartial.KnownEntityUID(req.Principal),
+		partial := partialinput.PartialRequest{
+			Principal: partialinput.KnownEntityUID(req.Principal),
 			Action:    req.Action,
-			Resource:  cedarpartial.KnownEntityUID(req.Resource),
+			Resource:  partialinput.KnownEntityUID(req.Resource),
 			Context:   &req.Context,
 		}
 		if field == "entities" || field == "rawEntities" {
 			// Mirror the malformed store into the partial leg so every field
 			// exercises the same rejection path.
-			partial.Entities = cedarpartial.NewPartialEntities(cedarpartial.PartialEntity{UID: entityuid.NewEntityUID("User", bad)})
+			partial.Entities = partialinput.NewPartialEntities(partialinput.PartialEntity{UID: entityuid.NewEntityUID("User", bad)})
 		}
 
 		resp, aerr := a.Authorize(ctx, req)

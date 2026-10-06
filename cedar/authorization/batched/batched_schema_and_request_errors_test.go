@@ -10,12 +10,13 @@ import (
 	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	testing "testing"
 )
 
 func TestBatchedSchemaAndRequestErrors(t *testing.T) {
-	f := testsupport.BatchedFixtures(t)[0]
+	f := BatchedFixtures(t)[0]
 	for _, mode := range []string{"no_schema", "bad_request", "bad_context", "nil_loader"} {
 		t.Run(mode, func(t *testing.T) {
 			schema := cedarschema.SchemaFromCedar(f.Schema)
@@ -23,12 +24,12 @@ func TestBatchedSchemaAndRequestErrors(t *testing.T) {
 			if mode == "no_schema" {
 				cfg.Schema = nil
 			}
-			a, err := testsupport.TestRuntime(t).NewAuthorizer(context.Background(), cfg)
+			a, err := testruntime.New(t).NewAuthorizer(context.Background(), cfg)
 			if err != nil {
 				t.Fatal(err)
 			}
 			defer a.Close()
-			req := testsupport.BatchRequest(f)
+			req := BatchRequest(f)
 			want := diagnostic.KindSchema
 			switch mode {
 			case "bad_request":

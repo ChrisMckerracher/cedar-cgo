@@ -79,8 +79,8 @@ func (p *process) Close() error {
 		_ = p.cmd.Process.Kill()
 		err := p.cmd.Wait()
 		p.reaped.Store(p.cmd.ProcessState != nil)
-		var exit *exec.ExitError
-		if err != nil && !errors.As(err, &exit) {
+		_, exited := errors.AsType[*exec.ExitError](err)
+		if err != nil && !exited {
 			// CommandContext can report cancellation after the process exits successfully.
 			canceled := err == context.Canceled || err == context.DeadlineExceeded
 			if state := p.cmd.ProcessState; !canceled || state == nil || !state.Success() {

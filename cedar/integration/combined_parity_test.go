@@ -2,6 +2,10 @@ package integration_test
 
 import (
 	context "context"
+	json "encoding/json"
+	partialinput "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial/input"
+	policysupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/policy"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
 
 	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
 
@@ -14,12 +18,12 @@ import (
 	template "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/template"
 	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
 	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+
 	testing "testing"
 )
 
 func TestCombinedPolicyEvaluationPaths(t *testing.T) {
-	ctx, rt := context.Background(), testsupport.TestRuntime(t)
+	ctx, rt := context.Background(), testruntime.New(t)
 	require := func(err error) {
 		t.Helper()
 		if err != nil {
@@ -36,13 +40,14 @@ func TestCombinedPolicyEvaluationPaths(t *testing.T) {
 	require(err)
 	policy, err := rt.Policies().ParsePolicy(ctx, permitID, formatted)
 	require(err)
-	syntax, err := policy.Syntax()
+	document := policysupport.MustPolicyJSON(t, policy)
+	document["annotations"].(map[string]any)["stage"] = "json"
+	encoded, err := json.Marshal(document)
 	require(err)
-	syntax.Annotations["stage"] = "pst"
-	policy, err = rt.Policies().PolicyFromSyntax(ctx, syntax)
+	policy, err = rt.Policies().PolicyFromJSON(ctx, policy.ID(), encoded)
 	require(err)
 	if policy.ID() != permitID || policy.Effect() != cedarpolicy.Permit {
-		t.Fatalf("PST reconstruction changed identity/effect: %q %s", policy.ID(), policy.Effect())
+		t.Fatalf("JSON reconstruction changed identity/effect: %q %s", policy.ID(), policy.Effect())
 	}
 	parsed, err := rt.Policies().AddPolicy(ctx, cedarpolicy.ParsedPolicySet{}.Source(), policy)
 	require(err)
@@ -61,8 +66,8 @@ func TestCombinedPolicyEvaluationPaths(t *testing.T) {
 	if !ok || !static.IsStatic() || static.ID() != permitID || len(snapshot.Policies()) != 2 {
 		t.Fatal("set snapshot lost the static policy or raw IDs")
 	}
-	if stage, ok := static.Annotation("stage"); !ok || stage != "pst" {
-		t.Fatal("set snapshot lost the PST edit")
+	if stage, ok := static.Annotation("stage"); !ok || stage != "json" {
+		t.Fatal("set snapshot lost the JSON edit")
 	}
 	linked, ok := snapshot.Policy(linkedID)
 	if !ok || linked.ID() != linkedID {
@@ -84,8 +89,8 @@ func TestCombinedPolicyEvaluationPaths(t *testing.T) {
 	a, err := rt.NewAuthorizer(ctx, authorization.Config{Schema: &schema, Policies: snapshot.Source(), Limits: authorization.Limits{MaxInstances: 1}})
 	require(err)
 	defer a.Close()
-	partial, err := a.Partial().PartialAuthorize(ctx, cedarpartial.PartialRequest{
-		Principal: cedarpartial.KnownEntityUID(principal), Action: action, Resource: cedarpartial.KnownEntityUID(resource),
+	partial, err := a.Partial().PartialAuthorize(ctx, partialinput.PartialRequest{
+		Principal: partialinput.KnownEntityUID(principal), Action: action, Resource: partialinput.KnownEntityUID(resource),
 	})
 	require(err)
 	if partial.Decision != cedarpartial.Undecided || len(partial.Residuals) != 2 {

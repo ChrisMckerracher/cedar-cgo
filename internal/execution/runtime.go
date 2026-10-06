@@ -23,24 +23,16 @@ type Config struct {
 	MaxSourceBytes     int
 	MaxResponseBytes   uint32
 	MaxConcurrentCalls int
-	Unsupported        string
 }
 type Option func(*Config)
 
 func WithMaxSourceBytes(n int) Option      { return func(c *Config) { c.MaxSourceBytes = n } }
 func WithMaxResponseBytes(n uint32) Option { return func(c *Config) { c.MaxResponseBytes = n } }
 func WithMaxConcurrentCalls(n int) Option  { return func(c *Config) { c.MaxConcurrentCalls = n } }
-func WithMemoryLimit(n uint64) Option      { return func(c *Config) { c.Unsupported = "WithMemoryLimit" } }
-func WithCompilationCache(_ any) Option {
-	return func(c *Config) { c.Unsupported = "WithCompilationCache" }
-}
 func New(ctx context.Context, opts ...Option) (*Runtime, error) {
 	c := Config{MaxSourceBytes: DefaultMaxSourceBytes, MaxResponseBytes: DefaultMaxResponseBytes, MaxConcurrentCalls: DefaultMaxConcurrentCalls}
 	for _, o := range opts {
 		o(&c)
-	}
-	if c.Unsupported != "" {
-		return nil, fmt.Errorf("cedar: %s is unsupported by native execution", c.Unsupported)
 	}
 	if c.MaxSourceBytes <= 0 || c.MaxResponseBytes == 0 || c.MaxConcurrentCalls <= 0 {
 		return nil, fmt.Errorf("cedar: source, response and concurrency limits must be positive")

@@ -1,6 +1,7 @@
 package partial
 
 import (
+	partialinput "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial/input"
 	"strings"
 
 	context "context"
@@ -31,7 +32,7 @@ func TestPartialFaultRecovery(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer a.session.Close()
-	req := PartialRequest{Principal: UnknownEntityUID("User"), Action: entityuid.NewEntityUID("Action", "view"), Resource: UnknownEntityUID("Photo")}
+	req := partialinput.PartialRequest{Principal: partialinput.UnknownEntityUID("User"), Action: entityuid.NewEntityUID("Action", "view"), Resource: partialinput.UnknownEntityUID("Photo")}
 	continuation, err := a.PartialAuthorize(ctx, req)
 	if err != nil {
 		t.Fatal(err)

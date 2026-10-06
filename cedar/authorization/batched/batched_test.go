@@ -12,7 +12,6 @@ import (
 	cedarrequest "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
 	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
 
 	reflect "reflect"
 	testing "testing"
@@ -26,12 +25,12 @@ func TestBatchedNativeParity(t *testing.T) {
 	var expected []struct {
 		Name, Decision string
 		Error          *string
-		Calls          [][]testsupport.BatchUID
+		Calls          [][]BatchUID
 	}
 	if err := json.Unmarshal(data, &expected); err != nil {
 		t.Fatal(err)
 	}
-	fixtures := testsupport.BatchedFixtures(t)
+	fixtures := BatchedFixtures(t)
 	if len(fixtures) != len(expected) {
 		t.Fatal("native fixture count differs")
 	}
@@ -41,18 +40,18 @@ func TestBatchedNativeParity(t *testing.T) {
 			if want.Name != f.Name {
 				t.Fatal("native fixture order differs")
 			}
-			a := testsupport.BatchAuthorizer(t, f, authorization.Limits{})
-			calls := make([][]testsupport.BatchUID, 0)
+			a := BatchAuthorizer(t, f, authorization.Limits{})
+			calls := make([][]BatchUID, 0)
 			loader := batched.EntityLoaderFunc(func(_ context.Context, uids []entityuid.EntityUID) (batched.EntityLoadResult, error) {
-				call := make([]testsupport.BatchUID, len(uids))
+				call := make([]BatchUID, len(uids))
 				for i, u := range uids {
-					call[i] = testsupport.BatchUID{Type: u.Type, ID: u.ID}
+					call[i] = BatchUID{Type: u.Type, ID: u.ID}
 				}
-				result := testsupport.FixtureBatch(f, len(calls))
+				result := FixtureBatch(f, len(calls))
 				calls = append(calls, call)
 				return result, nil
 			})
-			decision, err := a.Batched().AuthorizeBatched(context.Background(), testsupport.BatchRequest(f), loader, batched.BatchedOptions{MaxIterations: f.MaxIterations})
+			decision, err := a.Batched().AuthorizeBatched(context.Background(), BatchRequest(f), loader, batched.BatchedOptions{MaxIterations: f.MaxIterations})
 			if decision.String() != want.Decision {
 				t.Fatalf("decision %s, native %s", decision, want.Decision)
 			}
@@ -74,7 +73,7 @@ func TestBatchedNativeParity(t *testing.T) {
 }
 
 func TestBatchedCallbackFailures(t *testing.T) {
-	f := testsupport.BatchedFixtures(t)[0]
+	f := BatchedFixtures(t)[0]
 	sentinel := errors.New("database unavailable")
 	for _, tt := range []struct {
 		name   string
@@ -102,8 +101,8 @@ func TestBatchedCallbackFailures(t *testing.T) {
 		}, diagnostic.KindEntities, nil},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
-			a := testsupport.BatchAuthorizer(t, f, authorization.Limits{MaxInstances: 1})
-			d, err := a.Batched().AuthorizeBatched(context.Background(), testsupport.BatchRequest(f), tt.loader, batched.BatchedOptions{MaxIterations: 4})
+			a := BatchAuthorizer(t, f, authorization.Limits{MaxInstances: 1})
+			d, err := a.Batched().AuthorizeBatched(context.Background(), BatchRequest(f), tt.loader, batched.BatchedOptions{MaxIterations: 4})
 			var ce *diagnostic.Error
 			if d != cedarrequest.Deny || !errors.As(err, &ce) || ce.Kind != tt.kind {
 				t.Fatalf("got %s %v", d, err)
@@ -112,8 +111,8 @@ func TestBatchedCallbackFailures(t *testing.T) {
 				t.Fatalf("lost callback cause: %v", err)
 			}
 			n := 0
-			d, err = a.Batched().AuthorizeBatched(context.Background(), testsupport.BatchRequest(f), batched.EntityLoaderFunc(func(context.Context, []entityuid.EntityUID) (batched.EntityLoadResult, error) {
-				out := testsupport.FixtureBatch(f, n)
+			d, err = a.Batched().AuthorizeBatched(context.Background(), BatchRequest(f), batched.EntityLoaderFunc(func(context.Context, []entityuid.EntityUID) (batched.EntityLoadResult, error) {
+				out := FixtureBatch(f, n)
 				n++
 				return out, nil
 			}), batched.BatchedOptions{MaxIterations: 2})

@@ -24,7 +24,7 @@ type ValidationResult struct {
 type ValidateInput struct {
 	Schema              wire.Source `json:"schema"`
 	Policies            wire.Source `json:"policies"`
-	MaxDereferenceLevel *uint32     `json:"max_dereference_level,omitempty"`
+	MaxDereferenceLevel *uint32     `json:"max_dereference_level,omitzero"`
 }
 
 type ValidateOutput struct {
@@ -59,8 +59,7 @@ func (rt *Client) validate(ctx context.Context, schema schema.Schema, policies p
 	}
 	result, err := DecodeValidation(out, len(policies.Text()), len(schema.Text()))
 	if err != nil {
-		var ce *diagnostic.Error
-		if errors.As(err, &ce) {
+		if _, ok := errors.AsType[*diagnostic.Error](err); ok {
 			return ValidationResult{}, err
 		}
 		return ValidationResult{}, diagnostic.FaultError(fmt.Errorf("decode validation response: %w", err))

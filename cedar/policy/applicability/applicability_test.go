@@ -8,7 +8,9 @@ import (
 	applicability "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/applicability"
 	template "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/template"
 	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	fixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fixture"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	reflect "reflect"
 	testing "testing"
 )
@@ -31,16 +33,16 @@ func TestApplicabilityNativeFixtures(t *testing.T) {
 		Name          string
 		Applicability applicability.PolicyApplicability
 	}
-	if err := json.Unmarshal(testsupport.ReadFile(t, "../testdata/parity/applicability/input.json"), &input); err != nil {
+	if err := json.Unmarshal(fixture.MustReadFile(t, "../testdata/parity/applicability/input.json"), &input); err != nil {
 		t.Fatal(err)
 	}
-	if err := json.Unmarshal(testsupport.ReadFile(t, "../testdata/parity/applicability/expected.json"), &expected); err != nil {
+	if err := json.Unmarshal(fixture.MustReadFile(t, "../testdata/parity/applicability/expected.json"), &expected); err != nil {
 		t.Fatal(err)
 	}
 	if len(input.Cases) != len(expected) {
 		t.Fatal("fixture count mismatch")
 	}
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	for i, tc := range input.Cases {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -73,7 +75,7 @@ func TestApplicabilityNativeFixtures(t *testing.T) {
 				t.Fatalf("Go %+v; native %+v", got, expected[i])
 			}
 			if tc.Format == "json" {
-				testsupport.AssertApplicabilitySourceIDs(t, tc.Policies, got)
+				AssertApplicabilitySourceIDs(t, tc.Policies, got)
 			}
 		})
 	}
@@ -90,10 +92,10 @@ func TestApplicabilityRawIDFixtures(t *testing.T) {
 		Name          string
 		Applicability applicability.PolicyApplicability
 	}
-	if err := json.Unmarshal(testsupport.ReadFile(t, "../testdata/parity/applicability/input.json"), &input); err != nil {
+	if err := json.Unmarshal(fixture.MustReadFile(t, "../testdata/parity/applicability/input.json"), &input); err != nil {
 		t.Fatal(err)
 	}
-	if err := json.Unmarshal(testsupport.ReadFile(t, "../testdata/parity/applicability/expected.json"), &expected); err != nil {
+	if err := json.Unmarshal(fixture.MustReadFile(t, "../testdata/parity/applicability/expected.json"), &expected); err != nil {
 		t.Fatal(err)
 	}
 	if len(input.Cases) != len(expected) {
@@ -105,7 +107,7 @@ func TestApplicabilityRawIDFixtures(t *testing.T) {
 			if test.Name != expected[i].Name {
 				t.Fatal("fixture name differs")
 			}
-			testsupport.AssertApplicabilitySourceIDs(t, test.Policies, expected[i].Applicability)
+			AssertApplicabilitySourceIDs(t, test.Policies, expected[i].Applicability)
 			checked++
 		}
 	}

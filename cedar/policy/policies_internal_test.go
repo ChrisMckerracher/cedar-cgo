@@ -59,10 +59,6 @@ func TestPolicyOperationLimits(t *testing.T) {
 }
 
 func TestPolicyOperationMemoryLimit(t *testing.T) {
-	if rt, err := newRuntime(context.Background(), execution.WithMemoryLimit(16<<20)); err == nil {
-		rt.runtime.Close(context.Background())
-		t.Fatal("native memory option accepted")
-	}
 	rt, err := newRuntime(context.Background(), execution.WithMaxSourceBytes(1024))
 	if err != nil {
 		t.Fatal(err)
@@ -90,7 +86,7 @@ func TestPolicyProtocolRejectsUnknownFields(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		var envelope PolicyOutput
+		var envelope policyOutput
 		if err := json.Unmarshal(out, &envelope); err != nil {
 			t.Fatal(err)
 		}

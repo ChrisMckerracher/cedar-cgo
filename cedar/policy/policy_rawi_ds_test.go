@@ -4,12 +4,14 @@ import (
 	context "context"
 	json "encoding/json"
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	jsonassert "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/jsonassert"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	testing "testing"
 )
 
 func TestPolicyRawIDs(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	for _, id := range []string{"quote\"", "line\n", "slash\\", "quote\"\nslash\\雪"} {
 		t.Run(id, func(t *testing.T) {
@@ -20,14 +22,7 @@ func TestPolicyRawIDs(t *testing.T) {
 			if p.ID() != id {
 				t.Fatalf("ID escaped: %q != %q", p.ID(), id)
 			}
-			tree, err := p.Syntax()
-			if err != nil {
-				t.Fatal(err)
-			}
-			if tree.ID != id {
-				t.Fatal("syntax escaped ID")
-			}
-			rebuilt, err := rt.Policies().PolicyFromSyntax(ctx, tree)
+			rebuilt, err := rt.Policies().PolicyFromJSON(ctx, p.ID(), p.JSON())
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -64,7 +59,7 @@ func TestPolicyRawIDs(t *testing.T) {
 			Values     json.RawMessage `json:"values"`
 		} `json:"templateLinks"`
 	}
-	if err := json.Unmarshal(testsupport.LoadPolicyFixture(t).Linked.JSON, &object); err != nil {
+	if err := json.Unmarshal(LoadPolicyFixture(t).Linked.JSON, &object); err != nil {
 		t.Fatal(err)
 	}
 	object.Templates[rawID] = object.Templates["template"]
@@ -86,5 +81,5 @@ func TestPolicyRawIDs(t *testing.T) {
 	if got, ok := linked.TemplateID(); !ok || got != rawID {
 		t.Fatalf("template ID %q != %q", got, rawID)
 	}
-	testsupport.SameJSON(t, set.JSON(), data)
+	jsonassert.Equal(t, set.JSON(), data)
 }

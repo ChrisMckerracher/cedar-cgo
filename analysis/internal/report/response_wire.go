@@ -1,9 +1,11 @@
 package report
 
 import (
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"errors"
 
+	records "github.com/ChrisMckerracher/cedar-go-wasm/analysis/report"
 	"github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
 )
 
@@ -20,12 +22,12 @@ func (u counterexampleUID) complete() bool {
 	return u.Type != nil && *u.Type != "" && u.ID != nil
 }
 
-func validateCounterexampleEntity(data json.RawMessage) error {
+func validateCounterexampleEntity(data jsontext.Value) error {
 	var entity struct {
-		UID     counterexampleUID          `json:"uid"`
-		Attrs   map[string]json.RawMessage `json:"attrs"`
-		Parents []counterexampleUID        `json:"parents"`
-		Tags    json.RawMessage            `json:"tags"`
+		UID     counterexampleUID         `json:"uid"`
+		Attrs   map[string]jsontext.Value `json:"attrs"`
+		Parents []counterexampleUID       `json:"parents"`
+		Tags    jsontext.Value            `json:"tags"`
 	}
 	if err := json.Unmarshal(data, &entity); err != nil || !entity.UID.complete() || entity.Attrs == nil || entity.Parents == nil {
 		return errors.New("analysis: counterexample entity has an invalid record or UID")
@@ -36,7 +38,7 @@ func validateCounterexampleEntity(data json.RawMessage) error {
 		}
 	}
 	if len(entity.Tags) != 0 {
-		var tags map[string]json.RawMessage
+		var tags map[string]jsontext.Value
 		if err := json.Unmarshal(entity.Tags, &tags); err != nil || tags == nil {
 			return errors.New("analysis: counterexample entity tags are not a JSON object")
 		}
@@ -65,12 +67,12 @@ type counterexampleOutput struct {
 		Principal counterexampleUID `json:"principal"`
 		Action    counterexampleUID `json:"action"`
 		Resource  counterexampleUID `json:"resource"`
-		Context   json.RawMessage   `json:"context"`
+		Context   jsontext.Value    `json:"context"`
 	} `json:"request"`
-	Entities    json.RawMessage   `json:"entities"`
-	Text        string            `json:"text"`
-	ADecision   string            `json:"a_decision"`
-	BDecision   string            `json:"b_decision"`
-	AEvaluation *PolicyEvaluation `json:"a_evaluation"`
-	BEvaluation *PolicyEvaluation `json:"b_evaluation"`
+	Entities    jsontext.Value            `json:"entities"`
+	Text        string                    `json:"text"`
+	ADecision   string                    `json:"a_decision"`
+	BDecision   string                    `json:"b_decision"`
+	AEvaluation *records.PolicyEvaluation `json:"a_evaluation"`
+	BEvaluation *records.PolicyEvaluation `json:"b_evaluation"`
 }

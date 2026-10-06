@@ -4,13 +4,15 @@ import (
 	context "context"
 	json "encoding/json"
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	policysupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/policy"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	testing "testing"
 )
 
 func TestPolicyInspectionAndIsolation(t *testing.T) {
 	ctx := context.Background()
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	p, err := rt.Policies().ParsePolicy(ctx, "my-id", `@note("owner") @empty permit(principal is NS::User in NS::Group::"admins", action in [Action::"view", Action::"edit"], resource == Photo::"one") when { 9223372036854775807 == 9223372036854775807 } unless { false };`)
 	if err != nil {
 		t.Fatal(err)
@@ -24,24 +26,24 @@ func TestPolicyInspectionAndIsolation(t *testing.T) {
 	if _, ok := p.Annotation("missing"); ok {
 		t.Fatal("unexpected annotation")
 	}
-	principal := p.PrincipalConstraint()
-	if principal.Kind != cedarpolicy.ConstraintIsIn || principal.EntityType != "NS::User" || principal.Entity.ID != "admins" {
+	document := policysupport.MustPolicyJSON(t, p)
+	principal := document["principal"].(map[string]any)
+	if principal["op"] != "is" || principal["entity_type"] != "NS::User" || principal["in"].(map[string]any)["entity"].(map[string]any)["id"] != "admins" {
 		t.Fatalf("bad principal %+v", principal)
 	}
-	principal.Entity.ID = "changed"
-	action := p.ActionConstraint()
-	if action.Kind != cedarpolicy.ConstraintIn || len(action.Entities) != 2 {
+	principal["in"].(map[string]any)["entity"].(map[string]any)["id"] = "changed"
+	action := document["action"].(map[string]any)
+	if action["op"] != "in" || len(action["entities"].([]any)) != 2 {
 		t.Fatalf("bad action %+v", action)
 	}
-	action.Entities[0].ID = "changed"
+	action["entities"].([]any)[0].(map[string]any)["id"] = "changed"
 	p.Annotations()["note"] = "changed"
 	data := p.JSON()
 	data[0] = 'X'
-	syntax, _ := p.Syntax()
-	syntax.Annotations["note"] = "changed"
-	syntax.Conditions[0].Body[0] = 'X'
-	syntax.Principal.Entity.ID = "changed"
-	if p.PrincipalConstraint().Entity.ID != "admins" || p.ActionConstraint().Entities[0].ID == "changed" {
+	document["annotations"].(map[string]any)["note"] = "changed"
+	document["conditions"].([]any)[0].(map[string]any)["body"] = json.RawMessage(`{`)
+	unchanged := policysupport.MustPolicyJSON(t, p)
+	if unchanged["principal"].(map[string]any)["in"].(map[string]any)["entity"].(map[string]any)["id"] != "admins" || unchanged["action"].(map[string]any)["entities"].([]any)[0].(map[string]any)["id"] == "changed" {
 		t.Fatal("snapshot mutated through constraints")
 	}
 	if v, _ := p.Annotation("note"); v != "owner" {
@@ -50,7 +52,7 @@ func TestPolicyInspectionAndIsolation(t *testing.T) {
 	if !json.Valid(p.JSON()) {
 		t.Fatal("snapshot JSON mutated")
 	}
-	if _, err := rt.Policies().PolicyFromSyntax(ctx, testsupport.MustPolicySyntax(t, p)); err != nil {
+	if _, err := rt.Policies().PolicyFromJSON(ctx, p.ID(), p.JSON()); err != nil {
 		t.Fatal(err)
 	}
 	set, err := rt.Policies().AddPolicy(ctx, cedarpolicy.PoliciesFromCedar(""), p)

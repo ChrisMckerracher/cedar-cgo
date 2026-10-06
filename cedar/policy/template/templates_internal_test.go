@@ -30,7 +30,7 @@ func TestTemplateResourceAndLifecycle(t *testing.T) {
 	op := struct {
 		Op string `json:"op"`
 	}{"templates"}
-	in, err := json.Marshal(TemplateInput{Policies: cedarpolicy.PolicySet{}.Wire(), Operation: op})
+	in, err := json.Marshal(templateInput{Policies: cedarpolicy.PolicySet{}.Wire(), Operation: op})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -71,10 +71,6 @@ func TestTemplateResourceAndLifecycle(t *testing.T) {
 }
 
 func TestTemplateMemoryLimit(t *testing.T) {
-	if rt, err := newRuntime(context.Background(), execution.WithMemoryLimit(16<<20)); err == nil {
-		rt.runtime.Close(context.Background())
-		t.Fatal("native memory option accepted")
-	}
 	rt := TemplateRuntime(t, execution.WithMaxSourceBytes(1024))
 	ctx := context.Background()
 	large := TemplateFromCedar(`@large("` + strings.Repeat("x", 8<<20) + `") permit(principal == ?principal, action, resource);`)

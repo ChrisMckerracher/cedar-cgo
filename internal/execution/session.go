@@ -27,8 +27,6 @@ type Limits struct {
 	CallTimeout     time.Duration
 	LoadTimeout     time.Duration
 	MaxRequestBytes int
-	// Native execution rejects nonzero RecycleMemoryBytes.
-	RecycleMemoryBytes uint64
 }
 
 func (l Limits) WithDefaults() Limits {
@@ -56,9 +54,6 @@ type Session struct {
 }
 
 func NewSession(ctx context.Context, rt *Runtime, load []byte, limits Limits) (*Session, error) {
-	if limits.RecycleMemoryBytes != 0 {
-		return nil, fmt.Errorf("cedar: RecycleMemoryBytes is unsupported by native execution")
-	}
 	a := &Session{Runtime: rt, Load: append([]byte(nil), load...), Limits: limits.WithDefaults()}
 	pool, e := puddle.NewPool(&puddle.Config[*native.Instance]{Constructor: a.NewInstance, Destructor: func(i *native.Instance) { _ = i.Close(context.Background()) }, MaxSize: int32(min(a.Limits.MaxInstances, 1<<30))})
 	if e != nil {

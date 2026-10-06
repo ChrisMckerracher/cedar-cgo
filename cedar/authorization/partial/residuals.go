@@ -4,6 +4,8 @@ import (
 	bytes "bytes"
 	context "context"
 	json "encoding/json"
+	jsonv2 "encoding/json/v2"
+	partialinput "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial/input"
 	request "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
 	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	syntax "github.com/ChrisMckerracher/cedar-go-wasm/cedar/syntax"
@@ -68,7 +70,7 @@ func (r PartialResponse) Export() ([]byte, error) {
 	if r.authorizer == nil || len(r.input) == 0 {
 		return nil, &diagnostic.Error{Kind: diagnostic.KindInput, Message: "partial response has no continuation"}
 	}
-	return json.Marshal(PartialExport{ResidualProjectionVersion, syntax.CedarVersion, r.input, r.projection})
+	return jsonv2.Marshal(PartialExport{ResidualProjectionVersion, syntax.CedarVersion, r.input, r.projection})
 }
 
 type PartialExport struct {
@@ -88,14 +90,14 @@ func (a *Client) ImportPartialResponse(ctx context.Context, data []byte) (Partia
 		return PartialResponse{}, &diagnostic.Error{Kind: diagnostic.KindInput, Message: err.Error()}
 	}
 	var exported PartialExport
-	if err := json.Unmarshal(data, &exported); err != nil {
+	if err := jsonv2.Unmarshal(data, &exported); err != nil {
 		return PartialResponse{}, &diagnostic.Error{Kind: diagnostic.KindInput, Message: err.Error()}
 	}
 	if exported.Version != ResidualProjectionVersion || exported.CedarVersion != syntax.CedarVersion {
 		return PartialResponse{}, &diagnostic.Error{Kind: diagnostic.KindInput, Message: "unsupported partial export or Cedar version"}
 	}
 	var response PartialResponse
-	err := a.partialCall(ctx, "cgw_import_partial", data, func(out []byte) error {
+	err := a.session.Call(ctx, "cgw_import_partial", data, func(out []byte) error {
 		var err error
 		response, err = DecodePartial(out)
 		return err
@@ -108,9 +110,9 @@ func (a *Client) ImportPartialResponse(ctx context.Context, data []byte) (Partia
 }
 
 type PartialInput struct {
-	Principal PartialEntityUID `json:"principal"`
-	Action    wire.UID         `json:"action"`
-	Resource  PartialEntityUID `json:"resource"`
-	Context   *request.Context `json:"context"`
-	Entities  PartialEntities  `json:"entities"`
+	Principal partialinput.PartialEntityUID `json:"principal"`
+	Action    wire.UID                      `json:"action"`
+	Resource  partialinput.PartialEntityUID `json:"resource"`
+	Context   *request.Context              `json:"context"`
+	Entities  partialinput.PartialEntities  `json:"entities"`
 }

@@ -2,19 +2,21 @@ package diagnostic_test
 
 import (
 	generator "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/generator"
+	policysupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/policy"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
 
 	context "context"
 	json "encoding/json"
 	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+
 	reflect "reflect"
 	testing "testing"
 )
 
 func TestDiagnosticMetadataIgnoresSpellingHints(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	schema := cedarschema.SchemaFromCedar(`entity User; entity Uses; action view appliesTo {principal: User, resource: User, context: {}};`)
 	policies := cedarpolicy.PoliciesFromCedar(`permit(principal is Uset, action, resource);`)
@@ -27,14 +29,14 @@ func TestDiagnosticMetadataIgnoresSpellingHints(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if !reflect.DeepEqual(testsupport.StableDiagnostics(first.Errors), testsupport.StableDiagnostics(next.Errors)) {
+		if !reflect.DeepEqual(StableDiagnostics(first.Errors), StableDiagnostics(next.Errors)) {
 			t.Fatalf("metadata changed: %+v %+v", first.Errors, next.Errors)
 		}
 	}
 }
 
 func TestDiagnosticMetadataIgnoresNativeOrder(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	schema := cedarschema.SchemaFromCedar(`entity User; action view appliesTo {principal: User, resource: User, context: {}};`)
 	policies := cedarpolicy.PoliciesFromCedar(`permit(principal, action, resource) when { 1 && 2 };`)
@@ -54,7 +56,7 @@ func TestDiagnosticMetadataIgnoresNativeOrder(t *testing.T) {
 }
 
 func TestDiagnosticRawPolicyIDs(t *testing.T) {
-	rt := testsupport.TestRuntime(t)
+	rt := testruntime.New(t)
 	ctx := context.Background()
 	schema := cedarschema.SchemaFromCedar(`entity User; action view appliesTo {principal: User, resource: User, context: {}};`)
 	for _, id := range []struct{ name, value string }{
@@ -69,8 +71,8 @@ func TestDiagnosticRawPolicyIDs(t *testing.T) {
 			{"warning", `{"Value":false}`, "impossible_policy", diagnostic.SeverityWarning},
 		} {
 			t.Run(id.name+"/"+fixtureDiagnostic.name, func(t *testing.T) {
-				policies := testsupport.PartialIDPolicies(t, map[string]json.RawMessage{
-					id.value: testsupport.PartialIDPolicy("permit", "when", fixtureDiagnostic.body),
+				policies := policysupport.PartialIDPolicies(t, map[string]json.RawMessage{
+					id.value: policysupport.PartialIDPolicy("permit", "when", fixtureDiagnostic.body),
 				})
 				result, err := rt.Validation().Validate(ctx, schema, policies)
 				if err != nil || result.Passed != (fixtureDiagnostic.severity == diagnostic.SeverityWarning) {

@@ -9,7 +9,7 @@ import (
 	cedarrequest "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
 	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+
 	strings "strings"
 	sync "sync"
 	testing "testing"
@@ -17,7 +17,7 @@ import (
 )
 
 func TestBatchedLimits(t *testing.T) {
-	f := testsupport.BatchedFixtures(t)[0]
+	f := BatchedFixtures(t)[0]
 	for _, tt := range []struct {
 		name       string
 		opts       batched.BatchedOptions
@@ -39,8 +39,8 @@ func TestBatchedLimits(t *testing.T) {
 		{name: "input", opts: batched.BatchedOptions{MaxIterations: 2}, maxRequest: 1, kind: diagnostic.KindLimit},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
-			a := testsupport.BatchAuthorizer(t, f, authorization.Limits{MaxRequestBytes: tt.maxRequest})
-			d, err := a.Batched().AuthorizeBatched(context.Background(), testsupport.BatchRequest(f), batched.EntityLoaderFunc(func(context.Context, []entityuid.EntityUID) (batched.EntityLoadResult, error) { return tt.result, nil }), tt.opts)
+			a := BatchAuthorizer(t, f, authorization.Limits{MaxRequestBytes: tt.maxRequest})
+			d, err := a.Batched().AuthorizeBatched(context.Background(), BatchRequest(f), batched.EntityLoaderFunc(func(context.Context, []entityuid.EntityUID) (batched.EntityLoadResult, error) { return tt.result, nil }), tt.opts)
 			var ce *diagnostic.Error
 			if d != cedarrequest.Deny || !errors.As(err, &ce) || ce.Kind != tt.kind {
 				t.Fatalf("got %s %v, want %s", d, err, tt.kind)
@@ -50,12 +50,12 @@ func TestBatchedLimits(t *testing.T) {
 }
 
 func TestBatchedCancellationAndPoolWait(t *testing.T) {
-	f := testsupport.BatchedFixtures(t)[0]
-	a := testsupport.BatchAuthorizer(t, f, authorization.Limits{MaxInstances: 1, CallTimeout: -1})
+	f := BatchedFixtures(t)[0]
+	a := BatchAuthorizer(t, f, authorization.Limits{MaxInstances: 1, CallTimeout: -1})
 	entered, release := make(chan struct{}), make(chan struct{})
 	done := make(chan error, 1)
 	go func() {
-		_, err := a.Batched().AuthorizeBatched(context.Background(), testsupport.BatchRequest(f), batched.EntityLoaderFunc(func(context.Context, []entityuid.EntityUID) (batched.EntityLoadResult, error) {
+		_, err := a.Batched().AuthorizeBatched(context.Background(), BatchRequest(f), batched.EntityLoaderFunc(func(context.Context, []entityuid.EntityUID) (batched.EntityLoadResult, error) {
 			close(entered)
 			<-release
 			return batched.EntityLoadResult{}, errors.New("released")
@@ -66,7 +66,7 @@ func TestBatchedCancellationAndPoolWait(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Millisecond)
 	defer cancel()
 	calls := 0
-	d, err := a.Batched().AuthorizeBatched(ctx, testsupport.BatchRequest(f), batched.EntityLoaderFunc(func(context.Context, []entityuid.EntityUID) (batched.EntityLoadResult, error) {
+	d, err := a.Batched().AuthorizeBatched(ctx, BatchRequest(f), batched.EntityLoaderFunc(func(context.Context, []entityuid.EntityUID) (batched.EntityLoadResult, error) {
 		calls++
 		return batched.EntityLoadResult{}, nil
 	}), batched.BatchedOptions{MaxIterations: 2})
@@ -79,9 +79,9 @@ func TestBatchedCancellationAndPoolWait(t *testing.T) {
 	loader := batched.EntityLoaderFunc(func(ctx context.Context, _ []entityuid.EntityUID) (batched.EntityLoadResult, error) {
 		cancel()
 		<-ctx.Done()
-		return testsupport.FixtureBatch(f, 0), nil
+		return FixtureBatch(f, 0), nil
 	})
-	d, err = a.Batched().AuthorizeBatched(ctx, testsupport.BatchRequest(f), loader, batched.BatchedOptions{MaxIterations: 2})
+	d, err = a.Batched().AuthorizeBatched(ctx, BatchRequest(f), loader, batched.BatchedOptions{MaxIterations: 2})
 	if d != cedarrequest.Deny || !errors.Is(err, context.Canceled) {
 		t.Fatalf("callback cancellation: %s %v", d, err)
 	}
@@ -91,19 +91,19 @@ func TestBatchedCancellationAndPoolWait(t *testing.T) {
 }
 
 func TestBatchedTimeoutAndConcurrency(t *testing.T) {
-	f := testsupport.BatchedFixtures(t)[0]
+	f := BatchedFixtures(t)[0]
 	t.Run("timeout", func(t *testing.T) {
-		a := testsupport.BatchAuthorizer(t, f, authorization.Limits{CallTimeout: 20 * time.Millisecond})
-		d, err := a.Batched().AuthorizeBatched(context.Background(), testsupport.BatchRequest(f), batched.EntityLoaderFunc(func(ctx context.Context, _ []entityuid.EntityUID) (batched.EntityLoadResult, error) {
+		a := BatchAuthorizer(t, f, authorization.Limits{CallTimeout: 20 * time.Millisecond})
+		d, err := a.Batched().AuthorizeBatched(context.Background(), BatchRequest(f), batched.EntityLoaderFunc(func(ctx context.Context, _ []entityuid.EntityUID) (batched.EntityLoadResult, error) {
 			<-ctx.Done()
-			return testsupport.FixtureBatch(f, 0), nil
+			return FixtureBatch(f, 0), nil
 		}), batched.BatchedOptions{MaxIterations: 2})
 		if d != cedarrequest.Deny || !errors.Is(err, context.DeadlineExceeded) {
 			t.Fatalf("got %s %v", d, err)
 		}
 	})
 	t.Run("concurrent_and_isolated", func(t *testing.T) {
-		a := testsupport.BatchAuthorizer(t, f, authorization.Limits{MaxInstances: 4, CallTimeout: 5 * time.Second})
+		a := BatchAuthorizer(t, f, authorization.Limits{MaxInstances: 4, CallTimeout: 5 * time.Second})
 		var wg sync.WaitGroup
 		for i := 0; i < 16; i++ {
 			wg.Add(1)
@@ -114,8 +114,8 @@ func TestBatchedTimeoutAndConcurrency(t *testing.T) {
 				if i%2 == 0 {
 					want = cedarrequest.Deny
 				}
-				d, err := a.Batched().AuthorizeBatched(context.Background(), testsupport.BatchRequest(f), batched.EntityLoaderFunc(func(context.Context, []entityuid.EntityUID) (batched.EntityLoadResult, error) {
-					out := testsupport.FixtureBatch(f, n)
+				d, err := a.Batched().AuthorizeBatched(context.Background(), BatchRequest(f), batched.EntityLoaderFunc(func(context.Context, []entityuid.EntityUID) (batched.EntityLoadResult, error) {
+					out := FixtureBatch(f, n)
 					if n == 1 && want == cedarrequest.Deny {
 						out.Entities = json.RawMessage(strings.ReplaceAll(string(out.Entities), "true", "false"))
 					}

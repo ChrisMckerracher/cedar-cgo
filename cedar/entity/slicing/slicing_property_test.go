@@ -1,14 +1,17 @@
 package slicing_test
 
 import (
+	fixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fixture"
 	generator "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/generator"
+	joy "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/joy"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
 
 	context "context"
 	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
 	cedarentity "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
 	slicing "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/slicing"
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+
 	rapid "pgregory.net/rapid"
 	testing "testing"
 )
@@ -17,9 +20,9 @@ import (
 // reduced entity store (slicing_test.go's documented guarantee; errors from
 // policies irrelevant to the decision may differ).
 func TestPropertySliceDecisionPreserved(t *testing.T) {
-	d := testsupport.LoadJoy(t)
-	rt := testsupport.TestRuntime(t)
-	joyJSON := testsupport.ReadFile(t, "../testdata/joy/entities.json")
+	d := joy.LoadJoy(t)
+	rt := testruntime.New(t)
+	joyJSON := fixture.MustReadFile(t, "../testdata/joy/entities.json")
 	ctx := context.Background()
 	rapid.Check(t, func(pt *rapid.T) {
 		TextValue := generator.PropGenPolicySet(2).Draw(pt, "policies")

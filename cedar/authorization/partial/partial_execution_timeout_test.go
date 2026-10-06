@@ -6,19 +6,22 @@ import (
 	fmt "fmt"
 	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
 	cedarpartial "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial"
+	partialinput "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial/input"
 	cedarrequest "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
 	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	cedarentity "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
 	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	fault "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fault"
+	partialfixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/partial"
+
 	strings "strings"
 	testing "testing"
 	time "time"
 )
 
 func TestPartialExecutionTimeout(t *testing.T) {
-	a := testsupport.PartialAuthorizer(t, authorization.Limits{MaxInstances: 1, CallTimeout: 20 * time.Millisecond, MaxRequestBytes: 8 << 20})
-	req := testsupport.PartialRequest()
+	a := partialfixture.PartialAuthorizer(t, authorization.Limits{MaxInstances: 1, CallTimeout: 20 * time.Millisecond, MaxRequestBytes: 8 << 20})
+	req := partialfixture.PartialRequest()
 	var data strings.Builder
 	data.WriteByte('[')
 	for i := range 10000 {
@@ -28,7 +31,7 @@ func TestPartialExecutionTimeout(t *testing.T) {
 		fmt.Fprintf(&data, `{"uid":{"type":"User","id":"%d"},"attrs":{},"parents":[],"tags":{}}`, i)
 	}
 	data.WriteByte(']')
-	req.Entities = cedarpartial.PartialEntitiesFromJSON([]byte(data.String()))
+	req.Entities = partialinput.PartialEntitiesFromJSON([]byte(data.String()))
 	start := time.Now()
 	r, err := a.Partial().PartialAuthorize(context.Background(), req)
 	if r.Decision != cedarpartial.Undecided || !errors.Is(err, context.DeadlineExceeded) || !errors.Is(err, diagnostic.ErrFault) {
@@ -40,11 +43,11 @@ func TestPartialExecutionTimeout(t *testing.T) {
 	if a.Stats().Discarded != 1 {
 		t.Fatalf("faulted instance retained: %+v", a.Stats())
 	}
-	r, err = a.Partial().PartialAuthorize(context.Background(), testsupport.PartialRequest())
+	r, err = a.Partial().PartialAuthorize(context.Background(), partialfixture.PartialRequest())
 	if err != nil || r.Decision != cedarpartial.Undecided {
 		t.Fatalf("recovery: %+v %v", r, err)
 	}
-	concrete := testsupport.SimpleRequest(cedarrequest.NewContext(cedarvalue.Record{"mfa": cedarvalue.Bool(true)}))
+	concrete := fault.SimpleRequest(cedarrequest.NewContext(cedarvalue.Record{"mfa": cedarvalue.Bool(true)}))
 	concrete.Entities = cedarentity.EntitiesFromJSON([]byte(data.String()))
 	resp, err := r.Reauthorize(context.Background(), concrete)
 	if resp.Decision != cedarrequest.Deny || !errors.Is(err, context.DeadlineExceeded) {

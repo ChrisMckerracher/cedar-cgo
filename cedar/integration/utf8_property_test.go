@@ -1,10 +1,10 @@
 package integration_test
 
 import (
+	partialinput "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial/input"
 	generator "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/generator"
 
 	json "encoding/json"
-	cedarpartial "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial"
 	cedarentity "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
 	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
 	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
@@ -23,7 +23,7 @@ func TestPropertyUnicodeValuesPreserveIdentity(t *testing.T) {
 			uid, cedarvalue.String(TextValue), cedarvalue.Record{TextValue: cedarvalue.EntityRef(uid)},
 			cedarvalue.Set{cedarvalue.EntityRef(uid), cedarvalue.String(TextValue)}, cedarvalue.Decimal(TextValue), cedarvalue.IPAddr(TextValue),
 			cedarvalue.Datetime(TextValue), cedarvalue.Duration(TextValue),
-			cedarpartial.KnownEntityUID(uid), cedarpartial.UnknownEntityUID(TextValue),
+			partialinput.KnownEntityUID(uid), partialinput.UnknownEntityUID(TextValue),
 			cedarentity.Entity{UID: uid, Parents: []entityuid.EntityUID{uid}, Attrs: cedarvalue.Record{TextValue: cedarvalue.String(TextValue)}},
 		}
 		for _, value := range values {

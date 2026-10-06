@@ -5,7 +5,6 @@ import (
 	json "encoding/json"
 	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
 	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
-	maps "maps"
 	slices "slices"
 )
 
@@ -22,7 +21,7 @@ func (p ParsedPolicy) JSON() json.RawMessage {
 // represented with their links and return a KindPolicies error.
 func (p ParsedPolicy) Cedar() (string, error) {
 	if p.data == nil {
-		return "", InvalidParsedPolicy()
+		return "", invalidParsedPolicy()
 	}
 	if p.data.Cedar == nil {
 		return "", &diagnostic.Error{Kind: diagnostic.KindPolicies, Message: "linked policies cannot be rendered as Cedar while preserving links"}
@@ -30,41 +29,20 @@ func (p ParsedPolicy) Cedar() (string, error) {
 	return *p.data.Cedar, nil
 }
 
-// Syntax returns an independent editable copy. Linked policies must be edited
-// through their template; they return a KindPolicies error here.
-func (p ParsedPolicy) Syntax() (PolicySyntax, error) {
-	if p.data == nil {
-		return PolicySyntax{}, InvalidParsedPolicy()
-	}
-	if p.data.Syntax == nil {
-		return PolicySyntax{}, &diagnostic.Error{Kind: diagnostic.KindPolicies, Message: "linked policies do not have static policy syntax"}
-	}
-	s := *p.data.Syntax
-	s.Annotations = maps.Clone(s.Annotations)
-	s.Principal = CloneScope(s.Principal)
-	s.Resource = CloneScope(s.Resource)
-	s.Action = CloneAction(s.Action)
-	s.Conditions = slices.Clone(s.Conditions)
-	for i := range s.Conditions {
-		s.Conditions[i].Body = bytes.Clone(s.Conditions[i].Body)
-	}
-	return s, nil
-}
-
-func InvalidParsedPolicy() *diagnostic.Error {
+func invalidParsedPolicy() *diagnostic.Error {
 	return &diagnostic.Error{Kind: diagnostic.KindInput, Message: "zero ParsedPolicy is invalid"}
 }
 
-type ParsedSetData struct {
+type parsedSetData struct {
 	JSON     json.RawMessage    `json:"json"`
 	Cedar    *string            `json:"cedar"`
-	Policies []ParsedPolicyData `json:"policies"`
+	Policies []parsedPolicyData `json:"policies"`
 }
 
 // ParsedPolicySet is an immutable parsed snapshot. Its zero value is an empty set.
 // Templates and links are preserved in JSON and Source; Policies includes static
 // and linked policies, but not templates.
-type ParsedPolicySet struct{ data *ParsedSetData }
+type ParsedPolicySet struct{ data *parsedSetData }
 
 func (s ParsedPolicySet) JSON() json.RawMessage {
 	if s.data == nil {
@@ -90,7 +68,7 @@ func (s ParsedPolicySet) Policy(id string) (ParsedPolicy, bool) {
 	if s.data == nil {
 		return ParsedPolicy{}, false
 	}
-	i, ok := slices.BinarySearchFunc(s.data.Policies, id, func(p ParsedPolicyData, id string) int {
+	i, ok := slices.BinarySearchFunc(s.data.Policies, id, func(p parsedPolicyData, id string) int {
 		if p.ID < id {
 			return -1
 		}
@@ -117,9 +95,9 @@ func (s ParsedPolicySet) Cedar() (string, error) {
 	return *s.data.Cedar, nil
 }
 
-type PolicyOutput struct {
-	Policy  *ParsedPolicyData `json:"policy"`
-	Set     *ParsedSetData    `json:"set"`
+type policyOutput struct {
+	Policy  *parsedPolicyData `json:"policy"`
+	Set     *parsedSetData    `json:"set"`
 	Renames map[string]string `json:"renames"`
-	Error   *wire.Error       `json:"error"`
+	wire.Response
 }

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/ChrisMckerracher/cedar-go-wasm/analysis"
+	reports "github.com/ChrisMckerracher/cedar-go-wasm/analysis/report"
 	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/solver"
 	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
 	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
@@ -102,7 +103,7 @@ func TestNewlyPermittedJoy(t *testing.T) {
 }
 
 // Replay through Go to verify that counterexample decoding preserves the native result.
-func checkWithAuthorizer(t *testing.T, rt *cedar.Runtime, schema schemas.Schema, before, after policy.PolicySet, c *analysis.Counterexample) {
+func checkWithAuthorizer(t *testing.T, rt *cedar.Runtime, schema schemas.Schema, before, after policy.PolicySet, c *reports.Counterexample) {
 	t.Helper()
 	ctx := context.Background()
 	for _, tc := range []struct {

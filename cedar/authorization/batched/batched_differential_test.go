@@ -11,7 +11,10 @@ import (
 	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	fault "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fault"
+	fuzz "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fuzz"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	strings "strings"
 	testing "testing"
 	utf8 "unicode/utf8"
@@ -24,16 +27,16 @@ func FuzzBatchedDifferential(f *testing.F) {
 	f.Add("manager", "doc", ``, `[{"uid":{"type":"User","id":"alice"},"attrs":{},"parents":[]}]`, uint8(0))
 	f.Add("alice", "doc", `{}`, `[`, uint8(1))
 	f.Add("bob", "doc", `{}`, `[{"uid":{"type":"User","id":"bob"},"attrs":{"manager":{"__entity":{"type":"User","id":"missing"}}},"parents":[]}]`, uint8(0))
-	fixture := testsupport.BatchedFixtures(f)[0]
-	a := testsupport.BatchAuthorizer(f, fixture, testsupport.FuzzLimits)
-	rt := testsupport.TestRuntime(f)
+	fixture := BatchedFixtures(f)[0]
+	a := BatchAuthorizer(f, fixture, fuzz.FuzzLimits)
+	rt := testruntime.New(f)
 	f.Fuzz(func(t *testing.T, principalID, resourceID, ctxJSON, extraJSON string, flags uint8) {
 		if len(principalID)+len(resourceID)+len(ctxJSON)+len(extraJSON) > 4096 ||
-			testsupport.Nesting(ctxJSON) > 40 || testsupport.Nesting(extraJSON) > 40 {
+			fuzz.Nesting(ctxJSON) > 40 || fuzz.Nesting(extraJSON) > 40 {
 			t.Skip()
 		}
-		store, known := testsupport.FuzzBatchedStore(t, fixture, extraJSON)
-		req := testsupport.BatchRequest(fixture)
+		store, known := fuzzBatchedStore(t, fixture, extraJSON)
+		req := BatchRequest(fixture)
 		req.Principal = entityuid.NewEntityUID("User", principalID)
 		req.Resource = entityuid.NewEntityUID("Resource", resourceID)
 		if json.Valid([]byte(ctxJSON)) {
@@ -68,12 +71,12 @@ func FuzzBatchedDifferential(f *testing.F) {
 			return result, err
 		})
 		decision, err := a.Batched().AuthorizeBatched(context.Background(), req, loader, batched.BatchedOptions{MaxIterations: 4})
-		testsupport.CheckNoFault(t, err)
+		fault.CheckNoFault(t, err)
 		// The context gate mirrors the production path: structurally invalid
 		// JSON never reaches the wire, so only valid JSON can carry bad bytes.
 		if !utf8.ValidString(principalID) || !utf8.ValidString(resourceID) ||
 			(json.Valid([]byte(ctxJSON)) && !utf8.ValidString(ctxJSON)) {
-			testsupport.RequireUTF8InputError(t, err)
+			fault.RequireUTF8InputError(t, err)
 			if decision != cedarrequest.Deny {
 				t.Fatalf("malformed request allowed: %s", decision)
 			}
@@ -93,15 +96,15 @@ func FuzzBatchedDifferential(f *testing.F) {
 		schema := cedarschema.SchemaFromCedar(fixture.Schema)
 		sequential, seqBuild := rt.NewAuthorizer(context.Background(), authorization.Config{
 			Schema: &schema, Policies: cedarpolicy.PoliciesFromCedar(fixture.Policies),
-			Entities: cedarentity.EntitiesFromJSON(store), Limits: testsupport.FuzzLimits,
+			Entities: cedarentity.EntitiesFromJSON(store), Limits: fuzz.FuzzLimits,
 		})
-		testsupport.CheckNoFault(t, seqBuild)
+		fault.CheckNoFault(t, seqBuild)
 		if seqBuild != nil {
 			return
 		}
 		response, seqErr := sequential.Authorize(context.Background(), req)
 		sequential.Close()
-		testsupport.CheckNoFault(t, seqErr)
+		fault.CheckNoFault(t, seqErr)
 		if seqErr != nil && response.Decision != cedarrequest.Deny {
 			t.Fatalf("error %v came with %v", seqErr, response.Decision)
 		}

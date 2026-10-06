@@ -2,13 +2,21 @@
 import json
 import unittest
 from bundle import checksums
-from fixture import BundleCase, NATIVE_FILES
-from native import ARTIFACT_FILES, link_source, sha
+from fixture import BundleCase, NATIVE_FILES, link_source, sha
+from native import ARTIFACT_FILES
 
 
 class NativeBundleTests(BundleCase):
     def test_consumer_rejects_an_artifact_for_another_native_target(self):
         result = self.extract(self.files, target="aarch64-unknown-linux-gnu")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse((self.directory / "out").exists())
+
+    def test_artifact_platform_path_matches_expected_target(self):
+        files = {name.replace("internal/native/lib/linux_amd64/", "internal/native/lib/linux_arm64/"): data for name, data in self.files.items()}
+        from native import generated_names
+        files["SHA256SUMS"] = checksums({name: files[name] for name in generated_names("linux_arm64")})
+        result = self.extract(files, target="x86_64-unknown-linux-gnu")
         self.assertNotEqual(result.returncode, 0)
         self.assertFalse((self.directory / "out").exists())
 
@@ -51,7 +59,7 @@ class NativeBundleTests(BundleCase):
                     "archive": "native library is not an archive",
                     "mixed COFF": "native archive object target does not match",
                     "object target": "native archive object target does not match",
-                    "stale archive digest": "generated native linker source does not match",
+                    "stale archive digest": "generated linker source does not match",
                 }
                 if name in expected_errors:
                     self.assertIn(expected_errors[name], result.stderr)
@@ -68,6 +76,21 @@ class NativeBundleTests(BundleCase):
                 result = self.extract(files)
                 self.assertNotEqual(result.returncode, 0)
                 self.assertFalse((self.directory / "out").exists())
+
+    def test_matching_untrusted_headers_fail_before_extraction(self):
+        prefix = "internal/native/lib/linux_amd64/"
+        files = self.files | {prefix + "cedar.h": b"untrusted header", "internal/native/include/cedar.h": b"untrusted header"}
+        manifest = json.loads(files[prefix + "manifest.json"])
+        manifest["files"]["cedar.h"] = sha(files[prefix + "cedar.h"])
+        files[prefix + "manifest.json"] = json.dumps(manifest).encode()
+        files[prefix + "SHA256SUMS"] = checksums({entry: files["internal/native/link_flags.go" if entry == "link_flags.go" else prefix + entry] for entry in ARTIFACT_FILES if entry != "SHA256SUMS"})
+        files["SHA256SUMS"] = checksums({entry: files[entry] for entry in NATIVE_FILES})
+        source = {name: data for name, data in files.items() if name not in NATIVE_FILES and name not in ("SOURCE_COMMIT", "SHA256SUMS", "SOURCE_SHA256SUMS")}
+        files["SOURCE_SHA256SUMS"] = checksums(source)
+        result = self.extract(files)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("trusted source header", result.stderr)
+        self.assertFalse((self.directory / "out").exists())
 
 
 if __name__ == "__main__":

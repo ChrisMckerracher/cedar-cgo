@@ -10,7 +10,9 @@ import (
 	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
 	template "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/template"
 	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	testsupport "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport"
+	fixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fixture"
+	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+
 	reflect "reflect"
 	testing "testing"
 )
@@ -41,13 +43,13 @@ func TestTemplateNativeParity(t *testing.T) {
 			}
 		}
 	}
-	if err := json.Unmarshal(testsupport.ReadFile(t, "../testdata/parity/templates/native.json"), &fixtures); err != nil {
+	if err := json.Unmarshal(fixture.MustReadFile(t, "../testdata/parity/templates/native.json"), &fixtures); err != nil {
 		t.Fatal(err)
 	}
 	if fixtures.CedarVersion != "4.13.0" || len(fixtures.Cases) < 20 {
 		t.Fatal("missing pinned native template fixtures")
 	}
-	ctx, rt := context.Background(), testsupport.TestRuntime(t)
+	ctx, rt := context.Background(), testruntime.New(t)
 	for _, tc := range fixtures.Cases {
 		t.Run(tc.Name, func(t *testing.T) {
 			before := cedarpolicy.PoliciesFromJSON(tc.Policies)
@@ -83,12 +85,12 @@ func TestTemplateNativeParity(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			if !reflect.DeepEqual(testsupport.NormalizedPolicyJSON(t, []byte(got.Text())), testsupport.NormalizedPolicyJSON(t, tc.Expected.Policies)) {
+			if !reflect.DeepEqual(NormalizedPolicyJSON(t, []byte(got.Text())), NormalizedPolicyJSON(t, tc.Expected.Policies)) {
 				t.Fatalf("Go result %s differs from native Rust %s", got.Text(), tc.Expected.Policies)
 			}
 			schema := cedarschema.SchemaFromCedar(fixtures.Schema)
 			validation, err := rt.Validation().Validate(ctx, schema, got)
-			if err != nil || validation.Passed != tc.Expected.Valid || !testsupport.EqualTemplateMessages(validation.Errors, tc.Expected.Errors) || !testsupport.EqualTemplateMessages(validation.Warnings, tc.Expected.Warnings) {
+			if err != nil || validation.Passed != tc.Expected.Valid || !EqualTemplateMessages(validation.Errors, tc.Expected.Errors) || !EqualTemplateMessages(validation.Warnings, tc.Expected.Warnings) {
 				t.Fatalf("validation %+v, %v; native passed=%v", validation, err, tc.Expected.Valid)
 			}
 			a, err := rt.NewAuthorizer(ctx, authorization.Config{Schema: &schema, Policies: got})
@@ -96,7 +98,7 @@ func TestTemplateNativeParity(t *testing.T) {
 				t.Fatal(err)
 			}
 			defer a.Close()
-			response, err := a.Authorize(ctx, testsupport.TemplateRequest())
+			response, err := a.Authorize(ctx, TemplateRequest())
 			if err != nil || response.Decision.String() != tc.Expected.Decision || !reflect.DeepEqual(response.Reasons, tc.Expected.Reasons) || len(response.Errors) != 0 {
 				t.Fatalf("authorization %+v, %v; native %s %v", response, err, tc.Expected.Decision, tc.Expected.Reasons)
 			}

@@ -4,7 +4,6 @@ use serde::Serialize;
 use std::collections::BTreeMap;
 mod input;
 mod output;
-mod syntax;
 use input::Input;
 use output::{PolicyOutput, SetOutput, policy_output, set_output};
 
@@ -44,7 +43,6 @@ pub(super) fn execute(bytes: &[u8]) -> Result<Output, OpError> {
             };
             out.policy = Some(policy_output(&policy)?);
         }
-        Input::Construct { syntax } => out.policy = Some(policy_output(&syntax.into_policy()?)?),
         Input::Inspect { set } => out.set = Some(set_output(parse_policies(&set)?)?),
         Input::Add { set, id, policy } => {
             let mut set = parse_policies(&set)?;
