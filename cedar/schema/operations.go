@@ -1,14 +1,14 @@
 package schema
 
 import (
-	execution "github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
+	execution "github.com/ChrisMckerracher/cedar-cgo/internal/execution"
 
 	context "context"
 	json "encoding/json"
 	fmt "fmt"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	entity "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
-	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	entity "github.com/ChrisMckerracher/cedar-cgo/cedar/entity"
+	wire "github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 // ActionEntities extracts native action entities with their transitive parent relationships.

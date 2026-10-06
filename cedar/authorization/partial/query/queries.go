@@ -2,13 +2,13 @@ package query
 
 import (
 	context "context"
-	partialinput "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial/input"
-	request "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	entity "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
-	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	partialinput "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/partial/input"
+	request "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	entity "github.com/ChrisMckerracher/cedar-cgo/cedar/entity"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/execution"
+	wire "github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 func (a *Client) query(ctx context.Context, input any, action bool) (ActionQueryResult, error) {

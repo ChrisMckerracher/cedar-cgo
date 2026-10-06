@@ -3,8 +3,8 @@ package policy
 import (
 	bytes "bytes"
 	json "encoding/json"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	wire "github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 	slices "slices"
 )
 

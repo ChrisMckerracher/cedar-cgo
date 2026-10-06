@@ -1,6 +1,6 @@
 [package]
 name = "cgw-analysis"
-description = "Cedar change analysis (SymCC) for the cedar-go-wasm Go host"
+description = "Cedar change analysis (SymCC) for the cedar-cgo Go host"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

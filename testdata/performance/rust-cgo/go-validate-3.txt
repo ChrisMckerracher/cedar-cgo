@@ -1,0 +1,6 @@
+goos: linux
+goarch: amd64
+pkg: github.com/ChrisMckerracher/cedar-cgo/internal/verification/performance
+cpu: AMD Ryzen 5 5600X 6-Core Processor             
+BenchmarkRustCgoValidate-2   	     200	   4321312 ns/op	   26325 B/op	      17 allocs/op
+PASS

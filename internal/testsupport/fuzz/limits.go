@@ -1,7 +1,7 @@
 package fuzz
 
 import (
-	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
+	authorization "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization"
 	time "time"
 )
 

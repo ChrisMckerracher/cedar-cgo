@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"testing"
 
-	fixtures "github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/testsupport"
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
-	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
+	fixtures "github.com/ChrisMckerracher/cedar-cgo/analysis/internal/testsupport"
+	cedar "github.com/ChrisMckerracher/cedar-cgo/cedar"
+	schemas "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
 	"pgregory.net/rapid"
 )
 

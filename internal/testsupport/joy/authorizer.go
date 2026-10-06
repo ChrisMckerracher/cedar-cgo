@@ -1,18 +1,18 @@
 package joy
 
 import (
-	fixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fixture"
+	fixture "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/fixture"
 
-	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+	testruntime "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/runtime"
 
 	context "context"
-	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
-	request "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	cedarentity "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
+	authorization "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization"
+	request "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	cedarentity "github.com/ChrisMckerracher/cedar-cgo/cedar/entity"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	cedarpolicy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	cedarschema "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
+	cedarvalue "github.com/ChrisMckerracher/cedar-cgo/cedar/value"
 
 	testing "testing"
 )

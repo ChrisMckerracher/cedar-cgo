@@ -1,7 +1,7 @@
 package value
 
 import (
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
 )
 
 type EntityRef uid.EntityUID

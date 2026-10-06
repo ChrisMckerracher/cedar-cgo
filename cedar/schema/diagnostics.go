@@ -1,14 +1,14 @@
 package schema
 
 import (
-	execution "github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
+	execution "github.com/ChrisMckerracher/cedar-cgo/internal/execution"
 
 	context "context"
 	json "encoding/json"
 	errors "errors"
 	fmt "fmt"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	wire "github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 func DecodeSchemaWarnings(data []byte, sourceBytes int) ([]diagnostic.SchemaWarning, error) {

@@ -1,17 +1,17 @@
 package validation_test
 
 import (
-	corpus "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/corpus"
-	generator "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/generator"
-	joy "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/joy"
-	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+	corpus "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/corpus"
+	generator "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/generator"
+	joy "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/joy"
+	testruntime "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/runtime"
 
-	fixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fixture"
+	fixture "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/fixture"
 
 	bytes "bytes"
 	context "context"
 	json "encoding/json"
-	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
+	cedarpolicy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
 
 	os "os"
 	filepath "path/filepath"

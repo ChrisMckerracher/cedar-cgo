@@ -1,9 +1,9 @@
 package generator
 
 import (
-	batched "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/batched"
-	cedarentity "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
+	batched "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/batched"
+	cedarentity "github.com/ChrisMckerracher/cedar-cgo/cedar/entity"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
 
 	json "encoding/json"
 	fmt "fmt"

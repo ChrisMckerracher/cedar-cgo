@@ -11,10 +11,10 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/batched"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/batched"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
 )
 
 type checkpoint struct {

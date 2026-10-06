@@ -4,9 +4,9 @@ import (
 	"encoding/json/v2"
 	"errors"
 
-	requests "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	uids "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
+	requests "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	uids "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
 )
 
 // Report holds one [Result] per request environment of the schema.

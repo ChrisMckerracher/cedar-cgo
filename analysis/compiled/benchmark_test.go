@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	fixtures "github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/testsupport"
-	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
+	fixtures "github.com/ChrisMckerracher/cedar-cgo/analysis/internal/testsupport"
+	schemas "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
 )
 
 func BenchmarkRepeatedEquivalent(b *testing.B) {

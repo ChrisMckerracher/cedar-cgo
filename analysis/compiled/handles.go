@@ -5,9 +5,9 @@ import (
 	"encoding/json/v2"
 	"errors"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/report"
-	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/report"
+	policy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 // PolicySet is an opaque handle owned by one Session.

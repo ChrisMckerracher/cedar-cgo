@@ -1,6 +1,6 @@
 package format
 
-import "github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
+import "github.com/ChrisMckerracher/cedar-cgo/internal/execution"
 
 // Client permits concurrent calls. Runtime.Close invalidates this client.
 // Active native calls keep their resources until Cedar returns.

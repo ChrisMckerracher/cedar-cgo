@@ -6,9 +6,9 @@ import (
 	"encoding/json/jsontext"
 	jsonv2 "encoding/json/v2"
 	errors "errors"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	wire "github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 func (s *EntityLoaderState) Call(ctx context.Context, op uint32, data []byte) (result int, err error) {

@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"testing"
 
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
-	requests "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
+	cedar "github.com/ChrisMckerracher/cedar-cgo/cedar"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/authorization"
+	requests "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	policy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	schemas "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
 )
 
 const Schema = `entity User; entity Document; action view appliesTo { principal: User, resource: Document, context: { n: Long } };`

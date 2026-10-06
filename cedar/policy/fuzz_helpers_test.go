@@ -1,7 +1,7 @@
 package policy_test
 
 import (
-	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
+	cedarpolicy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
 	slices "slices"
 )
 

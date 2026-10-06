@@ -3,13 +3,13 @@ package template_test
 import (
 	context "context"
 	fmt "fmt"
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
-	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
-	cedarrequest "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	template "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/template"
-	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
+	cedar "github.com/ChrisMckerracher/cedar-cgo/cedar"
+	authorization "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization"
+	cedarrequest "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	cedarpolicy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	template "github.com/ChrisMckerracher/cedar-cgo/cedar/policy/template"
+	cedarschema "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
 	log "log"
 )
 

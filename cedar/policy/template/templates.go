@@ -1,16 +1,16 @@
 package template
 
 import (
-	execution "github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
+	execution "github.com/ChrisMckerracher/cedar-cgo/internal/execution"
 
 	context "context"
 	json "encoding/json"
 	fmt "fmt"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	syntax "github.com/ChrisMckerracher/cedar-go-wasm/cedar/syntax"
-	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	policy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	syntax "github.com/ChrisMckerracher/cedar-cgo/cedar/syntax"
+	wire "github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 // Template is an immutable template source, parsed by Rust when added to a set.

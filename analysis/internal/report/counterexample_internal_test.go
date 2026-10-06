@@ -4,7 +4,7 @@ import (
 	"encoding/json/v2"
 	"testing"
 
-	records "github.com/ChrisMckerracher/cedar-go-wasm/analysis/report"
+	records "github.com/ChrisMckerracher/cedar-cgo/analysis/report"
 )
 
 func TestPolicyEvaluationErrorFields(t *testing.T) {

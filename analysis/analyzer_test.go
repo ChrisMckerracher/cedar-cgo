@@ -7,14 +7,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis"
-	reports "github.com/ChrisMckerracher/cedar-go-wasm/analysis/report"
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/solver"
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
-	requests "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis"
+	reports "github.com/ChrisMckerracher/cedar-cgo/analysis/report"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/solver"
+	cedar "github.com/ChrisMckerracher/cedar-cgo/cedar"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/authorization"
+	requests "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	policy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	schemas "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
 )
 
 func readFile(t *testing.T, name string) string {

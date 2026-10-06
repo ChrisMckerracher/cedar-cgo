@@ -6,9 +6,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/report"
-	uids "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/report"
+	uids "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 type compiledEnvironment struct {

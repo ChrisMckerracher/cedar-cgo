@@ -1,13 +1,13 @@
 package batched
 
 import (
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
 
 	"context"
 	"encoding/json"
 	"errors"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
 	"testing"
 )
 

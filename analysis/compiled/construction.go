@@ -5,13 +5,13 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/lifetime"
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/settings"
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/options"
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/solver"
-	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/native"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/internal/lifetime"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/internal/settings"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/options"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/solver"
+	schemas "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/native"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 // New opens a reusable session with constructor-context lifetime.

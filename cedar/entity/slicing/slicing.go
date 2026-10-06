@@ -1,18 +1,18 @@
 package slicing
 
 import (
-	execution "github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
+	execution "github.com/ChrisMckerracher/cedar-cgo/internal/execution"
 
 	context "context"
 	json "encoding/json"
 	fmt "fmt"
-	request "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	entity "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	schema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	request "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	entity "github.com/ChrisMckerracher/cedar-cgo/cedar/entity"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	policy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	schema "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
+	wire "github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 // DefaultSliceIterations bounds Cedar's entity-loading rounds for a slice.

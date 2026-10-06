@@ -1,16 +1,16 @@
 package validation
 
 import (
-	execution "github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
+	execution "github.com/ChrisMckerracher/cedar-cgo/internal/execution"
 
 	context "context"
 
 	errors "errors"
 	fmt "fmt"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	schema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	policy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	schema "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
+	wire "github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 type ValidationResult struct {

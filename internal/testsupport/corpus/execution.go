@@ -1,15 +1,15 @@
 package corpus
 
 import (
-	fixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fixture"
+	fixture "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/fixture"
 
 	bytes "bytes"
 	context "context"
 	json "encoding/json"
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
-	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
-	request "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	cedarentity "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
+	cedar "github.com/ChrisMckerracher/cedar-cgo/cedar"
+	authorization "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization"
+	request "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	cedarentity "github.com/ChrisMckerracher/cedar-cgo/cedar/entity"
 
 	filepath "path/filepath"
 	slices "slices"

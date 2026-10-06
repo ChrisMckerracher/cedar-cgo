@@ -6,13 +6,13 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/authorization"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/entity"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
 )
 
 func joyConfig(t testing.TB) authorization.Config {

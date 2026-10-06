@@ -22,20 +22,20 @@
 
 ## Packages and imports
 
-The module path remains `github.com/ChrisMckerracher/cedar-go-wasm`.
+The module path is `github.com/ChrisMckerracher/cedar-cgo`.
 Import `cedar` for runtime construction.
 Import domain packages for records and feature clients.
 
 ```go
 import (
-    "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
-    "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
-    "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-    "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
-    "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-    "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-    "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-    "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
+    "github.com/ChrisMckerracher/cedar-cgo/cedar"
+    "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization"
+    "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+    "github.com/ChrisMckerracher/cedar-cgo/cedar/entity"
+    "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+    "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+    "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
+    "github.com/ChrisMckerracher/cedar-cgo/cedar/value"
 )
 ```
 

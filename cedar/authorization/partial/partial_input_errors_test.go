@@ -3,16 +3,16 @@ package partial_test
 import (
 	context "context"
 	errors "errors"
-	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
-	cedarpartial "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial"
-	partialinput "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial/input"
-	cedarrequest "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	fault "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fault"
-	partialfixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/partial"
-	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+	authorization "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization"
+	cedarpartial "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/partial"
+	partialinput "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/partial/input"
+	cedarrequest "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	fault "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/fault"
+	partialfixture "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/partial"
+	testruntime "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/runtime"
 
-	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
+	cedarvalue "github.com/ChrisMckerracher/cedar-cgo/cedar/value"
 
 	strings "strings"
 

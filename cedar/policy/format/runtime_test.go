@@ -2,7 +2,7 @@ package format
 
 import (
 	"context"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/execution"
 )
 
 func newRuntime(ctx context.Context, opts ...execution.Option) (*Client, error) {

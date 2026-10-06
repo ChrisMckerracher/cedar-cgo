@@ -2,8 +2,8 @@ package literal_test
 
 import (
 	json "encoding/json"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	literal "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/literal"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	literal "github.com/ChrisMckerracher/cedar-cgo/cedar/policy/literal"
 	reflect "reflect"
 	testing "testing"
 )

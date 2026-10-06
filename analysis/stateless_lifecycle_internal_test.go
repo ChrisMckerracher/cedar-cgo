@@ -9,11 +9,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/compiled"
-	fixtures "github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/testsupport"
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/solver"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/compiled"
+	fixtures "github.com/ChrisMckerracher/cedar-cgo/analysis/internal/testsupport"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/solver"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
 )
 
 type blockedStatelessTransport struct {

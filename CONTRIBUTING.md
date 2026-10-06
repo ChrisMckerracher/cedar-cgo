@@ -1,4 +1,4 @@
-# Contributor lessons for cedar-go-wasm
+# Contributor lessons for cedar-cgo
 
 Report bugs through GitHub issues. Report vulnerabilities through [SECURITY.md](SECURITY.md).
 Use existing tools and dependencies. Obtain approval before installing a new tool or dependency.

@@ -1,7 +1,7 @@
 package diagnostic_test
 
 import (
-	validation "github.com/ChrisMckerracher/cedar-go-wasm/cedar/validation"
+	validation "github.com/ChrisMckerracher/cedar-cgo/cedar/validation"
 	strings "strings"
 	testing "testing"
 )

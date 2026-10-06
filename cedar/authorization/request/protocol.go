@@ -3,9 +3,9 @@ package request
 import (
 	json "encoding/json"
 	fmt "fmt"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	entity "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
-	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	entity "github.com/ChrisMckerracher/cedar-cgo/cedar/entity"
+	wire "github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 type AuthorizeInput struct {

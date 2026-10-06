@@ -52,9 +52,9 @@ jobs:
         run: |
           set -euo pipefail
           mkdir dist
-          python3 scripts/package-consumer.py "$RUNNER_TEMP/native-artifact" "$GITHUB_SHA" "dist/cedar-go-wasm-${{ matrix.platform }}-source.zip"
-          scripts/check-consumer.sh "dist/cedar-go-wasm-${{ matrix.platform }}-source.zip" "$GITHUB_SHA"
-          python3 scripts/native/package-artifact.py "$RUNNER_TEMP/native-artifact" "dist/cedar-go-wasm-${{ matrix.platform }}-native.zip"
+          python3 scripts/package-consumer.py "$RUNNER_TEMP/native-artifact" "$GITHUB_SHA" "dist/cedar-cgo-${{ matrix.platform }}-source.zip"
+          scripts/check-consumer.sh "dist/cedar-cgo-${{ matrix.platform }}-source.zip" "$GITHUB_SHA"
+          python3 scripts/native/package-artifact.py "$RUNNER_TEMP/native-artifact" "dist/cedar-cgo-${{ matrix.platform }}-native.zip"
           cp LICENSE NOTICE THIRD_PARTY_LICENSES.txt dist/
           cp "$RUNNER_TEMP/native-artifact/SOURCE_COMMIT" "dist/SOURCE_COMMIT-${{ matrix.platform }}"
           python3 scripts/release/checksums.py dist "SHA256SUMS-${{ matrix.platform }}"

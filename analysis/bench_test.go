@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis"
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/solver"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/solver"
 )
 
 func BenchmarkNew(b *testing.B) {

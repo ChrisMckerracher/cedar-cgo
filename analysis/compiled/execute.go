@@ -8,11 +8,11 @@ import (
 	"fmt"
 	"unicode/utf8"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/settings"
-	callback "github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/transport"
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/report"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/native"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/internal/settings"
+	callback "github.com/ChrisMckerracher/cedar-cgo/analysis/internal/transport"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/report"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/native"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 func ordinaryCompiledError(kind string) bool {

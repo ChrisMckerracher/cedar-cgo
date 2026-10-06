@@ -2,10 +2,10 @@ package policy_test
 
 import (
 	context "context"
-	jsonassert "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/jsonassert"
-	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+	jsonassert "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/jsonassert"
+	testruntime "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/runtime"
 
-	cedarpolicy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
+	cedarpolicy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
 
 	reflect "reflect"
 	testing "testing"

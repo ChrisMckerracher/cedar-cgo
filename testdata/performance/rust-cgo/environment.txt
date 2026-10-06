@@ -1,0 +1,88 @@
+2026-10-06T15:41:34Z
+Linux agent-01 6.19.10-300.fc44.x86_64 #1 SMP PREEMPT_DYNAMIC Wed Mar 25 18:23:49 UTC 2026 x86_64 GNU/Linux
+Architecture:                            x86_64
+CPU op-mode(s):                          32-bit, 64-bit
+Address sizes:                           48 bits physical, 48 bits virtual
+Byte Order:                              Little Endian
+CPU(s):                                  12
+On-line CPU(s) list:                     0-11
+Vendor ID:                               AuthenticAMD
+Model name:                              AMD Ryzen 5 5600X 6-Core Processor
+CPU family:                              25
+Model:                                   33
+Thread(s) per core:                      2
+Core(s) per socket:                      6
+Socket(s):                               1
+Stepping:                                0
+BogoMIPS:                                7386.12
+Flags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm rep_good nopl xtopology cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves clzero xsaveerptr wbnoinvd arat npt lbrv nrip_save tsc_scale vmcb_clean flushbyasid pausefilter pfthreshold v_vmsave_vmload vgif umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor fsrm
+Virtualization:                          AMD-V
+Hypervisor vendor:                       KVM
+Virtualization type:                     full
+L1d cache:                               768 KiB (12 instances)
+L1i cache:                               768 KiB (12 instances)
+L2 cache:                                6 MiB (12 instances)
+L3 cache:                                192 MiB (12 instances)
+NUMA node(s):                            1
+NUMA node0 CPU(s):                       0-11
+Vulnerability Gather data sampling:      Not affected
+Vulnerability Ghostwrite:                Not affected
+Vulnerability Indirect target selection: Not affected
+Vulnerability Itlb multihit:             Not affected
+Vulnerability L1tf:                      Not affected
+Vulnerability Mds:                       Not affected
+Vulnerability Meltdown:                  Not affected
+Vulnerability Mmio stale data:           Not affected
+Vulnerability Old microcode:             Not affected
+Vulnerability Reg file data sampling:    Not affected
+Vulnerability Retbleed:                  Not affected
+Vulnerability Spec rstack overflow:      Mitigation; Safe RET
+Vulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl
+Vulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization
+Vulnerability Spectre v2:                Mitigation; Retpolines; IBPB conditional; IBRS_FW; STIBP always-on; RSB filling; PBRSB-eIBRS Not affected; BHI Not affected
+Vulnerability Srbds:                     Not affected
+Vulnerability Tsa:                       Mitigation; Clear CPU buffers
+Vulnerability Tsx async abort:           Not affected
+Vulnerability Vmscape:                   Not affected
+go version go1.27.1 linux/amd64
+rustc 1.99.0 (b940084d7 2026-09-28)
+562355e087e3667a1c1e887513c7e4f878484ba7
+db5837b1788b9403e12712e02ccb16720582bdad157bb3dfc3ec724f0e39f6c6  /tmp/cedar-issue-64/rust/Cargo.lock
+8f144f5e6076378e926d44cbbbed21ab9c2b5187a3f02fe2b1addb57defc11f5  /tmp/cedar-issue-64/internal/native/include/cedar.h
+727427cf9fc6af8653b3688952c5254e5511901663b9fc897e5a551a09d3c809  /tmp/cedar-issue-64/internal/native/lib/linux_amd64/libcgw_native.a
+682d20b2424bd21d4bce0eb29fa167feee7bca86c63b70090c486bd79cfb2af3  /tmp/tmp.dCl4xNCHKI/rust-native
+d48efeef51389be1cfb782b5a27286d3eda2c7eec211ba9f5b174842979a0552  /tmp/tmp.dCl4xNCHKI/go-cgo.test
+{
+  "abi": 2,
+  "cedar": "4.13.0",
+  "files": {
+    "cedar.h": "8f144f5e6076378e926d44cbbbed21ab9c2b5187a3f02fe2b1addb57defc11f5",
+    "libcgw_native.a": "727427cf9fc6af8653b3688952c5254e5511901663b9fc897e5a551a09d3c809",
+    "link_flags.go": "00f85e1ec2aef064a75a3263d9806436c1d7968b07a90fca81a018e4dc47711b"
+  },
+  "native_static_libs": [
+    "-lgcc_s",
+    "-lutil",
+    "-lrt",
+    "-lpthread",
+    "-lm",
+    "-ldl",
+    "-lc"
+  ],
+  "panic": "unwind",
+  "platform": "linux_amd64",
+  "profile": "native",
+  "source_commit": "562355e087e3667a1c1e887513c7e4f878484ba7",
+  "symcc": "0.7.0",
+  "target": "x86_64-unknown-linux-gnu",
+  "toolchain": "1.99.0"
+}
+Cargo native profile: opt-level=3, LTO=true, codegen-units=1, panic=unwind.
+Fresh process per sample/workload; five samples; Rust/Go order alternates.
+GOMAXPROCS=2; Go pool and native call caps=2; all workloads are serial.
+Authorization: 20000 operations; load: 500; strict validation: 200.
+All setup, input file reads, compilation and static linking are outside measured loops.
+Each authorization result must allow with reason policy1 and no errors.
+Validation must pass without errors, warnings or schema warnings.
+Source digest: 71604178af7e63f67304c6937a1f04fb97f83369d5c95c5f057897fbe09b1828
+Source and native archive hashes remained unchanged during all samples.

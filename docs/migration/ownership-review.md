@@ -11,8 +11,7 @@ The review covers the following files:
 - [`cedar.h`](../../internal/native/include/cedar.h)
 - [`instance.go`](../../internal/native/instance.go)
 
-The [measured source manifest](../../testdata/performance/native-migration/native-source.json) identifies the reviewed Rust implementation.
-The [environment record](../../testdata/performance/native-migration/environment.txt) identifies the C header and native archive hashes.
+The [migration snapshot](https://github.com/ChrisMckerracher/cedar-cgo/tree/2c35de826bde1350108eb5d4df653618a8a14206) retains the source and artifact records used for this review.
 
 ## Input and callback lifetime
 

@@ -1,67 +1,58 @@
-//! Native baseline for Go benchmarks: "decision" reuses a parsed request;
-//! "end-to-end" includes JSON parsing to match the guest's per-call work.
+//! Direct pinned Cedar timings use the same Joy inputs as production Go/cgo.
+mod inputs;
+mod workloads;
 
-use cedar_policy::{Authorizer, Context, Entities, EntityUid, PolicySet, Request, Schema};
 use std::hint::black_box;
-use std::str::FromStr;
 use std::time::Instant;
 
-const CONTEXT: &str = r#"{"deviceLevel":1,"platform":{"os":"ios","model":"iPhone17,1","securityLevel":3},"sessionId":"s1","now":{"__extn":{"fn":"datetime","arg":"2026-10-01T12:00:00Z"}},"machineAttested":true,"sourceIp":{"__extn":{"fn":"ip","arg":"10.1.2.3"}}}"#;
+type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
-fn uid(t: &str, id: &str) -> serde_json::Value {
-    serde_json::json!({"type": t, "id": id})
-}
+fn main() -> Result<()> {
+    let args: Vec<_> = std::env::args().collect();
+    let directory = args.get(1).ok_or("provide the Joy fixture directory")?;
+    let workload = args
+        .get(2)
+        .ok_or("provide decision, authorize, load, or validate")?;
+    let iterations: u32 = args.get(3).ok_or("provide iteration count")?.parse()?;
+    if iterations == 0 {
+        return Err("iteration count must be positive".into());
+    }
+    let inputs = inputs::Inputs::read(directory)?;
+    let loaded = inputs.load()?;
+    let request = inputs.request(&loaded.schema)?;
+    workloads::authorize(&loaded, &request)?;
+    inputs.validate()?;
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let dir = std::env::args()
-        .nth(1)
-        .unwrap_or_else(|| "../testdata/joy".into());
-    let (schema, _) =
-        Schema::from_cedarschema_str(&std::fs::read_to_string(format!("{dir}/joy.cedarschema"))?)?;
-    let policies = PolicySet::from_str(&std::fs::read_to_string(format!("{dir}/old.cedar"))?)?;
-    let entities = Entities::from_json_str(
-        &std::fs::read_to_string(format!("{dir}/entities.json"))?,
-        Some(&schema),
-    )?;
-    let authorizer = Authorizer::new();
-
-    let build = || -> Result<Request, Box<dyn std::error::Error>> {
-        let action = EntityUid::from_json(uid("Joy::Action", "session.write"))?;
-        let context = Context::from_json_str(CONTEXT, Some((&schema, &action)))?;
-        Ok(Request::new(
-            EntityUid::from_json(uid("Joy::Device", "phone1"))?,
-            action,
-            EntityUid::from_json(uid("Joy::Session", "s1"))?,
-            context,
-            Some(&schema),
-        )?)
+    let run = || -> Result<()> {
+        match workload.as_str() {
+            "decision" => workloads::decision(&loaded, &request),
+            "authorize" => workloads::authorize(&loaded, &inputs.request(&loaded.schema)?),
+            "load" => {
+                black_box(inputs.load()?);
+                Ok(())
+            }
+            "validate" => inputs.validate(),
+            _ => Err("unknown workload".into()),
+        }
     };
-
-    let request = build()?;
-    let n = 20_000;
+    run()?;
     let start = Instant::now();
-    for _ in 0..n {
-        black_box(authorizer.is_authorized(&request, &policies, &entities));
+    for _ in 0..iterations {
+        run()?;
     }
-    let decision = start.elapsed().as_nanos() as f64 / f64::from(n) / 1000.0;
-
-    let start = Instant::now();
-    for _ in 0..n {
-        let request = build()?;
-        let response = authorizer.is_authorized(&request, &policies, &entities);
-        let mut reasons: Vec<String> = response
-            .diagnostics()
-            .reason()
-            .map(ToString::to_string)
-            .collect();
-        reasons.sort_unstable();
-        black_box(serde_json::to_vec(&reasons)?);
-    }
-    let end_to_end = start.elapsed().as_nanos() as f64 / f64::from(n) / 1000.0;
-
+    let elapsed = start.elapsed().as_nanos();
     println!(
-        "policies={} decision={decision:.1}us end-to-end={end_to_end:.1}us",
-        policies.policies().count()
+        "{}",
+        serde_json::json!({
+            "workload": workload,
+            "iterations": iterations,
+            "elapsed_ns": elapsed,
+            "ns_per_op": elapsed as f64 / f64::from(iterations),
+            "expected_decision": "allow",
+            "expected_reasons": ["policy1"],
+            "policies": loaded.policies.policies().count(),
+            "entities": loaded.entities.iter().count(),
+        })
     );
     Ok(())
 }

@@ -1,6 +1,0 @@
-goos: linux
-goarch: amd64
-pkg: example.invalid/cedar-migration-wasm-performance
-cpu: AMD Ryzen 5 5600X 6-Core Processor             
-BenchmarkControlledRuntime-2   	       5	4139322209 ns/op	140248976 B/op	  294308 allocs/op
-PASS

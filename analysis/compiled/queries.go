@@ -6,8 +6,8 @@ import (
 	"encoding/json/v2"
 	"errors"
 
-	decoded "github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/report"
-	reports "github.com/ChrisMckerracher/cedar-go-wasm/analysis/report"
+	decoded "github.com/ChrisMckerracher/cedar-cgo/analysis/internal/report"
+	reports "github.com/ChrisMckerracher/cedar-cgo/analysis/report"
 )
 
 func (s *Session) check(ctx context.Context, query string, first, second PolicySet) (reports.Report, error) {

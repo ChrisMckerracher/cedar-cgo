@@ -1,17 +1,17 @@
 package batched_test
 
 import (
-	fixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fixture"
+	fixture "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/fixture"
 
 	context "context"
 	json "encoding/json"
 	errors "errors"
 
-	authorization "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
-	batched "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/batched"
-	cedarrequest "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
+	authorization "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization"
+	batched "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/batched"
+	cedarrequest "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
 
 	reflect "reflect"
 	testing "testing"

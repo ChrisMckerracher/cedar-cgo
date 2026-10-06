@@ -3,8 +3,8 @@ package policy_test
 import (
 	json "encoding/json"
 	errors "errors"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	fixture "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/fixture"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	fixture "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/fixture"
 	testing "testing"
 )
 

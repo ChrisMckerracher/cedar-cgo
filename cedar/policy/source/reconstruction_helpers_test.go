@@ -1,7 +1,7 @@
 package source_test
 
 import (
-	policysource "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/source"
+	policysource "github.com/ChrisMckerracher/cedar-cgo/cedar/policy/source"
 	strings "strings"
 )
 

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/artifact"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/artifact"
 )
 
 func main() {

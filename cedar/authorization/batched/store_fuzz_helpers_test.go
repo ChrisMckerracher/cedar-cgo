@@ -2,7 +2,7 @@ package batched_test
 
 import (
 	json "encoding/json"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
 	testing "testing"
 )
 

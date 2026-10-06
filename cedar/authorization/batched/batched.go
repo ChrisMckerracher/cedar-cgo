@@ -5,12 +5,12 @@ import (
 	json "encoding/json"
 
 	fmt "fmt"
-	request "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	execution "github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
-	native "github.com/ChrisMckerracher/cedar-go-wasm/internal/native"
-	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	request "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	execution "github.com/ChrisMckerracher/cedar-cgo/internal/execution"
+	native "github.com/ChrisMckerracher/cedar-cgo/internal/native"
+	wire "github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 const (

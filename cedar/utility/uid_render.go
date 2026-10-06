@@ -3,9 +3,9 @@ package utility
 import (
 	"context"
 	"fmt"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/execution"
 )
 
 // CedarText renders native Cedar syntax. String remains a Go-quoted log representation.

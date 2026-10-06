@@ -1,6 +1,8 @@
 # Native migration lessons for Go consumers
 
-The module path remains `github.com/ChrisMckerracher/cedar-go-wasm`.
+The module path is `github.com/ChrisMckerracher/cedar-cgo`.
+Replace `github.com/ChrisMckerracher/cedar-go-wasm` in all imports and module requirements.
+Older releases retain the previous module path and bundle names.
 This migration changes the public Go API and native build requirements.
 Use a breaking pre-v1 minor release for these changes.
 The post-cgo cleanup targets v0.3.0. It changes the v0.2.0 public interface.
@@ -18,26 +20,26 @@ Objective: Select domain records and create the native runtime.
 ```go
 import (
     "context"
-    "github.com/ChrisMckerracher/cedar-go-wasm/analysis"
-    "github.com/ChrisMckerracher/cedar-go-wasm/analysis/compiled"
-    "github.com/ChrisMckerracher/cedar-go-wasm/analysis/options"
-    "github.com/ChrisMckerracher/cedar-go-wasm/analysis/report"
-    "github.com/ChrisMckerracher/cedar-go-wasm/analysis/solver"
-    "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
-    "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization"
-    "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial"
-    partialinput "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial/input"
-    permissionquery "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial/query"
-    "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-    "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
-    "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/slicing"
-    "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/store"
-    "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-    "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-    "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/literal"
-    "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy/template"
-    "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-    "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
+    "github.com/ChrisMckerracher/cedar-cgo/analysis"
+    "github.com/ChrisMckerracher/cedar-cgo/analysis/compiled"
+    "github.com/ChrisMckerracher/cedar-cgo/analysis/options"
+    "github.com/ChrisMckerracher/cedar-cgo/analysis/report"
+    "github.com/ChrisMckerracher/cedar-cgo/analysis/solver"
+    "github.com/ChrisMckerracher/cedar-cgo/cedar"
+    "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization"
+    "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/partial"
+    partialinput "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/partial/input"
+    permissionquery "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/partial/query"
+    "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+    "github.com/ChrisMckerracher/cedar-cgo/cedar/entity"
+    "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/slicing"
+    "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/store"
+    "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+    "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+    "github.com/ChrisMckerracher/cedar-cgo/cedar/policy/literal"
+    "github.com/ChrisMckerracher/cedar-cgo/cedar/policy/template"
+    "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
+    "github.com/ChrisMckerracher/cedar-cgo/cedar/value"
 )
 ```
 

@@ -1,6 +1,6 @@
 # Cedar policy analysis for Go developers
 
-[Documentation](README.md) · [API](api.md) · [Performance](performance.md#change-analysis)
+[Documentation](README.md) · [API](api.md) · [Performance](performance.md)
 
 ## Lesson 1: Configure a solver
 

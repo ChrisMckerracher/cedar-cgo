@@ -1,0 +1,98 @@
+{
+  "authorize": {
+    "iterations": 20000,
+    "rust": {
+      "samples_ns_per_op": [
+        96263.53755,
+        95694.46615,
+        94032.1138,
+        98132.3375,
+        93352.11985
+      ],
+      "median_ns_per_op": 95694.46615,
+      "minimum_ns_per_op": 93352.11985,
+      "maximum_ns_per_op": 98132.3375
+    },
+    "go_cgo": {
+      "samples_ns_per_op": [
+        135021.0,
+        138048.0,
+        135573.0,
+        131485.0,
+        134534.0
+      ],
+      "median_ns_per_op": 135021.0,
+      "minimum_ns_per_op": 131485.0,
+      "maximum_ns_per_op": 138048.0
+    },
+    "go_over_rust": 1.4109593316332014
+  },
+  "load": {
+    "iterations": 500,
+    "rust": {
+      "samples_ns_per_op": [
+        1677124.322,
+        1664072.018,
+        1648791.368,
+        1652868.636,
+        1687750.496
+      ],
+      "median_ns_per_op": 1664072.018,
+      "minimum_ns_per_op": 1648791.368,
+      "maximum_ns_per_op": 1687750.496
+    },
+    "go_cgo": {
+      "samples_ns_per_op": [
+        2118436.0,
+        2016637.0,
+        2017834.0,
+        2020673.0,
+        2007166.0
+      ],
+      "median_ns_per_op": 2017834.0,
+      "minimum_ns_per_op": 2007166.0,
+      "maximum_ns_per_op": 2118436.0
+    },
+    "go_over_rust": 1.2125881441268247
+  },
+  "validate": {
+    "iterations": 200,
+    "rust": {
+      "samples_ns_per_op": [
+        3814816.01,
+        3918707.165,
+        3897489.665,
+        3845223.89,
+        3847958.39
+      ],
+      "median_ns_per_op": 3847958.39,
+      "minimum_ns_per_op": 3814816.01,
+      "maximum_ns_per_op": 3918707.165
+    },
+    "go_cgo": {
+      "samples_ns_per_op": [
+        4359826.0,
+        4341465.0,
+        4321312.0,
+        4369694.0,
+        4322548.0
+      ],
+      "median_ns_per_op": 4341465.0,
+      "minimum_ns_per_op": 4321312.0,
+      "maximum_ns_per_op": 4369694.0
+    },
+    "go_over_rust": 1.1282515453603956
+  },
+  "parsed_request_decision": {
+    "samples_ns_per_op": [
+      39660.52875,
+      40170.2046,
+      41058.0188,
+      40955.20395,
+      41805.2044
+    ],
+    "median_ns_per_op": 40955.20395,
+    "minimum_ns_per_op": 39660.52875,
+    "maximum_ns_per_op": 41805.2044
+  }
+}

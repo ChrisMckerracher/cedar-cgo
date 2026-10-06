@@ -2,9 +2,9 @@ package request
 
 import (
 	"context"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/value"
 )
 
 type UtilityClient interface {

@@ -3,10 +3,10 @@ package input
 import (
 	bytes "bytes"
 	json "encoding/json/v2"
-	request "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
-	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	request "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	cedarvalue "github.com/ChrisMckerracher/cedar-cgo/cedar/value"
+	wire "github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 // PartialEntityUID has a known type and an optional ID. Nil means unknown, not empty.

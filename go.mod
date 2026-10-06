@@ -1,4 +1,4 @@
-module github.com/ChrisMckerracher/cedar-go-wasm
+module github.com/ChrisMckerracher/cedar-cgo
 
 go 1.27.1
 

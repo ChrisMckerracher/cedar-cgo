@@ -1,0 +1,1 @@
+{"workload":"validate","iterations":200,"elapsed_ns":769044778,"ns_per_op":3845223.89,"expected_decision":"allow","expected_reasons":["policy1"],"policies":45,"entities":10}

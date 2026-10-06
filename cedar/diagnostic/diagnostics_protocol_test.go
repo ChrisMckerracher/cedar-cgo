@@ -1,11 +1,11 @@
 package diagnostic_test
 
 import (
-	cedarschema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
+	cedarschema "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
 
 	json "encoding/json"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	validation "github.com/ChrisMckerracher/cedar-go-wasm/cedar/validation"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	validation "github.com/ChrisMckerracher/cedar-cgo/cedar/validation"
 	testing "testing"
 )
 

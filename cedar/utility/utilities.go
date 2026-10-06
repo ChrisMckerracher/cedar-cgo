@@ -3,13 +3,13 @@ package utility
 import (
 	context "context"
 	fmt "fmt"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	schema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	syntax "github.com/ChrisMckerracher/cedar-go-wasm/cedar/syntax"
-	execution "github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
-	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	policy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	schema "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
+	syntax "github.com/ChrisMckerracher/cedar-cgo/cedar/syntax"
+	execution "github.com/ChrisMckerracher/cedar-cgo/internal/execution"
+	wire "github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 // ParseEntityUID requires Cedar's normalized UID syntax, including its string escapes.

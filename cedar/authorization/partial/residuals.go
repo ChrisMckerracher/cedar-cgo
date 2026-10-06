@@ -5,11 +5,11 @@ import (
 	context "context"
 	json "encoding/json"
 	jsonv2 "encoding/json/v2"
-	partialinput "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial/input"
-	request "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	diagnostic "github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	syntax "github.com/ChrisMckerracher/cedar-go-wasm/cedar/syntax"
-	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	partialinput "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/partial/input"
+	request "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	diagnostic "github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	syntax "github.com/ChrisMckerracher/cedar-cgo/cedar/syntax"
+	wire "github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 // ResidualState distinguishes unevaluated conditions from constant/error residuals.

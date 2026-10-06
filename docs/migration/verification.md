@@ -1,7 +1,7 @@
 # Native migration verification for Cedar Go maintainers
 
 Reference source: `a7083b5cb27dae4ec8be5f84d8f7b88b4a1fbcc6`.
-Migration tracker: [#49](https://github.com/ChrisMckerracher/cedar-go-wasm/issues/49).
+Migration tracker: [#49](https://github.com/ChrisMckerracher/cedar-cgo/issues/49).
 Chris selected Linux amd64 GNU, Linux arm64 GNU, and macOS arm64.
 The [platform contract](platforms.md) records this explicit scope change.
 

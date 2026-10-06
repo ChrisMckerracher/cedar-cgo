@@ -6,7 +6,7 @@ import (
 	"sync/atomic"
 	"testing"
 
-	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
+	policy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
 )
 
 func TestCompiledForeignAndReleasedHandlesBeforeGuest(t *testing.T) {

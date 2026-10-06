@@ -3,15 +3,15 @@ package authorization
 import (
 	context "context"
 
-	batched "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/batched"
-	partial "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial"
-	query "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/partial/query"
-	request "github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	entity "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity"
+	batched "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/batched"
+	partial "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/partial"
+	query "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/partial/query"
+	request "github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	entity "github.com/ChrisMckerracher/cedar-cgo/cedar/entity"
 
-	schema "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	execution "github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
-	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	schema "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
+	execution "github.com/ChrisMckerracher/cedar-cgo/internal/execution"
+	wire "github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 type loadInput struct {

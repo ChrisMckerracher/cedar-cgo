@@ -1,6 +1,6 @@
 [package]
 name = "cgw-authorizer"
-description = "Cedar authorization and strict validation for the cedar-go-wasm Go host"
+description = "Cedar authorization and strict validation for the cedar-cgo Go host"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

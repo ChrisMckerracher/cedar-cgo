@@ -3,7 +3,9 @@
 ## Versioning
 
 The migration changes public import paths, constructors, feature methods, and resource controls.
-It requires a breaking pre-v1 release. The module and repository names remain unchanged.
+It requires a breaking pre-v1 release.
+The module and repository now use `cedar-cgo`.
+Older release assets retain their original module path, bundle names, checksums, and attestations.
 Cedar, the formatter, and SymCC remain pinned together through the workspace dependency graph.
 
 ## Lesson 1: Update pinned Cedar dependencies
@@ -74,7 +76,7 @@ Objective: Publish only files from successful verification of the exact main com
 ```bash
 set -euo pipefail
 test -z "$(gofmt -l .)" || { gofmt -l .; exit 1; }
-scripts/release/check-ci.sh ChrisMckerracher/cedar-go-wasm "$(git rev-parse HEAD)"
+scripts/release/check-ci.sh ChrisMckerracher/cedar-cgo "$(git rev-parse HEAD)"
 ```
 
 The release workflow downloads the exact tested target archives from main CI.
@@ -102,8 +104,8 @@ Objective: Verify provenance and checksums before extraction.
 
 ```bash
 sha256sum --check SHA256SUMS-linux_amd64
-gh attestation verify cedar-go-wasm-linux_amd64-source.zip --repo ChrisMckerracher/cedar-go-wasm
-gh attestation verify cedar-go-wasm-linux_amd64-native.zip --repo ChrisMckerracher/cedar-go-wasm
+gh attestation verify cedar-cgo-linux_amd64-source.zip --repo ChrisMckerracher/cedar-cgo
+gh attestation verify cedar-cgo-linux_amd64-native.zip --repo ChrisMckerracher/cedar-cgo
 ```
 
 Use `linux_arm64` or `darwin_arm64` for the other supported targets.

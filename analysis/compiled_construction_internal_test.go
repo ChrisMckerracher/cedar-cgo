@@ -6,11 +6,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/compiled"
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/settings"
-	fixtures "github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/testsupport"
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/solver"
-	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/compiled"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/internal/settings"
+	fixtures "github.com/ChrisMckerracher/cedar-cgo/analysis/internal/testsupport"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/solver"
+	schemas "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
 )
 
 func TestCompiledAnalyzerCloseCancelsPendingConstruction(t *testing.T) {

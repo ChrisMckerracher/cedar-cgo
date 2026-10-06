@@ -1,7 +1,7 @@
 package cedar
 
 import (
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/execution"
 )
 
 type RuntimeOption = execution.Option

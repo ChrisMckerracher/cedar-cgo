@@ -4,10 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/compiled"
-	fixtures "github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/testsupport"
-	cedar "github.com/ChrisMckerracher/cedar-go-wasm/cedar"
-	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/compiled"
+	fixtures "github.com/ChrisMckerracher/cedar-cgo/analysis/internal/testsupport"
+	cedar "github.com/ChrisMckerracher/cedar-cgo/cedar"
+	schemas "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
 )
 
 func TestCompiledEmptySelectionDoesNotEstablishPolicyValidity(t *testing.T) {

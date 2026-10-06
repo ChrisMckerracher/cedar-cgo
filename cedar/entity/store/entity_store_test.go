@@ -1,7 +1,7 @@
 package store_test
 
 import (
-	jsonassert "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/jsonassert"
+	jsonassert "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/jsonassert"
 
 	reflect "reflect"
 	testing "testing"

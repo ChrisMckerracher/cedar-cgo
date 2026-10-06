@@ -1,8 +1,8 @@
 package integration_test
 
 import (
-	corpus "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/corpus"
-	testruntime "github.com/ChrisMckerracher/cedar-go-wasm/internal/testsupport/runtime"
+	corpus "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/corpus"
+	testruntime "github.com/ChrisMckerracher/cedar-cgo/internal/testsupport/runtime"
 
 	os "os"
 	filepath "path/filepath"

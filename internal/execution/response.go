@@ -3,7 +3,7 @@ package execution
 import (
 	"context"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
 )
 
 // CompletionError rejects cancellation during Go decoding, after native execution has returned.

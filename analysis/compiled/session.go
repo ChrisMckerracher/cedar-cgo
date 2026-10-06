@@ -5,9 +5,9 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/settings"
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/solver"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/native"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/internal/settings"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/solver"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/native"
 )
 
 var ErrClosed = errors.New("analysis: compiled session is closed")

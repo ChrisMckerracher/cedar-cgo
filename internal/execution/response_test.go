@@ -5,10 +5,10 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/validation"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/validation"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/execution"
 )
 
 func TestDecodeCancellationClearsStrictResult(t *testing.T) {

@@ -2,8 +2,8 @@ package request
 
 import (
 	bytes "bytes"
-	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
-	wire "github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	cedarvalue "github.com/ChrisMckerracher/cedar-cgo/cedar/value"
+	wire "github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 // Context defaults to an empty record.

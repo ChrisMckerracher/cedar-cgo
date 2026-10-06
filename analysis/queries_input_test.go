@@ -5,10 +5,10 @@ import (
 	"errors"
 	"testing"
 
-	fixtures "github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/testsupport"
-	reports "github.com/ChrisMckerracher/cedar-go-wasm/analysis/report"
-	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
+	fixtures "github.com/ChrisMckerracher/cedar-cgo/analysis/internal/testsupport"
+	reports "github.com/ChrisMckerracher/cedar-cgo/analysis/report"
+	policy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	schemas "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
 )
 
 func TestMatchingQueriesRequireOnePolicy(t *testing.T) {

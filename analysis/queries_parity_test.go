@@ -7,10 +7,10 @@ import (
 	"reflect"
 	"testing"
 
-	reports "github.com/ChrisMckerracher/cedar-go-wasm/analysis/report"
-	uids "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	policy "github.com/ChrisMckerracher/cedar-go-wasm/cedar/policy"
-	schemas "github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
+	reports "github.com/ChrisMckerracher/cedar-cgo/analysis/report"
+	uids "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	policy "github.com/ChrisMckerracher/cedar-cgo/cedar/policy"
+	schemas "github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
 )
 
 func TestAnalysisQueriesNativeParity(t *testing.T) {

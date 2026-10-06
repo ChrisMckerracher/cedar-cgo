@@ -4,7 +4,7 @@ import (
 	"encoding/json/jsontext"
 	"encoding/json/v2"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
 )
 
 // Encode checks the complete JSON envelope against its domain's byte limit.

@@ -3,13 +3,13 @@ package utility
 import (
 	"context"
 	"fmt"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/authorization/request"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/diagnostic"
-	entityuid "github.com/ChrisMckerracher/cedar-go-wasm/cedar/entity/uid"
-	"github.com/ChrisMckerracher/cedar-go-wasm/cedar/schema"
-	cedarvalue "github.com/ChrisMckerracher/cedar-go-wasm/cedar/value"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/execution"
-	"github.com/ChrisMckerracher/cedar-go-wasm/internal/wire"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/authorization/request"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/diagnostic"
+	entityuid "github.com/ChrisMckerracher/cedar-cgo/cedar/entity/uid"
+	"github.com/ChrisMckerracher/cedar-cgo/cedar/schema"
+	cedarvalue "github.com/ChrisMckerracher/cedar-cgo/cedar/value"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/execution"
+	"github.com/ChrisMckerracher/cedar-cgo/internal/wire"
 )
 
 // Values returns native evaluated values, including exact integers and extension values.

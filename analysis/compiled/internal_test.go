@@ -5,8 +5,8 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/settings"
-	fixtures "github.com/ChrisMckerracher/cedar-go-wasm/analysis/internal/testsupport"
+	"github.com/ChrisMckerracher/cedar-cgo/analysis/internal/settings"
+	fixtures "github.com/ChrisMckerracher/cedar-cgo/analysis/internal/testsupport"
 )
 
 type compiledTestInstance struct {
