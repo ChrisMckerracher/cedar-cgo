@@ -177,6 +177,7 @@ use its fields or JSON representation when passing it to Cedar.
 `store.Client.ParseEntityStore(ctx, entities, schema)` returns an immutable `store.ParsedEntityStore`.
 Import `cedar/entity/store` for parsed stores. Import `cedar/entity` for entity collections.
 Pass a nil schema to omit schema validation.
+The schema argument is `*schema.Schema`, not the removed `entity.SchemaSource` interface.
 A supplied schema validates entities and inserts its action entities.
 The store remains tied to its runtime.
 Close the runtime when all operations finish.

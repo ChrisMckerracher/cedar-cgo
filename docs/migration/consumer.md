@@ -91,9 +91,13 @@ Objective: Apply supported bounds without promising native heap containment.
 | `CedarVersion`, `SymCCVersion` | Constants in `cedar/syntax` |
 | `ModuleSHA256()` | Removed; use the native artifact manifest |
 | `analysis.CVC5(...)` | `solver.CVC5(...)` |
-| Analysis `With*` options and `Option` | Import `analysis/options` |
+| Analysis `With*` options, `Option`, and default limit constants | Import `analysis/options` |
 | `CompiledSession`, `CompiledPolicySet`, `RequestEnvironment`, `ErrCompiledClosed` | Use `compiled.Session`, `PolicySet`, `RequestEnvironment`, `ErrClosed` |
 | Analysis `Report`, `Error`, and result records | Import `analysis/report` |
+
+Pass `*schema.Schema` or nil to `store.Client.ParseEntityStore`. The removed `entity.SchemaSource` interface no longer accepts custom wrappers.
+Permission decoders `DecodeQuery` and `DecodeQueryUIDs` move from `partial` to `partial/query`.
+Analysis defaults `DefaultTimeout`, `DefaultMaxSourceBytes`, and `DefaultMaxSolverOutput` move to `analysis/options`.
 
 Worked example: Set `authorization.Limits{MaxInstances: 4, MaxRequestBytes: 1 << 20}` when creating an authorizer.
 The runtime also caps shared active native calls.
@@ -236,6 +240,9 @@ fmt.Println(report.Holds()) // true
 
 The [independent consumer](../../scripts/consumer/smoke/main.go) runs native authorization and both solver outcomes without Rust.
 The [analysis guide](../analysis.md) covers compiled reuse, counterexample replay, and solver limits.
+`analyzer.OpenCompiled` creates a child session. Closing the analyzer cancels and closes that child.
+For independent ownership, use `compiled.New(ctx, solver.CVC5(path), s, nil)` and close the returned session explicitly.
+The standalone constructor accepts the same selection records and `options.Option` values.
 
 Knowledge check: Does a native archive include cvc5? No. The solver has separate installation and license requirements.
 
@@ -266,13 +273,19 @@ Upstream Cedar can discard inapplicable scope fields and normalize clause spelli
 The adapter no longer applies separate typed-syntax rejection rules.
 
 Removed editing exports: `PolicySyntax`, `PolicyCondition`, `ConstraintKind`, `ScopeConstraint`, and `ActionConstraint`, including their constants.
+Removed constants: `ConstraintAny`, `ConstraintEq`, `ConstraintIn`, `ConstraintIs`, and `ConstraintIsIn`.
 Removed methods: `Syntax()`, `PolicyFromSyntax`, `PrincipalConstraint`, `ActionConstraint`, and `ResourceConstraint`.
 Inspect constraints through `JSON()`. Keep the returned body separate from the immutable snapshot.
 
 Removed implementation exports: `ParsedPolicyData`, `ParsedSetData`, `PolicyOutput`, `ScopeWire`, `ActionWire`, `CloneScope`, and `CloneAction`.
 Also removed: `PolicyUID`, `FromPolicyUID`, `PolicyInputUTF8`, `InvalidParsedPolicy`, `LiteralReplacement`, and `LiteralOutput`.
-Private template records replace `TemplateInput` and `TemplateOutput`. Private entity records replace `EntityJSON` and store wire helpers.
+Private template records replace `TemplateInput` and `TemplateOutput`. Strict encoding replaces the removed `TemplateUTF8` helper.
+Private entity records replace `EntityJSON`, `EntityStoreInput`, `EntityStoreOutput`, `NativeUIDs`, and `DecodeEntityRecord`.
+The unused `authorization.LoadOutput` and implementation record `authorization.LoadInput` are removed.
 Private extension encoding replaces `ExtnJSON` and `MarshalExtn`. Construct public `value` records instead of wire envelopes.
 These exports exposed adapter implementation. Use domain constructors, snapshots, and feature clients for application code.
+
+Removed lexer helpers: `SourceTokenSpelling`, `SourceTokenIdentifierByte`, `SourceTokenKeyword`, `SourceTokenTrivia`, `SourceTokenCommentGap`, `SourceTokenCommentSummaries`, and `SourceTokenKind`.
+Use `rt.Source().TokenizePolicies` for the pinned native lexer. Keep the original source for exact token spans and comments.
 
 Knowledge check: Does individual policy JSON preserve its ID or template link? No. Persist the complete set for those identities.
