@@ -5,7 +5,12 @@ import (
 	"time"
 )
 
-const MaxResponseBytes = 256 << 20
+const (
+	DefaultTimeout         = 60 * time.Second
+	DefaultMaxSourceBytes  = 64 << 20
+	DefaultMaxSolverOutput = 256 << 20
+	MaxResponseBytes       = 256 << 20
+)
 
 type Config struct {
 	Timeout         time.Duration
@@ -17,7 +22,7 @@ type Config struct {
 type Option func(*Config)
 
 func Apply(options ...Option) (Config, error) {
-	cfg := Config{Timeout: 60 * time.Second, MaxSourceBytes: 64 << 20, MaxSolverOutput: 256 << 20}
+	cfg := Config{Timeout: DefaultTimeout, MaxSourceBytes: DefaultMaxSourceBytes, MaxSolverOutput: DefaultMaxSolverOutput}
 	for _, option := range options {
 		option(&cfg)
 	}

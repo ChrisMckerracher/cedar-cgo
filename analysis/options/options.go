@@ -8,9 +8,9 @@ import (
 )
 
 const (
-	DefaultTimeout         = 60 * time.Second
-	DefaultMaxSourceBytes  = 64 << 20
-	DefaultMaxSolverOutput = 256 << 20
+	DefaultTimeout         = settings.DefaultTimeout
+	DefaultMaxSourceBytes  = settings.DefaultMaxSourceBytes
+	DefaultMaxSolverOutput = settings.DefaultMaxSolverOutput
 )
 
 type Option = settings.Option

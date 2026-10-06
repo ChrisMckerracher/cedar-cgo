@@ -60,6 +60,7 @@ The [contributor package tree](../CONTRIBUTING.md#package-responsibilities) reco
 Entity stores, entity literals, partial input, permission queries, compiled sessions, options, and reports now have distinct packages.
 Feature packages do not import runtime composition. Partial clients retain one shared loaded session.
 Parent analysis shutdown registers children and pending constructors in one implementation.
+Internal settings own analysis defaults. Public options expose the same constants.
 Compiled sessions retain exclusive native handles and solver ownership without a shutdown goroutine for each child.
 
 ## Source inventory
@@ -72,7 +73,7 @@ Moved local test helpers count with their destination test files, not production
 
 | Category | Baseline files / lines | Cleanup files / lines |
 |---|---:|---:|
-| Go production | 115 / 6,871 | 118 / 6,480 |
+| Go production | 115 / 6,871 | 118 / 6,485 |
 | Rust production | 54 / 4,088 | 53 / 3,871 |
 | C interface contract | 1 / 30 | 1 / 30 |
 | Supporting scripts | 43 / 1,161 | 25 / 967 |
@@ -83,10 +84,10 @@ Moved local test helpers count with their destination test files, not production
 | Rust inline test modules | 6 / 106 | 7 / 152 |
 | Python script tests | 7 / 425 | 9 / 667 |
 
-Combined Go and Rust production decreases by 608 lines. Supporting scripts and explicit catalogs decrease by 147 lines.
+Combined Go and Rust production decreases by 603 lines. Supporting scripts and explicit catalogs decrease by 147 lines.
 Removed vendor footprint is 76 files and 1,022,445 bytes. It is not custom-code savings.
 Shared support moves into focused packages or local test files. Rapid's ten generator files remain unchanged.
-Analysis adds 159 production lines for explicit configuration, decoding, callback, and shutdown boundaries.
+Analysis adds 164 production lines for explicit configuration, decoding, callback, and shutdown boundaries.
 This cost is included in the combined reduction.
 
 ## Crowded directory review
