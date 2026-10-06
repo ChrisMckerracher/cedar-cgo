@@ -1,4 +1,4 @@
-2026-10-06T15:30:40Z
+2026-10-06T15:41:34Z
 Linux agent-01 6.19.10-300.fc44.x86_64 #1 SMP PREEMPT_DYNAMIC Wed Mar 25 18:23:49 UTC 2026 x86_64 GNU/Linux
 Architecture:                            x86_64
 CPU op-mode(s):                          32-bit, 64-bit
@@ -46,13 +46,12 @@ Vulnerability Tsx async abort:           Not affected
 Vulnerability Vmscape:                   Not affected
 go version go1.27.1 linux/amd64
 rustc 1.99.0 (b940084d7 2026-09-28)
-4dfe6c71ef716cd2ea2ada5b0f16f2e7d0d6bb38
-?? testdata/performance/rust-cgo/
+562355e087e3667a1c1e887513c7e4f878484ba7
 db5837b1788b9403e12712e02ccb16720582bdad157bb3dfc3ec724f0e39f6c6  /tmp/cedar-issue-64/rust/Cargo.lock
 8f144f5e6076378e926d44cbbbed21ab9c2b5187a3f02fe2b1addb57defc11f5  /tmp/cedar-issue-64/internal/native/include/cedar.h
 727427cf9fc6af8653b3688952c5254e5511901663b9fc897e5a551a09d3c809  /tmp/cedar-issue-64/internal/native/lib/linux_amd64/libcgw_native.a
-c2e41ec6a4bf7dd7c623122b6cc9edb2bd22eb24852c6c4e32a1642ed0b24af3  /tmp/tmp.lugWBtya8W/rust-native
-d48efeef51389be1cfb782b5a27286d3eda2c7eec211ba9f5b174842979a0552  /tmp/tmp.lugWBtya8W/go-cgo.test
+682d20b2424bd21d4bce0eb29fa167feee7bca86c63b70090c486bd79cfb2af3  /tmp/tmp.dCl4xNCHKI/rust-native
+d48efeef51389be1cfb782b5a27286d3eda2c7eec211ba9f5b174842979a0552  /tmp/tmp.dCl4xNCHKI/go-cgo.test
 {
   "abi": 2,
   "cedar": "4.13.0",
@@ -73,7 +72,7 @@ d48efeef51389be1cfb782b5a27286d3eda2c7eec211ba9f5b174842979a0552  /tmp/tmp.lugWB
   "panic": "unwind",
   "platform": "linux_amd64",
   "profile": "native",
-  "source_commit": "4dfe6c71ef716cd2ea2ada5b0f16f2e7d0d6bb38",
+  "source_commit": "562355e087e3667a1c1e887513c7e4f878484ba7",
   "symcc": "0.7.0",
   "target": "x86_64-unknown-linux-gnu",
   "toolchain": "1.99.0"
@@ -85,5 +84,5 @@ Authorization: 20000 operations; load: 500; strict validation: 200.
 All setup, input file reads, compilation and static linking are outside measured loops.
 Each authorization result must allow with reason policy1 and no errors.
 Validation must pass without errors, warnings or schema warnings.
-Source digest: a0485e993cc4df83844bcbb9f9120f59c7f4403fe5480cb7bbe0b19e5dbc375e
+Source digest: 71604178af7e63f67304c6937a1f04fb97f83369d5c95c5f057897fbe09b1828
 Source and native archive hashes remained unchanged during all samples.

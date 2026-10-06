@@ -1,1 +1,1 @@
-{"workload":"load","iterations":500,"elapsed_ns":830974221,"ns_per_op":1661948.442,"expected_decision":"allow","expected_reasons":["policy1"],"policies":45,"entities":10}
+{"workload":"load","iterations":500,"elapsed_ns":832036009,"ns_per_op":1664072.018,"expected_decision":"allow","expected_reasons":["policy1"],"policies":45,"entities":10}

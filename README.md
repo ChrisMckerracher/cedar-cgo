@@ -117,9 +117,9 @@ Each workload has five samples, recorded on October 6, 2026, on an AMD Ryzen 5 5
 
 | Operation | Direct Rust | Go/cgo | Go/cgo ÷ Rust |
 |---|---:|---:|---:|
-| Authorization with request construction and result serialization | 93.345 µs | 137.769 µs | 1.48 |
-| Load and close an authorizer | 1.655 ms | 1.996 ms | 1.21 |
-| Strict validation with schema and policy parsing | 3.854 ms | 4.361 ms | 1.13 |
+| Authorization with request construction and result serialization | 95.694 µs | 135.021 µs | 1.41 |
+| Load and close an authorizer | 1.664 ms | 2.018 ms | 1.21 |
+| Strict validation with schema and policy parsing | 3.848 ms | 4.341 ms | 1.13 |
 
 The Go path also includes encoding, limits, pooling, cgo calls, and decoding.
 These ratios describe this workload and machine.

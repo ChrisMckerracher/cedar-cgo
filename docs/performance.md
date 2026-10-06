@@ -5,7 +5,7 @@
 ## Native Rust and production Go/cgo
 
 These measurements were recorded on 2026-10-06.
-The native artifact identifies source commit `4dfe6c71ef716cd2ea2ada5b0f16f2e7d0d6bb38`.
+The native artifact identifies source commit `562355e087e3667a1c1e887513c7e4f878484ba7`.
 The machine used an AMD Ryzen 5 5600X, Linux 6.19.10, Go 1.27.1, and Rust 1.99.0.
 Both executables used pinned Cedar 4.13.0 and the optimized Cargo `native` profile.
 That profile uses optimization level three, link-time optimization, one code generation unit, and panic unwinding.
@@ -25,9 +25,9 @@ They do not isolate the cost of one cgo call.
 
 | Workload | Native Rust median | Production Go/cgo median | Go/cgo ÷ Rust |
 |---|---:|---:|---:|
-| Authorization with request construction and result serialization | 93.345 µs | 137.769 µs | 1.48 |
-| Load and release an authorizer | 1.655 ms | 1.996 ms | 1.21 |
-| Strict validation with schema and policy parsing | 3.854 ms | 4.361 ms | 1.13 |
+| Authorization with request construction and result serialization | 95.694 µs | 135.021 µs | 1.41 |
+| Load and release an authorizer | 1.664 ms | 2.018 ms | 1.21 |
+| Strict validation with schema and policy parsing | 3.848 ms | 4.341 ms | 1.13 |
 
 Native Rust calls upstream Cedar APIs directly.
 Authorization reconstructs entity identifiers, parses the context JSON, builds the request, evaluates policies, and serializes the complete successful result.
@@ -42,7 +42,7 @@ Authorization also obtains and returns a pooled authorizer instance.
 Loading creates and closes that pool.
 Native Rust excludes these Go interface and transport operations.
 
-The separate native decision median is **40.658 µs**.
+The separate native decision median is **40.955 µs**.
 That workload reuses a parsed request and excludes request construction and result serialization.
 It includes result checks and response release.
 Its scope differs from the authorization row above.

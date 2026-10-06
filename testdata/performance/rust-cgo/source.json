@@ -1,5 +1,5 @@
 {
-  "digest": "a0485e993cc4df83844bcbb9f9120f59c7f4403fe5480cb7bbe0b19e5dbc375e",
+  "digest": "71604178af7e63f67304c6937a1f04fb97f83369d5c95c5f057897fbe09b1828",
   "files": {
     "analysis/analyzer.go": "ffe69df572f5701bccb56a55c76ca7178fe02ac14b1a302924690e1c1a058963",
     "analysis/compiled/construction.go": "2e1af6a66103995f098313b87d1ba6c9e8d257c8087b8d0feead2e37d6427463",
@@ -247,7 +247,7 @@
     "rust/crates/verification/src/authorizer/template/observations.rs": "6e01e596622d918b6854ed6e4f3d0a2054acddc206f7e99a6d7d28511566a2aa",
     "rust/crates/verification/src/authorizer/utility/main.rs": "4fc8e74c587267ec93dc82fcc925bb39716ffae4027f8f7f1472022d91285dfd",
     "rust/crates/verification/src/authorizer/validation_depth/main.rs": "c33bb843a22fe88d79e483c3be5ba5310f4d73aade700fd00f072e3f8b2dfa42",
-    "rust/crates/verification/src/benchmark/inputs.rs": "ab64331703edde174651028b30db242fc9f47ccfa0122770a295129a5aaa968a",
+    "rust/crates/verification/src/benchmark/inputs.rs": "10501a37e6c8695d23a44238b71ca6c3551f7b4323362a89c25931626d2d9637",
     "rust/crates/verification/src/benchmark/main.rs": "58b58e9d46405de27441e6daef1daae9c5afcc42eacbca202405a37047e1810e",
     "rust/crates/verification/src/benchmark/workloads.rs": "426fbdf8cd2e1b600e935de2f04df36a7a2f83aaddbacd05ae3fc0c520e4942f",
     "rust-toolchain.toml": "b2c19d86958ed6810741488db5cd352856f303c53bcf0ea774e72f94ee4d201e",
